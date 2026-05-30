@@ -47,6 +47,7 @@ final readonly class LoginHandler
         return $this->response->create([
             'token'      => $output->token,
             'expires_at' => (new DateTimeImmutable('@' . $output->expiresAt))->format(DateTimeInterface::ATOM),
+            'user_id'    => $output->userId,
             'email'      => $output->email,
             'role'       => $output->role,
             'org_id'     => $output->orgId,

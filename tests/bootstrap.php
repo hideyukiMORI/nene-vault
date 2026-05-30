@@ -75,3 +75,17 @@ $pdo->exec('CREATE TABLE IF NOT EXISTS vault_settings (
     updated_by INTEGER,
     updated_at DATETIME NOT NULL
 )');
+
+$pdo->exec('CREATE TABLE IF NOT EXISTS audit_events (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    action VARCHAR(64) NOT NULL,
+    entity_type VARCHAR(64) NOT NULL,
+    entity_id VARCHAR(64) NOT NULL,
+    actor_user_id INTEGER,
+    organization_id INTEGER,
+    before_json TEXT,
+    after_json TEXT,
+    source VARCHAR(32) NOT NULL DEFAULT "api",
+    metadata_json TEXT,
+    created_at DATETIME NOT NULL
+)');

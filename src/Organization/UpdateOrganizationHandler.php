@@ -47,6 +47,9 @@ final readonly class UpdateOrganizationHandler
             throw new ValidationException($errors);
         }
 
+        $claims = $request->getAttribute('nene2.auth.claims');
+        $actorUserId = is_array($claims) && isset($claims['user_id']) ? (int) $claims['user_id'] : null;
+
         $output = $this->useCase->execute(new UpdateOrganizationInput(
             id: $id,
             name: $name,
@@ -55,6 +58,7 @@ final readonly class UpdateOrganizationHandler
             isActive: $isActive,
             externalId: $externalId,
             customDomain: $customDomain,
+            actorUserId: $actorUserId,
         ));
 
         return $this->response->create([

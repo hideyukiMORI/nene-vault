@@ -9,6 +9,7 @@ use Nene2\Database\DatabaseQueryExecutorInterface;
 use Nene2\DependencyInjection\ContainerBuilder;
 use Nene2\DependencyInjection\ServiceProviderInterface;
 use Nene2\Http\JsonResponseFactory;
+use NeneVault\Audit\AuditRecorderInterface;
 use Psr\Container\ContainerInterface;
 
 final readonly class VaultSettingsServiceProvider implements ServiceProviderInterface
@@ -71,7 +72,13 @@ final readonly class VaultSettingsServiceProvider implements ServiceProviderInte
                         throw new LogicException('JsonResponseFactory service is invalid.');
                     }
 
-                    return new UpdateVaultSettingsHandler($repo, $json);
+                    $audit = $c->get(AuditRecorderInterface::class);
+
+                    if (!$audit instanceof AuditRecorderInterface) {
+                        throw new LogicException('AuditRecorderInterface service is invalid.');
+                    }
+
+                    return new UpdateVaultSettingsHandler($repo, $json, $audit);
                 },
             )
             ->set(

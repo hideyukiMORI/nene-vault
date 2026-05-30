@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace NeneVault\Organization;
 
+use NeneVault\Audit\AuditAction;
+use NeneVault\Audit\AuditRecorderInterface;
 use NeneVault\VaultSettings\VaultSettingsSeederInterface;
 
 final readonly class CreateOrganizationUseCase implements CreateOrganizationUseCaseInterface
@@ -11,6 +13,7 @@ final readonly class CreateOrganizationUseCase implements CreateOrganizationUseC
     public function __construct(
         private OrganizationRepositoryInterface $organizations,
         private VaultSettingsSeederInterface $settingsSeeder,
+        private AuditRecorderInterface $audit,
     ) {
     }
 
@@ -31,11 +34,20 @@ final readonly class CreateOrganizationUseCase implements CreateOrganizationUseC
             customDomain: $input->customDomain,
         ));
 
-        // Seed default vault settings for the new organization
         $this->settingsSeeder->seed($id);
 
         $org = $this->organizations->findById($id);
         assert($org !== null);
+
+        $this->audit->record(
+            action: AuditAction::ORGANIZATION_CREATED,
+            entityType: 'organization',
+            entityId: (string) $id,
+            actorUserId: $input->actorUserId,
+            organizationId: null,
+            beforeJson: null,
+            afterJson: $this->toAuditArray($org),
+        );
 
         return new CreateOrganizationOutput(
             id: $org->id ?? $id,
@@ -47,5 +59,19 @@ final readonly class CreateOrganizationUseCase implements CreateOrganizationUseC
             customDomain: $org->customDomain,
             createdAt: $org->createdAt ?? '',
         );
+    }
+
+    /** @return array<string, mixed> */
+    private function toAuditArray(Organization $org): array
+    {
+        return [
+            'id'            => $org->id,
+            'name'          => $org->name,
+            'slug'          => $org->slug,
+            'plan'          => $org->plan,
+            'is_active'     => $org->isActive,
+            'external_id'   => $org->externalId,
+            'custom_domain' => $org->customDomain,
+        ];
     }
 }

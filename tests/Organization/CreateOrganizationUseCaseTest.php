@@ -4,11 +4,14 @@ declare(strict_types=1);
 
 namespace NeneVault\Tests\Organization;
 
+use NeneVault\Audit\AuditEventRepositoryInterface;
+use NeneVault\Audit\AuditRecorder;
 use NeneVault\Organization\CreateOrganizationInput;
 use NeneVault\Organization\CreateOrganizationUseCase;
 use NeneVault\Organization\Organization;
 use NeneVault\Organization\OrganizationRepositoryInterface;
 use NeneVault\Organization\OrganizationSlugConflictException;
+use NeneVault\Tests\Audit\InMemoryAuditEventRepository;
 use NeneVault\VaultSettings\VaultSettingsSeederInterface;
 use PHPUnit\Framework\TestCase;
 
@@ -18,7 +21,8 @@ final class CreateOrganizationUseCaseTest extends TestCase
     {
         $repo = new InMemoryOrganizationRepository();
         $seeder = new InMemoryVaultSettingsSeeder();
-        $useCase = new CreateOrganizationUseCase($repo, $seeder);
+        $auditRepo = new InMemoryAuditEventRepository();
+        $useCase = new CreateOrganizationUseCase($repo, $seeder, new AuditRecorder($auditRepo));
 
         $output = $useCase->execute(new CreateOrganizationInput(
             name: 'ACME Corp',
@@ -31,11 +35,28 @@ final class CreateOrganizationUseCaseTest extends TestCase
         $this->assertTrue($seeder->seededOrgIds[$output->id] ?? false);
     }
 
+    public function test_audit_event_recorded_on_create(): void
+    {
+        $repo = new InMemoryOrganizationRepository();
+        $seeder = new InMemoryVaultSettingsSeeder();
+        $auditRepo = new InMemoryAuditEventRepository();
+        $useCase = new CreateOrganizationUseCase($repo, $seeder, new AuditRecorder($auditRepo));
+
+        $useCase->execute(new CreateOrganizationInput(name: 'Test', slug: 'test', actorUserId: 7));
+
+        $events = $auditRepo->all();
+        $this->assertCount(1, $events);
+        $this->assertSame('organization.created', $events[0]->action);
+        $this->assertSame(7, $events[0]->actorUserId);
+        $this->assertNull($events[0]->beforeJson);
+        $this->assertNotNull($events[0]->afterJson);
+    }
+
     public function test_throws_when_slug_already_exists(): void
     {
         $repo = new InMemoryOrganizationRepository();
         $seeder = new InMemoryVaultSettingsSeeder();
-        $useCase = new CreateOrganizationUseCase($repo, $seeder);
+        $useCase = new CreateOrganizationUseCase($repo, $seeder, new AuditRecorder(new InMemoryAuditEventRepository()));
 
         $useCase->execute(new CreateOrganizationInput(name: 'First', slug: 'acme'));
 

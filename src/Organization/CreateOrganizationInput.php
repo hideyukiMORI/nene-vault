@@ -13,6 +13,7 @@ final readonly class CreateOrganizationInput
         public bool $isActive = true,
         public ?string $externalId = null,
         public ?string $customDomain = null,
+        public ?int $actorUserId = null,
     ) {
     }
 }

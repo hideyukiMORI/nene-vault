@@ -14,6 +14,7 @@ final readonly class UpdateOrganizationInput
         public bool $isActive,
         public ?string $externalId,
         public ?string $customDomain,
+        public ?int $actorUserId = null,
     ) {
     }
 }
