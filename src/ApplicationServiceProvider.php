@@ -13,6 +13,12 @@ use NeneVault\Audit\AuditRouteRegistrar;
 use NeneVault\Audit\AuditServiceProvider;
 use NeneVault\Auth\AuthRouteRegistrar;
 use NeneVault\Auth\InvalidCredentialsExceptionHandler;
+use NeneVault\Document\DocumentRouteRegistrar;
+use NeneVault\Document\DocumentServiceProvider;
+use NeneVault\Document\DuplicateFileExceptionHandler;
+use NeneVault\Document\FileTooLargeExceptionHandler;
+use NeneVault\Document\MimeTypeNotAllowedExceptionHandler;
+use NeneVault\Document\VaultDocumentNotFoundExceptionHandler;
 use NeneVault\Http\HealthHandler;
 use NeneVault\Organization\OrganizationNotFoundExceptionHandler;
 use NeneVault\Organization\OrganizationRouteRegistrar;
@@ -45,7 +51,8 @@ final readonly class ApplicationServiceProvider implements ServiceProviderInterf
         $builder
             ->addProvider(new AuditServiceProvider())
             ->addProvider(new OrganizationServiceProvider())
-            ->addProvider(new VaultSettingsServiceProvider());
+            ->addProvider(new VaultSettingsServiceProvider())
+            ->addProvider(new DocumentServiceProvider());
 
         // Health handler
         $builder->set(
@@ -70,6 +77,7 @@ final readonly class ApplicationServiceProvider implements ServiceProviderInterf
                 $org = $c->get(OrganizationRouteRegistrar::class);
                 $settings = $c->get(VaultSettingsRouteRegistrar::class);
                 $audit = $c->get(AuditRouteRegistrar::class);
+                $document = $c->get(DocumentRouteRegistrar::class);
 
                 if (!$health instanceof HealthHandler) {
                     throw new LogicException('HealthHandler service is invalid.');
@@ -91,12 +99,17 @@ final readonly class ApplicationServiceProvider implements ServiceProviderInterf
                     throw new LogicException('AuditRouteRegistrar service is invalid.');
                 }
 
+                if (!$document instanceof DocumentRouteRegistrar) {
+                    throw new LogicException('DocumentRouteRegistrar service is invalid.');
+                }
+
                 return [
                     static fn ($router) => $router->get('/health', $health->handle(...)),
                     static fn ($router) => $auth->register($router),
                     static fn ($router) => $org->register($router),
                     static fn ($router) => $settings->register($router),
                     static fn ($router) => $audit->register($router),
+                    static fn ($router) => $document->register($router),
                 ];
             },
         );
@@ -109,6 +122,10 @@ final readonly class ApplicationServiceProvider implements ServiceProviderInterf
                     $c->get(InvalidCredentialsExceptionHandler::class),
                     $c->get(OrganizationNotFoundExceptionHandler::class),
                     $c->get(OrganizationSlugConflictExceptionHandler::class),
+                    $c->get(VaultDocumentNotFoundExceptionHandler::class),
+                    $c->get(DuplicateFileExceptionHandler::class),
+                    $c->get(MimeTypeNotAllowedExceptionHandler::class),
+                    $c->get(FileTooLargeExceptionHandler::class),
                 ];
             },
         );
