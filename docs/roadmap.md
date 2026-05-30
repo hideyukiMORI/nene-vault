@@ -10,7 +10,7 @@ Operators self-host Vault to store and search **received** vendor documents with
 
 ## Phase 0: Governance and Foundation
 
-- Governance docs, ADR 0001/0002/0007–0012/0009 ✅
+- Governance docs, ADR 0001–0006/0008–0014 ✅
 - Product vision, scope contract, compliance doc ✅
 - NENE2 scaffold + `GET /health` 🔲 Issue #4+
 - 税理士 review gate before Phase 2 UI 🔲

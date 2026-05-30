@@ -23,9 +23,10 @@ See also: `docs/inheritance-from-nene2.md`.
 Use Conventional Commit style as the prefix:
 
 - `docs/1-governance-foundation`
-- `feat/5-bank-csv-import`
-- `fix/12-allocation-overpayment-credit`
-- `test/8-dunning-minimum-interval`
+- `feat/4-nene2-runtime-scaffold`
+- `feat/5-openapi-stub-document-endpoints`
+- `fix/12-document-search-date-range`
+- `test/8-upload-sha256-duplicate-warning`
 
 ## PR Requirements
 

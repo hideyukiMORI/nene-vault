@@ -84,9 +84,16 @@ Must satisfy [`received-document-compliance.md`](./received-document-compliance.
 
 ## 6. Retention requirements
 
-- [ ] Default `retention_years = 7`; max 10
-- [ ] Documents before retention expiry cannot be purged by cron
-- [ ] Voided documents remain in index with `voided_at` (hidden by default filter)
+See [ADR 0004](../adr/0004-retention-period-calculation.md) for the statutory
+basis and calculation rationale.
+
+- [ ] Default `retention_years = 10` (not 7 — see ADR 0004: "7 years from transaction_date" is systematically shorter than the statutory 7 years from the filing deadline)
+- [ ] Minimum configurable: 7 (with warning: "may not cover statutory minimum — confirm with your 税理士")
+- [ ] Maximum configurable: 99 (permanent retention is a valid policy)
+- [ ] `retention_expires_at` computed at upload time: `transaction_date + retention_years`; if `transaction_date` is null, `uploaded_at + retention_years` with `date_uncertain = true` flag
+- [ ] `retention_years` change in vault_settings does NOT retroactively shorten retention on existing documents — only lengthens
+- [ ] Documents before `retention_expires_at` cannot be purged; system blocks purge
+- [ ] Voided documents remain in index with `voided_at` (excluded from default search filter); same retention enforcement applies
 
 ---
 

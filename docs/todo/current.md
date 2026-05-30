@@ -1,13 +1,13 @@
 # Current TODO
 
-**Phase 0 — Governance and product design** (2026-05-29 bootstrap)
+**Phase 0 — Governance and product design**
 
-## In progress
+## Done
 
-- [ ] Issue #1: Governance bootstrap → PR → merge
-- [ ] Issue #2: Product vision & requirements review → PR → merge
+- [x] Issue #1: Governance bootstrap — merged (PR #1, 2026-05-30)
+- [x] Issue #2: Product vision & requirements review — merged (PR #2, 2026-05-30)
 
-## Next (Phase 0+)
+## Next (Phase 0 → Phase 1)
 
 - [ ] Issue #4: NENE2 runtime scaffold + `GET /health`
 - [ ] Issue #5: OpenAPI stub (document endpoints)
@@ -22,4 +22,4 @@ None.
 
 Parallel bootstrap with **`nene-profile`**. See publication-strategy decision 0005.
 
-Last updated: 2026-05-29
+Last updated: 2026-05-30
