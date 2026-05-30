@@ -3,3 +3,4 @@ export { Button } from './primitives/Button';
 export { Input } from './primitives/Input';
 export { Text } from './primitives/Text';
 export { Stack } from './primitives/Stack';
+export { AppShell } from './components/AppShell';

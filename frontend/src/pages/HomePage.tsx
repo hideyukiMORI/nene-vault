@@ -1,8 +1,7 @@
 import { useNavigate } from 'react-router-dom';
 import { authStore } from '@/entities/auth';
 import { useTranslation } from '@/shared/i18n/use-translation';
-import { Button, Stack, Text } from '@/shared/ui';
-import { LanguageSwitcher } from '@/shared/ui/components/LanguageSwitcher';
+import { AppShell, Stack, Text } from '@/shared/ui';
 
 export function HomePage() {
   const { t } = useTranslation();
@@ -15,42 +14,51 @@ export function HomePage() {
   }
 
   return (
-    <div className="min-h-screen bg-surface">
-      <header className="flex items-center gap-inline-lg border-b border-border bg-surface-raised px-inline-lg py-stack-sm">
-        <Text as="span" className="text-heading-sm">
-          NeNe Vault
-        </Text>
-        <nav className="flex gap-inline-md">
-          <Text as="span" tone="muted">
-            {t('navigation.documents')}
+    <AppShell onLogout={handleLogout}>
+      <Stack gap="lg">
+        <div>
+          <Text as="h1" className="text-heading-md">
+            NeNe Vault
           </Text>
-          <Text as="span" tone="muted">
-            {t('navigation.audit_events')}
-          </Text>
-          <Text as="span" tone="muted">
-            {t('navigation.settings')}
-          </Text>
-        </nav>
-        <div className="ml-auto flex items-center gap-inline-md">
-          <LanguageSwitcher />
           {session !== null && (
-            <Text as="span" tone="muted">
-              {session.email} ({t(`user.role.${session.role}`)})
+            <Text tone="muted" className="mt-stack-xs">
+              {session.email}
             </Text>
           )}
-          <Button variant="secondary" onClick={handleLogout}>
-            {t('navigation.logout')}
-          </Button>
         </div>
-      </header>
-      <main className="p-inline-lg">
-        <Stack gap="md">
-          <Text as="h1" className="text-heading-md">
-            {t('navigation.documents')}
-          </Text>
-          <Text tone="muted">{t('document.list.empty')}</Text>
-        </Stack>
-      </main>
-    </div>
+
+        <div className="grid grid-cols-2 gap-inline-lg">
+          <button
+            type="button"
+            onClick={() => {
+              navigate('/documents');
+            }}
+            className="rounded-lg border border-border bg-surface-raised p-stack-lg text-left hover:bg-surface transition-colors"
+          >
+            <Text as="h2" className="text-heading-sm">
+              {t('navigation.documents')}
+            </Text>
+            <Text tone="muted" className="mt-stack-xs text-body-sm">
+              {t('document.list.title')}
+            </Text>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => {
+              navigate('/audit');
+            }}
+            className="rounded-lg border border-border bg-surface-raised p-stack-lg text-left hover:bg-surface transition-colors"
+          >
+            <Text as="h2" className="text-heading-sm">
+              {t('navigation.audit_events')}
+            </Text>
+            <Text tone="muted" className="mt-stack-xs text-body-sm">
+              {t('audit_event.list.title')}
+            </Text>
+          </button>
+        </div>
+      </Stack>
+    </AppShell>
   );
 }
