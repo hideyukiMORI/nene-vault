@@ -66,8 +66,8 @@ final class UserApiTest extends TestCase
         $this->assertArrayNotHasKey('password_hash', $created);
         $userId = $created['id'];
 
-        // List — created user present
-        $list = $handler->handle($this->request('GET', '/admin/users'));
+        // List — created user present (use high limit to avoid pagination hiding the user)
+        $list = $handler->handle($this->request('GET', '/admin/users?limit=100'));
         $this->assertSame(200, $list->getStatusCode());
         $listBody = json_decode((string) $list->getBody(), true);
         $this->assertContains($userId, array_column($listBody['items'], 'id'));
