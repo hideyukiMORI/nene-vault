@@ -1,0 +1,494 @@
+{
+  "_meta": {
+    "locale": "en",
+    "label": "English",
+    "direction": "ltr",
+    "note": "Secondary locale. Statutory field labels remain in Japanese in both locales (ADR 0005)."
+  },
+
+  "common": {
+    "buttons": {
+      "save": "Save",
+      "cancel": "Cancel",
+      "delete": "Delete",
+      "edit": "Edit",
+      "add": "Add",
+      "search": "Search",
+      "reset": "Reset",
+      "upload": "Upload",
+      "download": "Download",
+      "export": "Export",
+      "void": "Void",
+      "restore": "Restore",
+      "submit": "Submit",
+      "confirm": "Confirm",
+      "close": "Close",
+      "back": "Back",
+      "next": "Next",
+      "previous": "Previous",
+      "invite": "Invite",
+      "copy": "Copy",
+      "view_history": "View History",
+      "view_detail": "Details"
+    },
+    "status": {
+      "loading": "Loading...",
+      "saving": "Saving...",
+      "uploading": "Uploading...",
+      "processing": "Processing...",
+      "success": "Done",
+      "error": "An error occurred",
+      "empty": "No data"
+    },
+    "pagination": {
+      "items_per_page": "per page",
+      "showing": "Showing {{from}}–{{to}} of {{total}}",
+      "no_items": "0 items"
+    },
+    "confirmation": {
+      "title": "Confirm",
+      "are_you_sure": "Are you sure?",
+      "cannot_be_undone": "This action cannot be undone.",
+      "yes_proceed": "Yes, proceed",
+      "no_cancel": "Cancel"
+    },
+    "table": {
+      "actions": "Actions",
+      "created_at": "Created",
+      "updated_at": "Updated",
+      "no_data": "No data to display"
+    },
+    "required_marker": "Required",
+    "optional_marker": "Optional",
+    "unknown": "Unknown",
+    "yes": "Yes",
+    "no": "No",
+    "none": "None"
+  },
+
+  "auth": {
+    "login": {
+      "title": "NeNe Vault Login",
+      "email_label": "Email",
+      "email_placeholder": "admin@example.com",
+      "password_label": "Password",
+      "password_placeholder": "Enter your password",
+      "submit": "Log In",
+      "logging_in": "Logging in..."
+    },
+    "logout": {
+      "button": "Log Out",
+      "confirm": "Log out?"
+    },
+    "session": {
+      "expired": "Your session has expired. Please log in again."
+    },
+    "errors": {
+      "invalid_credentials": "The email or password is incorrect.",
+      "account_inactive": "This account is inactive. Please contact your administrator."
+    }
+  },
+
+  "navigation": {
+    "home": "Home",
+    "documents": "Received Documents",
+    "audit_events": "Audit Log",
+    "settings": "Vault Settings",
+    "organizations": "Organizations",
+    "users": "Users",
+    "export": "Export",
+    "logout": "Log Out",
+    "language": "Language"
+  },
+
+  "organization": {
+    "list": {
+      "title": "Organizations",
+      "add_button": "Add Organization",
+      "table": {
+        "name": "Name",
+        "slug": "Slug",
+        "plan": "Plan",
+        "status": "Status",
+        "custom_domain": "Custom Domain",
+        "created_at": "Created",
+        "actions": "Actions"
+      },
+      "empty": "No organizations registered yet."
+    },
+    "form": {
+      "create_title": "Add Organization",
+      "edit_title": "Edit Organization",
+      "name_label": "Organization Name",
+      "name_placeholder": "e.g. Sample Inc.",
+      "slug_label": "Slug",
+      "slug_placeholder": "e.g. sample-corp",
+      "slug_hint": "Lowercase letters, numbers, and hyphens only",
+      "plan_label": "Plan",
+      "is_active_label": "Active",
+      "custom_domain_label": "Custom Domain",
+      "custom_domain_placeholder": "e.g. vault.example.com",
+      "external_id_label": "External ID",
+      "external_id_placeholder": "For external system integration (optional)"
+    },
+    "plan": {
+      "free": "Free",
+      "standard": "Standard",
+      "enterprise": "Enterprise"
+    },
+    "status": {
+      "active": "Active",
+      "inactive": "Inactive"
+    },
+    "messages": {
+      "created": "Organization created.",
+      "updated": "Organization updated.",
+      "deleted": "Organization deleted.",
+      "delete_confirm": "Delete organization \"{{name}}\". All associated documents, users, and settings will also be deleted."
+    },
+    "errors": {
+      "slug_conflict": "This slug is already in use. Please enter a different slug.",
+      "not_found": "The specified organization was not found."
+    }
+  },
+
+  "user": {
+    "list": {
+      "title": "Users",
+      "invite_button": "Invite User",
+      "table": {
+        "email": "Email",
+        "role": "Role",
+        "status": "Status",
+        "created_at": "Created",
+        "actions": "Actions"
+      },
+      "empty": "No users registered yet."
+    },
+    "form": {
+      "create_title": "Invite User",
+      "edit_title": "Edit User",
+      "email_label": "Email",
+      "email_placeholder": "user@example.com",
+      "password_label": "Password",
+      "password_placeholder": "8 characters or more",
+      "role_label": "Role"
+    },
+    "role": {
+      "superadmin": "Superadmin",
+      "admin": "Admin",
+      "member": "Member",
+      "viewer": "Viewer"
+    },
+    "role_description": {
+      "superadmin": "Can manage all organizations",
+      "admin": "Can manage all documents and settings within the organization",
+      "member": "Can upload documents and edit metadata",
+      "viewer": "Can search and view documents only"
+    },
+    "status": {
+      "active": "Active",
+      "invited": "Invited"
+    },
+    "messages": {
+      "created": "User invited.",
+      "updated": "User updated.",
+      "deleted": "User deleted.",
+      "delete_confirm": "Delete user \"{{email}}\"?"
+    },
+    "errors": {
+      "email_conflict": "This email is already in use.",
+      "not_found": "The specified user was not found.",
+      "cannot_delete_self": "You cannot delete your own account."
+    }
+  },
+
+  "vault_settings": {
+    "title": "Vault Settings",
+    "save_button": "Save Settings",
+    "fields": {
+      "retention_years_label": "Retention Period (years)",
+      "retention_years_hint": "Number of years to retain documents (counted from the transaction date). 10 years or more is recommended to satisfy the Electronic Books Preservation Act.",
+      "retention_warning": "The retention period is below 10 years. It may not satisfy the statutory retention period (7 years from the filing deadline). Please confirm with your 税理士.",
+      "retention_min_hint": "Minimum: 7 years (税理士 confirmation required)",
+      "storage_path_label": "Storage Path (override)",
+      "storage_path_placeholder": "/var/vault/storage",
+      "storage_path_hint": "Leave blank to use the default path",
+      "invoice_api_base_url_label": "NeNe Invoice API URL (optional)",
+      "invoice_api_base_url_placeholder": "https://invoice.example.com",
+      "clear_api_base_url_label": "NeNe Clear API URL (optional)",
+      "clear_api_base_url_placeholder": "https://clear.example.com",
+      "updated_at_label": "Last Updated"
+    },
+    "messages": {
+      "saved": "Vault settings saved."
+    }
+  },
+
+  "document": {
+    "list": {
+      "title": "Received Documents",
+      "upload_button": "Upload Document",
+      "table": {
+        "transaction_date": "取引年月日",
+        "amount": "取引金額",
+        "counterparty_name": "取引先名",
+        "category": "Category",
+        "status": "Status",
+        "uploaded_at": "Uploaded",
+        "actions": "Actions"
+      },
+      "empty": "No documents registered yet.",
+      "voided_hidden": "Voided documents are hidden.",
+      "show_voided": "Show voided"
+    },
+    "upload": {
+      "title": "Upload Document",
+      "file_label": "Select File",
+      "file_hint": "PDF, JPEG, PNG (max {{max_size_mb}} MB)",
+      "file_drag": "Drop file here",
+      "transaction_date_label": "取引年月日 (Transaction Date)",
+      "transaction_date_placeholder": "e.g. 2026-03-31",
+      "transaction_date_hint": "The transaction date stated on the document",
+      "amount_label": "取引金額 (Amount, JPY)",
+      "amount_placeholder": "e.g. 110000",
+      "amount_hint": "Leave blank if not stated",
+      "counterparty_label": "取引先名 (Counterparty)",
+      "counterparty_placeholder": "e.g. Sample Inc.",
+      "category_label": "Category",
+      "tags_label": "Tags",
+      "tags_placeholder": "Enter tags separated by commas",
+      "submit": "Upload",
+      "scan_warning": "Scanned documents are subject to different \"scanner preservation\" (スキャナ保存) requirements. Please confirm with your 税理士.",
+      "duplicate_warning": "An identical file has already been uploaded. Upload as a duplicate?"
+    },
+    "search": {
+      "title": "Search Documents",
+      "date_from_label": "取引年月日 (From)",
+      "date_to_label": "取引年月日 (To)",
+      "amount_min_label": "取引金額 (Min)",
+      "amount_max_label": "取引金額 (Max)",
+      "counterparty_label": "取引先名",
+      "category_label": "Category",
+      "include_voided_label": "Include voided",
+      "search_button": "Search",
+      "reset_button": "Clear",
+      "results_count": "{{count}} documents found"
+    },
+    "detail": {
+      "title": "Document Detail",
+      "file_section": "File",
+      "metadata_section": "Metadata",
+      "versions_section": "Version History",
+      "history_section": "Change History",
+      "links_section": "Linked Records",
+      "download_button": "Download",
+      "version_number": "Version {{number}}",
+      "current_version": "Latest",
+      "date_uncertain_badge": "Date uncertain",
+      "metadata_unconfirmed_badge": "Metadata unconfirmed"
+    },
+    "metadata": {
+      "transaction_date": "取引年月日",
+      "amount_cents": "取引金額",
+      "counterparty_name": "取引先名",
+      "category": "Category",
+      "tags": "Tags",
+      "source": "Source",
+      "file_sha256": "SHA-256",
+      "version_number": "Version",
+      "uploaded_at": "Uploaded",
+      "uploaded_by": "Uploaded By",
+      "retention_expires_at": "Retention Expires",
+      "date_uncertain": "Date Uncertain",
+      "is_metadata_confirmed": "Metadata Confirmed",
+      "amount_unit": "JPY",
+      "no_amount": "No amount"
+    },
+    "void": {
+      "title": "Void Document",
+      "description": "Voided documents are removed from default search results, but the record is retained.",
+      "reason_label": "Reason for voiding",
+      "reason_placeholder": "e.g. Registered by mistake",
+      "note_label": "Note (optional)",
+      "confirm_button": "Void",
+      "warning": "Voiding does not delete the document. The record is retained throughout the retention period."
+    },
+    "restore": {
+      "title": "Restore Document",
+      "description": "Return a voided document to active status.",
+      "confirm_button": "Restore"
+    },
+    "metadata_edit": {
+      "title": "Edit Metadata",
+      "description": "Changes are recorded in the audit log (before and after).",
+      "save_button": "Save Changes"
+    },
+    "status": {
+      "active": "Active",
+      "voided": "Voided"
+    },
+    "category": {
+      "invoice_received": "Invoice Received",
+      "contract": "Contract",
+      "receipt": "Receipt",
+      "delivery_note": "Delivery Note",
+      "other": "Other"
+    },
+    "source": {
+      "web_upload": "Web Upload",
+      "email_inbound": "Email Inbound",
+      "api": "API",
+      "scan_upload": "Scan"
+    },
+    "history": {
+      "title": "Change History",
+      "table": {
+        "action": "Action",
+        "actor": "Actor",
+        "timestamp": "Time",
+        "before": "Before",
+        "after": "After"
+      },
+      "no_history": "No change history"
+    },
+    "links": {
+      "add_button": "Add Link",
+      "sibling_product_label": "Product",
+      "entity_type_label": "Entity Type",
+      "entity_id_label": "Entity ID",
+      "note": "No before/after data (links are reference only)"
+    },
+    "messages": {
+      "uploaded": "Document uploaded.",
+      "metadata_updated": "Metadata updated.",
+      "voided": "Document voided.",
+      "restored": "Document restored."
+    }
+  },
+
+  "audit_event": {
+    "list": {
+      "title": "Audit Log",
+      "table": {
+        "action": "Action",
+        "entity": "Target",
+        "actor": "Actor",
+        "before": "Before",
+        "after": "After",
+        "timestamp": "Time"
+      },
+      "filter": {
+        "entity_type_label": "Entity Type",
+        "entity_id_label": "Entity ID",
+        "action_label": "Action",
+        "actor_label": "Actor"
+      },
+      "empty": "No audit events",
+      "show_diff": "Show diff"
+    },
+    "action": {
+      "organization.created": "Organization Created",
+      "organization.updated": "Organization Updated",
+      "organization.deleted": "Organization Deleted",
+      "user.created": "User Created",
+      "user.updated": "User Updated",
+      "user.deleted": "User Deleted",
+      "vault_settings.changed": "Vault Settings Changed",
+      "document.uploaded": "Document Uploaded",
+      "document.metadata_changed": "Metadata Changed",
+      "document.voided": "Document Voided",
+      "document.restored": "Document Restored",
+      "document.version_added": "Version Added",
+      "document.exported": "Exported",
+      "document.purged": "Document Purged (post-retention)",
+      "document.link_created": "Link Created",
+      "document.link_deleted": "Link Deleted"
+    },
+    "entity_type": {
+      "organization": "Organization",
+      "user": "User",
+      "vault_settings": "Vault Settings",
+      "vault_document": "Received Document",
+      "document_version": "Document Version",
+      "document_link": "Linked Record"
+    }
+  },
+
+  "export": {
+    "title": "Export Documents",
+    "description": "Download documents for a date range as a ZIP file and a manifest CSV.",
+    "form": {
+      "date_from_label": "取引年月日 (From)",
+      "date_to_label": "取引年月日 (To)",
+      "counterparty_label": "取引先名 (Filter)",
+      "include_voided_label": "Include voided",
+      "submit": "Start Export"
+    },
+    "manifest": {
+      "title": "Export File Contents",
+      "document_id": "Document ID",
+      "version": "Version",
+      "transaction_date": "取引年月日",
+      "amount_cents": "Amount (integer JPY)",
+      "counterparty_name": "取引先名",
+      "category": "Category",
+      "file_sha256": "SHA-256",
+      "uploaded_at": "Uploaded",
+      "voided_at": "Voided"
+    },
+    "messages": {
+      "started": "Export started. Please wait.",
+      "ready": "Your export is ready.",
+      "downloaded": "Downloaded."
+    }
+  },
+
+  "validation": {
+    "required": "This field is required.",
+    "invalid_format": "The format is invalid.",
+    "invalid_email": "Please enter a valid email address.",
+    "invalid_slug": "Only lowercase letters, numbers, and hyphens are allowed.",
+    "too_small": "The value is too small.",
+    "too_large": "The value is too large.",
+    "invalid_date": "Please enter a valid date (e.g. 2026-03-31).",
+    "invalid_amount": "Please enter a valid amount (integer).",
+    "mime_type_not_allowed": "This file type cannot be uploaded. Only PDF, JPEG, and PNG are supported.",
+    "file_too_large": "The file size exceeds the limit.",
+    "duplicate_file": "An identical file is already registered."
+  },
+
+  "problem": {
+    "unauthorized": "Authentication is required. Please log in.",
+    "forbidden": "You do not have permission to perform this action.",
+    "org_access_denied": "You do not have permission to access this page.",
+    "validation_failed": "The input contains errors.",
+    "not_found": "The specified resource was not found.",
+    "organization_not_found": "The specified organization was not found.",
+    "organization_slug_conflict": "This slug is already in use.",
+    "document_not_found": "The specified document was not found.",
+    "retention_window_active": "Documents within the retention period cannot be deleted.",
+    "mime_type_not_allowed": "Unsupported file type.",
+    "file_too_large": "The file size exceeds the limit.",
+    "duplicate_file": "An identical file is already registered.",
+    "org_not_found": "Organization not found.",
+    "org_inactive": "This organization is currently inactive.",
+    "internal_server_error": "A server error occurred. Please try again later.",
+    "invalid_credentials": "The email or password is incorrect."
+  },
+
+  "compliance": {
+    "scanner_warning": {
+      "title": "Note on Scanner Preservation",
+      "body": "This file appears to be a scanned document. Scanner preservation (スキャナ保存) may be subject to different legal requirements than electronic transaction data. Please confirm with your 税理士."
+    },
+    "retention_short_warning": {
+      "title": "Please Review Your Retention Setting",
+      "body": "The retention period is below 10 years. It may fall short of the statutory retention period (7 years from the day after the filing deadline). Please confirm with your 税理士 before saving."
+    },
+    "date_uncertain_warning": {
+      "title": "Transaction Date Not Set",
+      "body": "Because the transaction date is not set, the retention expiry is calculated from the upload date. Please confirm and enter the document's transaction date."
+    }
+  }
+}

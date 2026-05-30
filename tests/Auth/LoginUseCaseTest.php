@@ -14,7 +14,6 @@ use PHPUnit\Framework\TestCase;
 
 final class LoginUseCaseTest extends TestCase
 {
-
     public function test_issues_token_with_org_id_for_admin(): void
     {
         $passwordHash = password_hash('secret', PASSWORD_BCRYPT);
@@ -92,25 +91,56 @@ final class LoginUseCaseTest extends TestCase
     {
         return new class ($users) implements UserRepositoryInterface {
             /** @param array<string, User> $users */
-            public function __construct(private array $users) {}
+            public function __construct(private array $users)
+            {
+            }
 
             public function findByEmail(string $email): ?User
             {
                 return $this->users[$email] ?? null;
             }
 
-            public function findById(int $id): ?User { return null; }
-            public function listByOrganizationId(int $organizationId): array { return []; }
-            public function create(string $email, string $passwordHash, string $role, ?int $organizationId): User { throw new \LogicException('not implemented'); }
-            public function updatePassword(int $id, string $passwordHash): void {}
-            public function updateStatus(int $id, string $status): void {}
-            public function storeInviteToken(int $id, string $tokenHash, int $expiresAt): void {}
-            public function findByInviteToken(string $tokenHash): ?User { return null; }
-            public function clearInviteToken(int $id): void {}
-            public function storePasswordResetToken(int $id, string $tokenHash, int $expiresAt): void {}
-            public function findByPasswordResetToken(string $tokenHash): ?User { return null; }
-            public function clearPasswordResetToken(int $id): void {}
-            public function delete(int $id): void {}
+            public function findById(int $id): ?User
+            {
+                return null;
+            }
+            public function listByOrganizationId(int $organizationId): array
+            {
+                return [];
+            }
+            public function create(string $email, string $passwordHash, string $role, ?int $organizationId): User
+            {
+                throw new \LogicException('not implemented');
+            }
+            public function updatePassword(int $id, string $passwordHash): void
+            {
+            }
+            public function updateStatus(int $id, string $status): void
+            {
+            }
+            public function storeInviteToken(int $id, string $tokenHash, int $expiresAt): void
+            {
+            }
+            public function findByInviteToken(string $tokenHash): ?User
+            {
+                return null;
+            }
+            public function clearInviteToken(int $id): void
+            {
+            }
+            public function storePasswordResetToken(int $id, string $tokenHash, int $expiresAt): void
+            {
+            }
+            public function findByPasswordResetToken(string $tokenHash): ?User
+            {
+                return null;
+            }
+            public function clearPasswordResetToken(int $id): void
+            {
+            }
+            public function delete(int $id): void
+            {
+            }
         };
     }
 }
