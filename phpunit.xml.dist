@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:noNamespaceSchemaLocation="vendor/phpunit/phpunit/phpunit.xsd"
+         bootstrap="tests/bootstrap.php"
+         colors="true">
+    <testsuites>
+        <testsuite name="NeneVault">
+            <directory>tests</directory>
+        </testsuite>
+    </testsuites>
+    <source>
+        <include>
+            <directory>src</directory>
+        </include>
+    </source>
+    <php>
+        <env name="APP_ENV" value="test"/>
+        <env name="APP_DEBUG" value="false"/>
+        <env name="NENE2_LOCAL_JWT_SECRET" value="nene-vault-test-secret"/>
+        <env name="PROBLEM_DETAILS_BASE_URL" value="https://nene-vault.dev/problems/"/>
+        <env name="TENANT_RESOLUTION" value="single"/>
+        <env name="ORG_SLUG" value="test-org"/>
+        <env name="DB_ENV" value="test"/>
+        <env name="DB_ADAPTER" value="sqlite"/>
+        <env name="DB_NAME" value="var/nene_vault_test.sqlite"/>
+        <env name="NENE_VAULT_STORAGE_PATH" value="/tmp/nene-vault-test"/>
+        <env name="NENE_VAULT_MAX_FILE_SIZE_MB" value="20"/>
+    </php>
+</phpunit>
