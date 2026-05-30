@@ -1,0 +1,50 @@
+{
+    "name": "hideyukimori/nene-vault",
+    "description": "NeNe Vault — Received-document archive for Japan SMB (電子帳簿保存法).",
+    "type": "project",
+    "license": "MIT",
+    "require": {
+        "php": ">=8.4.1 <9.0",
+        "hideyukimori/nene2": "@dev"
+    },
+    "repositories": [
+        {
+            "type": "path",
+            "url": "../NENE2"
+        }
+    ],
+    "autoload": {
+        "psr-4": {
+            "NeneVault\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "NeneVault\\Tests\\": "tests/"
+        }
+    },
+    "scripts": {
+        "test": "phpunit --testsuite NeneVault",
+        "analyse": "phpstan analyse --memory-limit 512M",
+        "cs": "php-cs-fixer fix --dry-run --diff --config=.php-cs-fixer.php --allow-risky=yes",
+        "cs:fix": "php-cs-fixer fix --config=.php-cs-fixer.php --allow-risky=yes",
+        "migrations:new": "php vendor/hideyukimori/nene2/tools/migration-new.php",
+        "migrations:status": "phinx status -c phinx.php",
+        "migrations:migrate": "phinx migrate -c phinx.php",
+        "migrations:rollback": "phinx rollback -c phinx.php",
+        "check": [
+            "@test",
+            "@analyse",
+            "@cs"
+        ]
+    },
+    "config": {
+        "sort-packages": true
+    },
+    "require-dev": {
+        "friendsofphp/php-cs-fixer": "^3.95",
+        "phpstan/phpstan": "^2.1",
+        "phpunit/phpunit": "^13.1",
+        "robmorgan/phinx": "^0.16.11"
+    }
+}
