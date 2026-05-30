@@ -149,6 +149,41 @@ final class DocumentApiTest extends TestCase
         }
     }
 
+    public function test_download_version_returns_file_bytes(): void
+    {
+        $handler = $this->handler();
+        $id = $this->upload(handler: $handler, counterparty: 'Zeta Corp', date: '2026-06-01', amount: '8000');
+
+        // Get the version id from history
+        $history = $handler->handle($this->request('GET', '/admin/vault/documents/' . $id . '/history'));
+        $historyBody = json_decode((string) $history->getBody(), true);
+        $versionId = $historyBody['versions'][0]['id'];
+        $this->assertIsString($versionId);
+
+        $download = $handler->handle($this->request(
+            'GET',
+            '/admin/vault/documents/' . $id . '/versions/' . $versionId . '/download',
+        ));
+
+        $this->assertSame(200, $download->getStatusCode(), (string) $download->getBody());
+        $this->assertSame('application/pdf', $download->getHeaderLine('Content-Type'));
+        $this->assertStringContainsString('attachment', $download->getHeaderLine('Content-Disposition'));
+        $this->assertStringStartsWith('%PDF', (string) $download->getBody());
+    }
+
+    public function test_download_unknown_version_returns_404(): void
+    {
+        $handler = $this->handler();
+        $id = $this->upload(handler: $handler, counterparty: 'Eta Corp', date: '2026-06-02', amount: '9000');
+
+        $response = $handler->handle($this->request(
+            'GET',
+            '/admin/vault/documents/' . $id . '/versions/00000000000000000000000000/download',
+        ));
+
+        $this->assertSame(404, $response->getStatusCode());
+    }
+
     public function test_metadata_edit_then_void_then_restore_with_history(): void
     {
         $handler = $this->handler();

@@ -18,6 +18,8 @@ use NeneVault\DocumentVersion\LocalFilesystemDocumentStorage;
 use NeneVault\DocumentVersion\PdoDocumentVersionRepository;
 use NeneVault\VaultSettings\VaultSettingsRepositoryInterface;
 use Psr\Container\ContainerInterface;
+use Psr\Http\Message\ResponseFactoryInterface;
+use Psr\Http\Message\StreamFactoryInterface;
 
 final readonly class DocumentServiceProvider implements ServiceProviderInterface
 {
@@ -177,6 +179,18 @@ final readonly class DocumentServiceProvider implements ServiceProviderInterface
                 },
             )
             ->set(
+                DownloadDocumentVersionUseCaseInterface::class,
+                static function (ContainerInterface $c): DownloadDocumentVersionUseCaseInterface {
+                    $storage = $c->get(DocumentStorageInterface::class);
+
+                    if (!$storage instanceof DocumentStorageInterface) {
+                        throw new LogicException('DocumentStorageInterface service is invalid.');
+                    }
+
+                    return new DownloadDocumentVersionUseCase(self::versionRepo($c), $storage);
+                },
+            )
+            ->set(
                 UpdateDocumentMetadataHandler::class,
                 static function (ContainerInterface $c): UpdateDocumentMetadataHandler {
                     $uc = $c->get(UpdateDocumentMetadataUseCaseInterface::class);
@@ -222,6 +236,40 @@ final readonly class DocumentServiceProvider implements ServiceProviderInterface
                     }
 
                     return new GetDocumentHistoryHandler($uc, self::json($c));
+                },
+            )
+            ->set(
+                DownloadDocumentVersionHandler::class,
+                static function (ContainerInterface $c): DownloadDocumentVersionHandler {
+                    $uc = $c->get(DownloadDocumentVersionUseCaseInterface::class);
+                    $responseFactory = $c->get(ResponseFactoryInterface::class);
+                    $streamFactory = $c->get(StreamFactoryInterface::class);
+
+                    if (!$uc instanceof DownloadDocumentVersionUseCaseInterface) {
+                        throw new LogicException('DownloadDocumentVersionUseCaseInterface service is invalid.');
+                    }
+
+                    if (!$responseFactory instanceof ResponseFactoryInterface) {
+                        throw new LogicException('ResponseFactoryInterface service is invalid.');
+                    }
+
+                    if (!$streamFactory instanceof StreamFactoryInterface) {
+                        throw new LogicException('StreamFactoryInterface service is invalid.');
+                    }
+
+                    return new DownloadDocumentVersionHandler($uc, $responseFactory, $streamFactory);
+                },
+            )
+            ->set(
+                FileIntegrityExceptionHandler::class,
+                static function (ContainerInterface $c): FileIntegrityExceptionHandler {
+                    $pd = $c->get(ProblemDetailsResponseFactory::class);
+
+                    if (!$pd instanceof ProblemDetailsResponseFactory) {
+                        throw new LogicException('ProblemDetailsResponseFactory service is invalid.');
+                    }
+
+                    return new FileIntegrityExceptionHandler($pd);
                 },
             )
             ->set(
@@ -333,6 +381,7 @@ final readonly class DocumentServiceProvider implements ServiceProviderInterface
                     $void = $c->get(VoidDocumentHandler::class);
                     $restore = $c->get(RestoreDocumentHandler::class);
                     $history = $c->get(GetDocumentHistoryHandler::class);
+                    $download = $c->get(DownloadDocumentVersionHandler::class);
 
                     if (!$upload instanceof UploadDocumentHandler) {
                         throw new LogicException('UploadDocumentHandler service is invalid.');
@@ -362,7 +411,11 @@ final readonly class DocumentServiceProvider implements ServiceProviderInterface
                         throw new LogicException('GetDocumentHistoryHandler service is invalid.');
                     }
 
-                    return new DocumentRouteRegistrar($upload, $search, $get, $updateMetadata, $void, $restore, $history);
+                    if (!$download instanceof DownloadDocumentVersionHandler) {
+                        throw new LogicException('DownloadDocumentVersionHandler service is invalid.');
+                    }
+
+                    return new DocumentRouteRegistrar($upload, $search, $get, $updateMetadata, $void, $restore, $history, $download);
                 },
             );
     }
