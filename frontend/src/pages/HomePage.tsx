@@ -1,43 +1,55 @@
-import { clearToken } from '../api/client';
-import { useLocale } from '../locale/useLocale';
-import { LanguageSwitcher } from '../components/LanguageSwitcher';
+import { useNavigate } from 'react-router-dom';
+import { authStore } from '@/entities/auth';
+import { useTranslation } from '@/shared/i18n/use-translation';
+import { Button, Stack, Text } from '@/shared/ui';
+import { LanguageSwitcher } from '@/shared/ui/components/LanguageSwitcher';
 
-interface HomePageProps {
-  email: string;
-  role: string;
-  onLogout: () => void;
-}
-
-export function HomePage({ email, role, onLogout }: HomePageProps) {
-  const { t } = useLocale();
+export function HomePage() {
+  const { t } = useTranslation();
+  const navigate = useNavigate();
+  const session = authStore.getSession();
 
   function handleLogout() {
-    clearToken();
-    onLogout();
+    authStore.clearSession();
+    navigate('/login', { replace: true });
   }
 
   return (
-    <div className="home-page">
-      <header className="app-header">
-        <strong>NeNe Vault</strong>
-        <nav>
-          <span>{t('navigation.documents')}</span>
-          <span>{t('navigation.audit_events')}</span>
-          <span>{t('navigation.settings')}</span>
+    <div className="min-h-screen bg-surface">
+      <header className="flex items-center gap-inline-lg border-b border-border bg-surface-raised px-inline-lg py-stack-sm">
+        <Text as="span" className="text-heading-sm">
+          NeNe Vault
+        </Text>
+        <nav className="flex gap-inline-md">
+          <Text as="span" tone="muted">
+            {t('navigation.documents')}
+          </Text>
+          <Text as="span" tone="muted">
+            {t('navigation.audit_events')}
+          </Text>
+          <Text as="span" tone="muted">
+            {t('navigation.settings')}
+          </Text>
         </nav>
-        <div className="app-header-right">
+        <div className="ml-auto flex items-center gap-inline-md">
           <LanguageSwitcher />
-          <span className="user-badge">
-            {email} ({t(`user.role.${role}`)})
-          </span>
-          <button type="button" onClick={handleLogout}>
+          {session !== null && (
+            <Text as="span" tone="muted">
+              {session.email} ({t(`user.role.${session.role}`)})
+            </Text>
+          )}
+          <Button variant="secondary" onClick={handleLogout}>
             {t('navigation.logout')}
-          </button>
+          </Button>
         </div>
       </header>
-      <main className="home-main">
-        <h1>{t('navigation.documents')}</h1>
-        <p>{t('document.list.empty')}</p>
+      <main className="p-inline-lg">
+        <Stack gap="md">
+          <Text as="h1" className="text-heading-md">
+            {t('navigation.documents')}
+          </Text>
+          <Text tone="muted">{t('document.list.empty')}</Text>
+        </Stack>
       </main>
     </div>
   );

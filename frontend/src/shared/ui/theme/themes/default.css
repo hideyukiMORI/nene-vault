@@ -1,0 +1,45 @@
+/* Complete default theme. All visual tokens live here (zero-tolerance rule).
+   A second theme redefines every token below; swap active.css to restyle. */
+@theme {
+  /* Color */
+  --color-surface: oklch(99% 0.005 260);
+  --color-surface-raised: oklch(100% 0 0);
+  --color-surface-overlay: oklch(98% 0.005 260);
+  --color-text-primary: oklch(25% 0.02 260);
+  --color-text-muted: oklch(55% 0.02 260);
+  --color-border: oklch(90% 0.01 260);
+  --color-accent: oklch(55% 0.15 250);
+  --color-accent-text: oklch(100% 0 0);
+  --color-danger: oklch(55% 0.2 25);
+  --color-focus-ring: oklch(55% 0.15 250);
+
+  /* Spacing */
+  --spacing-inline-sm: 0.5rem;
+  --spacing-inline-md: 1rem;
+  --spacing-inline-lg: 1.5rem;
+  --spacing-stack-sm: 0.75rem;
+  --spacing-stack-md: 1.25rem;
+  --spacing-stack-lg: 2rem;
+
+  /* Typography */
+  --font-sans:
+    'Inter', system-ui, -apple-system, 'Hiragino Kaku Gothic ProN', 'Noto Sans JP', sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, monospace;
+  --text-body: 0.875rem;
+  --text-heading-sm: 1.125rem;
+  --text-heading-md: 1.5rem;
+
+  /* Radius */
+  --radius-sm: 0.25rem;
+  --radius-md: 0.5rem;
+  --radius-full: 9999px;
+
+  /* Shadow */
+  --shadow-sm: 0 1px 2px oklch(0% 0 0 / 8%);
+  --shadow-md: 0 2px 8px oklch(0% 0 0 / 12%);
+
+  /* Z-index */
+  --z-dropdown: 10;
+  --z-modal: 100;
+  --z-toast: 1000;
+}

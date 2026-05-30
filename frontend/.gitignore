@@ -1,5 +1,7 @@
 node_modules
 dist
+storybook-static
+coverage
 *.local
-.vite
 *.tsbuildinfo
+.vite
