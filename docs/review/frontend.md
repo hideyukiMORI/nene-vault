@@ -55,8 +55,8 @@ Violations of placement / dependency / data-flow / security / styling / testing
 ## API & security
 
 - [ ] `AppError` is the single Problem Details parse path (`shared/api/errors.ts`).
-- [ ] **No auth token in `localStorage`** (httpOnly cookie or ADR).
-- [ ] Fail closed: 401 → login, 403 → forbidden; no silent unauthenticated mutation.
+- [ ] Auth via `entities/auth` `authStore` (localStorage) + `Authorization: Bearer` + `credentials: 'include'` (NeNe Records pattern).
+- [ ] Fail closed: 401 → clear session + login, 403 → forbidden; no silent unauthenticated mutation.
 - [ ] API JSON kept snake_case (no rename to camelCase in transit).
 - [ ] RBAC UI gating matches API capability; treated as UX only.
 - [ ] No `dangerouslySetInnerHTML` without DOMPurify + Issue.
