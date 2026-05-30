@@ -34,6 +34,7 @@ without becoming accounting software or expense workflow. Built on
 - **Self-hosted OSS** — MIT; Tier A shared hosting or Tier B Docker/VPS
 - **Optional links** — HTTP reference to Invoice/Clear entities; **no shared DB**
 - **No third-party product names** in repository docs — [ADR 0013](./docs/adr/0013-no-third-party-product-names.md)
+- **UI: Japanese + English only** — [ADR 0005](./docs/adr/0005-ui-language-scope-ja-en.md)
 
 ## Documentation (read first)
 
@@ -50,7 +51,8 @@ without becoming accounting software or expense workflow. Built on
 
 ## Status
 
-**Phase 0** — governance and product design. Runtime scaffold follows Issues #4+.
+**Phase 0 complete** — governance and product design done (PR #1, #2 merged 2026-05-30).
+Phase 1 runtime scaffold follows Issues #4+.
 
 ## Ecosystem
 

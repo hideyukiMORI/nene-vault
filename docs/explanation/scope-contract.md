@@ -15,6 +15,23 @@ Read first: [ADR 0009](../adr/0009-separate-from-billing-and-reconciliation.md),
 
 ---
 
+## Governing principle
+
+1. **Compliance is non-negotiable.** Correct adherence to the law takes
+   precedence over every other product goal — UX, performance, or convenience.
+2. **No silent deviation.** Any departure from [`received-document-compliance.md`](./received-document-compliance.md)
+   requires an ADR with **explicit sign-off by a licensed 税理士 or 公認会計士**.
+   Code may not merge a deviation without it.
+3. **Engineering is not the legal authority.** When a requirement is unclear,
+   stop and consult a 税理士 — do not guess. Record the resolved interpretation
+   in the compliance doc.
+4. **Evidence store, not ledger.** Vault stores received documents and their
+   metadata. It does not post journal entries, compute tax, or issue documents.
+
+---
+
+---
+
 ## GOAL
 
 > **NeNe Vault lets a Japan SMB store, search, and preserve received business

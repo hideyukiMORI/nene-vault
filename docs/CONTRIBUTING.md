@@ -4,20 +4,34 @@ NeNe Vault is built through small, Issue-driven changes. This document is the sh
 
 ## Required Reading
 
+The following documents exist now and must be read before contributing:
+
+| Topic | Document |
+| --- | --- |
+| Agent entry point | `AGENTS.md` |
+| Scope contract (binding) | `docs/explanation/scope-contract.md` |
+| Compliance (binding) | `docs/explanation/received-document-compliance.md` |
+| Product vision | `docs/explanation/product-vision.md` |
+| Requirements | `docs/explanation/requirements.md` |
+| Sibling product boundaries | `docs/integrations/sibling-products.md` |
+| Workflow | `docs/workflow.md` |
+| Roadmap | `docs/roadmap.md` |
+| Current work | `docs/todo/current.md` |
+
+The following documents are also available:
+
 | Topic | Document |
 | --- | --- |
 | NENE2 inheritance map | `docs/inheritance-from-nene2.md` |
-| Sibling product boundaries | `docs/integrations/sibling-products.md` |
-| Workflow | `docs/workflow.md` |
 | Coding standards | `docs/development/coding-standards.md` |
 | Naming conventions | `docs/development/naming-conventions.md` |
-| Glossary | `docs/explanation/glossary.md` |
 | Backend standards (PHP/API) | `docs/development/backend-standards.md` |
-| Commit messages | `docs/development/commit-conventions.md` |
-| AI tools | `docs/integrations/ai-tools.md` |
-| Agent entry point | `AGENTS.md` |
-| Roadmap | `docs/roadmap.md` |
-| Current work | `docs/todo/current.md` |
+| Commit conventions | `docs/development/commit-conventions.md` |
+| ADR operation | `docs/development/adr.md` |
+| Self-review policy | `docs/development/self-review.md` |
+| Glossary | `docs/explanation/glossary.md` |
+| Self-review checklists | `docs/review/` |
+| AI tool configuration | `docs/integrations/ai-tools.md` (Phase 1+) |
 
 ## Collaboration Policy
 
@@ -40,19 +54,21 @@ Do not commit passwords, tokens, private URLs, production credentials, or local 
 Sensitive keys for this product include:
 
 - Admin JWT secrets
-- Invoice upstream API bearer token (and optional NeNe Records / NeNe Concierge tokens)
-- SMTP credentials for dunning email delivery
+- Storage path configuration (if it leaks internal directory structure)
+- Optional bearer tokens for sibling link validation (Invoice API, Clear API)
+- SMTP credentials if email inbound is implemented (Phase 3+)
 
 ## Engineering Theme
 
 NeNe Vault should stay readable, secure, and self-hostable:
 
-- strict, typed, explicit boundaries (inherited from NENE2)
-- decoupled use cases and infrastructure
+- Strict, typed, explicit boundaries (inherited from NENE2)
+- Decoupled use cases and infrastructure
 - OpenAPI contracts before client assumptions
-- Reconciliation/dunning compliance enforced at the API layer; no quote/invoice/tax/PDF logic (ADR 0009)
+- Received-document archive posture enforced at the API layer; no issuance,
+  reconciliation, dunning, or CSV logic (ADR 0009)
 - MCP access only through documented HTTP boundaries
-- **never** merge into or embed inside NeNe Records (ADR 0002)
+- **Never** merge into or embed inside sibling products (ADR 0002)
 
 ## Upstream Framework
 
