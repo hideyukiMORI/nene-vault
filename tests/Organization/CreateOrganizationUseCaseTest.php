@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace NeneVault\Tests\Organization;
 
-use NeneVault\Audit\AuditEventRepositoryInterface;
 use NeneVault\Audit\AuditRecorder;
 use NeneVault\Organization\CreateOrganizationInput;
 use NeneVault\Organization\CreateOrganizationUseCase;

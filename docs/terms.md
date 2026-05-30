@@ -15,6 +15,7 @@
 **Meanings and context:** [`docs/explanation/glossary.md`](explanation/glossary.md)
 **Legal/compliance terms for 士業 review:** [`docs/explanation/terminology.md`](explanation/terminology.md)
 **Naming rules and patterns:** [`docs/development/naming-conventions.md`](development/naming-conventions.md)
+**UI display text (ja + en):** [`locales/`](../locales) — keyed by the codes registered here; see [`docs/development/locale-guide.md`](development/locale-guide.md)
 
 ---
 

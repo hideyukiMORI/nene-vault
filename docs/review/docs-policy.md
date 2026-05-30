@@ -38,6 +38,14 @@ Use for: workflow changes, ADR additions, roadmap updates, Cursor rules, AGENTS.
 - [ ] Japanese appears only in: UI locale catalogs, operator guides, or parenthetical statutory labels.
 - [ ] OpenAPI descriptions and Problem Details metadata are English.
 
+## UI strings / locales (ADR 0005)
+
+- [ ] Any new operator-facing string was added to **both** `locales/ja.json` and `locales/en.json` with the same key.
+- [ ] `composer locales` passes (identical key structure).
+- [ ] No hard-coded display text was added to a component or handler.
+- [ ] Statutory labels (取引年月日, 取引金額, 取引先名) stay Japanese in both locales.
+- [ ] No third locale file was added (ja + en only).
+
 ## No third-party names (ADR 0013)
 
 - [ ] No named commercial products in repository docs (use "bundled cloud accounting SaaS", etc.).

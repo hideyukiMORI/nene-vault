@@ -1,0 +1,494 @@
+{
+  "_meta": {
+    "locale": "ja",
+    "label": "日本語",
+    "direction": "ltr",
+    "note": "Primary locale. Statutory field labels appear in Japanese in both locales (ADR 0005)."
+  },
+
+  "common": {
+    "buttons": {
+      "save": "保存",
+      "cancel": "キャンセル",
+      "delete": "削除",
+      "edit": "編集",
+      "add": "追加",
+      "search": "検索",
+      "reset": "リセット",
+      "upload": "アップロード",
+      "download": "ダウンロード",
+      "export": "エクスポート",
+      "void": "無効化",
+      "restore": "復元",
+      "submit": "送信",
+      "confirm": "確認",
+      "close": "閉じる",
+      "back": "戻る",
+      "next": "次へ",
+      "previous": "前へ",
+      "invite": "招待",
+      "copy": "コピー",
+      "view_history": "履歴を見る",
+      "view_detail": "詳細"
+    },
+    "status": {
+      "loading": "読み込み中...",
+      "saving": "保存中...",
+      "uploading": "アップロード中...",
+      "processing": "処理中...",
+      "success": "完了しました",
+      "error": "エラーが発生しました",
+      "empty": "データがありません"
+    },
+    "pagination": {
+      "items_per_page": "件/ページ",
+      "showing": "{{from}}〜{{to}}件を表示（全{{total}}件）",
+      "no_items": "0件"
+    },
+    "confirmation": {
+      "title": "確認",
+      "are_you_sure": "本当によろしいですか？",
+      "cannot_be_undone": "この操作は取り消せません。",
+      "yes_proceed": "はい、続ける",
+      "no_cancel": "キャンセル"
+    },
+    "table": {
+      "actions": "操作",
+      "created_at": "作成日時",
+      "updated_at": "更新日時",
+      "no_data": "表示するデータがありません"
+    },
+    "required_marker": "必須",
+    "optional_marker": "任意",
+    "unknown": "不明",
+    "yes": "はい",
+    "no": "いいえ",
+    "none": "なし"
+  },
+
+  "auth": {
+    "login": {
+      "title": "NeNe Vault ログイン",
+      "email_label": "メールアドレス",
+      "email_placeholder": "admin@example.com",
+      "password_label": "パスワード",
+      "password_placeholder": "パスワードを入力",
+      "submit": "ログイン",
+      "logging_in": "ログイン中..."
+    },
+    "logout": {
+      "button": "ログアウト",
+      "confirm": "ログアウトしますか？"
+    },
+    "session": {
+      "expired": "セッションが切れました。再度ログインしてください。"
+    },
+    "errors": {
+      "invalid_credentials": "メールアドレスまたはパスワードが正しくありません。",
+      "account_inactive": "このアカウントは無効です。管理者にお問い合わせください。"
+    }
+  },
+
+  "navigation": {
+    "home": "ホーム",
+    "documents": "受取書類",
+    "audit_events": "監査ログ",
+    "settings": "保管設定",
+    "organizations": "組織管理",
+    "users": "ユーザー管理",
+    "export": "エクスポート",
+    "logout": "ログアウト",
+    "language": "言語切替"
+  },
+
+  "organization": {
+    "list": {
+      "title": "組織一覧",
+      "add_button": "組織を追加",
+      "table": {
+        "name": "組織名",
+        "slug": "スラッグ",
+        "plan": "プラン",
+        "status": "状態",
+        "custom_domain": "カスタムドメイン",
+        "created_at": "作成日時",
+        "actions": "操作"
+      },
+      "empty": "組織がまだ登録されていません。"
+    },
+    "form": {
+      "create_title": "組織を追加",
+      "edit_title": "組織を編集",
+      "name_label": "組織名",
+      "name_placeholder": "例: 株式会社サンプル",
+      "slug_label": "スラッグ",
+      "slug_placeholder": "例: sample-corp",
+      "slug_hint": "英小文字・数字・ハイフンのみ使用可",
+      "plan_label": "プラン",
+      "is_active_label": "有効",
+      "custom_domain_label": "カスタムドメイン",
+      "custom_domain_placeholder": "例: vault.example.com",
+      "external_id_label": "外部ID",
+      "external_id_placeholder": "外部システムとの連携用（任意）"
+    },
+    "plan": {
+      "free": "フリー",
+      "standard": "スタンダード",
+      "enterprise": "エンタープライズ"
+    },
+    "status": {
+      "active": "有効",
+      "inactive": "無効"
+    },
+    "messages": {
+      "created": "組織を作成しました。",
+      "updated": "組織情報を更新しました。",
+      "deleted": "組織を削除しました。",
+      "delete_confirm": "組織「{{name}}」を削除します。関連する書類・ユーザー・設定もすべて削除されます。"
+    },
+    "errors": {
+      "slug_conflict": "このスラッグはすでに使用されています。別のスラッグを入力してください。",
+      "not_found": "指定された組織が見つかりません。"
+    }
+  },
+
+  "user": {
+    "list": {
+      "title": "ユーザー一覧",
+      "invite_button": "ユーザーを招待",
+      "table": {
+        "email": "メールアドレス",
+        "role": "ロール",
+        "status": "状態",
+        "created_at": "作成日時",
+        "actions": "操作"
+      },
+      "empty": "ユーザーがまだ登録されていません。"
+    },
+    "form": {
+      "create_title": "ユーザーを招待",
+      "edit_title": "ユーザーを編集",
+      "email_label": "メールアドレス",
+      "email_placeholder": "user@example.com",
+      "password_label": "パスワード",
+      "password_placeholder": "8文字以上",
+      "role_label": "ロール"
+    },
+    "role": {
+      "superadmin": "スーパー管理者",
+      "admin": "管理者",
+      "member": "メンバー",
+      "viewer": "閲覧者"
+    },
+    "role_description": {
+      "superadmin": "全組織を管理できます",
+      "admin": "組織内の全書類操作・設定管理ができます",
+      "member": "書類のアップロードとメタデータ編集ができます",
+      "viewer": "書類の検索・閲覧のみできます"
+    },
+    "status": {
+      "active": "有効",
+      "invited": "招待済み"
+    },
+    "messages": {
+      "created": "ユーザーを招待しました。",
+      "updated": "ユーザー情報を更新しました。",
+      "deleted": "ユーザーを削除しました。",
+      "delete_confirm": "ユーザー「{{email}}」を削除しますか？"
+    },
+    "errors": {
+      "email_conflict": "このメールアドレスはすでに使用されています。",
+      "not_found": "指定されたユーザーが見つかりません。",
+      "cannot_delete_self": "自分自身のアカウントは削除できません。"
+    }
+  },
+
+  "vault_settings": {
+    "title": "保管設定",
+    "save_button": "設定を保存",
+    "fields": {
+      "retention_years_label": "保存年数",
+      "retention_years_hint": "書類を保存する年数（取引日を起点）。電子帳簿保存法の要件を満たすため 10 年以上を推奨します。",
+      "retention_warning": "保存年数が 10 年未満です。法定保存期間（申告期限から 7 年）を満たさない可能性があります。税理士にご確認ください。",
+      "retention_min_hint": "最小値: 7 年（税理士確認必須）",
+      "storage_path_label": "ストレージパス（上書き）",
+      "storage_path_placeholder": "/var/vault/storage",
+      "storage_path_hint": "空欄の場合はデフォルトパスを使用します",
+      "invoice_api_base_url_label": "NeNe Invoice API URL（任意）",
+      "invoice_api_base_url_placeholder": "https://invoice.example.com",
+      "clear_api_base_url_label": "NeNe Clear API URL（任意）",
+      "clear_api_base_url_placeholder": "https://clear.example.com",
+      "updated_at_label": "最終更新日時"
+    },
+    "messages": {
+      "saved": "保管設定を保存しました。"
+    }
+  },
+
+  "document": {
+    "list": {
+      "title": "受取書類一覧",
+      "upload_button": "書類をアップロード",
+      "table": {
+        "transaction_date": "取引年月日",
+        "amount": "取引金額",
+        "counterparty_name": "取引先名",
+        "category": "書類種別",
+        "status": "状態",
+        "uploaded_at": "アップロード日時",
+        "actions": "操作"
+      },
+      "empty": "書類がまだ登録されていません。",
+      "voided_hidden": "無効化された書類は非表示です。",
+      "show_voided": "無効化済みを表示"
+    },
+    "upload": {
+      "title": "書類をアップロード",
+      "file_label": "ファイルを選択",
+      "file_hint": "PDF・JPEG・PNG（最大 {{max_size_mb}} MB）",
+      "file_drag": "ここにファイルをドロップ",
+      "transaction_date_label": "取引年月日",
+      "transaction_date_placeholder": "例: 2026-03-31",
+      "transaction_date_hint": "書類に記載された取引日",
+      "amount_label": "取引金額（円）",
+      "amount_placeholder": "例: 110000",
+      "amount_hint": "記載がない場合は空欄",
+      "counterparty_label": "取引先名",
+      "counterparty_placeholder": "例: 株式会社サンプル",
+      "category_label": "書類種別",
+      "tags_label": "タグ",
+      "tags_placeholder": "タグをカンマ区切りで入力",
+      "submit": "アップロード",
+      "scan_warning": "スキャンした書類は「スキャナ保存」の要件が異なります。税理士にご確認ください。",
+      "duplicate_warning": "同一ファイルが既にアップロードされています。重複してアップロードしますか？"
+    },
+    "search": {
+      "title": "書類を検索",
+      "date_from_label": "取引年月日（開始）",
+      "date_to_label": "取引年月日（終了）",
+      "amount_min_label": "取引金額（下限）",
+      "amount_max_label": "取引金額（上限）",
+      "counterparty_label": "取引先名",
+      "category_label": "書類種別",
+      "include_voided_label": "無効化済みを含む",
+      "search_button": "検索",
+      "reset_button": "条件クリア",
+      "results_count": "{{count}} 件の書類が見つかりました"
+    },
+    "detail": {
+      "title": "書類詳細",
+      "file_section": "ファイル",
+      "metadata_section": "メタデータ",
+      "versions_section": "バージョン履歴",
+      "history_section": "変更履歴",
+      "links_section": "関連リンク",
+      "download_button": "ダウンロード",
+      "version_number": "バージョン {{number}}",
+      "current_version": "最新",
+      "date_uncertain_badge": "日付未確定",
+      "metadata_unconfirmed_badge": "メタデータ未確認"
+    },
+    "metadata": {
+      "transaction_date": "取引年月日",
+      "amount_cents": "取引金額",
+      "counterparty_name": "取引先名",
+      "category": "書類種別",
+      "tags": "タグ",
+      "source": "アップロード元",
+      "file_sha256": "SHA-256",
+      "version_number": "バージョン",
+      "uploaded_at": "アップロード日時",
+      "uploaded_by": "アップロード者",
+      "retention_expires_at": "保存期限",
+      "date_uncertain": "日付不確定",
+      "is_metadata_confirmed": "メタデータ確認済み",
+      "amount_unit": "円",
+      "no_amount": "金額なし"
+    },
+    "void": {
+      "title": "書類を無効化",
+      "description": "無効化した書類は通常の検索に表示されなくなりますが、記録は保持されます。",
+      "reason_label": "無効化の理由",
+      "reason_placeholder": "例: 誤って登録したため",
+      "note_label": "補足（任意）",
+      "confirm_button": "無効化する",
+      "warning": "無効化しても書類は削除されません。保存期間中は記録が保持されます。"
+    },
+    "restore": {
+      "title": "書類を復元",
+      "description": "無効化した書類を有効な状態に戻します。",
+      "confirm_button": "復元する"
+    },
+    "metadata_edit": {
+      "title": "メタデータを編集",
+      "description": "変更内容は監査ログに記録されます（変更前・変更後）。",
+      "save_button": "変更を保存"
+    },
+    "status": {
+      "active": "有効",
+      "voided": "無効"
+    },
+    "category": {
+      "invoice_received": "受取請求書",
+      "contract": "契約書",
+      "receipt": "領収書",
+      "delivery_note": "納品書",
+      "other": "その他"
+    },
+    "source": {
+      "web_upload": "Webアップロード",
+      "email_inbound": "メール受信",
+      "api": "API",
+      "scan_upload": "スキャン"
+    },
+    "history": {
+      "title": "変更履歴",
+      "table": {
+        "action": "操作",
+        "actor": "操作者",
+        "timestamp": "日時",
+        "before": "変更前",
+        "after": "変更後"
+      },
+      "no_history": "変更履歴がありません"
+    },
+    "links": {
+      "add_button": "リンクを追加",
+      "sibling_product_label": "連携製品",
+      "entity_type_label": "エンティティ種別",
+      "entity_id_label": "エンティティID",
+      "note": "変更前・変更後のデータはありません（リンクは参照のみ）"
+    },
+    "messages": {
+      "uploaded": "書類をアップロードしました。",
+      "metadata_updated": "メタデータを更新しました。",
+      "voided": "書類を無効化しました。",
+      "restored": "書類を復元しました。"
+    }
+  },
+
+  "audit_event": {
+    "list": {
+      "title": "監査ログ",
+      "table": {
+        "action": "操作",
+        "entity": "対象",
+        "actor": "操作者",
+        "before": "変更前",
+        "after": "変更後",
+        "timestamp": "日時"
+      },
+      "filter": {
+        "entity_type_label": "エンティティ種別",
+        "entity_id_label": "エンティティID",
+        "action_label": "操作種別",
+        "actor_label": "操作者"
+      },
+      "empty": "監査ログがありません",
+      "show_diff": "差分を表示"
+    },
+    "action": {
+      "organization.created": "組織作成",
+      "organization.updated": "組織更新",
+      "organization.deleted": "組織削除",
+      "user.created": "ユーザー作成",
+      "user.updated": "ユーザー更新",
+      "user.deleted": "ユーザー削除",
+      "vault_settings.changed": "保管設定変更",
+      "document.uploaded": "書類アップロード",
+      "document.metadata_changed": "メタデータ変更",
+      "document.voided": "書類無効化",
+      "document.restored": "書類復元",
+      "document.version_added": "バージョン追加",
+      "document.exported": "エクスポート",
+      "document.purged": "書類削除（保存期限後）",
+      "document.link_created": "リンク作成",
+      "document.link_deleted": "リンク削除"
+    },
+    "entity_type": {
+      "organization": "組織",
+      "user": "ユーザー",
+      "vault_settings": "保管設定",
+      "vault_document": "受取書類",
+      "document_version": "文書バージョン",
+      "document_link": "関連リンク"
+    }
+  },
+
+  "export": {
+    "title": "書類エクスポート",
+    "description": "指定期間の書類をZIPファイルとマニフェストCSVとしてダウンロードします。",
+    "form": {
+      "date_from_label": "取引年月日（開始）",
+      "date_to_label": "取引年月日（終了）",
+      "counterparty_label": "取引先名（絞り込み）",
+      "include_voided_label": "無効化済みを含む",
+      "submit": "エクスポート開始"
+    },
+    "manifest": {
+      "title": "エクスポートファイルの内容",
+      "document_id": "書類ID",
+      "version": "バージョン",
+      "transaction_date": "取引年月日",
+      "amount_cents": "取引金額（円整数）",
+      "counterparty_name": "取引先名",
+      "category": "書類種別",
+      "file_sha256": "SHA-256",
+      "uploaded_at": "アップロード日時",
+      "voided_at": "無効化日時"
+    },
+    "messages": {
+      "started": "エクスポートを開始しました。しばらくお待ちください。",
+      "ready": "エクスポートの準備ができました。",
+      "downloaded": "ダウンロードしました。"
+    }
+  },
+
+  "validation": {
+    "required": "この項目は必須です。",
+    "invalid_format": "入力形式が正しくありません。",
+    "invalid_email": "有効なメールアドレスを入力してください。",
+    "invalid_slug": "英小文字・数字・ハイフンのみ使用できます。",
+    "too_small": "値が小さすぎます。",
+    "too_large": "値が大きすぎます。",
+    "invalid_date": "有効な日付を入力してください（例: 2026-03-31）。",
+    "invalid_amount": "有効な金額（整数）を入力してください。",
+    "mime_type_not_allowed": "このファイル形式はアップロードできません。PDF・JPEG・PNG のみ対応しています。",
+    "file_too_large": "ファイルサイズが上限を超えています。",
+    "duplicate_file": "同一のファイルが既に登録されています。"
+  },
+
+  "problem": {
+    "unauthorized": "認証が必要です。ログインしてください。",
+    "forbidden": "この操作を行う権限がありません。",
+    "org_access_denied": "このページにアクセスする権限がありません。",
+    "validation_failed": "入力内容に誤りがあります。",
+    "not_found": "指定されたリソースが見つかりません。",
+    "organization_not_found": "指定された組織が見つかりません。",
+    "organization_slug_conflict": "このスラッグはすでに使用されています。",
+    "document_not_found": "指定された書類が見つかりません。",
+    "retention_window_active": "保存期間中の書類は削除できません。",
+    "mime_type_not_allowed": "対応していないファイル形式です。",
+    "file_too_large": "ファイルサイズが上限を超えています。",
+    "duplicate_file": "同一のファイルが既に登録されています。",
+    "org_not_found": "組織が見つかりません。",
+    "org_inactive": "この組織は現在無効です。",
+    "internal_server_error": "サーバーエラーが発生しました。しばらく後にもう一度お試しください。",
+    "invalid_credentials": "メールアドレスまたはパスワードが正しくありません。"
+  },
+
+  "compliance": {
+    "scanner_warning": {
+      "title": "スキャナ保存に関するご注意",
+      "body": "このファイルはスキャンした書類と思われます。スキャナ保存は電子取引データ保存とは異なる法的要件が適用される場合があります。詳細は税理士にご確認ください。"
+    },
+    "retention_short_warning": {
+      "title": "保存期間の設定をご確認ください",
+      "body": "保存年数が 10 年未満です。法定保存期間（申告期限の翌日から 7 年）を下回る可能性があります。税理士にご確認のうえ設定してください。"
+    },
+    "date_uncertain_warning": {
+      "title": "取引年月日が未設定です",
+      "body": "取引年月日が設定されていないため、保存期限はアップロード日を基準に計算されています。書類の取引日を確認して入力してください。"
+    }
+  }
+}
