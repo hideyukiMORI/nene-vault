@@ -72,6 +72,55 @@ final readonly class PdoVaultDocumentRepository implements VaultDocumentReposito
         );
     }
 
+    /** @param list<string> $tags */
+    public function updateMetadata(
+        string $id,
+        int $organizationId,
+        ?string $transactionDate,
+        ?int $amountCents,
+        string $counterpartyName,
+        string $category,
+        array $tags,
+        bool $dateUncertain,
+    ): void {
+        $this->query->execute(
+            'UPDATE vault_documents
+             SET transaction_date = ?, amount_cents = ?, counterparty_name = ?,
+                 category = ?, tags = ?, date_uncertain = ?, is_metadata_confirmed = 1
+             WHERE id = ? AND organization_id = ?',
+            [
+                $transactionDate,
+                $amountCents,
+                $counterpartyName,
+                $category,
+                json_encode($tags, JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR),
+                $dateUncertain ? 1 : 0,
+                $id,
+                $organizationId,
+            ],
+        );
+    }
+
+    public function void(string $id, int $organizationId, int $voidedBy, string $voidReason, ?string $voidNote): void
+    {
+        $this->query->execute(
+            "UPDATE vault_documents
+             SET status = 'voided', voided_at = ?, voided_by = ?, void_reason = ?, void_note = ?
+             WHERE id = ? AND organization_id = ?",
+            [date('Y-m-d H:i:s'), $voidedBy, $voidReason, $voidNote, $id, $organizationId],
+        );
+    }
+
+    public function restore(string $id, int $organizationId): void
+    {
+        $this->query->execute(
+            "UPDATE vault_documents
+             SET status = 'active', voided_at = NULL, voided_by = NULL, void_reason = NULL, void_note = NULL
+             WHERE id = ? AND organization_id = ?",
+            [$id, $organizationId],
+        );
+    }
+
     /**
      * @return list<array{0: VaultDocument, 1: DocumentVersion}>
      */

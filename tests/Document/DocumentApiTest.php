@@ -149,6 +149,85 @@ final class DocumentApiTest extends TestCase
         }
     }
 
+    public function test_metadata_edit_then_void_then_restore_with_history(): void
+    {
+        $handler = $this->handler();
+        $id = $this->upload(handler: $handler, counterparty: 'Delta Ltd', date: '2026-04-01', amount: '12345');
+
+        // 1. Edit metadata — counterparty + amount change
+        $patch = $this->request('PATCH', '/admin/vault/documents/' . $id . '/metadata', json: [
+            'counterparty_name' => 'Delta Limited',
+            'category' => 'invoice_received',
+            'transaction_date' => '2026-04-02',
+            'amount_cents' => '54321',
+        ]);
+        $patchResponse = $handler->handle($patch);
+        $this->assertSame(200, $patchResponse->getStatusCode(), (string) $patchResponse->getBody());
+        $patched = json_decode((string) $patchResponse->getBody(), true);
+        $this->assertSame('Delta Limited', $patched['counterparty_name']);
+        $this->assertSame(54321, $patched['amount_cents']);
+        $this->assertTrue($patched['is_metadata_confirmed']);
+
+        // 2. Void with reason
+        $void = $this->request('POST', '/admin/vault/documents/' . $id . '/void', json: ['void_reason' => 'Duplicate entry']);
+        $voidResponse = $handler->handle($void);
+        $this->assertSame(200, $voidResponse->getStatusCode(), (string) $voidResponse->getBody());
+        $voided = json_decode((string) $voidResponse->getBody(), true);
+        $this->assertSame('voided', $voided['status']);
+        $this->assertSame('Duplicate entry', $voided['void_reason']);
+
+        // 3. Voided excluded from default search
+        $search = $handler->handle($this->request('GET', '/admin/vault/documents?counterparty_name=Delta+Limited'));
+        $searchBody = json_decode((string) $search->getBody(), true);
+        foreach ($searchBody['items'] as $item) {
+            $this->assertNotSame($id, $item['id'], 'Voided document must not appear in default search');
+        }
+
+        // 4. Voided included when include_voided=true
+        $searchVoided = $handler->handle($this->request('GET', '/admin/vault/documents?counterparty_name=Delta+Limited&include_voided=true'));
+        $searchVoidedBody = json_decode((string) $searchVoided->getBody(), true);
+        $ids = array_column($searchVoidedBody['items'], 'id');
+        $this->assertContains($id, $ids);
+
+        // 5. Restore
+        $restore = $handler->handle($this->request('POST', '/admin/vault/documents/' . $id . '/restore'));
+        $this->assertSame(200, $restore->getStatusCode());
+        $restored = json_decode((string) $restore->getBody(), true);
+        $this->assertSame('active', $restored['status']);
+
+        // 6. History contains version + audit events (uploaded, metadata_changed, voided, restored)
+        $history = $handler->handle($this->request('GET', '/admin/vault/documents/' . $id . '/history'));
+        $this->assertSame(200, $history->getStatusCode());
+        $historyBody = json_decode((string) $history->getBody(), true);
+        $this->assertCount(1, $historyBody['versions']);
+        $actions = array_column($historyBody['audit_events'], 'action');
+        $this->assertContains('document.uploaded', $actions);
+        $this->assertContains('document.metadata_changed', $actions);
+        $this->assertContains('document.voided', $actions);
+        $this->assertContains('document.restored', $actions);
+
+        // metadata_changed event must carry before/after
+        foreach ($historyBody['audit_events'] as $event) {
+            if ($event['action'] === 'document.metadata_changed') {
+                $this->assertSame('Delta Ltd', $event['before_json']['counterparty_name']);
+                $this->assertSame('Delta Limited', $event['after_json']['counterparty_name']);
+            }
+        }
+    }
+
+    public function test_void_requires_reason(): void
+    {
+        $handler = $this->handler();
+        $id = $this->upload(handler: $handler, counterparty: 'Epsilon', date: '2026-05-01', amount: '100');
+
+        // Send a JSON object without void_reason → validation 422
+        $response = $handler->handle(
+            $this->request('POST', '/admin/vault/documents/' . $id . '/void', json: ['void_note' => 'no reason given']),
+        );
+
+        $this->assertSame(422, $response->getStatusCode());
+    }
+
     public function test_get_unknown_document_returns_404(): void
     {
         $response = $this->handler()->handle(
@@ -179,7 +258,8 @@ final class DocumentApiTest extends TestCase
         return $handler;
     }
 
-    private function request(string $method, string $uri, bool $auth = true): ServerRequestInterface
+    /** @param array<string, mixed>|null $json */
+    private function request(string $method, string $uri, bool $auth = true, ?array $json = null): ServerRequestInterface
     {
         $container = self::$container;
         assert($container !== null);
@@ -199,10 +279,18 @@ final class DocumentApiTest extends TestCase
             parse_str($queryString, $queryParams);
         }
 
+        $body = null;
+        if ($json !== null) {
+            $headers['Content-Type'] = 'application/json';
+            $encoded = json_encode($json, JSON_THROW_ON_ERROR);
+            $body = $psr17->createStream($encoded);
+        }
+
         return $creator->fromArrays(
             server: ['REQUEST_METHOD' => $method, 'REQUEST_URI' => $uri],
             headers: $headers,
             get: $queryParams,
+            body: $body,
         );
     }
 
