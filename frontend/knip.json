@@ -1,14 +1,15 @@
 {
   "$schema": "https://unpkg.com/knip@5/schema.json",
   "entry": [
-    "src/main.tsx",
     ".storybook/{main,preview}.ts",
     "src/**/*.stories.tsx",
     "src/**/*.test.{ts,tsx}",
-    "tests/**/*.{ts,tsx}"
+    "tests/**/*.{ts,tsx}",
+    "src/entities/*/index.ts",
+    "src/features/*/index.ts"
   ],
   "project": ["src/**/*.{ts,tsx}", "tests/**/*.{ts,tsx}"],
   "ignore": ["src/shared/api/generated/**"],
-  "ignoreDependencies": ["@storybook/addon-essentials", "@storybook/addon-a11y", "tailwindcss"],
+  "ignoreDependencies": ["tailwindcss"],
   "ignoreExportsUsedInFile": true
 }
