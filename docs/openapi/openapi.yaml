@@ -1,0 +1,1373 @@
+openapi: 3.1.0
+info:
+  title: NeNe Vault API
+  version: 0.1.0
+  description: >
+    NeNe Vault public API contract — received-document archive for Japan SMB
+    (電子帳簿保存法). Multi-tenant. Phase 1 covers auth, organizations, users,
+    vault settings, audit events, and the received-document lifecycle
+    (upload, search, detail, metadata edit, void/restore, history, download).
+    All identifiers follow docs/terms.md. Errors use RFC 9457 Problem Details.
+servers:
+  - url: http://localhost:8080
+    description: Local development server
+tags:
+  - name: System
+    description: Runtime health endpoints.
+  - name: Auth
+    description: Authentication — login and JWT issuance.
+  - name: Organization
+    description: Organization (tenant) management. Superadmin only.
+  - name: User
+    description: User account management within an organization. Admin only.
+  - name: VaultSettings
+    description: Per-organization retention and sibling-link settings.
+  - name: Document
+    description: Received-document lifecycle — upload, search, void, history, download.
+  - name: Audit
+    description: Append-only audit event log.
+
+paths:
+  /health:
+    get:
+      tags: [System]
+      summary: Health check
+      description: Operational health check. Unauthenticated.
+      operationId: getHealth
+      responses:
+        '200':
+          description: Service healthy.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HealthResponse'
+              examples:
+                ok:
+                  value:
+                    status: ok
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /admin/auth/login:
+    post:
+      tags: [Auth]
+      summary: Log in
+      description: Authenticates with email and password, returns a JWT bearer token. Unauthenticated.
+      operationId: login
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+            example:
+              email: admin@example.com
+              password: secret
+      responses:
+        '200':
+          description: Token issued.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LoginResponse'
+              examples:
+                ok:
+                  value:
+                    token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+                    expires_at: '2026-05-31T00:00:00Z'
+                    user_id: 1
+                    email: admin@example.com
+                    role: admin
+                    org_id: 1
+        '401':
+          $ref: '#/components/responses/InvalidCredentials'
+        '422':
+          $ref: '#/components/responses/ValidationFailed'
+
+  /admin/organizations:
+    get:
+      tags: [Organization]
+      summary: List organizations
+      description: Returns a paginated list of organizations. Superadmin only.
+      operationId: listOrganizations
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/LimitQuery'
+        - $ref: '#/components/parameters/OffsetQuery'
+      responses:
+        '200':
+          description: Paginated organization list.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrganizationListResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+    post:
+      tags: [Organization]
+      summary: Create organization
+      description: Creates a new organization (tenant) and seeds default vault settings. Superadmin only.
+      operationId: createOrganization
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateOrganizationRequest'
+            example:
+              name: Sample Inc.
+              slug: sample-corp
+              plan: free
+              is_active: true
+      responses:
+        '201':
+          description: Organization created.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrganizationResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '409':
+          $ref: '#/components/responses/OrganizationSlugConflict'
+        '422':
+          $ref: '#/components/responses/ValidationFailed'
+
+  /admin/organizations/{id}:
+    parameters:
+      - $ref: '#/components/parameters/IdPath'
+    get:
+      tags: [Organization]
+      summary: Get organization
+      description: Returns a single organization by ID. Superadmin only.
+      operationId: getOrganizationById
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Organization detail.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrganizationResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/OrganizationNotFound'
+    patch:
+      tags: [Organization]
+      summary: Update organization
+      description: Updates an organization. Superadmin only. Audited.
+      operationId: updateOrganization
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateOrganizationRequest'
+      responses:
+        '200':
+          description: Organization updated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrganizationResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/OrganizationNotFound'
+        '422':
+          $ref: '#/components/responses/ValidationFailed'
+    delete:
+      tags: [Organization]
+      summary: Delete organization
+      description: Deletes an organization. Superadmin only. Audited.
+      operationId: deleteOrganization
+      security:
+        - bearerAuth: []
+      responses:
+        '204':
+          description: Organization deleted.
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/OrganizationNotFound'
+
+  /admin/users:
+    get:
+      tags: [User]
+      summary: List users
+      description: Returns users within the resolved organization. Admin only.
+      operationId: listUsers
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/LimitQuery'
+        - $ref: '#/components/parameters/OffsetQuery'
+      responses:
+        '200':
+          description: User list.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserListResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+    post:
+      tags: [User]
+      summary: Create user
+      description: Creates a user within the organization. Admin only. Audited.
+      operationId: createUser
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateUserRequest'
+            example:
+              email: member@example.com
+              password: changeme123
+              role: member
+      responses:
+        '201':
+          description: User created.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '422':
+          $ref: '#/components/responses/ValidationFailed'
+
+  /admin/users/{id}:
+    parameters:
+      - $ref: '#/components/parameters/IdPath'
+    get:
+      tags: [User]
+      summary: Get user
+      description: Returns a single user. Admin only.
+      operationId: getUserById
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: User detail.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    patch:
+      tags: [User]
+      summary: Update user
+      description: Updates a user. Admin only. Audited.
+      operationId: updateUser
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateUserRequest'
+      responses:
+        '200':
+          description: User updated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '422':
+          $ref: '#/components/responses/ValidationFailed'
+    delete:
+      tags: [User]
+      summary: Delete user
+      description: Deletes a user. Admin only. Audited.
+      operationId: deleteUser
+      security:
+        - bearerAuth: []
+      responses:
+        '204':
+          description: User deleted.
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /admin/vault/settings:
+    get:
+      tags: [VaultSettings]
+      summary: Get vault settings
+      description: Returns retention and sibling-link settings for the resolved organization.
+      operationId: getVaultSettings
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Vault settings.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VaultSettingsResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+    patch:
+      tags: [VaultSettings]
+      summary: Update vault settings
+      description: >
+        Updates retention years (min 7, max 99; default 10 — see ADR 0004) and
+        optional sibling-link config. Admin only. Audited.
+      operationId: updateVaultSettings
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateVaultSettingsRequest'
+            example:
+              retention_years: 10
+      responses:
+        '200':
+          description: Vault settings updated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VaultSettingsResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '422':
+          $ref: '#/components/responses/ValidationFailed'
+
+  /admin/vault/documents:
+    get:
+      tags: [Document]
+      summary: Search documents
+      description: >
+        Searches received documents by transaction date range, amount range,
+        counterparty (partial), and category. Combinations of two or more fields
+        are supported (検索要件, 電帳法施行規則 第4条第1項第3号). Voided documents
+        are excluded unless include_voided=true.
+      operationId: searchDocuments
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: transaction_date_from
+          in: query
+          description: Transaction date range start (取引年月日, inclusive).
+          schema:
+            type: string
+            format: date
+        - name: transaction_date_to
+          in: query
+          description: Transaction date range end (取引年月日, inclusive).
+          schema:
+            type: string
+            format: date
+        - name: amount_min_cents
+          in: query
+          description: Minimum amount (取引金額) in integer JPY.
+          schema:
+            type: integer
+        - name: amount_max_cents
+          in: query
+          description: Maximum amount (取引金額) in integer JPY.
+          schema:
+            type: integer
+        - name: counterparty_name
+          in: query
+          description: Counterparty (取引先名) partial match.
+          schema:
+            type: string
+        - name: category
+          in: query
+          schema:
+            $ref: '#/components/schemas/DocumentCategory'
+        - name: include_voided
+          in: query
+          description: Include voided documents in results.
+          schema:
+            type: boolean
+            default: false
+        - $ref: '#/components/parameters/LimitQuery'
+        - $ref: '#/components/parameters/OffsetQuery'
+      responses:
+        '200':
+          description: Paginated document list.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VaultDocumentListResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+    post:
+      tags: [Document]
+      summary: Upload document
+      description: >
+        Uploads a received document (PDF/JPEG/PNG) with metadata as multipart
+        form data. Computes SHA-256, creates document_version 1, and records a
+        document.uploaded audit event. Duplicate SHA-256 within the organization
+        returns 409 duplicate-file unless confirmed. Member, admin, superadmin.
+      operationId: uploadDocument
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/UploadDocumentRequest'
+      responses:
+        '201':
+          description: Document uploaded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VaultDocumentResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '409':
+          $ref: '#/components/responses/DuplicateFile'
+        '413':
+          $ref: '#/components/responses/FileTooLarge'
+        '415':
+          $ref: '#/components/responses/MimeTypeNotAllowed'
+        '422':
+          $ref: '#/components/responses/ValidationFailed'
+
+  /admin/vault/documents/{id}:
+    parameters:
+      - $ref: '#/components/parameters/IdPath'
+    get:
+      tags: [Document]
+      summary: Get document detail
+      description: Returns a single document with current metadata and version info.
+      operationId: getDocumentById
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Document detail.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VaultDocumentResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/DocumentNotFound'
+
+  /admin/vault/documents/{id}/metadata:
+    parameters:
+      - $ref: '#/components/parameters/IdPath'
+    patch:
+      tags: [Document]
+      summary: Update document metadata
+      description: >
+        Updates transaction_date, amount_cents, counterparty_name, category, or
+        tags. File bytes are never changed. Records a document.metadata_changed
+        audit event with before/after. Member (own), admin, superadmin.
+      operationId: updateDocumentMetadata
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateDocumentMetadataRequest'
+      responses:
+        '200':
+          description: Metadata updated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VaultDocumentResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/DocumentNotFound'
+        '422':
+          $ref: '#/components/responses/ValidationFailed'
+
+  /admin/vault/documents/{id}/void:
+    parameters:
+      - $ref: '#/components/parameters/IdPath'
+    post:
+      tags: [Document]
+      summary: Void document
+      description: >
+        Voids a document (logical deactivation) with a mandatory reason. The
+        document remains stored and counts toward retention. Records a
+        document.voided audit event. Admin, superadmin.
+      operationId: voidDocument
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VoidDocumentRequest'
+            example:
+              void_reason: Registered by mistake
+      responses:
+        '200':
+          description: Document voided.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VaultDocumentResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/DocumentNotFound'
+        '422':
+          $ref: '#/components/responses/ValidationFailed'
+
+  /admin/vault/documents/{id}/restore:
+    parameters:
+      - $ref: '#/components/parameters/IdPath'
+    post:
+      tags: [Document]
+      summary: Restore voided document
+      description: Returns a voided document to active status. Records a document.restored audit event. Admin, superadmin.
+      operationId: restoreDocument
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Document restored.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VaultDocumentResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/DocumentNotFound'
+
+  /admin/vault/documents/{id}/history:
+    parameters:
+      - $ref: '#/components/parameters/IdPath'
+    get:
+      tags: [Document]
+      summary: Get document history
+      description: Returns all versions and audit events for a document (訂正削除の履歴).
+      operationId: getDocumentHistory
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Document history.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DocumentHistoryResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/DocumentNotFound'
+
+  /admin/vault/documents/{id}/versions/{versionId}/download:
+    parameters:
+      - $ref: '#/components/parameters/IdPath'
+      - name: versionId
+        in: path
+        required: true
+        description: document_version ID.
+        schema:
+          type: string
+    get:
+      tags: [Document]
+      summary: Download document version
+      description: >
+        Streams the file bytes for a specific version through an authenticated
+        endpoint. SHA-256 is verified before serving. The storage path is never
+        exposed.
+      operationId: downloadDocumentVersion
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: File bytes.
+          content:
+            application/pdf:
+              schema:
+                type: string
+                format: binary
+            image/jpeg:
+              schema:
+                type: string
+                format: binary
+            image/png:
+              schema:
+                type: string
+                format: binary
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/DocumentNotFound'
+
+  /admin/audit-events:
+    get:
+      tags: [Audit]
+      summary: List audit events
+      description: >
+        Returns a paginated, filterable list of audit events. Superadmin sees all;
+        other roles see their organization only. Append-only — events are never
+        modified or deleted.
+      operationId: listAuditEvents
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: entity_type
+          in: query
+          schema:
+            type: string
+        - name: entity_id
+          in: query
+          schema:
+            type: string
+        - name: action
+          in: query
+          schema:
+            type: string
+        - name: actor_user_id
+          in: query
+          schema:
+            type: integer
+        - $ref: '#/components/parameters/LimitQuery'
+        - $ref: '#/components/parameters/OffsetQuery'
+      responses:
+        '200':
+          description: Paginated audit event list.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuditEventListResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: 'JWT issued by POST /admin/auth/login. Sent as `Authorization: Bearer <token>`.'
+
+  parameters:
+    LimitQuery:
+      name: limit
+      in: query
+      description: Maximum items to return (1–100, default 20).
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 100
+        default: 20
+    OffsetQuery:
+      name: offset
+      in: query
+      description: Number of items to skip (default 0).
+      schema:
+        type: integer
+        minimum: 0
+        default: 0
+    IdPath:
+      name: id
+      in: path
+      required: true
+      description: Resource ID.
+      schema:
+        type: string
+
+  schemas:
+    HealthResponse:
+      type: object
+      required: [status]
+      properties:
+        status:
+          type: string
+          examples: [ok]
+
+    LoginRequest:
+      type: object
+      required: [email, password]
+      properties:
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+
+    LoginResponse:
+      type: object
+      required: [token, expires_at, user_id, email, role]
+      properties:
+        token:
+          type: string
+        expires_at:
+          type: string
+          format: date-time
+        user_id:
+          type: integer
+        email:
+          type: string
+          format: email
+        role:
+          $ref: '#/components/schemas/Role'
+        org_id:
+          type: [integer, 'null']
+          description: Organization ID; null for superadmin.
+
+    Role:
+      type: string
+      enum: [superadmin, admin, member, viewer]
+
+    OrganizationResponse:
+      type: object
+      required: [id, name, slug, plan, is_active]
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        slug:
+          type: string
+        plan:
+          type: string
+        is_active:
+          type: boolean
+        external_id:
+          type: [string, 'null']
+        custom_domain:
+          type: [string, 'null']
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+
+    OrganizationListResponse:
+      type: object
+      required: [items, total, limit, offset]
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/OrganizationResponse'
+        total:
+          type: integer
+        limit:
+          type: integer
+        offset:
+          type: integer
+
+    CreateOrganizationRequest:
+      type: object
+      required: [name, slug]
+      properties:
+        name:
+          type: string
+        slug:
+          type: string
+          pattern: '^[a-z0-9-]+$'
+        plan:
+          type: string
+          default: free
+        is_active:
+          type: boolean
+          default: true
+        external_id:
+          type: [string, 'null']
+        custom_domain:
+          type: [string, 'null']
+
+    UpdateOrganizationRequest:
+      type: object
+      required: [name, slug]
+      properties:
+        name:
+          type: string
+        slug:
+          type: string
+          pattern: '^[a-z0-9-]+$'
+        plan:
+          type: string
+        is_active:
+          type: boolean
+        external_id:
+          type: [string, 'null']
+        custom_domain:
+          type: [string, 'null']
+
+    UserResponse:
+      type: object
+      required: [id, email, role, status]
+      properties:
+        id:
+          type: integer
+        email:
+          type: string
+          format: email
+        role:
+          $ref: '#/components/schemas/Role'
+        organization_id:
+          type: [integer, 'null']
+        status:
+          type: string
+          enum: [active, invited]
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+
+    UserListResponse:
+      type: object
+      required: [items, total, limit, offset]
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/UserResponse'
+        total:
+          type: integer
+        limit:
+          type: integer
+        offset:
+          type: integer
+
+    CreateUserRequest:
+      type: object
+      required: [email, password, role]
+      properties:
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+          minLength: 8
+        role:
+          $ref: '#/components/schemas/Role'
+
+    UpdateUserRequest:
+      type: object
+      properties:
+        email:
+          type: string
+          format: email
+        role:
+          $ref: '#/components/schemas/Role'
+        status:
+          type: string
+          enum: [active, invited]
+
+    VaultSettingsResponse:
+      type: object
+      required: [organization_id, retention_years]
+      properties:
+        organization_id:
+          type: integer
+        retention_years:
+          type: integer
+          minimum: 7
+          maximum: 99
+        storage_path_override:
+          type: [string, 'null']
+        invoice_api_base_url:
+          type: [string, 'null']
+        clear_api_base_url:
+          type: [string, 'null']
+        updated_at:
+          type: [string, 'null']
+          format: date-time
+
+    UpdateVaultSettingsRequest:
+      type: object
+      properties:
+        retention_years:
+          type: integer
+          minimum: 7
+          maximum: 99
+          description: Years to retain (from transaction date). Default 10; below 10 warns. See ADR 0004.
+        storage_path_override:
+          type: [string, 'null']
+        invoice_api_base_url:
+          type: [string, 'null']
+        clear_api_base_url:
+          type: [string, 'null']
+
+    DocumentStatus:
+      type: string
+      enum: [active, voided]
+
+    DocumentCategory:
+      type: string
+      enum: [invoice_received, contract, receipt, delivery_note, other]
+
+    DocumentSource:
+      type: string
+      enum: [web_upload, email_inbound, api, scan_upload]
+
+    VaultDocumentResponse:
+      type: object
+      required:
+        - id
+        - organization_id
+        - status
+        - counterparty_name
+        - category
+        - file_sha256
+        - version_number
+        - source
+        - uploaded_at
+      properties:
+        id:
+          type: string
+        organization_id:
+          type: integer
+        status:
+          $ref: '#/components/schemas/DocumentStatus'
+        transaction_date:
+          type: [string, 'null']
+          format: date
+          description: 取引年月日.
+        amount_cents:
+          type: [integer, 'null']
+          description: 取引金額 in integer JPY. Null when the document carries no amount.
+        counterparty_name:
+          type: string
+          description: 取引先名.
+        category:
+          $ref: '#/components/schemas/DocumentCategory'
+        tags:
+          type: array
+          items:
+            type: string
+        file_sha256:
+          type: string
+          pattern: '^[0-9a-f]{64}$'
+        mime_type:
+          type: string
+          enum: [application/pdf, image/jpeg, image/png]
+        original_filename:
+          type: string
+        file_size_bytes:
+          type: integer
+        version_number:
+          type: integer
+        source:
+          $ref: '#/components/schemas/DocumentSource'
+        uploaded_at:
+          type: string
+          format: date-time
+        uploaded_by:
+          type: [integer, 'null']
+        voided_at:
+          type: [string, 'null']
+          format: date-time
+        voided_by:
+          type: [integer, 'null']
+        void_reason:
+          type: [string, 'null']
+        date_uncertain:
+          type: boolean
+        is_metadata_confirmed:
+          type: boolean
+        retention_years:
+          type: integer
+        retention_expires_at:
+          type: string
+          format: date
+
+    VaultDocumentListResponse:
+      type: object
+      required: [items, total, limit, offset]
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/VaultDocumentResponse'
+        total:
+          type: integer
+        limit:
+          type: integer
+        offset:
+          type: integer
+
+    UploadDocumentRequest:
+      type: object
+      required: [file, counterparty_name, category]
+      properties:
+        file:
+          type: string
+          format: binary
+          description: PDF, JPEG, or PNG file.
+        transaction_date:
+          type: string
+          format: date
+          description: 取引年月日. Optional; if omitted, date_uncertain is set.
+        amount_cents:
+          type: integer
+          description: 取引金額 in integer JPY. Optional.
+        counterparty_name:
+          type: string
+          description: 取引先名.
+        category:
+          $ref: '#/components/schemas/DocumentCategory'
+        tags:
+          type: string
+          description: Comma-separated tags.
+        confirm_duplicate:
+          type: boolean
+          default: false
+          description: Set true to accept an upload whose SHA-256 already exists in the organization.
+
+    UpdateDocumentMetadataRequest:
+      type: object
+      properties:
+        transaction_date:
+          type: [string, 'null']
+          format: date
+        amount_cents:
+          type: [integer, 'null']
+        counterparty_name:
+          type: string
+        category:
+          $ref: '#/components/schemas/DocumentCategory'
+        tags:
+          type: array
+          items:
+            type: string
+
+    VoidDocumentRequest:
+      type: object
+      required: [void_reason]
+      properties:
+        void_reason:
+          type: string
+          description: Mandatory reason for voiding.
+        void_note:
+          type: [string, 'null']
+          description: Optional extended context.
+
+    DocumentVersionResponse:
+      type: object
+      required: [id, version_number, file_sha256, mime_type, original_filename, source, uploaded_at]
+      properties:
+        id:
+          type: string
+        version_number:
+          type: integer
+        file_sha256:
+          type: string
+          pattern: '^[0-9a-f]{64}$'
+        mime_type:
+          type: string
+        original_filename:
+          type: string
+        file_size_bytes:
+          type: integer
+        source:
+          $ref: '#/components/schemas/DocumentSource'
+        uploaded_at:
+          type: string
+          format: date-time
+        uploaded_by:
+          type: [integer, 'null']
+
+    DocumentHistoryResponse:
+      type: object
+      required: [versions, audit_events]
+      properties:
+        versions:
+          type: array
+          items:
+            $ref: '#/components/schemas/DocumentVersionResponse'
+        audit_events:
+          type: array
+          items:
+            $ref: '#/components/schemas/AuditEventResponse'
+
+    AuditEventResponse:
+      type: object
+      required: [id, action, entity_type, entity_id, created_at]
+      properties:
+        id:
+          type: integer
+        action:
+          type: string
+        entity_type:
+          type: string
+        entity_id:
+          type: string
+        actor_user_id:
+          type: [integer, 'null']
+        organization_id:
+          type: [integer, 'null']
+        before_json:
+          type: [object, 'null']
+          additionalProperties: true
+        after_json:
+          type: [object, 'null']
+          additionalProperties: true
+        source:
+          type: string
+        metadata_json:
+          type: [object, 'null']
+          additionalProperties: true
+        created_at:
+          type: string
+          format: date-time
+
+    AuditEventListResponse:
+      type: object
+      required: [items, total, limit, offset]
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/AuditEventResponse'
+        total:
+          type: integer
+        limit:
+          type: integer
+        offset:
+          type: integer
+
+    ExportDocumentsRequest:
+      type: object
+      properties:
+        transaction_date_from:
+          type: string
+          format: date
+        transaction_date_to:
+          type: string
+          format: date
+        counterparty_name:
+          type: string
+        include_voided:
+          type: boolean
+          default: false
+
+    ProblemDetails:
+      type: object
+      required: [type, title, status]
+      properties:
+        type:
+          type: string
+          format: uri
+          description: Stable problem type URI under https://nene-vault.dev/problems/.
+        title:
+          type: string
+        status:
+          type: integer
+        detail:
+          type: string
+        instance:
+          type: string
+
+    ValidationProblemDetails:
+      allOf:
+        - $ref: '#/components/schemas/ProblemDetails'
+        - type: object
+          properties:
+            errors:
+              type: array
+              items:
+                type: object
+                required: [field, message, code]
+                properties:
+                  field:
+                    type: string
+                  message:
+                    type: string
+                  code:
+                    type: string
+
+  responses:
+    Unauthorized:
+      description: Authentication required or token invalid.
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/ProblemDetails'
+          example:
+            type: https://nene-vault.dev/problems/unauthorized
+            title: Unauthorized
+            status: 401
+            detail: No Bearer token was provided.
+    Forbidden:
+      description: Insufficient capability or organization access denied.
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/ProblemDetails'
+          example:
+            type: https://nene-vault.dev/problems/forbidden
+            title: Forbidden
+            status: 403
+            detail: You do not have permission to perform this action.
+    NotFound:
+      description: Resource not found.
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/ProblemDetails'
+    DocumentNotFound:
+      description: Document not found.
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/ProblemDetails'
+          example:
+            type: https://nene-vault.dev/problems/document-not-found
+            title: Document Not Found
+            status: 404
+    OrganizationNotFound:
+      description: Organization not found.
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/ProblemDetails'
+          example:
+            type: https://nene-vault.dev/problems/organization-not-found
+            title: Organization Not Found
+            status: 404
+    OrganizationSlugConflict:
+      description: Slug already in use.
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/ProblemDetails'
+          example:
+            type: https://nene-vault.dev/problems/organization-slug-conflict
+            title: Organization Slug Conflict
+            status: 409
+    DuplicateFile:
+      description: A file with the same SHA-256 already exists in this organization.
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/ProblemDetails'
+          example:
+            type: https://nene-vault.dev/problems/duplicate-file
+            title: Duplicate File
+            status: 409
+    FileTooLarge:
+      description: File exceeds the maximum allowed size.
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/ProblemDetails'
+          example:
+            type: https://nene-vault.dev/problems/file-too-large
+            title: File Too Large
+            status: 413
+    MimeTypeNotAllowed:
+      description: File type not in the allowlist (PDF/JPEG/PNG).
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/ProblemDetails'
+          example:
+            type: https://nene-vault.dev/problems/mime-type-not-allowed
+            title: MIME Type Not Allowed
+            status: 415
+    InvalidCredentials:
+      description: Email or password incorrect.
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/ProblemDetails'
+          example:
+            type: https://nene-vault.dev/problems/invalid-credentials
+            title: Invalid Credentials
+            status: 401
+    ValidationFailed:
+      description: Request body failed validation.
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/ValidationProblemDetails'
+          example:
+            type: https://nene-vault.dev/problems/validation-failed
+            title: Validation Failed
+            status: 422
+            errors:
+              - field: counterparty_name
+                message: This field is required.
+                code: required
+    InternalServerError:
+      description: Unexpected server error.
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/ProblemDetails'
+          example:
+            type: https://nene-vault.dev/problems/internal-server-error
+            title: Internal Server Error
+            status: 500

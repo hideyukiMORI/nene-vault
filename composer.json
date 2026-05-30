@@ -33,11 +33,13 @@
         "migrations:migrate": "phinx migrate -c phinx.php",
         "migrations:rollback": "phinx rollback -c phinx.php",
         "locales": "php tools/validate-locales.php",
+        "openapi": "php tools/validate-openapi.php",
         "check": [
             "@test",
             "@analyse",
             "@cs",
-            "@locales"
+            "@locales",
+            "@openapi"
         ]
     },
     "config": {
@@ -47,6 +49,7 @@
         "friendsofphp/php-cs-fixer": "^3.95",
         "phpstan/phpstan": "^2.1",
         "phpunit/phpunit": "^13.1",
-        "robmorgan/phinx": "^0.16.11"
+        "robmorgan/phinx": "^0.16.11",
+        "symfony/yaml": "^8.0"
     }
 }
