@@ -1,1 +1,0 @@
-{"root":["./src/App.tsx","./src/main.tsx","./src/vite-env.d.ts","./src/api/auth.ts","./src/api/client.ts","./src/components/LanguageSwitcher.tsx","./src/locale/LocaleContext.tsx","./src/locale/context.ts","./src/locale/locales.ts","./src/locale/useLocale.ts","./src/pages/HomePage.tsx","./src/pages/LoginPage.tsx","./vite.config.ts"],"version":"5.9.3"}
