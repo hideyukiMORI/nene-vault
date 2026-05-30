@@ -202,17 +202,50 @@ Catalog: `docs/mcp/tools.json`. Phase 4+ (read tools first per roadmap).
 
 ---
 
-## 9. Frontend (Phase 2+)
+## 9. Frontend (Phase 2)
+
+**Binding** — full rules and enforcement in [`frontend-standards.md`](./frontend-standards.md).
+Placement/naming violations block merge.
+
+### Files and exports
+
+| Item | Rule | Example |
+| --- | --- | --- |
+| Component file + export | PascalCase, **named export** (no default) | `DocumentList.tsx` → `export function DocumentList` |
+| Hook file | `use-kebab-case.ts` | `use-document-list.ts` |
+| Util / non-component file | kebab-case | `query-keys.ts`, `mapper.ts` |
+| Props type | `{Component}Props` in same file | `DocumentListProps` |
+| Entity folder | kebab-case, matches OpenAPI tag | `entities/vault-document/` |
+| Feature folder | kebab-case workflow name | `features/document-search/` |
+
+### Entity slice files (fixed names)
+
+`index.ts`, `ids.ts`, `enum.ts`, `api-types.ts`, `model.ts`, `mapper.ts`,
+`query-keys.ts`, `queries.ts`, `mutations.ts`, `mapper.test.ts`. No other names
+for these roles.
+
+### Identifiers
 
 | Item | Rule |
 | --- | --- |
-| Components | PascalCase file and export |
-| Hooks | camelCase with `use` prefix |
-| API client | Maps snake_case JSON; do not rename API fields in transit |
-| Admin SPA | React + TypeScript strict mode |
-| Locale keys | snake_case; `ja` primary, `en` secondary (ADR 0005) |
+| Branded ID | `{Resource}Id` in `ids.ts` (e.g. `VaultDocumentId`) — no bare `string` for ids |
+| Query key factory | `{resource}Keys` in `query-keys.ts` (e.g. `vaultDocumentKeys`) |
+| Query hook | `use{Resource}` / `use{Resource}List` |
+| Mutation hook | `use{Verb}{Resource}` (e.g. `useVoidVaultDocument`) |
+| Model type | `{Resource}` (e.g. `VaultDocument`) — UI read model, distinct from DTO |
+| DTO alias | from `shared/api/generated/` via `api-types.ts` |
 
-Full frontend standards: `docs/development/frontend-standards.md` (Phase 2).
+### API & locale
+
+| Item | Rule |
+| --- | --- |
+| API client | snake_case JSON passed through — **do not rename** API fields to camelCase |
+| Problem Details | parsed to `AppError` in `shared/api/errors.ts`; base `https://nene-vault.dev/problems/` |
+| Locale keys | dot-notation from `locales/*.json` (e.g. `document.list.title`); ja+en only (ADR 0005) |
+| Auth token | **not** in `localStorage` (httpOnly cookie or ADR) |
+
+Full frontend standards: [`frontend-standards.md`](./frontend-standards.md).
+Self-review: [`../review/frontend.md`](../review/frontend.md).
 
 ---
 
