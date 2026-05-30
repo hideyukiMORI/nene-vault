@@ -15,19 +15,22 @@ See [ADR 0009](docs/adr/0009-separate-from-billing-and-reconciliation.md).
 
 ## Read First
 
+- **Canonical terms — single source of truth (binding):** `docs/terms.md` ← **START HERE for any identifier**
 - **Scope contract (binding):** `docs/explanation/scope-contract.md`
 - **Compliance (binding):** `docs/explanation/received-document-compliance.md`
 - **No competitor names (binding):** `docs/adr/0013-no-third-party-product-names.md`
+- **Naming rules:** `docs/development/naming-conventions.md`
+- **Backend standards:** `docs/development/backend-standards.md`
 - **Portfolio strategy:** [publication-strategy `docs/products/nene-vault.md`](https://github.com/hideyukiMORI/publication-strategy/blob/main/docs/products/nene-vault.md)
 - **Product vision:** `docs/explanation/product-vision.md`
 - **Requirements:** `docs/explanation/requirements.md`
 - **Domain model:** `docs/explanation/domain-model.md`
-- **Terminology (binding spellings):** `docs/explanation/terminology.md`
-- **Glossary:** `docs/explanation/glossary.md`
+- **Glossary (meanings):** `docs/explanation/glossary.md`
+- **Legal/compliance vocabulary:** `docs/explanation/terminology.md`
 - **Retention calculation (ADR 0004):** `docs/adr/0004-retention-period-calculation.md`
 - **Audit event schema (ADR 0014):** `docs/adr/0014-audit-event-schema.md`
 - **Scope boundary:** `docs/explanation/scope-boundary.md`
-- **NENE2 conventions:** `docs/development/nene2-compliance.md`
+- **NENE2 inheritance map:** `docs/inheritance-from-nene2.md`
 - **Sibling integration:** `docs/integrations/sibling-products.md`
 - **Current work:** `docs/todo/current.md`
 - **Roadmap:** `docs/roadmap.md`

@@ -4,10 +4,15 @@ NeNe Vault is built through small, Issue-driven changes. This document is the sh
 
 ## Required Reading
 
+> **Start with `docs/terms.md`.** It is the single source of truth for every
+> canonical identifier spelling. Any identifier not in that file, or that differs
+> from the registered form, blocks merge.
+
 The following documents exist now and must be read before contributing:
 
 | Topic | Document |
 | --- | --- |
+| **Canonical terms (binding)** | **`docs/terms.md`** ← single source of truth for all identifier spellings |
 | Agent entry point | `AGENTS.md` |
 | Scope contract (binding) | `docs/explanation/scope-contract.md` |
 | Compliance (binding) | `docs/explanation/received-document-compliance.md` |
