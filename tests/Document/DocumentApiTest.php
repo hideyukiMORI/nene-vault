@@ -108,6 +108,47 @@ final class DocumentApiTest extends TestCase
         @unlink($tmp);
     }
 
+    public function test_search_by_counterparty_and_date_combination(): void
+    {
+        $handler = $this->handler();
+
+        // Upload two documents with distinct counterparties and dates
+        $this->upload(handler: $handler, counterparty: 'Alpha Trading', date: '2026-02-10', amount: '50000');
+        $this->upload(handler: $handler, counterparty: 'Beta Supplies', date: '2026-08-20', amount: '75000');
+
+        // Two-field combination: counterparty partial + date range
+        $response = $handler->handle($this->request(
+            'GET',
+            '/admin/vault/documents?counterparty_name=Alpha&transaction_date_from=2026-01-01&transaction_date_to=2026-06-30',
+        ));
+
+        $this->assertSame(200, $response->getStatusCode(), (string) $response->getBody());
+        $body = json_decode((string) $response->getBody(), true);
+        $this->assertIsArray($body);
+        $this->assertGreaterThanOrEqual(1, $body['total']);
+        foreach ($body['items'] as $item) {
+            $this->assertStringContainsString('Alpha', $item['counterparty_name']);
+        }
+    }
+
+    public function test_search_by_amount_range(): void
+    {
+        $handler = $this->handler();
+        $this->upload(handler: $handler, counterparty: 'Gamma Corp', date: '2026-03-15', amount: '999999');
+
+        $response = $handler->handle($this->request(
+            'GET',
+            '/admin/vault/documents?amount_min_cents=999999&amount_max_cents=999999&counterparty_name=Gamma',
+        ));
+
+        $this->assertSame(200, $response->getStatusCode());
+        $body = json_decode((string) $response->getBody(), true);
+        $this->assertGreaterThanOrEqual(1, $body['total']);
+        foreach ($body['items'] as $item) {
+            $this->assertSame(999999, $item['amount_cents']);
+        }
+    }
+
     public function test_get_unknown_document_returns_404(): void
     {
         $response = $this->handler()->handle(
@@ -152,10 +193,38 @@ final class DocumentApiTest extends TestCase
             $headers['Authorization'] = 'Bearer ' . self::$token;
         }
 
+        $queryParams = [];
+        $queryString = parse_url($uri, PHP_URL_QUERY);
+        if (is_string($queryString)) {
+            parse_str($queryString, $queryParams);
+        }
+
         return $creator->fromArrays(
             server: ['REQUEST_METHOD' => $method, 'REQUEST_URI' => $uri],
             headers: $headers,
+            get: $queryParams,
         );
+    }
+
+    /** Uploads a document and returns its id. */
+    private function upload(RequestHandlerInterface $handler, string $counterparty, string $date, string $amount): string
+    {
+        $tmp = $this->makeTempFile("%PDF-1.4\n{$counterparty} {$date} {$amount}\n");
+        $request = $this->request('POST', '/admin/vault/documents')
+            ->withUploadedFiles(['file' => $this->uploadedFile($tmp, 'doc.pdf', 'application/pdf')])
+            ->withParsedBody([
+                'counterparty_name' => $counterparty,
+                'category' => 'invoice_received',
+                'transaction_date' => $date,
+                'amount_cents' => $amount,
+            ]);
+
+        $response = $handler->handle($request);
+        assert($response->getStatusCode() === 201, (string) $response->getBody());
+        $body = json_decode((string) $response->getBody(), true);
+        @unlink($tmp);
+
+        return (string) $body['id'];
     }
 
     private function makeTempFile(string $content): string

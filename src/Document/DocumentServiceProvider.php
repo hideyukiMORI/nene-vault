@@ -118,6 +118,35 @@ final readonly class DocumentServiceProvider implements ServiceProviderInterface
                 },
             )
             ->set(
+                SearchDocumentsUseCaseInterface::class,
+                static function (ContainerInterface $c): SearchDocumentsUseCaseInterface {
+                    $documents = $c->get(VaultDocumentRepositoryInterface::class);
+
+                    if (!$documents instanceof VaultDocumentRepositoryInterface) {
+                        throw new LogicException('VaultDocumentRepositoryInterface service is invalid.');
+                    }
+
+                    return new SearchDocumentsUseCase($documents);
+                },
+            )
+            ->set(
+                SearchDocumentsHandler::class,
+                static function (ContainerInterface $c): SearchDocumentsHandler {
+                    $uc = $c->get(SearchDocumentsUseCaseInterface::class);
+                    $json = $c->get(JsonResponseFactory::class);
+
+                    if (!$uc instanceof SearchDocumentsUseCaseInterface) {
+                        throw new LogicException('SearchDocumentsUseCaseInterface service is invalid.');
+                    }
+
+                    if (!$json instanceof JsonResponseFactory) {
+                        throw new LogicException('JsonResponseFactory service is invalid.');
+                    }
+
+                    return new SearchDocumentsHandler($uc, $json);
+                },
+            )
+            ->set(
                 UploadDocumentHandler::class,
                 static function (ContainerInterface $c): UploadDocumentHandler {
                     $uc = $c->get(UploadDocumentUseCaseInterface::class);
@@ -203,17 +232,22 @@ final readonly class DocumentServiceProvider implements ServiceProviderInterface
                 DocumentRouteRegistrar::class,
                 static function (ContainerInterface $c): DocumentRouteRegistrar {
                     $upload = $c->get(UploadDocumentHandler::class);
+                    $search = $c->get(SearchDocumentsHandler::class);
                     $get = $c->get(GetDocumentByIdHandler::class);
 
                     if (!$upload instanceof UploadDocumentHandler) {
                         throw new LogicException('UploadDocumentHandler service is invalid.');
                     }
 
+                    if (!$search instanceof SearchDocumentsHandler) {
+                        throw new LogicException('SearchDocumentsHandler service is invalid.');
+                    }
+
                     if (!$get instanceof GetDocumentByIdHandler) {
                         throw new LogicException('GetDocumentByIdHandler service is invalid.');
                     }
 
-                    return new DocumentRouteRegistrar($upload, $get);
+                    return new DocumentRouteRegistrar($upload, $search, $get);
                 },
             );
     }
