@@ -5,15 +5,15 @@ Authoritative naming rules for NeNe Vault code, API contracts, database objects,
 > **Absolute adherence — non-negotiable.** These rules are **MUST**, not
 > suggestions. A name that violates a rule here, or a spelling variant of a
 > registered term, is a defect and **blocks merge**. There is no "close enough."
-> When in doubt, match the registry exactly.
->
-> The canonical spelling of every term and identifier lives in the **single
-> source of truth**: [`../explanation/terminology.md`](../explanation/terminology.md).
-> This document defines the *patterns*; the registry defines the *exact strings*.
-> Introducing or renaming any identifier **MUST** update the registry in the same PR.
+> When in doubt, look up the exact spelling in `docs/terms.md` and copy it verbatim.
 
-**Terminology registry:** [`docs/explanation/terminology.md`](../explanation/terminology.md)
-**Glossary (meanings):** [`docs/explanation/glossary.md`](../explanation/glossary.md)
+**Canonical spellings — single source of truth: [`docs/terms.md`](../terms.md)**
+Every registered identifier is in `docs/terms.md`. This document defines *patterns*;
+`docs/terms.md` defines *exact strings*. When they conflict, `docs/terms.md` wins.
+Introducing or renaming any identifier **MUST** update `docs/terms.md` in the same PR.
+
+**Meanings and definitions:** [`docs/explanation/glossary.md`](../explanation/glossary.md)
+**Legal / compliance terms:** [`docs/explanation/terminology.md`](../explanation/terminology.md)
 **Framework baseline:** NENE2 [`domain-layer.md`](https://github.com/hideyukiMORI/NENE2/blob/main/docs/development/domain-layer.md) and [`database-migrations.md`](https://github.com/hideyukiMORI/NENE2/blob/main/docs/development/database-migrations.md).
 
 ---
@@ -220,19 +220,21 @@ Full frontend standards: `docs/development/frontend-standards.md` (Phase 2).
 
 | Surface | Language | Naming |
 | --- | --- | --- |
-| Public docs, OpenAPI, API errors | English | Use glossary canonical terms |
-| Issues, PRs, commit bodies | Japanese allowed | Prefer glossary English term on first mention |
+| Public docs, OpenAPI, API errors | English | Use `docs/terms.md` canonical forms |
+| Issues, PRs, commit bodies | Japanese allowed | Prefer `docs/terms.md` English form on first mention |
 | Commit subject | Conventional Commits + `(#issue)` | See [`commit-conventions.md`](./commit-conventions.md) |
 | ADR file | `NNNN-kebab-title.md` | `0004-retention-period-calculation.md` |
 
-When adding or renaming any identifier, update [`terminology.md`](../explanation/terminology.md) in the same PR; if it is a product concept, also update [`glossary.md`](../explanation/glossary.md).
+When adding or renaming any identifier, update **[`docs/terms.md`](../terms.md)** in the same PR.
+If it is a product concept with a meaning, also update [`docs/explanation/glossary.md`](../explanation/glossary.md).
+`docs/explanation/terminology.md` is for legal/compliance vocabulary only — not for code spellings.
 
 ---
 
 ## 11. Prohibited patterns
 
-- **Typos or spelling variants of any term registered in `terminology.md`** — blocks merge
-- **Unregistered identifiers** — using an entity, status, field, slug, or `operationId` not in `terminology.md` without adding it in the same PR
+- **Typos or spelling variants of any term in `docs/terms.md`** — blocks merge. See also the "risky near-miss pairs" table in `docs/terms.md` Appendix.
+- **Unregistered identifiers** — using an entity, status, field, slug, or `operationId` not in `docs/terms.md` without adding it in the same PR
 - Layer-first folders (`src/Handlers/`, `src/Repositories/`, `src/UseCases/`)
 - SQL outside `Pdo*Repository` classes
 - File I/O outside `DocumentStorageInterface` implementations

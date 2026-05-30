@@ -13,12 +13,18 @@ Use for: workflow changes, ADR additions, roadmap updates, Cursor rules, AGENTS.
 - [ ] If the ADR deviates from `received-document-compliance.md`: professional sign-off is recorded.
 - [ ] If the ADR supersedes another: the superseded ADR's status is updated.
 
+## Terms registry
+
+- [ ] **`docs/terms.md` is updated** when any new identifier is introduced or renamed — this is required, not optional.
+- [ ] The new identifier does not appear in the "DO NOT use" column of any existing entry.
+- [ ] The new identifier is consistent with the patterns in `docs/development/naming-conventions.md`.
+- [ ] If it is a product concept with a meaning, `docs/explanation/glossary.md` is also updated.
+
 ## Compliance and governance docs
 
 - [ ] Changes to `received-document-compliance.md` have a compliance review sign-off (§0.2).
 - [ ] Changes to `scope-contract.md` have an ADR if they add to the DO or DON'T lists.
-- [ ] `terminology.md` is updated when a new identifier is introduced or renamed.
-- [ ] `glossary.md` is updated for new product concepts in the same PR.
+- [ ] `docs/explanation/terminology.md` is updated only for legal/compliance vocabulary — code spellings go in `docs/terms.md`.
 
 ## Roadmap and milestones
 
