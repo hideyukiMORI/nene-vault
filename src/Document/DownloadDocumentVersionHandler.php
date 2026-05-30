@@ -1,0 +1,47 @@
+<?php
+
+declare(strict_types=1);
+
+namespace NeneVault\Document;
+
+use Nene2\Routing\Router;
+use Psr\Http\Message\ResponseFactoryInterface;
+use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\ServerRequestInterface;
+use Psr\Http\Message\StreamFactoryInterface;
+
+final readonly class DownloadDocumentVersionHandler
+{
+    public function __construct(
+        private DownloadDocumentVersionUseCaseInterface $useCase,
+        private ResponseFactoryInterface $responseFactory,
+        private StreamFactoryInterface $streamFactory,
+    ) {
+    }
+
+    public function handle(ServerRequestInterface $request): ResponseInterface
+    {
+        $orgId = $request->getAttribute('nene2.org.id');
+        assert(is_int($orgId));
+
+        $params = $request->getAttribute(Router::PARAMETERS_ATTRIBUTE, []);
+        $documentId = (string) ($params['id'] ?? '');
+        $versionId = (string) ($params['versionId'] ?? '');
+
+        $result = $this->useCase->execute($documentId, $versionId, $orgId);
+
+        $stream = $this->streamFactory->createStreamFromFile($result['absolute_path'], 'rb');
+
+        return $this->responseFactory->createResponse(200)
+            ->withHeader('Content-Type', $result['mime_type'])
+            ->withHeader('Content-Disposition', 'attachment; filename="' . $this->sanitizeFilename($result['filename']) . '"')
+            ->withHeader('X-Content-Type-Options', 'nosniff')
+            ->withBody($stream);
+    }
+
+    private function sanitizeFilename(string $filename): string
+    {
+        // Strip characters that could break the header; keep it simple and safe.
+        return str_replace(['"', "\r", "\n"], '', $filename);
+    }
+}

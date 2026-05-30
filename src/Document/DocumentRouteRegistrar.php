@@ -16,6 +16,7 @@ final readonly class DocumentRouteRegistrar
         private VoidDocumentHandler $void,
         private RestoreDocumentHandler $restore,
         private GetDocumentHistoryHandler $history,
+        private DownloadDocumentVersionHandler $download,
     ) {
     }
 
@@ -28,5 +29,6 @@ final readonly class DocumentRouteRegistrar
         $router->post('/admin/vault/documents/{id}/void', $this->void->handle(...));
         $router->post('/admin/vault/documents/{id}/restore', $this->restore->handle(...));
         $router->get('/admin/vault/documents/{id}/history', $this->history->handle(...));
+        $router->get('/admin/vault/documents/{id}/versions/{versionId}/download', $this->download->handle(...));
     }
 }
