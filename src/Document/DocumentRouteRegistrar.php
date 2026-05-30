@@ -12,6 +12,10 @@ final readonly class DocumentRouteRegistrar
         private UploadDocumentHandler $upload,
         private SearchDocumentsHandler $search,
         private GetDocumentByIdHandler $get,
+        private UpdateDocumentMetadataHandler $updateMetadata,
+        private VoidDocumentHandler $void,
+        private RestoreDocumentHandler $restore,
+        private GetDocumentHistoryHandler $history,
     ) {
     }
 
@@ -20,5 +24,9 @@ final readonly class DocumentRouteRegistrar
         $router->get('/admin/vault/documents', $this->search->handle(...));
         $router->post('/admin/vault/documents', $this->upload->handle(...));
         $router->get('/admin/vault/documents/{id}', $this->get->handle(...));
+        $router->patch('/admin/vault/documents/{id}/metadata', $this->updateMetadata->handle(...));
+        $router->post('/admin/vault/documents/{id}/void', $this->void->handle(...));
+        $router->post('/admin/vault/documents/{id}/restore', $this->restore->handle(...));
+        $router->get('/admin/vault/documents/{id}/history', $this->history->handle(...));
     }
 }

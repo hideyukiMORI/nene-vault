@@ -10,6 +10,7 @@ use Nene2\DependencyInjection\ContainerBuilder;
 use Nene2\DependencyInjection\ServiceProviderInterface;
 use Nene2\Error\ProblemDetailsResponseFactory;
 use Nene2\Http\JsonResponseFactory;
+use NeneVault\Audit\AuditEventRepositoryInterface;
 use NeneVault\Audit\AuditRecorderInterface;
 use NeneVault\DocumentVersion\DocumentStorageInterface;
 use NeneVault\DocumentVersion\DocumentVersionRepositoryInterface;
@@ -130,6 +131,100 @@ final readonly class DocumentServiceProvider implements ServiceProviderInterface
                 },
             )
             ->set(
+                UpdateDocumentMetadataUseCaseInterface::class,
+                static function (ContainerInterface $c): UpdateDocumentMetadataUseCaseInterface {
+                    return new UpdateDocumentMetadataUseCase(
+                        self::repo($c),
+                        self::versionRepo($c),
+                        self::audit($c),
+                    );
+                },
+            )
+            ->set(
+                VoidDocumentUseCaseInterface::class,
+                static function (ContainerInterface $c): VoidDocumentUseCaseInterface {
+                    return new VoidDocumentUseCase(
+                        self::repo($c),
+                        self::versionRepo($c),
+                        self::audit($c),
+                    );
+                },
+            )
+            ->set(
+                RestoreDocumentUseCaseInterface::class,
+                static function (ContainerInterface $c): RestoreDocumentUseCaseInterface {
+                    return new RestoreDocumentUseCase(
+                        self::repo($c),
+                        self::versionRepo($c),
+                        self::audit($c),
+                    );
+                },
+            )
+            ->set(
+                GetDocumentHistoryUseCaseInterface::class,
+                static function (ContainerInterface $c): GetDocumentHistoryUseCaseInterface {
+                    $auditEvents = $c->get(AuditEventRepositoryInterface::class);
+
+                    if (!$auditEvents instanceof AuditEventRepositoryInterface) {
+                        throw new LogicException('AuditEventRepositoryInterface service is invalid.');
+                    }
+
+                    return new GetDocumentHistoryUseCase(
+                        self::repo($c),
+                        self::versionRepo($c),
+                        $auditEvents,
+                    );
+                },
+            )
+            ->set(
+                UpdateDocumentMetadataHandler::class,
+                static function (ContainerInterface $c): UpdateDocumentMetadataHandler {
+                    $uc = $c->get(UpdateDocumentMetadataUseCaseInterface::class);
+
+                    if (!$uc instanceof UpdateDocumentMetadataUseCaseInterface) {
+                        throw new LogicException('UpdateDocumentMetadataUseCaseInterface service is invalid.');
+                    }
+
+                    return new UpdateDocumentMetadataHandler($uc, self::json($c));
+                },
+            )
+            ->set(
+                VoidDocumentHandler::class,
+                static function (ContainerInterface $c): VoidDocumentHandler {
+                    $uc = $c->get(VoidDocumentUseCaseInterface::class);
+
+                    if (!$uc instanceof VoidDocumentUseCaseInterface) {
+                        throw new LogicException('VoidDocumentUseCaseInterface service is invalid.');
+                    }
+
+                    return new VoidDocumentHandler($uc, self::json($c));
+                },
+            )
+            ->set(
+                RestoreDocumentHandler::class,
+                static function (ContainerInterface $c): RestoreDocumentHandler {
+                    $uc = $c->get(RestoreDocumentUseCaseInterface::class);
+
+                    if (!$uc instanceof RestoreDocumentUseCaseInterface) {
+                        throw new LogicException('RestoreDocumentUseCaseInterface service is invalid.');
+                    }
+
+                    return new RestoreDocumentHandler($uc, self::json($c));
+                },
+            )
+            ->set(
+                GetDocumentHistoryHandler::class,
+                static function (ContainerInterface $c): GetDocumentHistoryHandler {
+                    $uc = $c->get(GetDocumentHistoryUseCaseInterface::class);
+
+                    if (!$uc instanceof GetDocumentHistoryUseCaseInterface) {
+                        throw new LogicException('GetDocumentHistoryUseCaseInterface service is invalid.');
+                    }
+
+                    return new GetDocumentHistoryHandler($uc, self::json($c));
+                },
+            )
+            ->set(
                 SearchDocumentsHandler::class,
                 static function (ContainerInterface $c): SearchDocumentsHandler {
                     $uc = $c->get(SearchDocumentsUseCaseInterface::class);
@@ -234,6 +329,10 @@ final readonly class DocumentServiceProvider implements ServiceProviderInterface
                     $upload = $c->get(UploadDocumentHandler::class);
                     $search = $c->get(SearchDocumentsHandler::class);
                     $get = $c->get(GetDocumentByIdHandler::class);
+                    $updateMetadata = $c->get(UpdateDocumentMetadataHandler::class);
+                    $void = $c->get(VoidDocumentHandler::class);
+                    $restore = $c->get(RestoreDocumentHandler::class);
+                    $history = $c->get(GetDocumentHistoryHandler::class);
 
                     if (!$upload instanceof UploadDocumentHandler) {
                         throw new LogicException('UploadDocumentHandler service is invalid.');
@@ -247,8 +346,68 @@ final readonly class DocumentServiceProvider implements ServiceProviderInterface
                         throw new LogicException('GetDocumentByIdHandler service is invalid.');
                     }
 
-                    return new DocumentRouteRegistrar($upload, $search, $get);
+                    if (!$updateMetadata instanceof UpdateDocumentMetadataHandler) {
+                        throw new LogicException('UpdateDocumentMetadataHandler service is invalid.');
+                    }
+
+                    if (!$void instanceof VoidDocumentHandler) {
+                        throw new LogicException('VoidDocumentHandler service is invalid.');
+                    }
+
+                    if (!$restore instanceof RestoreDocumentHandler) {
+                        throw new LogicException('RestoreDocumentHandler service is invalid.');
+                    }
+
+                    if (!$history instanceof GetDocumentHistoryHandler) {
+                        throw new LogicException('GetDocumentHistoryHandler service is invalid.');
+                    }
+
+                    return new DocumentRouteRegistrar($upload, $search, $get, $updateMetadata, $void, $restore, $history);
                 },
             );
+    }
+
+    private static function repo(ContainerInterface $c): VaultDocumentRepositoryInterface
+    {
+        $r = $c->get(VaultDocumentRepositoryInterface::class);
+
+        if (!$r instanceof VaultDocumentRepositoryInterface) {
+            throw new LogicException('VaultDocumentRepositoryInterface service is invalid.');
+        }
+
+        return $r;
+    }
+
+    private static function versionRepo(ContainerInterface $c): DocumentVersionRepositoryInterface
+    {
+        $r = $c->get(DocumentVersionRepositoryInterface::class);
+
+        if (!$r instanceof DocumentVersionRepositoryInterface) {
+            throw new LogicException('DocumentVersionRepositoryInterface service is invalid.');
+        }
+
+        return $r;
+    }
+
+    private static function audit(ContainerInterface $c): AuditRecorderInterface
+    {
+        $a = $c->get(AuditRecorderInterface::class);
+
+        if (!$a instanceof AuditRecorderInterface) {
+            throw new LogicException('AuditRecorderInterface service is invalid.');
+        }
+
+        return $a;
+    }
+
+    private static function json(ContainerInterface $c): JsonResponseFactory
+    {
+        $j = $c->get(JsonResponseFactory::class);
+
+        if (!$j instanceof JsonResponseFactory) {
+            throw new LogicException('JsonResponseFactory service is invalid.');
+        }
+
+        return $j;
     }
 }

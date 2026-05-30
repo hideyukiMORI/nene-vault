@@ -218,6 +218,30 @@ final class InMemoryVaultDocumentRepository implements VaultDocumentRepositoryIn
         // not needed for upload slice tests
     }
 
+    /** @param list<string> $tags */
+    public function updateMetadata(
+        string $id,
+        int $organizationId,
+        ?string $transactionDate,
+        ?int $amountCents,
+        string $counterpartyName,
+        string $category,
+        array $tags,
+        bool $dateUncertain,
+    ): void {
+        // not needed for upload slice tests
+    }
+
+    public function void(string $id, int $organizationId, int $voidedBy, string $voidReason, ?string $voidNote): void
+    {
+        // not needed for upload slice tests
+    }
+
+    public function restore(string $id, int $organizationId): void
+    {
+        // not needed for upload slice tests
+    }
+
     /** @return list<array{0: VaultDocument, 1: \NeneVault\DocumentVersion\DocumentVersion}> */
     public function search(\NeneVault\Document\DocumentSearchCriteria $criteria): array
     {
