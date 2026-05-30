@@ -354,7 +354,8 @@ final class DocumentApiTest extends TestCase
     {
         $tmp = tempnam(sys_get_temp_dir(), 'vault_test_');
         assert($tmp !== false);
-        file_put_contents($tmp, $content);
+        // Append random bytes so each test run produces a unique SHA-256.
+        file_put_contents($tmp, $content . bin2hex(random_bytes(8)));
 
         return $tmp;
     }

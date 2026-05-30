@@ -117,7 +117,7 @@ final class UserApiTest extends TestCase
         $conn = $container->get(DatabaseConnectionFactoryInterface::class);
         assert($conn instanceof DatabaseConnectionFactoryInterface);
         $pdo = $conn->create();
-        $pdo->exec("INSERT INTO users (id, email, password_hash, role, organization_id, status, created_at, updated_at)
+        $pdo->exec("INSERT OR IGNORE INTO users (id, email, password_hash, role, organization_id, status, created_at, updated_at)
             VALUES (1000, 'self@example.com', 'x', 'admin', " . self::$orgId . ", 'active', datetime('now'), datetime('now'))");
 
         // JWT user_id is 1000 — deleting id 1000 is self
