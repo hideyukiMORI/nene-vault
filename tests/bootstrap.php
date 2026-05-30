@@ -89,3 +89,41 @@ $pdo->exec('CREATE TABLE IF NOT EXISTS audit_events (
     metadata_json TEXT,
     created_at DATETIME NOT NULL
 )');
+
+$pdo->exec('CREATE TABLE IF NOT EXISTS vault_documents (
+    id CHAR(26) PRIMARY KEY,
+    organization_id INTEGER NOT NULL,
+    current_version_id CHAR(26) NOT NULL,
+    status VARCHAR(16) NOT NULL DEFAULT "active",
+    transaction_date DATE,
+    amount_cents INTEGER,
+    counterparty_name VARCHAR(255) NOT NULL,
+    category VARCHAR(32) NOT NULL,
+    tags TEXT,
+    date_uncertain INTEGER NOT NULL DEFAULT 0,
+    is_metadata_confirmed INTEGER NOT NULL DEFAULT 0,
+    retention_years INTEGER NOT NULL DEFAULT 10,
+    retention_expires_at DATE NOT NULL,
+    uploaded_at DATETIME NOT NULL,
+    uploaded_by INTEGER,
+    voided_at DATETIME,
+    voided_by INTEGER,
+    void_reason VARCHAR(255),
+    void_note TEXT
+)');
+
+$pdo->exec('CREATE TABLE IF NOT EXISTS document_versions (
+    id CHAR(26) PRIMARY KEY,
+    vault_document_id CHAR(26) NOT NULL,
+    organization_id INTEGER NOT NULL,
+    version_number INTEGER NOT NULL,
+    file_path VARCHAR(512) NOT NULL,
+    file_sha256 CHAR(64) NOT NULL,
+    mime_type VARCHAR(64) NOT NULL,
+    original_filename VARCHAR(255) NOT NULL,
+    file_size_bytes INTEGER NOT NULL,
+    source VARCHAR(32) NOT NULL DEFAULT "web_upload",
+    uploaded_at DATETIME NOT NULL,
+    uploaded_by INTEGER,
+    UNIQUE(vault_document_id, version_number)
+)');

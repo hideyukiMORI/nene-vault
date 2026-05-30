@@ -313,6 +313,10 @@ final readonly class RuntimeServiceProvider implements ServiceProviderInterface
                         new CapabilityMiddleware($pd),
                     ];
 
+                    // Allow uploads up to the configured max file size plus multipart overhead.
+                    $maxFileMb = (int) (getenv('NENE_VAULT_MAX_FILE_SIZE_MB') ?: 20);
+                    $maxBodyBytes = ($maxFileMb + 5) * 1024 * 1024;
+
                     return new RuntimeApplicationFactory(
                         responseFactory: $rf,
                         streamFactory: $sf,
@@ -323,6 +327,7 @@ final readonly class RuntimeServiceProvider implements ServiceProviderInterface
                         routeRegistrars: $routeRegistrars,
                         authMiddleware: $authMiddleware,
                         debug: $config->debug,
+                        requestMaxBodyBytes: $maxBodyBytes,
                     );
                 },
             )
