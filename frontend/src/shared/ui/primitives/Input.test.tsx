@@ -1,3 +1,4 @@
+import { createRef } from 'react';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
@@ -7,6 +8,12 @@ describe('Input', () => {
   it('renders an input element', () => {
     render(<Input />);
     expect(screen.getByRole('textbox')).toBeInTheDocument();
+  });
+
+  it('forwards its ref to the underlying input (required by React Hook Form)', () => {
+    const ref = createRef<HTMLInputElement>();
+    render(<Input ref={ref} />);
+    expect(ref.current).toBeInstanceOf(HTMLInputElement);
   });
 
   it('forwards type prop', () => {
