@@ -5,7 +5,10 @@ NeNe Vault's admin UI is a **React + TypeScript** client of the JSON API. It is
 (`composer check`, OpenAPI) is.
 
 **Status:** **Phase 2** — standards locked here; the scaffold is rebuilt to comply
-(Issue #34). The PR #31 scaffold is **non-compliant** and is being replaced.
+(Issue #34). The PR #31 scaffold predates these structural rules (FSD layering,
+Tailwind tokens, TanStack Query, Storybook, tests, codegen) and is replaced. Its
+auth approach (JWT in `localStorage` + Bearer) already matches NeNe Records and is
+kept.
 
 **Framework baseline:** [NENE2 frontend integration](https://github.com/hideyukiMORI/NENE2/blob/main/docs/development/frontend-integration.md).
 **Inheritance map:** `docs/inheritance-from-nene2.md`.
@@ -17,8 +20,10 @@ temporary exceptions without an ADR.
 > This document mirrors the NeNe Records frontend standards, **adapted for vault**:
 > i18n is **ja/en only** (ADR 0005) and reads the repository-root `locales/`
 > (single source of truth); entities are vault resources; Problem Details base is
-> `https://nene-vault.dev/problems/`; auth tokens are **not** stored in
-> `localStorage`.
+> `https://nene-vault.dev/problems/`. Auth follows the NeNe Records pattern:
+> a JWT session in an `entities/auth` `authStore` (localStorage), sent as
+> `Authorization: Bearer` with `credentials: 'include'`; 401 → clear session +
+> `/login`, 403 → `/forbidden`.
 
 ---
 
@@ -32,7 +37,7 @@ temporary exceptions without an ADR.
 | **Fixed placement** | Models, enums, hooks, tests live in mandated paths — placement violations block merge. |
 | **Explicit dependencies** | Import graph encodes architecture; ESLint enforces it. |
 | **Loose coupling** | Layers communicate through public surfaces (`index.ts`, props, hooks) — not internals. |
-| **Secure by default** | Fail closed on auth errors; minimal trust of client input and third-party markup; no token in `localStorage`. |
+| **Secure by default** | Fail closed on auth errors; minimal trust of client input and third-party markup. |
 | **Test by behavior** | Tests assert user-observable outcomes; MSW mirrors OpenAPI at boundaries. |
 | **Theme by substitution** | All visual values live in theme token files; swapping the active theme restyles the app without touching components. |
 | **No magic styling** | Margin, padding, color, typography, background never appear as raw literals outside the theme layer. |
@@ -302,7 +307,7 @@ Cover at least default, disabled (if applicable), and each variant. Colocate
 ### HTTP client (`shared/api/client.ts`)
 
 - Single `apiClient` with typed `get/post/patch/delete`.
-- Attaches auth per policy (see Security — **not** a `localStorage` bearer).
+- Attaches `Authorization: Bearer` from the `entities/auth` `authStore` and sends `credentials: 'include'` (see Security).
 - Parses JSON; throws **`AppError`** from Problem Details on 4xx/5xx.
 - Transport only — no domain logic.
 
@@ -371,7 +376,7 @@ potentially compromised.
 | Topic | Rule |
 | --- | --- |
 | **Secrets** | Never in repo. Only public `VITE_*` in frontend env. |
-| **Auth tokens** | **No JWT/refresh token in `localStorage`** — httpOnly cookie, or an explicit ADR if a bearer-in-memory approach is justified. The PR #31 scaffold violated this; the rebuild fixes it. |
+| **Auth tokens** | JWT session held in `entities/auth` `authStore` (localStorage, same as NeNe Records), sent as `Authorization: Bearer` with `credentials: 'include'`. XSS is mitigated by no `dangerouslySetInnerHTML` (without DOMPurify), CSP, and dependency audit. A move to httpOnly cookies later is an ADR, not a blocker. |
 | **XSS** | No `dangerouslySetInnerHTML` without DOMPurify + Issue. |
 | **Links** | `rel="noopener noreferrer"` on `target="_blank"`. |
 | **Open redirects** | Validate post-login redirect against an allowlist. |
@@ -440,7 +445,6 @@ values (`/\[.+\]/`) outside `shared/ui/theme/`, forbid inline `style` literals i
 
 - Duplicating API validation as source of truth in the browser.
 - Hard-coded visual values outside `shared/ui/theme/`.
-- Auth token in `localStorage` (without ADR).
 - A third UI locale beyond ja/en.
 - DB or MCP access from the browser.
 - Committing `node_modules/` or generated assets.
