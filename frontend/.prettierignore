@@ -1,2 +1,5 @@
 dist
+storybook-static
 node_modules
+coverage
+src/shared/api/generated

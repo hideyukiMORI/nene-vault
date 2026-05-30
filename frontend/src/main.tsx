@@ -1,8 +1,9 @@
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
-import { LocaleProvider } from './locale/LocaleContext';
-import { App } from './App';
-import './styles.css';
+import { RouterProvider } from 'react-router-dom';
+import { Providers } from '@/app/providers';
+import { RootErrorBoundary } from '@/app/root-error-boundary';
+import { router } from '@/app/router';
 
 const rootElement = document.getElementById('root');
 if (rootElement === null) {
@@ -11,8 +12,10 @@ if (rootElement === null) {
 
 createRoot(rootElement).render(
   <StrictMode>
-    <LocaleProvider>
-      <App />
-    </LocaleProvider>
+    <RootErrorBoundary>
+      <Providers>
+        <RouterProvider router={router} />
+      </Providers>
+    </RootErrorBoundary>
   </StrictMode>,
 );

@@ -1,27 +1,34 @@
-import { defineConfig } from 'vite';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+import tailwindcss from '@tailwindcss/vite';
 import react from '@vitejs/plugin-react';
-import { resolve } from 'node:path';
+import { defineConfig, loadEnv } from 'vite';
 
-// The repository-root locales/ directory is the single source of truth for UI
-// strings (ADR 0005). Allow Vite to read it and expose a stable alias.
-const projectRoot = resolve(import.meta.dirname, '..');
+const dirname = path.dirname(fileURLToPath(import.meta.url));
 
-export default defineConfig({
-  plugins: [react()],
-  resolve: {
-    alias: {
-      '@locales': resolve(projectRoot, 'locales'),
+export default defineConfig(({ mode }) => {
+  // Read NENE_VAULT_PORT from the project-root .env (one level up from frontend/)
+  // so the dev proxy stays in sync without duplicating the value.
+  const projectEnv = loadEnv(mode, path.resolve(dirname, '..'), '');
+  const appPort = projectEnv['NENE_VAULT_PORT'] ?? '8080';
+  const target = `http://localhost:${appPort}`;
+
+  return {
+    plugins: [react(), tailwindcss()],
+    resolve: {
+      alias: {
+        '@': path.resolve(dirname, './src'),
+        '@tests': path.resolve(dirname, './tests'),
+        // locales/ at the repo root is the single source of truth (ADR 0005).
+        '@locales': path.resolve(dirname, '..', 'locales'),
+      },
     },
-  },
-  server: {
-    fs: {
-      // Permit importing locales/ from the repo root (one level above frontend/).
-      allow: [projectRoot],
+    server: {
+      fs: { allow: [path.resolve(dirname, '..')] },
+      proxy: {
+        '/admin': { target, changeOrigin: true },
+        '/health': { target, changeOrigin: true },
+      },
     },
-    proxy: {
-      // Proxy admin/health API calls to the local backend during development.
-      '/admin': 'http://localhost:8080',
-      '/health': 'http://localhost:8080',
-    },
-  },
+  };
 });
