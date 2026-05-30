@@ -1,25 +1,37 @@
 # Current TODO
 
-**Phase 0 — Governance and product design**
+**Phase 1 — Document API complete; compliance review gate open.**
 
 ## Done
 
-- [x] Issue #1: Governance bootstrap — merged (PR #1, 2026-05-30)
-- [x] Issue #2: Product vision & requirements review — merged (PR #2, 2026-05-30)
+- [x] Governance bootstrap, product definition (PR #1, #2)
+- [x] Coding standards + review checklists (PR #4)
+- [x] `docs/terms.md` canonical identifier registry (PR #6)
+- [x] Multi-tenancy foundation — Auth / Organization / VaultSettings (PR #8)
+- [x] Audit logging — before/after on all mutations (PR #10)
+- [x] ja/en locale files (PR #12)
+- [x] OpenAPI 3.1 contract — all Phase 1 endpoints (PR #14)
+- [x] Document upload + storage + get detail (PR #16)
+- [x] Document search — date/amount/counterparty/category (PR #18)
+- [x] Metadata edit + void/restore + history (PR #20)
+- [x] Version download — SHA-256 verified (PR #22)
+- [x] User CRUD endpoints (PR #24)
+- [x] Manifest export — CSV (PR #26)
+- [x] Tax advisor review package prepared (Issue #27)
 
-## Next (Phase 0 → Phase 1)
+## In progress / gating
 
-- [ ] Issue #4: NENE2 runtime scaffold + `GET /health`
-- [ ] Issue #5: OpenAPI stub (document endpoints)
-- [ ] Issue #6: CI (`composer check`)
-- [ ] 税理士 review gate before Phase 2 UI
+- [ ] **税理士 review gate** — package ready in `docs/compliance-review/`;
+      awaiting professional sign-off in `signoff-record.md`. **Blocks Phase 2 UI.**
+
+## Next (Phase 2, after sign-off)
+
+- [ ] Admin UI scaffold — React + Vite + ja/en locale integration
+- [ ] Export ZIP bundling (currently CSV only)
+- [ ] Operator guide (storage, backup, retention, search) + 事務処理規程 template
 
 ## Blockers
 
-None.
-
-## Handoff
-
-Parallel bootstrap with **`nene-profile`**. See publication-strategy decision 0005.
+- Phase 2 admin UI is gated on the compliance sign-off above.
 
 Last updated: 2026-05-30
