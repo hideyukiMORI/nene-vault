@@ -7,11 +7,14 @@ import { defineConfig, loadEnv } from 'vite';
 const dirname = path.dirname(fileURLToPath(import.meta.url));
 
 export default defineConfig(({ mode }) => {
-  // Read NENE_VAULT_PORT from the project-root .env (one level up from frontend/)
-  // so the dev proxy stays in sync without duplicating the value.
+  // Read NENE_VAULT_PORT and NENE_VAULT_APP_HOST from the project-root .env
+  // (one level up from frontend/) so the dev proxy stays in sync.
+  // NENE_VAULT_APP_HOST defaults to 'localhost' but is set to 'app' inside Docker Compose.
   const projectEnv = loadEnv(mode, path.resolve(dirname, '..'), '');
-  const appPort = projectEnv['NENE_VAULT_PORT'] ?? '8080';
-  const target = `http://localhost:${appPort}`;
+  const appHost =
+    process.env['NENE_VAULT_APP_HOST'] ?? projectEnv['NENE_VAULT_APP_HOST'] ?? 'localhost';
+  const appPort = process.env['NENE_VAULT_PORT'] ?? projectEnv['NENE_VAULT_PORT'] ?? '8080';
+  const target = `http://${appHost}:${appPort}`;
 
   return {
     plugins: [react(), tailwindcss()],
@@ -24,6 +27,7 @@ export default defineConfig(({ mode }) => {
       },
     },
     server: {
+      host: true,
       fs: { allow: [path.resolve(dirname, '..')] },
       proxy: {
         '/admin': { target, changeOrigin: true },

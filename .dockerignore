@@ -1,0 +1,37 @@
+# PHP runtime artifacts
+vendor/
+var/
+.php-cs-fixer.cache
+
+# Frontend build artifacts
+frontend/node_modules/
+frontend/dist/
+frontend/storybook-static/
+frontend/coverage/
+
+# Test artifacts
+tests/
+*.test.php
+phpunit.xml.dist
+phpstan.neon.dist
+.php-cs-fixer.php
+
+# Git / editor
+.git/
+.gitignore
+.gitattributes
+.editorconfig
+*.md
+!README.md
+
+# Docker (don't include docker files in the COPY context)
+docker-compose*.yml
+.dockerignore
+Dockerfile
+frontend/Dockerfile
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo

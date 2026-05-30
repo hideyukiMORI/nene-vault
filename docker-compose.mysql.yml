@@ -1,0 +1,24 @@
+## MySQL override for NeNe Vault
+##
+## Usage:
+##   docker compose -f docker-compose.yml -f docker-compose.mysql.yml up
+##
+## Or use the mysql profile shorthand:
+##   docker compose --profile mysql up
+
+services:
+  app:
+    environment:
+      DB_ENV: local
+      DB_ADAPTER: mysql
+      DB_HOST: mysql
+      DB_PORT: "3306"
+      DB_NAME: "${DB_NAME:-nene_vault}"
+      DB_USER: "${DB_USER:-nene_vault}"
+      DB_PASSWORD: "${DB_PASSWORD:-nene_vault}"
+    depends_on:
+      mysql:
+        condition: service_healthy
+
+  mysql:
+    profiles: []  # Remove profile restriction so MySQL always starts
