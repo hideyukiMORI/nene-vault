@@ -218,6 +218,17 @@ final class InMemoryVaultDocumentRepository implements VaultDocumentRepositoryIn
         // not needed for upload slice tests
     }
 
+    /** @return list<array{0: VaultDocument, 1: \NeneVault\DocumentVersion\DocumentVersion}> */
+    public function search(\NeneVault\Document\DocumentSearchCriteria $criteria): array
+    {
+        return [];
+    }
+
+    public function countByCriteria(\NeneVault\Document\DocumentSearchCriteria $criteria): int
+    {
+        return 0;
+    }
+
     /** @return list<VaultDocument> */
     public function all(): array
     {

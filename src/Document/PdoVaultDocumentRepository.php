@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace NeneVault\Document;
 
 use Nene2\Database\DatabaseQueryExecutorInterface;
+use NeneVault\DocumentVersion\DocumentVersion;
 
 final readonly class PdoVaultDocumentRepository implements VaultDocumentRepositoryInterface
 {
@@ -68,6 +69,109 @@ final readonly class PdoVaultDocumentRepository implements VaultDocumentReposito
         $this->query->execute(
             'UPDATE vault_documents SET current_version_id = ? WHERE id = ? AND organization_id = ?',
             [$currentVersionId, $id, $organizationId],
+        );
+    }
+
+    /**
+     * @return list<array{0: VaultDocument, 1: DocumentVersion}>
+     */
+    public function search(DocumentSearchCriteria $criteria): array
+    {
+        [$where, $params] = $this->buildSearchWhere($criteria);
+
+        $docCols = implode(', ', array_map(static fn (string $c) => 'd.' . trim($c), explode(',', self::COLUMNS)));
+
+        $sql = 'SELECT ' . $docCols . ',
+                v.id AS v_id, v.version_number AS v_version_number,
+                v.file_sha256 AS v_file_sha256, v.mime_type AS v_mime_type,
+                v.original_filename AS v_original_filename, v.file_size_bytes AS v_file_size_bytes,
+                v.source AS v_source, v.uploaded_at AS v_uploaded_at, v.uploaded_by AS v_uploaded_by
+            FROM vault_documents d
+            INNER JOIN document_versions v ON v.id = d.current_version_id AND v.organization_id = d.organization_id'
+            . $where
+            . ' ORDER BY d.transaction_date DESC, d.id DESC LIMIT ? OFFSET ?';
+
+        $rows = $this->query->fetchAll($sql, [...$params, $criteria->limit, $criteria->offset]);
+
+        return array_map(
+            fn (array $row) => [$this->mapRow($row), $this->mapVersionRow($row)],
+            $rows,
+        );
+    }
+
+    public function countByCriteria(DocumentSearchCriteria $criteria): int
+    {
+        [$where, $params] = $this->buildSearchWhere($criteria);
+
+        $row = $this->query->fetchOne(
+            'SELECT COUNT(*) AS cnt FROM vault_documents d' . $where,
+            $params,
+        );
+
+        return $row !== null ? (int) $row['cnt'] : 0;
+    }
+
+    /**
+     * @return array{string, list<mixed>}
+     */
+    private function buildSearchWhere(DocumentSearchCriteria $criteria): array
+    {
+        $conditions = ['d.organization_id = ?'];
+        $params = [$criteria->organizationId];
+
+        if (!$criteria->includeVoided) {
+            $conditions[] = "d.status = 'active'";
+        }
+
+        if ($criteria->transactionDateFrom !== null) {
+            $conditions[] = 'd.transaction_date >= ?';
+            $params[] = $criteria->transactionDateFrom;
+        }
+
+        if ($criteria->transactionDateTo !== null) {
+            $conditions[] = 'd.transaction_date <= ?';
+            $params[] = $criteria->transactionDateTo;
+        }
+
+        if ($criteria->amountMinCents !== null) {
+            $conditions[] = 'd.amount_cents >= ?';
+            $params[] = $criteria->amountMinCents;
+        }
+
+        if ($criteria->amountMaxCents !== null) {
+            $conditions[] = 'd.amount_cents <= ?';
+            $params[] = $criteria->amountMaxCents;
+        }
+
+        if ($criteria->counterpartyName !== null && $criteria->counterpartyName !== '') {
+            $conditions[] = 'd.counterparty_name LIKE ?';
+            $params[] = '%' . $criteria->counterpartyName . '%';
+        }
+
+        if ($criteria->category !== null && $criteria->category !== '') {
+            $conditions[] = 'd.category = ?';
+            $params[] = $criteria->category;
+        }
+
+        return [' WHERE ' . implode(' AND ', $conditions), $params];
+    }
+
+    /** @param array<string, mixed> $row */
+    private function mapVersionRow(array $row): DocumentVersion
+    {
+        return new DocumentVersion(
+            id: (string) $row['v_id'],
+            vaultDocumentId: (string) $row['id'],
+            organizationId: (int) $row['organization_id'],
+            versionNumber: (int) $row['v_version_number'],
+            filePath: '',
+            fileSha256: (string) $row['v_file_sha256'],
+            mimeType: (string) $row['v_mime_type'],
+            originalFilename: (string) $row['v_original_filename'],
+            fileSizeBytes: (int) $row['v_file_size_bytes'],
+            source: (string) $row['v_source'],
+            uploadedAt: isset($row['v_uploaded_at']) ? (string) $row['v_uploaded_at'] : null,
+            uploadedBy: isset($row['v_uploaded_by']) ? (int) $row['v_uploaded_by'] : null,
         );
     }
 
