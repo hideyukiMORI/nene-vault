@@ -60,6 +60,31 @@ async function request<T>(path: string, options: RequestOptions = {}): Promise<T
   return (await response.json()) as T;
 }
 
+async function uploadFormData<T>(path: string, formData: FormData): Promise<T> {
+  const base = env.apiBaseUrl.replace(/\/$/, '');
+  const url = `${base}${path}`;
+  const headers: Record<string, string> = {};
+
+  const token = authStore.getToken();
+  if (token !== null) {
+    headers['Authorization'] = `Bearer ${token}`;
+  }
+
+  const response = await fetch(url, {
+    method: 'POST',
+    headers,
+    credentials: 'include',
+    body: formData,
+  });
+
+  if (!response.ok) {
+    handleAuthError(response, path);
+    throw await parseProblemDetails(response);
+  }
+
+  return (await response.json()) as T;
+}
+
 export const apiClient = {
   get<T>(path: string, signal?: AbortSignal): Promise<T> {
     return request<T>(path, { method: 'GET', signal });
@@ -72,5 +97,8 @@ export const apiClient = {
   },
   delete<T>(path: string): Promise<T> {
     return request<T>(path, { method: 'DELETE' });
+  },
+  upload<T>(path: string, formData: FormData): Promise<T> {
+    return uploadFormData<T>(path, formData);
   },
 };
