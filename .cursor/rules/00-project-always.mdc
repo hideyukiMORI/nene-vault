@@ -1,0 +1,12 @@
+---
+description: NeNe Vault project rules
+alwaysApply: true
+---
+
+# Project Rules
+
+- Canonical docs: `README.md`, `AGENTS.md`, `docs/explanation/scope-contract.md`, `docs/explanation/received-document-compliance.md`.
+- **NeNe Vault = received-document archive only** (ADR 0009).
+- Do NOT add invoice issuance, bank reconciliation, CSV presets, or expense workflows.
+- Compliance changes require ADR + professional review when cited by law.
+- Issue-driven; English repository docs (ADR 0008); no secrets in git.
