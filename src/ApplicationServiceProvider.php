@@ -9,6 +9,8 @@ use Nene2\DependencyInjection\ContainerBuilder;
 use Nene2\DependencyInjection\ServiceProviderInterface;
 use Nene2\Http\JsonResponseFactory;
 use Nene2\Http\RequestScopedHolder;
+use NeneVault\Audit\AuditRouteRegistrar;
+use NeneVault\Audit\AuditServiceProvider;
 use NeneVault\Auth\AuthRouteRegistrar;
 use NeneVault\Auth\InvalidCredentialsExceptionHandler;
 use NeneVault\Http\HealthHandler;
@@ -41,6 +43,7 @@ final readonly class ApplicationServiceProvider implements ServiceProviderInterf
         );
 
         $builder
+            ->addProvider(new AuditServiceProvider())
             ->addProvider(new OrganizationServiceProvider())
             ->addProvider(new VaultSettingsServiceProvider());
 
@@ -66,6 +69,7 @@ final readonly class ApplicationServiceProvider implements ServiceProviderInterf
                 $auth = $c->get('nene-vault.route_registrar.auth');
                 $org = $c->get(OrganizationRouteRegistrar::class);
                 $settings = $c->get(VaultSettingsRouteRegistrar::class);
+                $audit = $c->get(AuditRouteRegistrar::class);
 
                 if (!$health instanceof HealthHandler) {
                     throw new LogicException('HealthHandler service is invalid.');
@@ -83,11 +87,16 @@ final readonly class ApplicationServiceProvider implements ServiceProviderInterf
                     throw new LogicException('VaultSettingsRouteRegistrar service is invalid.');
                 }
 
+                if (!$audit instanceof AuditRouteRegistrar) {
+                    throw new LogicException('AuditRouteRegistrar service is invalid.');
+                }
+
                 return [
                     static fn ($router) => $router->get('/health', $health->handle(...)),
                     static fn ($router) => $auth->register($router),
                     static fn ($router) => $org->register($router),
                     static fn ($router) => $settings->register($router),
+                    static fn ($router) => $audit->register($router),
                 ];
             },
         );

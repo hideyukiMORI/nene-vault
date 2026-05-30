@@ -10,6 +10,7 @@ use Nene2\DependencyInjection\ContainerBuilder;
 use Nene2\DependencyInjection\ServiceProviderInterface;
 use Nene2\Error\ProblemDetailsResponseFactory;
 use Nene2\Http\JsonResponseFactory;
+use NeneVault\Audit\AuditRecorderInterface;
 use NeneVault\VaultSettings\VaultSettingsSeederInterface;
 use Psr\Container\ContainerInterface;
 use Psr\Http\Message\ResponseFactoryInterface;
@@ -46,7 +47,13 @@ final readonly class OrganizationServiceProvider implements ServiceProviderInter
                         throw new LogicException('VaultSettingsSeederInterface service is invalid.');
                     }
 
-                    return new CreateOrganizationUseCase($repo, $seeder);
+                    $audit = $c->get(AuditRecorderInterface::class);
+
+                    if (!$audit instanceof AuditRecorderInterface) {
+                        throw new LogicException('AuditRecorderInterface service is invalid.');
+                    }
+
+                    return new CreateOrganizationUseCase($repo, $seeder, $audit);
                 },
             )
             ->set(
@@ -82,19 +89,30 @@ final readonly class OrganizationServiceProvider implements ServiceProviderInter
                         throw new LogicException('OrganizationRepositoryInterface service is invalid.');
                     }
 
-                    return new UpdateOrganizationUseCase($repo);
+                    $audit = $c->get(AuditRecorderInterface::class);
+
+                    if (!$audit instanceof AuditRecorderInterface) {
+                        throw new LogicException('AuditRecorderInterface service is invalid.');
+                    }
+
+                    return new UpdateOrganizationUseCase($repo, $audit);
                 },
             )
             ->set(
                 DeleteOrganizationUseCaseInterface::class,
                 static function (ContainerInterface $c): DeleteOrganizationUseCaseInterface {
                     $repo = $c->get(OrganizationRepositoryInterface::class);
+                    $audit = $c->get(AuditRecorderInterface::class);
 
                     if (!$repo instanceof OrganizationRepositoryInterface) {
                         throw new LogicException('OrganizationRepositoryInterface service is invalid.');
                     }
 
-                    return new DeleteOrganizationUseCase($repo);
+                    if (!$audit instanceof AuditRecorderInterface) {
+                        throw new LogicException('AuditRecorderInterface service is invalid.');
+                    }
+
+                    return new DeleteOrganizationUseCase($repo, $audit);
                 },
             )
             // ── Handlers ──

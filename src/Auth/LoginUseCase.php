@@ -37,11 +37,12 @@ final readonly class LoginUseCase
         $orgId = $role === Role::Superadmin ? null : $user->organizationId;
 
         $token = $this->tokenIssuer->issue([
-            'sub'    => $user->email,
-            'role'   => $role->value,
-            'org_id' => $orgId,
-            'iat'    => time(),
-            'exp'    => $expiresAt,
+            'sub'     => $user->email,
+            'user_id' => $user->id,
+            'role'    => $role->value,
+            'org_id'  => $orgId,
+            'iat'     => time(),
+            'exp'     => $expiresAt,
         ]);
 
         return new LoginOutput(
@@ -50,6 +51,7 @@ final readonly class LoginUseCase
             email: $user->email,
             role: $role->value,
             orgId: $orgId,
+            userId: $user->id,
         );
     }
 }

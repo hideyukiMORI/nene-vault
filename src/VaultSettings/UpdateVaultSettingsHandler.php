@@ -8,6 +8,8 @@ use Nene2\Http\JsonRequestBodyParser;
 use Nene2\Http\JsonResponseFactory;
 use Nene2\Validation\ValidationError;
 use Nene2\Validation\ValidationException;
+use NeneVault\Audit\AuditAction;
+use NeneVault\Audit\AuditRecorderInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
@@ -19,6 +21,7 @@ final readonly class UpdateVaultSettingsHandler
     public function __construct(
         private VaultSettingsRepositoryInterface $settings,
         private JsonResponseFactory $response,
+        private AuditRecorderInterface $audit,
     ) {
     }
 
@@ -26,6 +29,9 @@ final readonly class UpdateVaultSettingsHandler
     {
         $orgId = $request->getAttribute('nene2.org.id');
         assert(is_int($orgId));
+
+        $claims = $request->getAttribute('nene2.auth.claims');
+        $actorUserId = is_array($claims) && isset($claims['user_id']) ? (int) $claims['user_id'] : null;
 
         $body = JsonRequestBodyParser::parse($request);
         $errors = [];
@@ -61,10 +67,10 @@ final readonly class UpdateVaultSettingsHandler
             throw new ValidationException($errors);
         }
 
-        $claims = $request->getAttribute('nene2.auth.claims');
-        $actorId = is_array($claims) && isset($claims['sub']) ? null : null; // resolved from user lookup in Phase 1+
-
         $current = $this->settings->findByOrganizationId($orgId);
+
+        // Capture before state
+        $beforeJson = $current !== null ? $this->toAuditArray($current) : null;
 
         $updated = new VaultSettings(
             organizationId: $orgId,
@@ -72,7 +78,7 @@ final readonly class UpdateVaultSettingsHandler
             storagePathOverride: $storagePathOverride,
             invoiceApiBaseUrl: $invoiceApiBaseUrl,
             clearApiBaseUrl: $clearApiBaseUrl,
-            updatedBy: $actorId,
+            updatedBy: $actorUserId,
         );
 
         if ($current === null) {
@@ -83,6 +89,16 @@ final readonly class UpdateVaultSettingsHandler
 
         $refreshed = $this->settings->findByOrganizationId($orgId) ?? $updated;
 
+        $this->audit->record(
+            action: AuditAction::VAULT_SETTINGS_CHANGED,
+            entityType: 'vault_settings',
+            entityId: (string) $orgId,
+            actorUserId: $actorUserId,
+            organizationId: $orgId,
+            beforeJson: $beforeJson,
+            afterJson: $this->toAuditArray($refreshed),
+        );
+
         return $this->response->create([
             'organization_id'       => $refreshed->organizationId,
             'retention_years'       => $refreshed->retentionYears,
@@ -91,5 +107,17 @@ final readonly class UpdateVaultSettingsHandler
             'clear_api_base_url'    => $refreshed->clearApiBaseUrl,
             'updated_at'            => $refreshed->updatedAt,
         ]);
+    }
+
+    /** @return array<string, mixed> */
+    private function toAuditArray(VaultSettings $s): array
+    {
+        return [
+            'organization_id'       => $s->organizationId,
+            'retention_years'       => $s->retentionYears,
+            'storage_path_override' => $s->storagePathOverride,
+            'invoice_api_base_url'  => $s->invoiceApiBaseUrl,
+            'clear_api_base_url'    => $s->clearApiBaseUrl,
+        ];
     }
 }
