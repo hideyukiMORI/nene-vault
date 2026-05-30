@@ -1,0 +1,106 @@
+## NeNe Vault — development stack
+##
+## Prerequisites:
+##   composer install     (once, on the host — resolves ../NENE2 path dependency)
+##   cp .env.example .env (and customise as needed)
+##
+## Usage:
+##   docker compose up                    # SQLite (default), Vite dev server
+##   docker compose --profile mysql up    # MySQL variant
+##
+## First-run credentials (see .env / ADMIN_EMAIL / ADMIN_PASSWORD):
+##   Admin login: admin@example.com / changeme123
+##   API base:    http://localhost:8080
+##   Frontend:    http://localhost:5173
+
+services:
+  # ── PHP backend (Apache + PHP 8.4) ──────────────────────────────────────────
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: dev
+    ports:
+      - "${NENE_VAULT_PORT:-8080}:8080"
+    volumes:
+      # Source + vendor (read-only); vendor resolved by host composer install
+      - .:/var/www/html:ro
+      # vendor/hideyukimori/nene2 is a symlink pointing 3 levels up to NENE2/.
+      # Mount the sibling NENE2 directory at the resolved path inside the container.
+      - ../NENE2:/var/www/NENE2:ro
+      # SQLite database and uploaded files need to be writable
+      - sqlite_data:/var/www/html/var
+      - vault_storage:/var/www/html/storage/vault
+    environment:
+      APP_ENV: local
+      APP_DEBUG: "true"
+      NENE2_LOCAL_JWT_SECRET: "${NENE2_LOCAL_JWT_SECRET:-nene-vault-dev-secret-CHANGE-IN-PROD}"
+      PROBLEM_DETAILS_BASE_URL: "${PROBLEM_DETAILS_BASE_URL:-https://nene-vault.dev/problems/}"
+      TENANT_RESOLUTION: "${TENANT_RESOLUTION:-single}"
+      ORG_SLUG: "${ORG_SLUG:-default}"
+      ORG_NAME: "${ORG_NAME:-NeNe Vault}"
+      ADMIN_EMAIL: "${ADMIN_EMAIL:-admin@example.com}"
+      ADMIN_PASSWORD: "${ADMIN_PASSWORD:-changeme123}"
+      NENE_VAULT_STORAGE_PATH: storage/vault
+      NENE_VAULT_MAX_FILE_SIZE_MB: "${NENE_VAULT_MAX_FILE_SIZE_MB:-20}"
+      DB_ENV: local
+      DB_ADAPTER: sqlite
+      # Absolute path — Apache's CWD is not /var/www/html, so a relative path
+      # would resolve incorrectly at request time.
+      DB_NAME: /var/www/html/var/nene_vault.sqlite
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+
+  # ── Vite dev server ──────────────────────────────────────────────────────────
+  frontend:
+    build:
+      context: .
+      dockerfile: frontend/Dockerfile
+      target: dev
+    ports:
+      - "${NENE_VAULT_FRONTEND_PORT:-5173}:5173"
+    volumes:
+      # Mount entire repo so @locales alias resolves to /app/locales
+      - .:/app:ro
+      # node_modules from the image (not overwritten by the mount)
+      - frontend_modules:/app/frontend/node_modules
+    working_dir: /app/frontend
+    command: ["npx", "vite", "--host", "0.0.0.0"]
+    environment:
+      # Proxy target: 'app' service inside Docker, 'localhost' on the host
+      NENE_VAULT_APP_HOST: app
+      NENE_VAULT_PORT: "8080"
+    depends_on:
+      app:
+        condition: service_healthy
+
+  # ── MySQL (opt-in via --profile mysql) ───────────────────────────────────────
+  mysql:
+    image: mysql:8.0
+    profiles: [mysql]
+    ports:
+      - "${NENE_VAULT_MYSQL_PORT:-3307}:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: "${MYSQL_ROOT_PASSWORD:-nene_vault_root}"
+      MYSQL_DATABASE: "${DB_NAME:-nene_vault}"
+      MYSQL_USER: "${DB_USER:-nene_vault}"
+      MYSQL_PASSWORD: "${DB_PASSWORD:-nene_vault}"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root",
+             "--password=${MYSQL_ROOT_PASSWORD:-nene_vault_root}"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+
+volumes:
+  sqlite_data:
+  vault_storage:
+  frontend_modules:
+  mysql_data:

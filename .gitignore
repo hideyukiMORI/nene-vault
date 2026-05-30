@@ -1,7 +1,8 @@
 /vendor/
-/var/
+/var/*.sqlite
+/var/*.cache
 /.env
 /.php-cs-fixer.cache
 /.phpstan.cache/
 .phpunit.result.cache
-/storage/
+/storage/vault/

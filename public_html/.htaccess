@@ -1,0 +1,6 @@
+Options -MultiViews -Indexes
+RewriteEngine On
+
+# Route all requests through the front controller
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteRule ^ index.php [QSA,L]

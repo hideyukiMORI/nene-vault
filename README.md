@@ -49,10 +49,42 @@ without becoming accounting software or expense workflow. Built on
 | **Agents** | [`AGENTS.md`](./AGENTS.md) |
 | **Roadmap** | [`docs/roadmap.md`](./docs/roadmap.md) |
 
+## Quick start (Docker)
+
+```sh
+composer install            # once, on the host — resolves the ../NENE2 path dependency
+cp .env.example .env        # customise ADMIN_EMAIL / ADMIN_PASSWORD if desired
+docker compose up           # SQLite (default) + Vite dev server
+```
+
+Then open:
+
+| Service  | URL                     | Notes                                  |
+|----------|-------------------------|----------------------------------------|
+| Frontend | http://localhost:5173   | Vite dev server (proxies API to `app`) |
+| API      | http://localhost:8080   | Apache + PHP 8.4                        |
+
+First-run admin credentials come from `.env` (`ADMIN_EMAIL` / `ADMIN_PASSWORD`,
+default `admin@example.com` / `changeme123`). A `default` organization, its
+vault settings, and a superadmin user are seeded automatically.
+
+**MySQL instead of SQLite:**
+
+```sh
+docker compose --profile mysql -f docker-compose.yml -f docker-compose.mysql.yml up
+```
+
+**Port conflicts:** if 8080 / 5173 are already in use (e.g. a sibling product's
+dev server), override the host ports:
+
+```sh
+NENE_VAULT_PORT=8090 NENE_VAULT_FRONTEND_PORT=5180 docker compose up
+```
+
 ## Status
 
 **Phase 0 complete** — governance and product design done (PR #1, #2 merged 2026-05-30).
-Phase 1 runtime scaffold follows Issues #4+.
+Phase 1 (API) and Phase 2 (Admin UI) implemented; Docker development environment available.
 
 ## Ecosystem
 
