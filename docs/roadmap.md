@@ -12,15 +12,18 @@ Operators self-host Vault to store and search **received** vendor documents with
 
 - Governance docs, ADR 0001–0006/0008–0014 ✅
 - Product vision, scope contract, compliance doc ✅
-- NENE2 scaffold + `GET /health` 🔲 Issue #4+
+- NENE2 scaffold + `GET /health` ✅ (PR #8)
 - 税理士 review gate before Phase 2 UI 🔲
 
 ## Phase 1: Document API
 
-- Multi-tenant + JWT + RBAC (ADR 0006)
-- Upload, metadata, search, void, version history
-- Local filesystem storage (ADR 0012)
-- OpenAPI + PHPUnit + PHPStan 8
+- Multi-tenant + JWT + RBAC (ADR 0006) ✅ (PR #8)
+- Audit logging — before/after on all mutations (ADR 0014) ✅ (PR #10)
+- ja/en locale files (ADR 0005) ✅ (PR #12)
+- OpenAPI 3.1 contract — all Phase 1 endpoints ✅ (PR #14)
+- Upload, metadata, search, void, version history 🔲 (in progress)
+- Local filesystem storage (ADR 0012) 🔲
+- PHPUnit + PHPStan 8 ✅ (gate established)
 
 ## Phase 2: Admin UI + Export
 

@@ -304,6 +304,7 @@ Admin routes are under `/admin/vault/…` (vault-scoped namespace).
 | Canonical form | Method | Description | DO NOT use |
 | --- | --- | --- | --- |
 | `/health` | GET | Health check (unauthenticated) | `/api/health`, `/ping`, `/status` |
+| `/admin/auth/login` | POST | Login, issue JWT (unauthenticated) | `/login`, `/auth/login`, `/admin/login` |
 | `/admin/vault/documents` | GET | Search documents | `/admin/documents`, `/vault/documents` |
 | `/admin/vault/documents` | POST | Upload document | — |
 | `/admin/vault/documents/{id}` | GET | Get document detail | `/admin/vault/document/{id}` (singular) |
@@ -328,6 +329,7 @@ Admin routes are under `/admin/vault/…` (vault-scoped namespace).
 | Canonical form | Method + Route | DO NOT use |
 | --- | --- | --- |
 | `getHealth` | GET /health | `healthCheck`, `ping` |
+| `login` | POST /admin/auth/login | `authenticate`, `signIn`, `adminLogin` |
 | `uploadDocument` | POST /admin/vault/documents | `createDocument`, `addDocument` |
 | `searchDocuments` | GET /admin/vault/documents | `listDocuments`, `getDocuments` |
 | `getDocumentById` | GET /admin/vault/documents/{id} | `getDocument`, `fetchDocument` |
@@ -409,6 +411,31 @@ Standard fields used across multiple responses:
 | `ExportDocumentsRequest` | Export request body | `CreateExportRequest` |
 | `ProblemDetails` | RFC 9457 error response | `ErrorResponse`, `ApiError`, `Problem` |
 | `ValidationProblemDetails` | Validation error response (extends ProblemDetails) | `ValidationErrorResponse` |
+| `HealthResponse` | Health check response | `StatusResponse`, `PingResponse` |
+| `LoginRequest` | Login request body | `AuthRequest`, `SignInRequest` |
+| `LoginResponse` | Login response (token + claims) | `AuthResponse`, `TokenResponse` |
+| `OrganizationResponse` | Single organization response | `OrgResponse`, `TenantResponse` |
+| `OrganizationListResponse` | List of organizations | `OrgListResponse` |
+| `CreateOrganizationRequest` | Org create body | `NewOrganizationRequest` |
+| `UpdateOrganizationRequest` | Org update body | `EditOrganizationRequest` |
+| `UserResponse` | Single user response | `AccountResponse` |
+| `UserListResponse` | List of users | `AccountListResponse` |
+| `CreateUserRequest` | User create body | `InviteUserRequest`, `NewUserRequest` |
+| `UpdateUserRequest` | User update body | `EditUserRequest` |
+| `DocumentVersionResponse` | Single version response | `VersionResponse` |
+| `DocumentHistoryResponse` | Versions + audit events for a document | `HistoryResponse`, `DocumentAuditResponse` |
+
+### Enum wrapper schemas (OpenAPI)
+
+These wrap an enum whose values are registered in §9–§13. The schema name is the
+PascalCase concept; the values are the canonical codes.
+
+| Canonical form | Wraps values from | DO NOT use |
+| --- | --- | --- |
+| `Role` | §13 Role values | `UserRole`, `RoleEnum` |
+| `DocumentStatus` | §9 status values | `Status`, `VaultDocumentStatus` |
+| `DocumentCategory` | §10 category values | `Category` |
+| `DocumentSource` | §11 source values | `Source`, `UploadSource` |
 
 ---
 
