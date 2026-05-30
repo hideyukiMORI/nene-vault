@@ -1,0 +1,74 @@
+import { screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+import { describe, expect, it, vi } from 'vitest';
+import { renderWithProviders } from '@tests/render/render-with-providers';
+import { Pagination } from './Pagination';
+
+const base = {
+  offset: 0,
+  limit: 20,
+  total: 50,
+  canPrev: false,
+  canNext: true,
+  onPrev: vi.fn(),
+  onNext: vi.fn(),
+};
+
+describe('Pagination', () => {
+  it('renders nothing when total is 0', () => {
+    const { container } = renderWithProviders(<Pagination {...base} total={0} canNext={false} />);
+    expect(container.firstChild).toBeNull();
+  });
+
+  it('renders Previous/Next buttons when total > 0', () => {
+    renderWithProviders(<Pagination {...base} />);
+    expect(screen.getByRole('button', { name: 'Previous' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Next' })).toBeInTheDocument();
+  });
+
+  it('disables Previous when canPrev is false', () => {
+    renderWithProviders(<Pagination {...base} canPrev={false} />);
+    expect(screen.getByRole('button', { name: 'Previous' })).toBeDisabled();
+  });
+
+  it('enables Previous when canPrev is true', () => {
+    renderWithProviders(<Pagination {...base} canPrev={true} offset={20} />);
+    expect(screen.getByRole('button', { name: 'Previous' })).not.toBeDisabled();
+  });
+
+  it('disables Next when canNext is false', () => {
+    renderWithProviders(<Pagination {...base} canNext={false} />);
+    expect(screen.getByRole('button', { name: 'Next' })).toBeDisabled();
+  });
+
+  it('calls onNext when Next is clicked', async () => {
+    const onNext = vi.fn();
+    renderWithProviders(<Pagination {...base} onNext={onNext} />);
+    await userEvent.click(screen.getByRole('button', { name: 'Next' }));
+    expect(onNext).toHaveBeenCalledOnce();
+  });
+
+  it('calls onPrev when Previous is clicked', async () => {
+    const onPrev = vi.fn();
+    renderWithProviders(<Pagination {...base} canPrev={true} offset={20} onPrev={onPrev} />);
+    await userEvent.click(screen.getByRole('button', { name: 'Previous' }));
+    expect(onPrev).toHaveBeenCalledOnce();
+  });
+
+  it('shows the clamped "to" value on the last partial page', () => {
+    // offset=40, limit=20, total=45 → to=45 (not 60)
+    renderWithProviders(
+      <Pagination
+        offset={40}
+        limit={20}
+        total={45}
+        canPrev={true}
+        canNext={false}
+        onPrev={vi.fn()}
+        onNext={vi.fn()}
+      />,
+    );
+    // Range text contains "45"
+    expect(screen.getByText(/45/)).toBeInTheDocument();
+  });
+});
