@@ -4,11 +4,12 @@ NeNe Vault's admin UI is a **React + TypeScript** client of the JSON API. It is
 **not** the source of truth for schema, validation, or persistence — the backend
 (`composer check`, OpenAPI) is.
 
-**Status:** **Phase 2** — standards locked here; the scaffold is rebuilt to comply
-(Issue #34). The PR #31 scaffold predates these structural rules (FSD layering,
-Tailwind tokens, TanStack Query, Storybook, tests, codegen) and is replaced. Its
-auth approach (JWT in `localStorage` + Bearer) already matches NeNe Records and is
-kept.
+**Status:** **Phase 2 — implemented.** Standards locked here and the scaffold is
+rebuilt to comply (Issue #36, merged in PR #37). `npm run check` (type-check, lint,
+format, test, knip, build-storybook) and `npm run build` are green. The PR #31
+scaffold predated these structural rules (FSD layering, Tailwind tokens, TanStack
+Query, Storybook, tests, codegen) and was replaced. Its auth approach (JWT in
+`localStorage` + Bearer) already matches NeNe Records and is kept.
 
 **Framework baseline:** [NENE2 frontend integration](https://github.com/hideyukiMORI/NENE2/blob/main/docs/development/frontend-integration.md).
 **Inheritance map:** `docs/inheritance-from-nene2.md`.
