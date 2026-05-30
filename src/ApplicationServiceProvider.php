@@ -25,6 +25,12 @@ use NeneVault\Organization\OrganizationNotFoundExceptionHandler;
 use NeneVault\Organization\OrganizationRouteRegistrar;
 use NeneVault\Organization\OrganizationServiceProvider;
 use NeneVault\Organization\OrganizationSlugConflictExceptionHandler;
+use NeneVault\User\CannotDeleteSelfExceptionHandler;
+use NeneVault\User\InvalidUserRoleExceptionHandler;
+use NeneVault\User\UserEmailConflictExceptionHandler;
+use NeneVault\User\UserNotFoundExceptionHandler;
+use NeneVault\User\UserRouteRegistrar;
+use NeneVault\User\UserServiceProvider;
 use NeneVault\VaultSettings\VaultSettingsRouteRegistrar;
 use NeneVault\VaultSettings\VaultSettingsServiceProvider;
 use Psr\Container\ContainerInterface;
@@ -53,7 +59,8 @@ final readonly class ApplicationServiceProvider implements ServiceProviderInterf
             ->addProvider(new AuditServiceProvider())
             ->addProvider(new OrganizationServiceProvider())
             ->addProvider(new VaultSettingsServiceProvider())
-            ->addProvider(new DocumentServiceProvider());
+            ->addProvider(new DocumentServiceProvider())
+            ->addProvider(new UserServiceProvider());
 
         // Health handler
         $builder->set(
@@ -79,6 +86,7 @@ final readonly class ApplicationServiceProvider implements ServiceProviderInterf
                 $settings = $c->get(VaultSettingsRouteRegistrar::class);
                 $audit = $c->get(AuditRouteRegistrar::class);
                 $document = $c->get(DocumentRouteRegistrar::class);
+                $user = $c->get(UserRouteRegistrar::class);
 
                 if (!$health instanceof HealthHandler) {
                     throw new LogicException('HealthHandler service is invalid.');
@@ -104,6 +112,10 @@ final readonly class ApplicationServiceProvider implements ServiceProviderInterf
                     throw new LogicException('DocumentRouteRegistrar service is invalid.');
                 }
 
+                if (!$user instanceof UserRouteRegistrar) {
+                    throw new LogicException('UserRouteRegistrar service is invalid.');
+                }
+
                 return [
                     static fn ($router) => $router->get('/health', $health->handle(...)),
                     static fn ($router) => $auth->register($router),
@@ -111,6 +123,7 @@ final readonly class ApplicationServiceProvider implements ServiceProviderInterf
                     static fn ($router) => $settings->register($router),
                     static fn ($router) => $audit->register($router),
                     static fn ($router) => $document->register($router),
+                    static fn ($router) => $user->register($router),
                 ];
             },
         );
@@ -128,6 +141,10 @@ final readonly class ApplicationServiceProvider implements ServiceProviderInterf
                     $c->get(MimeTypeNotAllowedExceptionHandler::class),
                     $c->get(FileTooLargeExceptionHandler::class),
                     $c->get(FileIntegrityExceptionHandler::class),
+                    $c->get(UserNotFoundExceptionHandler::class),
+                    $c->get(UserEmailConflictExceptionHandler::class),
+                    $c->get(InvalidUserRoleExceptionHandler::class),
+                    $c->get(CannotDeleteSelfExceptionHandler::class),
                 ];
             },
         );
