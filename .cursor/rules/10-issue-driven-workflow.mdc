@@ -1,0 +1,14 @@
+---
+description: Issue-driven workflow and PR merge policy
+alwaysApply: true
+---
+
+# Issue Driven Workflow
+
+- All code, documentation, and configuration changes **require a GitHub Issue** first.
+- Before starting: read `docs/roadmap.md`, `docs/milestones/`, `docs/todo/current.md`, and related Issues/PRs.
+- **Never commit or push directly to `main`.** Branch name: `type/issue-number-summary`.
+- Standard completion: commit → push → PR (`Closes #number` + self-review checklist) → CI → **merge** → sync local `main`.
+- Commits: Conventional Commits per `docs/development/commit-conventions.md` — **English** description/body, `(#issue)` in subject.
+- If the user limits scope (investigation only, no commit, PR only), follow that instruction.
+- Canonical: `docs/workflow.md`, `docs/development/commit-conventions.md`.
