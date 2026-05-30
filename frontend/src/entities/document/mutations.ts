@@ -1,7 +1,7 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { apiClient } from '@/shared/api/client';
 import type { AppError } from '@/shared/api/errors';
-import type { VaultDocument } from './types';
+import type { DocumentCategory, VaultDocument } from './types';
 import { documentQueryKeys } from './queries';
 
 export interface UploadDocumentInput {
@@ -34,6 +34,62 @@ export function useUploadDocument(onSuccess?: () => void) {
       return apiClient.upload<VaultDocument>('/admin/vault/documents', fd);
     },
     onSuccess: () => {
+      void queryClient.invalidateQueries({ queryKey: documentQueryKeys.all });
+      onSuccess?.();
+    },
+  });
+}
+
+export interface UpdateMetadataInput {
+  id: string;
+  transaction_date?: string | null | undefined;
+  amount_cents?: number | null | undefined;
+  counterparty_name?: string | undefined;
+  category?: DocumentCategory | undefined;
+  tags?: string[] | undefined;
+}
+
+export function useUpdateDocumentMetadata(onSuccess?: () => void) {
+  const queryClient = useQueryClient();
+
+  return useMutation<VaultDocument, AppError, UpdateMetadataInput>({
+    mutationFn: ({ id, ...body }) =>
+      apiClient.patch<VaultDocument>(`/admin/vault/documents/${id}/metadata`, body),
+    onSuccess: (_, { id }) => {
+      void queryClient.invalidateQueries({ queryKey: documentQueryKeys.detail(id) });
+      void queryClient.invalidateQueries({ queryKey: documentQueryKeys.all });
+      onSuccess?.();
+    },
+  });
+}
+
+export interface VoidDocumentInput {
+  id: string;
+  void_reason: string;
+  void_note?: string | null | undefined;
+}
+
+export function useVoidDocument(onSuccess?: () => void) {
+  const queryClient = useQueryClient();
+
+  return useMutation<VaultDocument, AppError, VoidDocumentInput>({
+    mutationFn: ({ id, ...body }) =>
+      apiClient.post<VaultDocument>(`/admin/vault/documents/${id}/void`, body),
+    onSuccess: (_, { id }) => {
+      void queryClient.invalidateQueries({ queryKey: documentQueryKeys.detail(id) });
+      void queryClient.invalidateQueries({ queryKey: documentQueryKeys.all });
+      onSuccess?.();
+    },
+  });
+}
+
+export function useRestoreDocument(onSuccess?: () => void) {
+  const queryClient = useQueryClient();
+
+  return useMutation<VaultDocument, AppError, string>({
+    mutationFn: (id) => apiClient.post<VaultDocument>(`/admin/vault/documents/${id}/restore`, {}),
+    onSuccess: (_, id) => {
+      void queryClient.invalidateQueries({ queryKey: documentQueryKeys.detail(id) });
       void queryClient.invalidateQueries({ queryKey: documentQueryKeys.all });
       onSuccess?.();
     },

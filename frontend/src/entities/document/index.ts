@@ -7,5 +7,10 @@ export type {
   DocumentSource,
 } from './types';
 export { useDocuments, useDocumentById, documentQueryKeys } from './queries';
-export { useUploadDocument } from './mutations';
-export type { UploadDocumentInput } from './mutations';
+export {
+  useUploadDocument,
+  useUpdateDocumentMetadata,
+  useVoidDocument,
+  useRestoreDocument,
+} from './mutations';
+export type { UploadDocumentInput, UpdateMetadataInput, VoidDocumentInput } from './mutations';
