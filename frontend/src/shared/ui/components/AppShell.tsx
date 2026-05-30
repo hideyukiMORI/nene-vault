@@ -37,6 +37,9 @@ export function AppShell({ children, onLogout }: AppShellProps) {
   const navLinks = [
     { to: '/documents', label: t('navigation.documents') },
     { to: '/audit', label: t('navigation.audit_events') },
+    { to: '/settings', label: t('navigation.settings') },
+    { to: '/users', label: t('navigation.users') },
+    { to: '/export', label: t('navigation.export') },
   ];
 
   return (

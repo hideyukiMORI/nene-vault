@@ -2,7 +2,7 @@ import type { ReactNode } from 'react';
 
 export interface TextProps {
   as?: 'p' | 'span' | 'h1' | 'h2';
-  tone?: 'primary' | 'muted' | 'danger';
+  tone?: 'primary' | 'muted' | 'danger' | 'success';
   children: ReactNode;
   className?: string;
 }
@@ -11,6 +11,7 @@ const TONE_CLASS: Record<NonNullable<TextProps['tone']>, string> = {
   primary: 'text-text-primary',
   muted: 'text-text-muted',
   danger: 'text-danger',
+  success: 'text-success',
 };
 
 export function Text({ as = 'p', tone = 'primary', children, className }: TextProps) {
