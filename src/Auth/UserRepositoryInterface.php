@@ -19,6 +19,10 @@ interface UserRepositoryInterface
 
     public function updateStatus(int $id, string $status): void;
 
+    public function updateRole(int $id, string $role): void;
+
+    public function updateEmail(int $id, string $email): void;
+
     public function storeInviteToken(int $id, string $tokenHash, int $expiresAt): void;
 
     public function findByInviteToken(string $tokenHash): ?User;
