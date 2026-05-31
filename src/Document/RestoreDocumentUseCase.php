@@ -28,6 +28,10 @@ final readonly class RestoreDocumentUseCase implements RestoreDocumentUseCaseInt
             throw new VaultDocumentNotFoundException($documentId);
         }
 
+        if ($document->status !== 'voided') {
+            throw new InvalidDocumentStateException($documentId, $document->status, 'restored');
+        }
+
         $beforeJson = ['status' => $document->status];
 
         $this->documents->restore($documentId, $organizationId);

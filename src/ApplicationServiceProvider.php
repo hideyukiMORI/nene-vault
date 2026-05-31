@@ -18,6 +18,7 @@ use NeneVault\Document\DocumentServiceProvider;
 use NeneVault\Document\DuplicateFileExceptionHandler;
 use NeneVault\Document\FileIntegrityExceptionHandler;
 use NeneVault\Document\FileTooLargeExceptionHandler;
+use NeneVault\Document\InvalidDocumentStateExceptionHandler;
 use NeneVault\Document\MimeTypeNotAllowedExceptionHandler;
 use NeneVault\Document\VaultDocumentNotFoundExceptionHandler;
 use NeneVault\Export\ExportRouteRegistrar;
@@ -159,6 +160,7 @@ final readonly class ApplicationServiceProvider implements ServiceProviderInterf
                     $c->get(MimeTypeNotAllowedExceptionHandler::class),
                     $c->get(FileTooLargeExceptionHandler::class),
                     $c->get(FileIntegrityExceptionHandler::class),
+                    $c->get(InvalidDocumentStateExceptionHandler::class),
                     $c->get(UserNotFoundExceptionHandler::class),
                     $c->get(UserEmailConflictExceptionHandler::class),
                     $c->get(InvalidUserRoleExceptionHandler::class),

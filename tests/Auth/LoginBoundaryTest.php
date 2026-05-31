@@ -1,0 +1,119 @@
+<?php
+
+declare(strict_types=1);
+
+namespace NeneVault\Tests\Auth;
+
+use NeneVault\Tests\Support\ApiTestCase;
+
+/**
+ * HTTP-level login boundary tests: missing fields, wrong password,
+ * unknown email, successful token issuance.
+ */
+final class LoginBoundaryTest extends ApiTestCase
+{
+    private static int    $orgId = 0;
+    private static string $email = '';
+    private const PASSWORD = 'correct-horse-battery';
+
+    public static function setUpBeforeClass(): void
+    {
+        self::bootContainer();
+        self::$orgId = self::ensureOrg('test-org');
+        self::$email = 'login-bnd-' . uniqid() . '@example.com';
+
+        // Insert a user with a known bcrypt hash.
+        $hash = password_hash(self::PASSWORD, PASSWORD_BCRYPT);
+        $pdo  = self::pdo();
+        $stmt = $pdo->prepare(
+            "INSERT INTO users (email, password_hash, role, organization_id, status, created_at, updated_at)
+             VALUES (?, ?, 'admin', ?, 'active', datetime('now'), datetime('now'))",
+        );
+        $stmt->execute([self::$email, $hash, self::$orgId]);
+    }
+
+    // ── Validation ─────────────────────────────────────────────────────────────
+
+    public function test_login_missing_email_returns_422(): void
+    {
+        $resp = $this->handler()->handle(
+            $this->request('POST', '/admin/auth/login', null, ['password' => self::PASSWORD]),
+        );
+        $this->assertSame(422, $resp->getStatusCode());
+    }
+
+    public function test_login_missing_password_returns_422(): void
+    {
+        $resp = $this->handler()->handle(
+            $this->request('POST', '/admin/auth/login', null, ['email' => self::$email]),
+        );
+        $this->assertSame(422, $resp->getStatusCode());
+    }
+
+    public function test_login_empty_body_returns_400(): void
+    {
+        // An empty JSON array is a malformed body (not an object) → 400 at parse time.
+        $resp = $this->handler()->handle(
+            $this->request('POST', '/admin/auth/login', null, []),
+        );
+        $this->assertSame(400, $resp->getStatusCode());
+    }
+
+    // ── Credentials ────────────────────────────────────────────────────────────
+
+    public function test_login_wrong_password_returns_401(): void
+    {
+        $resp = $this->handler()->handle(
+            $this->request('POST', '/admin/auth/login', null, ['email' => self::$email, 'password' => 'wrong-password']),
+        );
+        $this->assertSame(401, $resp->getStatusCode());
+    }
+
+    public function test_login_unknown_email_returns_401(): void
+    {
+        $resp = $this->handler()->handle(
+            $this->request('POST', '/admin/auth/login', null, ['email' => 'nobody-' . uniqid() . '@example.com', 'password' => self::PASSWORD]),
+        );
+        $this->assertSame(401, $resp->getStatusCode());
+    }
+
+    // ── Success ────────────────────────────────────────────────────────────────
+
+    public function test_login_success_returns_token(): void
+    {
+        $resp = $this->handler()->handle(
+            $this->request('POST', '/admin/auth/login', null, ['email' => self::$email, 'password' => self::PASSWORD]),
+        );
+        $this->assertSame(200, $resp->getStatusCode(), (string) $resp->getBody());
+        $body = json_decode((string) $resp->getBody(), true);
+        $this->assertArrayHasKey('token', $body);
+        $this->assertNotEmpty($body['token']);
+        $this->assertSame(self::$email, $body['email']);
+        $this->assertSame('admin', $body['role']);
+        $this->assertSame(self::$orgId, $body['org_id']);
+        $this->assertArrayHasKey('expires_at', $body);
+    }
+
+    public function test_login_response_excludes_password_hash(): void
+    {
+        $resp = $this->handler()->handle(
+            $this->request('POST', '/admin/auth/login', null, ['email' => self::$email, 'password' => self::PASSWORD]),
+        );
+        $body = json_decode((string) $resp->getBody(), true);
+        $this->assertArrayNotHasKey('password_hash', $body);
+        $this->assertArrayNotHasKey('password', $body);
+    }
+
+    public function test_issued_token_is_accepted_by_protected_route(): void
+    {
+        $login = $this->handler()->handle(
+            $this->request('POST', '/admin/auth/login', null, ['email' => self::$email, 'password' => self::PASSWORD]),
+        );
+        $token = json_decode((string) $login->getBody(), true)['token'];
+
+        $resp = $this->handler()->handle(
+            $this->request('GET', '/admin/vault/documents', $token),
+        );
+        $this->assertSame(200, $resp->getStatusCode(), 'Token from login must authenticate against a protected route');
+    }
+}

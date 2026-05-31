@@ -572,6 +572,12 @@ paths:
           $ref: '#/components/responses/Forbidden'
         '404':
           $ref: '#/components/responses/DocumentNotFound'
+        '409':
+          description: Document is not active (already voided).
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
         '422':
           $ref: '#/components/responses/ValidationFailed'
 
@@ -598,6 +604,12 @@ paths:
           $ref: '#/components/responses/Forbidden'
         '404':
           $ref: '#/components/responses/DocumentNotFound'
+        '409':
+          description: Document is not voided (already active).
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
 
   /admin/vault/documents/{id}/history:
     parameters:
