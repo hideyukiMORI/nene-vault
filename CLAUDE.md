@@ -29,7 +29,13 @@ locales/       ja.json + en.json (single source of truth for all UI text)
 composer check          # test + PHPStan + CS + locales + openapi + mcp
 npm run check --prefix frontend  # type-check + lint + test + build
 composer mcp:server     # start MCP server (stdio JSON-RPC)
+docker compose up       # local stack — API :8600 · Frontend :5186 · MySQL :3386
 ```
+
+## Local ports (fixed, "86 lane")
+
+API **8600** · Frontend **5186** · MySQL **3386** — unique across the NeNe
+portfolio; never reuse sibling ports. See README "Local port allocation".
 
 ## Hard rules (never violate without an ADR)
 

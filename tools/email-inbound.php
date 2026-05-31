@@ -8,7 +8,7 @@
  *
  * Environment variables (set in .env or export before running):
  *   NENE_VAULT_EMAIL_MAILDIR        Directory containing .eml files (required)
- *   NENE_VAULT_EMAIL_API_BASE_URL   API base URL (default: http://localhost:8080)
+ *   NENE_VAULT_EMAIL_API_BASE_URL   API base URL (default: http://localhost:8600)
  *   NENE_VAULT_EMAIL_API_TOKEN      Bearer token for API auth (required)
  *   NENE_VAULT_EMAIL_CATEGORY       Document category (default: invoice_received)
  *   NENE_VAULT_EMAIL_DRY_RUN        Set to 'true' to parse only without uploading
@@ -33,7 +33,7 @@ use NeneVault\Email\MaildirPoller;
 use NeneVault\Email\MimeParser;
 
 $maildir = (string) (getenv('NENE_VAULT_EMAIL_MAILDIR') ?: '');
-$apiBase = rtrim((string) (getenv('NENE_VAULT_EMAIL_API_BASE_URL') ?: 'http://localhost:8080'), '/');
+$apiBase = rtrim((string) (getenv('NENE_VAULT_EMAIL_API_BASE_URL') ?: 'http://localhost:8600'), '/');
 $token = (string) (getenv('NENE_VAULT_EMAIL_API_TOKEN') ?: '');
 $category = (string) (getenv('NENE_VAULT_EMAIL_CATEGORY') ?: 'invoice_received');
 $dryRun = getenv('NENE_VAULT_EMAIL_DRY_RUN') === 'true';

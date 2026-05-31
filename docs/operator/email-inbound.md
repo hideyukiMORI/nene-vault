@@ -67,7 +67,7 @@ it securely (not in `.env` if shared).
 
 ```env
 NENE_VAULT_EMAIL_MAILDIR=/var/mail/vault
-NENE_VAULT_EMAIL_API_BASE_URL=http://localhost:8080
+NENE_VAULT_EMAIL_API_BASE_URL=http://localhost:8600
 NENE_VAULT_EMAIL_API_TOKEN=your-bearer-token-here
 NENE_VAULT_EMAIL_CATEGORY=invoice_received
 ```

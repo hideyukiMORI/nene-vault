@@ -12,3 +12,4 @@ alwaysApply: true
 - Compliance changes require ADR + professional review when cited by law.
 - Issue-driven; English repository docs (ADR 0008); no secrets in git.
 - New or renamed identifier → update `docs/terms.md` in the same PR. No exceptions.
+- **Fixed local Docker ports ("86 lane"): API 8600 · Frontend 5186 · MySQL 3386.** Unique across the NeNe portfolio — never reuse sibling ports (NENE2 82**/3316, Clear 83**/5173, Profile 84**/3409, Invoice 85**/5185, Records 180**). See README "Local port allocation".
