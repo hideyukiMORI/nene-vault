@@ -289,6 +289,18 @@ final readonly class DocumentServiceProvider implements ServiceProviderInterface
                 },
             )
             ->set(
+                InvalidDocumentStateExceptionHandler::class,
+                static function (ContainerInterface $c): InvalidDocumentStateExceptionHandler {
+                    $pd = $c->get(ProblemDetailsResponseFactory::class);
+
+                    if (!$pd instanceof ProblemDetailsResponseFactory) {
+                        throw new LogicException('ProblemDetailsResponseFactory service is invalid.');
+                    }
+
+                    return new InvalidDocumentStateExceptionHandler($pd);
+                },
+            )
+            ->set(
                 SearchDocumentsHandler::class,
                 static function (ContainerInterface $c): SearchDocumentsHandler {
                     $uc = $c->get(SearchDocumentsUseCaseInterface::class);

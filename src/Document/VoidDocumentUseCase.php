@@ -33,6 +33,10 @@ final readonly class VoidDocumentUseCase implements VoidDocumentUseCaseInterface
             throw new VaultDocumentNotFoundException($documentId);
         }
 
+        if ($document->status !== 'active') {
+            throw new InvalidDocumentStateException($documentId, $document->status, 'voided');
+        }
+
         $beforeJson = ['status' => $document->status];
 
         $this->documents->void($documentId, $organizationId, $actorUserId ?? 0, $voidReason, $voidNote);
