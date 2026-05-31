@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { authStore } from '@/entities/auth';
 import { useTranslation } from '@/shared/i18n/use-translation';
-import { AppShell, Button, Stack, Text } from '@/shared/ui';
+import { AppShell, Button, Field, Input, Stack, Text } from '@/shared/ui';
 import { env } from '@/shared/config/env';
 
 export function ExportPage() {
@@ -84,50 +84,37 @@ export function ExportPage() {
           <div className="rounded-lg border border-border bg-surface p-stack-md">
             <Stack gap="md">
               <div className="grid grid-cols-2 gap-inline-md">
-                <div className="flex flex-col gap-stack-xs">
-                  <label className="text-label-sm font-medium">
-                    {t('export.form.date_from_label')}
-                  </label>
-                  <input
+                <Field label={t('export.form.date_from_label')}>
+                  <Input
                     type="date"
                     value={dateFrom}
                     onChange={(e) => {
                       setDateFrom(e.target.value);
                     }}
-                    className="h-10 rounded-md border border-border bg-surface px-inline-sm text-body-sm focus:outline-none focus:ring-2 focus:ring-brand"
                   />
-                </div>
-                <div className="flex flex-col gap-stack-xs">
-                  <label className="text-label-sm font-medium">
-                    {t('export.form.date_to_label')}
-                  </label>
-                  <input
+                </Field>
+                <Field label={t('export.form.date_to_label')}>
+                  <Input
                     type="date"
                     value={dateTo}
                     onChange={(e) => {
                       setDateTo(e.target.value);
                     }}
-                    className="h-10 rounded-md border border-border bg-surface px-inline-sm text-body-sm focus:outline-none focus:ring-2 focus:ring-brand"
                   />
-                </div>
+                </Field>
               </div>
 
-              <div className="flex flex-col gap-stack-xs">
-                <label className="text-label-sm font-medium">
-                  {t('export.form.counterparty_label')}
-                </label>
-                <input
+              <Field label={t('export.form.counterparty_label')}>
+                <Input
                   type="text"
                   value={counterparty}
                   onChange={(e) => {
                     setCounterparty(e.target.value);
                   }}
-                  className="h-10 rounded-md border border-border bg-surface px-inline-sm text-body-sm focus:outline-none focus:ring-2 focus:ring-brand"
                 />
-              </div>
+              </Field>
 
-              <div className="flex flex-col gap-stack-xs">
-                <span className="text-label-sm font-medium">{t('export.form.format_label')}</span>
+              <Field label={t('export.form.format_label')}>
                 <div className="flex flex-col gap-stack-xs">
                   {(['zip', 'csv'] as const).map((f) => (
                     <label key={f} className="flex items-center gap-inline-sm cursor-pointer">
@@ -147,7 +134,7 @@ export function ExportPage() {
                     </label>
                   ))}
                 </div>
-              </div>
+              </Field>
 
               <label className="flex items-center gap-inline-sm cursor-pointer">
                 <input

@@ -1,15 +1,10 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import {
-  useDocumentSearch,
-  DocumentSearchForm,
-  DocumentTable,
-  Pagination,
-} from '@/features/document-search';
+import { useDocumentSearch, DocumentSearchForm, DocumentTable } from '@/features/document-search';
 import { DocumentUploadModal } from '@/features/document-upload';
 import { authStore } from '@/entities/auth';
 import { useTranslation } from '@/shared/i18n/use-translation';
-import { AppShell, Button, Stack, Text } from '@/shared/ui';
+import { AppShell, Button, Pagination, Stack, Text } from '@/shared/ui';
 
 export function DocumentsPage() {
   const { t } = useTranslation();

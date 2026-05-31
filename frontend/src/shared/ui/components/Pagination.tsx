@@ -1,5 +1,5 @@
 import { useTranslation } from '@/shared/i18n/use-translation';
-import { Button } from '@/shared/ui';
+import { Button } from '@/shared/ui/primitives/Button';
 
 interface PaginationProps {
   offset: number;

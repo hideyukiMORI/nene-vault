@@ -1,7 +1,7 @@
 import { useRestoreDocument } from '@/entities/document';
 import { messageKeyForError } from '@/shared/i18n/map-problem-details';
 import { useTranslation } from '@/shared/i18n/use-translation';
-import { Button, Stack, Text } from '@/shared/ui';
+import { Button, Modal, Stack, Text } from '@/shared/ui';
 
 interface RestoreModalProps {
   documentId: string;
@@ -17,16 +17,9 @@ export function RestoreModal({ documentId, onClose }: RestoreModalProps) {
       : null;
 
   return (
-    <div
-      role="dialog"
-      aria-modal="true"
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/50"
-    >
-      <div className="w-full max-w-md rounded-xl border border-border bg-surface shadow-lg p-inline-lg">
+    <Modal title={t('document.restore.title')} onClose={onClose}>
+      <div className="p-inline-lg">
         <Stack gap="md">
-          <Text as="h2" className="text-heading-sm">
-            {t('document.restore.title')}
-          </Text>
           <Text tone="muted" className="text-body-sm">
             {t('document.restore.description')}
           </Text>
@@ -59,6 +52,6 @@ export function RestoreModal({ documentId, onClose }: RestoreModalProps) {
           </div>
         </Stack>
       </div>
-    </div>
+    </Modal>
   );
 }

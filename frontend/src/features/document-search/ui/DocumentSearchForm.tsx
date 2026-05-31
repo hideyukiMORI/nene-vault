@@ -1,6 +1,6 @@
 import type { UseFormReturn } from 'react-hook-form';
 import { useTranslation } from '@/shared/i18n/use-translation';
-import { Button, Input, Stack } from '@/shared/ui';
+import { Button, Field, Input, Select, Stack } from '@/shared/ui';
 import type { SearchFormValues } from '../hooks/use-document-search';
 
 interface DocumentSearchFormProps {
@@ -30,60 +30,43 @@ export function DocumentSearchForm({
     >
       <Stack gap="md">
         <div className="grid grid-cols-2 gap-inline-md">
-          <div className="flex flex-col gap-stack-xs">
-            <label className="text-label-sm text-muted">
-              {t('document.search.date_from_label')}
-            </label>
+          <Field label={t('document.search.date_from_label')} labelTone="muted">
             <Input type="date" {...register('transaction_date_from')} />
-          </div>
-          <div className="flex flex-col gap-stack-xs">
-            <label className="text-label-sm text-muted">{t('document.search.date_to_label')}</label>
+          </Field>
+          <Field label={t('document.search.date_to_label')} labelTone="muted">
             <Input type="date" {...register('transaction_date_to')} />
-          </div>
+          </Field>
         </div>
 
         <div className="grid grid-cols-2 gap-inline-md">
-          <div className="flex flex-col gap-stack-xs">
-            <label className="text-label-sm text-muted">
-              {t('document.search.amount_min_label')}
-            </label>
+          <Field label={t('document.search.amount_min_label')} labelTone="muted">
             <Input type="number" placeholder="0" {...register('amount_min')} />
-          </div>
-          <div className="flex flex-col gap-stack-xs">
-            <label className="text-label-sm text-muted">
-              {t('document.search.amount_max_label')}
-            </label>
+          </Field>
+          <Field label={t('document.search.amount_max_label')} labelTone="muted">
             <Input type="number" placeholder="0" {...register('amount_max')} />
-          </div>
+          </Field>
         </div>
 
-        <div className="flex flex-col gap-stack-xs">
-          <label className="text-label-sm text-muted">
-            {t('document.search.counterparty_label')}
-          </label>
+        <Field label={t('document.search.counterparty_label')} labelTone="muted">
           <Input
             type="text"
             placeholder={t('document.upload.counterparty_placeholder')}
             {...register('counterparty_name')}
           />
-        </div>
+        </Field>
 
         <div className="flex items-center gap-inline-lg">
-          <div className="flex flex-col gap-stack-xs flex-1">
-            <label className="text-label-sm text-muted">
-              {t('document.search.category_label')}
-            </label>
-            <select
-              {...register('category')}
-              className="h-10 rounded-md border border-border bg-surface px-inline-sm text-body-sm focus:outline-none focus:ring-2 focus:ring-brand"
-            >
-              <option value="">{t('common.none')}</option>
-              {CATEGORIES.map((cat) => (
-                <option key={cat} value={cat}>
-                  {t(`document.category.${cat}`)}
-                </option>
-              ))}
-            </select>
+          <div className="flex-1">
+            <Field label={t('document.search.category_label')} labelTone="muted">
+              <Select {...register('category')}>
+                <option value="">{t('common.none')}</option>
+                {CATEGORIES.map((cat) => (
+                  <option key={cat} value={cat}>
+                    {t(`document.category.${cat}`)}
+                  </option>
+                ))}
+              </Select>
+            </Field>
           </div>
 
           <label className="flex items-center gap-inline-sm cursor-pointer mt-stack-lg">
