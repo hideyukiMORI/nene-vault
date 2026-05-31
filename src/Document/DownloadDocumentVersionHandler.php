@@ -30,7 +30,7 @@ final readonly class DownloadDocumentVersionHandler
 
         $result = $this->useCase->execute($documentId, $versionId, $orgId);
 
-        $stream = $this->streamFactory->createStreamFromFile($result['absolute_path'], 'rb');
+        $stream = $this->streamFactory->createStream($result['file_contents']);
 
         return $this->responseFactory->createResponse(200)
             ->withHeader('Content-Type', $result['mime_type'])

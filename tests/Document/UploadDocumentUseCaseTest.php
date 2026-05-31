@@ -190,6 +190,16 @@ final class FakeDocumentStorage implements DocumentStorageInterface
         return '/tmp/' . $relativePath;
     }
 
+    public function exists(string $relativePath): bool
+    {
+        return true;
+    }
+
+    public function readContents(string $relativePath): string
+    {
+        return '';
+    }
+
     public function sha256(string $absolutePath): string
     {
         return $this->sha;

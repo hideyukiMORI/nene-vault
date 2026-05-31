@@ -16,6 +16,8 @@ use NeneVault\DocumentVersion\DocumentStorageInterface;
 use NeneVault\DocumentVersion\DocumentVersionRepositoryInterface;
 use NeneVault\DocumentVersion\LocalFilesystemDocumentStorage;
 use NeneVault\DocumentVersion\PdoDocumentVersionRepository;
+use NeneVault\DocumentVersion\S3DocumentStorage;
+use NeneVault\DocumentVersion\S3DocumentStorageConfig;
 use NeneVault\VaultSettings\VaultSettingsRepositoryInterface;
 use Psr\Container\ContainerInterface;
 use Psr\Http\Message\ResponseFactoryInterface;
@@ -29,6 +31,20 @@ final readonly class DocumentServiceProvider implements ServiceProviderInterface
             ->set(
                 DocumentStorageInterface::class,
                 static function (): DocumentStorageInterface {
+                    $adapter = (string) (getenv('NENE_VAULT_STORAGE_ADAPTER') ?: 'local');
+
+                    if ($adapter === 's3') {
+                        return new S3DocumentStorage(new S3DocumentStorageConfig(
+                            endpoint:  (string) (getenv('NENE_VAULT_S3_ENDPOINT') ?: 'https://s3.amazonaws.com'),
+                            region:    (string) (getenv('NENE_VAULT_S3_REGION') ?: 'us-east-1'),
+                            bucket:    (string) (getenv('NENE_VAULT_S3_BUCKET') ?: ''),
+                            accessKey: (string) (getenv('NENE_VAULT_S3_ACCESS_KEY') ?: ''),
+                            secretKey: (string) (getenv('NENE_VAULT_S3_SECRET_KEY') ?: ''),
+                            prefix:    (string) (getenv('NENE_VAULT_S3_PREFIX') ?: ''),
+                            pathStyle: (getenv('NENE_VAULT_S3_PATH_STYLE') === 'true'),
+                        ));
+                    }
+
                     $root = (string) (getenv('NENE_VAULT_STORAGE_PATH') ?: 'storage/vault');
 
                     if (!str_starts_with($root, '/')) {

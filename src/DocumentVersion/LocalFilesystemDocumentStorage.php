@@ -47,6 +47,23 @@ final readonly class LocalFilesystemDocumentStorage implements DocumentStorageIn
         return $this->storageRoot . '/' . $relativePath;
     }
 
+    public function exists(string $relativePath): bool
+    {
+        return is_file($this->resolveAbsolutePath($relativePath));
+    }
+
+    public function readContents(string $relativePath): string
+    {
+        $abs = $this->resolveAbsolutePath($relativePath);
+        $contents = @file_get_contents($abs);
+
+        if ($contents === false) {
+            throw new RuntimeException('Failed to read stored file: ' . $relativePath);
+        }
+
+        return $contents;
+    }
+
     public function sha256(string $absolutePath): string
     {
         $hash = hash_file('sha256', $absolutePath);

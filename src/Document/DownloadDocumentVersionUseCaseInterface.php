@@ -7,7 +7,7 @@ namespace NeneVault\Document;
 interface DownloadDocumentVersionUseCaseInterface
 {
     /**
-     * @return array{absolute_path: string, mime_type: string, filename: string}
+     * @return array{absolute_path: string, file_contents: string, mime_type: string, filename: string}
      * @throws VaultDocumentNotFoundException
      * @throws FileIntegrityException
      */

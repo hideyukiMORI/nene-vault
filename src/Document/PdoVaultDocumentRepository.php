@@ -132,7 +132,8 @@ final readonly class PdoVaultDocumentRepository implements VaultDocumentReposito
 
         $sql = 'SELECT ' . $docCols . ',
                 v.id AS v_id, v.version_number AS v_version_number,
-                v.file_sha256 AS v_file_sha256, v.mime_type AS v_mime_type,
+                v.file_path AS v_file_path, v.file_sha256 AS v_file_sha256,
+                v.mime_type AS v_mime_type,
                 v.original_filename AS v_original_filename, v.file_size_bytes AS v_file_size_bytes,
                 v.source AS v_source, v.uploaded_at AS v_uploaded_at, v.uploaded_by AS v_uploaded_by
             FROM vault_documents d
@@ -213,7 +214,7 @@ final readonly class PdoVaultDocumentRepository implements VaultDocumentReposito
             vaultDocumentId: (string) $row['id'],
             organizationId: (int) $row['organization_id'],
             versionNumber: (int) $row['v_version_number'],
-            filePath: '',
+            filePath: (string) ($row['v_file_path'] ?? ''),
             fileSha256: (string) $row['v_file_sha256'],
             mimeType: (string) $row['v_mime_type'],
             originalFilename: (string) $row['v_original_filename'],
