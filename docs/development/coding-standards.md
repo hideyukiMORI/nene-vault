@@ -91,7 +91,7 @@ Any change that touches **document storage, file serving, search, metadata editi
 - **No hard-coded operator-facing text** in frontend components. Every UI string lives in `locales/ja.json` and `locales/en.json`, looked up by key.
 - Both locale files **MUST** have an identical key structure — enforced by `composer locales`. A missing key blocks merge.
 - Only `ja` and `en` locales exist (ADR 0005). Do not add a third.
-- Statutory field labels (取引年月日, 取引金額, 取引先名) stay Japanese in both locales.
+- Statutory field labels (取引年月日, 取引金額, 取引先名) follow the active locale: Japanese in `ja`, plain English in `en` (Transaction Date / Amount / Counterparty). The Japanese terminology is preserved in the `ja` catalog, `docs/terms.md`, and export manifest semantics (ADR 0005, revised 2026-05-31).
 - API Problem Details responses stay English (ADR 0008); the `problem.*` locale keys translate them for display only.
 - See [`locale-guide.md`](./locale-guide.md).
 

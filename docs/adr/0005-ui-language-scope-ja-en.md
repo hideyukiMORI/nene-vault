@@ -47,8 +47,12 @@ NeNe Vault admin UI and operator-facing materials support
   third locale will be rejected at review with a pointer to this ADR.
 - **Language selector:** toggle ja / en in admin UI; default resolves from
   browser `Accept-Language` header with `ja` as fallback.
-- **Statutory field labels** (e.g. 取引年月日, 取引金額, 取引先) appear in
-  Japanese in both locales where legally traceable terminology is required.
+- **Statutory field labels** (取引年月日, 取引金額, 取引先名) render in the active
+  locale: Japanese in `ja` mode, plain English in `en` mode
+  (Transaction Date, Amount, Counterparty). See "Revision 2026-05-31" below.
+  The legally-traceable Japanese terminology is preserved in the `ja` catalog,
+  in the export manifest's canonical mapping, and in compliance documentation —
+  the UI label is a display concern and follows the selected locale.
 
 This restriction applies to the upstream repository only. The MIT licence permits
 operators or forks to add additional locales; the upstream project will not
@@ -71,6 +75,23 @@ maintain them.
   statutory labels.
 - Future jurisdiction expansion (e.g. a Taiwan edition) would require a fork
   or a separate product, not an i18n flag in this repository.
+
+## Revision 2026-05-31 — statutory labels follow the active locale
+
+The original decision required statutory field labels to appear in Japanese in
+**both** locales. In practice this left English-mode forms (search, upload,
+metadata edit) showing Japanese-led labels, which read as "untranslated" to
+English operators.
+
+**Revised rule:** statutory field labels render in the active locale —
+Japanese in `ja` mode, plain English in `en` mode. The legally-traceable
+Japanese terminology is not lost: it remains the canonical form in the `ja`
+catalog, in `docs/terms.md`, in the compliance documentation, and in the export
+manifest's column semantics. The on-screen label is a display concern and must
+follow the operator's selected language, consistent with the rest of the UI.
+
+This does not weaken compliance: the statutory mapping lives in the data layer
+and documentation, not in the UI label text.
 
 ## Related
 

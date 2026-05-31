@@ -5,7 +5,6 @@
     "direction": "ltr",
     "note": "Secondary locale. Statutory field labels remain in Japanese in both locales (ADR 0005)."
   },
-
   "common": {
     "buttons": {
       "save": "Save",
@@ -65,7 +64,6 @@
     "no": "No",
     "none": "None"
   },
-
   "auth": {
     "login": {
       "title": "NeNe Vault Login",
@@ -88,7 +86,6 @@
       "account_inactive": "This account is inactive. Please contact your administrator."
     }
   },
-
   "navigation": {
     "home": "Home",
     "documents": "Received Documents",
@@ -100,7 +97,6 @@
     "logout": "Log Out",
     "language": "Language"
   },
-
   "organization": {
     "list": {
       "title": "Organizations",
@@ -151,7 +147,6 @@
       "not_found": "The specified organization was not found."
     }
   },
-
   "user": {
     "list": {
       "title": "Users",
@@ -202,15 +197,14 @@
       "cannot_delete_self": "You cannot delete your own account."
     }
   },
-
   "vault_settings": {
     "title": "Vault Settings",
     "save_button": "Save Settings",
     "fields": {
       "retention_years_label": "Retention Period (years)",
       "retention_years_hint": "Number of years to retain documents (counted from the transaction date). 10 years or more is recommended to satisfy the Electronic Books Preservation Act.",
-      "retention_warning": "The retention period is below 10 years. It may not satisfy the statutory retention period (7 years from the filing deadline). Please confirm with your 税理士.",
-      "retention_min_hint": "Minimum: 7 years (税理士 confirmation required)",
+      "retention_warning": "The retention period is below 10 years. It may not satisfy the statutory retention period (7 years from the filing deadline). Please confirm with your tax advisor (税理士).",
+      "retention_min_hint": "Minimum: 7 years (tax advisor confirmation required)",
       "storage_path_label": "Storage Path (override)",
       "storage_path_placeholder": "/var/vault/storage",
       "storage_path_hint": "Leave blank to use the default path",
@@ -224,15 +218,14 @@
       "saved": "Vault settings saved."
     }
   },
-
   "document": {
     "list": {
       "title": "Received Documents",
       "upload_button": "Upload Document",
       "table": {
-        "transaction_date": "取引年月日",
-        "amount": "取引金額",
-        "counterparty_name": "取引先名",
+        "transaction_date": "Transaction Date",
+        "amount": "Amount (JPY)",
+        "counterparty_name": "Counterparty",
         "category": "Category",
         "status": "Status",
         "uploaded_at": "Uploaded",
@@ -247,28 +240,28 @@
       "file_label": "Select File",
       "file_hint": "PDF, JPEG, PNG (max {{max_size_mb}} MB)",
       "file_drag": "Drop file here",
-      "transaction_date_label": "取引年月日 (Transaction Date)",
+      "transaction_date_label": "Transaction Date",
       "transaction_date_placeholder": "e.g. 2026-03-31",
       "transaction_date_hint": "The transaction date stated on the document",
-      "amount_label": "取引金額 (Amount, JPY)",
+      "amount_label": "Amount (JPY)",
       "amount_placeholder": "e.g. 110000",
       "amount_hint": "Leave blank if not stated",
-      "counterparty_label": "取引先名 (Counterparty)",
+      "counterparty_label": "Counterparty",
       "counterparty_placeholder": "e.g. Sample Inc.",
       "category_label": "Category",
       "tags_label": "Tags",
       "tags_placeholder": "Enter tags separated by commas",
       "submit": "Upload",
-      "scan_warning": "Scanned documents are subject to different \"scanner preservation\" (スキャナ保存) requirements. Please confirm with your 税理士.",
+      "scan_warning": "Scanned documents are subject to different scanner preservation (スキャナ保存) requirements. Please confirm with your tax advisor (税理士).",
       "duplicate_warning": "An identical file has already been uploaded. Upload as a duplicate?"
     },
     "search": {
       "title": "Search Documents",
-      "date_from_label": "取引年月日 (From)",
-      "date_to_label": "取引年月日 (To)",
-      "amount_min_label": "取引金額 (Min)",
-      "amount_max_label": "取引金額 (Max)",
-      "counterparty_label": "取引先名 (Counterparty)",
+      "date_from_label": "Transaction Date (From)",
+      "date_to_label": "Transaction Date (To)",
+      "amount_min_label": "Amount (Min)",
+      "amount_max_label": "Amount (Max)",
+      "counterparty_label": "Counterparty",
       "category_label": "Category",
       "include_voided_label": "Include voided",
       "search_button": "Search",
@@ -290,9 +283,9 @@
       "metadata_unconfirmed_badge": "Metadata unconfirmed"
     },
     "metadata": {
-      "transaction_date": "取引年月日 (Transaction Date)",
-      "amount_cents": "取引金額 (Amount, JPY)",
-      "counterparty_name": "取引先名 (Counterparty)",
+      "transaction_date": "Transaction Date",
+      "amount_cents": "Amount (JPY)",
+      "counterparty_name": "Counterparty",
       "category": "Category",
       "tags": "Tags",
       "source": "Source",
@@ -367,7 +360,6 @@
       "restored": "Document restored."
     }
   },
-
   "audit_event": {
     "list": {
       "title": "Audit Log",
@@ -415,14 +407,13 @@
       "document_link": "Linked Record"
     }
   },
-
   "export": {
     "title": "Export Documents",
     "description": "Download documents for a date range as a ZIP file and a manifest CSV.",
     "form": {
-      "date_from_label": "取引年月日 (From)",
-      "date_to_label": "取引年月日 (To)",
-      "counterparty_label": "取引先名 (Filter)",
+      "date_from_label": "Transaction Date (From)",
+      "date_to_label": "Transaction Date (To)",
+      "counterparty_label": "Counterparty (Filter)",
       "include_voided_label": "Include voided",
       "format_label": "Output format",
       "format_zip": "ZIP (document files + manifest)",
@@ -433,9 +424,9 @@
       "title": "Export File Contents",
       "document_id": "Document ID",
       "version": "Version",
-      "transaction_date": "取引年月日",
+      "transaction_date": "Transaction Date",
       "amount_cents": "Amount (integer JPY)",
-      "counterparty_name": "取引先名",
+      "counterparty_name": "Counterparty",
       "category": "Category",
       "file_sha256": "SHA-256",
       "uploaded_at": "Uploaded",
@@ -447,7 +438,6 @@
       "downloaded": "Downloaded."
     }
   },
-
   "validation": {
     "required": "This field is required.",
     "invalid_format": "The format is invalid.",
@@ -461,7 +451,6 @@
     "file_too_large": "The file size exceeds the limit.",
     "duplicate_file": "An identical file is already registered."
   },
-
   "problem": {
     "unauthorized": "Authentication is required. Please log in.",
     "forbidden": "You do not have permission to perform this action.",
@@ -486,15 +475,14 @@
     "user_email_conflict": "This email address is already in use.",
     "ocr_failed": "OCR could not be run. Check the server configuration."
   },
-
   "compliance": {
     "scanner_warning": {
       "title": "Note on Scanner Preservation",
-      "body": "This file appears to be a scanned document. Scanner preservation (スキャナ保存) may be subject to different legal requirements than electronic transaction data. Please confirm with your 税理士."
+      "body": "This file appears to be a scanned document. Scanner preservation (スキャナ保存) may be subject to different legal requirements than electronic transaction data. Please confirm with your tax advisor (税理士)."
     },
     "retention_short_warning": {
       "title": "Please Review Your Retention Setting",
-      "body": "The retention period is below 10 years. It may fall short of the statutory retention period (7 years from the day after the filing deadline). Please confirm with your 税理士 before saving."
+      "body": "The retention period is below 10 years. It may fall short of the statutory retention period (7 years from the day after the filing deadline). Please confirm with your tax advisor (税理士) before saving."
     },
     "date_uncertain_warning": {
       "title": "Transaction Date Not Set",

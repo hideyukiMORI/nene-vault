@@ -49,7 +49,7 @@ Violations of placement / dependency / data-flow / security / styling / testing
 
 - [ ] No hardcoded operator-facing strings — all via `t(key)`.
 - [ ] New keys added to **both** `locales/ja.json` and `locales/en.json` (`composer locales` green).
-- [ ] Statutory labels (取引年月日, 取引金額, 取引先名) stay Japanese in both locales.
+- [ ] Statutory labels (取引年月日, 取引金額, 取引先名) follow the active locale — Japanese in `ja`, plain English in `en` (ADR 0005, revised 2026-05-31).
 - [ ] No third locale introduced.
 
 ## API & security
