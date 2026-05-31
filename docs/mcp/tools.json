@@ -1,0 +1,164 @@
+{
+  "version": 1,
+  "source": "docs/openapi/openapi.yaml",
+  "tools": [
+    {
+      "name": "searchVaultDocuments",
+      "title": "Search Vault Documents",
+      "description": "Search received documents by 取引年月日 (date range), 取引金額 (amount range), 取引先名 (counterparty partial), and category. Satisfies 電帳法施行規則 第4条第1項第3号 search requirements. Voided documents are excluded by default.",
+      "safety": "read",
+      "source": {
+        "type": "openapi",
+        "operationId": "searchDocuments",
+        "method": "GET",
+        "path": "/admin/vault/documents"
+      },
+      "inputSchema": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "transaction_date_from": {
+            "type": "string",
+            "format": "date",
+            "description": "取引年月日 range start (inclusive, YYYY-MM-DD)"
+          },
+          "transaction_date_to": {
+            "type": "string",
+            "format": "date",
+            "description": "取引年月日 range end (inclusive, YYYY-MM-DD)"
+          },
+          "amount_min_cents": {
+            "type": "integer",
+            "minimum": 0,
+            "description": "Minimum 取引金額 in integer JPY"
+          },
+          "amount_max_cents": {
+            "type": "integer",
+            "minimum": 0,
+            "description": "Maximum 取引金額 in integer JPY"
+          },
+          "counterparty_name": {
+            "type": "string",
+            "description": "取引先名 partial match"
+          },
+          "category": {
+            "type": "string",
+            "enum": ["invoice_received", "contract", "receipt", "other"],
+            "description": "Document category filter"
+          },
+          "include_voided": {
+            "type": "boolean",
+            "default": false,
+            "description": "Include voided documents in results"
+          },
+          "limit": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 100,
+            "default": 20
+          },
+          "offset": {
+            "type": "integer",
+            "minimum": 0,
+            "default": 0
+          }
+        }
+      },
+      "responseSchemaRef": "#/components/schemas/VaultDocumentListResponse"
+    },
+    {
+      "name": "getVaultDocumentById",
+      "title": "Get Vault Document",
+      "description": "Retrieve a single received document by ID, including metadata, SHA-256, retention expiry, and current version number.",
+      "safety": "read",
+      "source": {
+        "type": "openapi",
+        "operationId": "getDocumentById",
+        "method": "GET",
+        "path": "/admin/vault/documents/{id}"
+      },
+      "inputSchema": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id"],
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Document ULID"
+          }
+        }
+      },
+      "responseSchemaRef": "#/components/schemas/VaultDocumentResponse"
+    },
+    {
+      "name": "getVaultDocumentHistory",
+      "title": "Get Vault Document History",
+      "description": "Retrieve the full audit trail and version history for a received document. Returns all file versions and every audit event (upload, metadata edit, void, restore) with before/after state.",
+      "safety": "read",
+      "source": {
+        "type": "openapi",
+        "operationId": "getDocumentHistory",
+        "method": "GET",
+        "path": "/admin/vault/documents/{id}/history"
+      },
+      "inputSchema": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id"],
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Document ULID"
+          }
+        }
+      },
+      "responseSchemaRef": "#/components/schemas/DocumentHistoryResponse"
+    },
+    {
+      "name": "listVaultAuditEvents",
+      "title": "List Vault Audit Events",
+      "description": "Browse the append-only audit event log. Filter by entity type, entity ID, action, or actor. Useful for compliance review and tax audit responses.",
+      "safety": "read",
+      "source": {
+        "type": "openapi",
+        "operationId": "listAuditEvents",
+        "method": "GET",
+        "path": "/admin/audit-events"
+      },
+      "inputSchema": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "entity_type": {
+            "type": "string",
+            "description": "Filter by entity type (e.g. vault_document)"
+          },
+          "entity_id": {
+            "type": "string",
+            "description": "Filter by entity ID"
+          },
+          "action": {
+            "type": "string",
+            "description": "Filter by action (e.g. document.uploaded)"
+          },
+          "actor_user_id": {
+            "type": "integer",
+            "description": "Filter by actor user ID"
+          },
+          "limit": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 100,
+            "default": 20
+          },
+          "offset": {
+            "type": "integer",
+            "minimum": 0,
+            "default": 0
+          }
+        }
+      },
+      "responseSchemaRef": "#/components/schemas/AuditEventListResponse"
+    }
+  ]
+}
