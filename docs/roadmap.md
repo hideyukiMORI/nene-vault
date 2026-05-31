@@ -31,19 +31,20 @@ Operators self-host Vault to store and search **received** vendor documents with
 **Phase 1 Document API complete.** Remaining: user CRUD endpoints, manifest export
 (Phase 2), 税理士 review gate before Phase 2 UI.
 
-## Phase 2: Admin UI + Export
+## Phase 2: Admin UI + Export ✅
 
-- Document list, search UI, upload wizard
-- Metadata edit with audit preview
-- Manifest CSV + ZIP export
-- ja + en UI (ADR 0005)
-- Optional Invoice/Clear link UI
+- Document list, search UI, upload wizard ✅ (PR #39–#48)
+- Metadata edit with audit preview ✅
+- Manifest CSV + ZIP export ✅ (PR #64)
+- ja + en UI (ADR 0005) ✅
+- Optional Invoice/Clear link UI — deferred to Phase 4
 
-## Phase 3: Tier A Shared Hosting
+## Phase 3: Tier A Shared Hosting ✅
 
-- Web installer + release ZIP
-- Operator guide (backup, retention, search)
-- Beside Invoice/Clear/Profile on same server
+- Web installer + release ZIP ✅ (PR #68)
+- Operator guide (backup, retention, search) ✅ (PR #66)
+- 事務処理規程 template ✅ (PR #66)
+- Beside Invoice/Clear/Profile on same server — pending Tier A testing
 
 ## Phase 4: Ecosystem
 
