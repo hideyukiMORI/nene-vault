@@ -33,10 +33,10 @@
 - [x] Docker Compose dev environment (PR #57, #58)
 - [x] Export ZIP bundling — manifest CSV + document files in single archive (PR #64)
 
-## Next (Phase 3)
+## Phase 3 — In progress
 
-- [ ] Operator guide (storage, backup, retention, search) + 事務処理規程 template
+- [x] Operator guide (storage, backup, retention, search, export) — `docs/operator/` (PR #66)
+- [x] 事務処理規程 template — `docs/operator/jimu-shokirei-template.md` (PR #66)
 - [ ] Web installer + release ZIP (Tier A shared hosting)
-- [ ] Operator guide: backup, retention policy, search walkthrough
 
 Last updated: 2026-05-31
