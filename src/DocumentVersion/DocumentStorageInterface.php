@@ -31,9 +31,15 @@ interface DocumentStorageInterface
         string $originalFilename,
     ): string;
 
-    /** Absolute path for reading a stored file. */
+    /** Absolute path for reading a stored file (local adapter only; informational for remote adapters). */
     public function resolveAbsolutePath(string $relativePath): string;
 
-    /** Compute the SHA-256 hex digest of a file. */
+    /** Check whether a stored file exists at the given relative path. */
+    public function exists(string $relativePath): bool;
+
+    /** Read all bytes of a stored file by relative path. */
+    public function readContents(string $relativePath): string;
+
+    /** Compute the SHA-256 hex digest of a file at an absolute local path (used at upload time on temp files). */
     public function sha256(string $absolutePath): string;
 }

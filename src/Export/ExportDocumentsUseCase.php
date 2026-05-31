@@ -137,17 +137,18 @@ final readonly class ExportDocumentsUseCase implements ExportDocumentsUseCaseInt
         $zip->addFromString('manifest.csv', $this->buildCsv($rows));
 
         foreach ($rows as [$document, $version]) {
-            $absPath = $this->storage->resolveAbsolutePath($version->filePath);
-            $fileContents = @file_get_contents($absPath);
-            if ($fileContents !== false) {
-                $zipEntry = sprintf(
-                    'files/%s/v%d/%s',
-                    $document->id,
-                    $version->versionNumber,
-                    basename($version->filePath),
-                );
-                $zip->addFromString($zipEntry, $fileContents);
+            if (!$this->storage->exists($version->filePath)) {
+                continue;
             }
+
+            $fileContents = $this->storage->readContents($version->filePath);
+            $zipEntry = sprintf(
+                'files/%s/v%d/%s',
+                $document->id,
+                $version->versionNumber,
+                basename($version->filePath),
+            );
+            $zip->addFromString($zipEntry, $fileContents);
         }
 
         $zip->close();
