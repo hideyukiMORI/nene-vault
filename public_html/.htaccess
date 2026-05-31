@@ -1,6 +1,14 @@
 Options -MultiViews -Indexes
 RewriteEngine On
 
-# Route all requests through the front controller
-RewriteCond %{REQUEST_FILENAME} !-f
+# Serve existing static files (JS, CSS, images, fonts) directly
+RewriteCond %{REQUEST_FILENAME} -f
+RewriteRule ^ - [L]
+
+# API and health routes → PHP front controller
+RewriteRule ^(admin|health) index.php [QSA,L]
+
+# All other routes → SPA index.html (if present) or PHP front controller
+RewriteCond %{DOCUMENT_ROOT}/index.html -f
+RewriteRule ^ index.html [L]
 RewriteRule ^ index.php [QSA,L]

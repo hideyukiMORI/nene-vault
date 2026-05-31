@@ -1,4 +1,5 @@
 /vendor/
+/dist/
 /var/*.sqlite
 /var/*.cache
 /.env

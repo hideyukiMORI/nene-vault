@@ -87,8 +87,62 @@ NENE_VAULT_PORT=8090 NENE_VAULT_FRONTEND_PORT=5180 docker compose up -d
 
 ## Tier A — Shared hosting
 
-Tier A support (release ZIP + web installer) is planned for Phase 3. Until then,
-the Docker Compose setup above is the supported deployment path.
+For operators on shared hosting without Docker access.
+
+### 1. Build the release ZIP
+
+On a machine with Docker/Node.js/Composer:
+
+```sh
+git clone https://github.com/hideyukiMORI/nene-vault.git
+cd nene-vault
+bash tools/build-release.sh 1.0.0
+# → dist/nene-vault-1.0.0.zip
+```
+
+Or download a pre-built release ZIP from the GitHub Releases page.
+
+### 2. Upload and extract
+
+Upload `nene-vault-1.0.0.zip` to your server and extract it:
+
+```sh
+unzip nene-vault-1.0.0.zip
+```
+
+### 3. Set document root
+
+Configure your web server's document root (or virtual host) to point to
+`public_html/` inside the extracted directory:
+
+```
+DocumentRoot /path/to/nene-vault-1.0.0/public_html
+```
+
+If you cannot change the document root, copy the contents of `public_html/`
+to your `public_html/` or `htdocs/` directory and update the paths in
+`public_html/index.php` accordingly.
+
+### 4. Run the web installer
+
+Visit `http://your-domain.example.com/install.php` in a browser. The installer
+walks you through:
+
+1. **Requirements check** — PHP 8.4, ext-zip, writable directories
+2. **Database** — SQLite (default) or MySQL credentials
+3. **Application settings** — JWT secret, storage path, admin email/password
+4. **Setup** — writes `.env`, runs migrations, seeds initial data
+5. **Done** — deletes `install.php`
+
+### 5. Fix permissions
+
+```sh
+chmod 755 var/
+chmod 755 storage/
+```
+
+The PHP process must be able to write to `var/` (SQLite DB) and
+`storage/vault/` (uploaded files).
 
 ---
 
