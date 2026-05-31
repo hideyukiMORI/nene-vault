@@ -283,6 +283,7 @@
       "history_section": "変更履歴",
       "links_section": "関連リンク",
       "download_button": "ダウンロード",
+      "ocr_suggest_button": "OCR 提案",
       "version_number": "バージョン {{number}}",
       "current_version": "最新",
       "date_uncertain_badge": "日付未確定",

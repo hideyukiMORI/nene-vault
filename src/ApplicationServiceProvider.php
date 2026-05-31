@@ -23,6 +23,8 @@ use NeneVault\Document\VaultDocumentNotFoundExceptionHandler;
 use NeneVault\Export\ExportRouteRegistrar;
 use NeneVault\Export\ExportServiceProvider;
 use NeneVault\Http\HealthHandler;
+use NeneVault\Ocr\OcrRouteRegistrar;
+use NeneVault\Ocr\OcrServiceProvider;
 use NeneVault\Organization\OrganizationNotFoundExceptionHandler;
 use NeneVault\Organization\OrganizationRouteRegistrar;
 use NeneVault\Organization\OrganizationServiceProvider;
@@ -63,7 +65,8 @@ final readonly class ApplicationServiceProvider implements ServiceProviderInterf
             ->addProvider(new VaultSettingsServiceProvider())
             ->addProvider(new DocumentServiceProvider())
             ->addProvider(new UserServiceProvider())
-            ->addProvider(new ExportServiceProvider());
+            ->addProvider(new ExportServiceProvider())
+            ->addProvider(new OcrServiceProvider());
 
         // Health handler
         $builder->set(
@@ -91,6 +94,7 @@ final readonly class ApplicationServiceProvider implements ServiceProviderInterf
                 $document = $c->get(DocumentRouteRegistrar::class);
                 $user = $c->get(UserRouteRegistrar::class);
                 $export = $c->get(ExportRouteRegistrar::class);
+                $ocr = $c->get(OcrRouteRegistrar::class);
 
                 if (!$health instanceof HealthHandler) {
                     throw new LogicException('HealthHandler service is invalid.');
@@ -124,6 +128,10 @@ final readonly class ApplicationServiceProvider implements ServiceProviderInterf
                     throw new LogicException('ExportRouteRegistrar service is invalid.');
                 }
 
+                if (!$ocr instanceof OcrRouteRegistrar) {
+                    throw new LogicException('OcrRouteRegistrar service is invalid.');
+                }
+
                 return [
                     static fn ($router) => $router->get('/health', $health->handle(...)),
                     static fn ($router) => $auth->register($router),
@@ -133,6 +141,7 @@ final readonly class ApplicationServiceProvider implements ServiceProviderInterf
                     static fn ($router) => $document->register($router),
                     static fn ($router) => $user->register($router),
                     static fn ($router) => $export->register($router),
+                    static fn ($router) => $ocr->register($router),
                 ];
             },
         );

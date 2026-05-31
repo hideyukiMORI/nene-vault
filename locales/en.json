@@ -283,6 +283,7 @@
       "history_section": "Change History",
       "links_section": "Linked Records",
       "download_button": "Download",
+      "ocr_suggest_button": "OCR Suggest",
       "version_number": "Version {{number}}",
       "current_version": "Latest",
       "date_uncertain_badge": "Date uncertain",

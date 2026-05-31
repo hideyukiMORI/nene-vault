@@ -707,6 +707,56 @@ paths:
         '403':
           $ref: '#/components/responses/Forbidden'
 
+  /admin/vault/documents/{id}/ocr-suggest:
+    parameters:
+      - $ref: '#/components/parameters/IdPath'
+    get:
+      tags: [Document]
+      summary: OCR metadata suggestion
+      description: >
+        Runs OCR on the current version of a document and returns suggested
+        metadata (取引年月日, 取引金額, 取引先名). Suggestions are never applied
+        automatically — the operator confirms via the metadata edit form.
+        Requires `NENE_VAULT_OCR_ENABLED=true` and Tesseract installed on the server.
+        Returns 422 if OCR fails (Tesseract not found, unreadable file, etc.).
+      operationId: ocrSuggestDocument
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: OCR suggestion (fields may be null if not detected).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OcrSuggestionResponse'
+              examples:
+                withSuggestion:
+                  value:
+                    document_id: 01JXXXXXXXXXXXXXXXXXXXXXX
+                    transaction_date: '2026-05-31'
+                    amount_cents: 110000
+                    counterparty_name: 株式会社サンプル
+                    has_suggestion: true
+                noSuggestion:
+                  value:
+                    document_id: 01JXXXXXXXXXXXXXXXXXXXXXX
+                    transaction_date: null
+                    amount_cents: null
+                    counterparty_name: null
+                    has_suggestion: false
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/DocumentNotFound'
+        '422':
+          description: OCR failed (Tesseract error or unsupported file type).
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+
   /admin/vault/export:
     post:
       tags: [Export]
@@ -1247,6 +1297,26 @@ components:
           type: integer
         offset:
           type: integer
+
+    OcrSuggestionResponse:
+      type: object
+      required: [document_id, transaction_date, amount_cents, counterparty_name, has_suggestion]
+      properties:
+        document_id:
+          type: string
+        transaction_date:
+          type: string
+          format: date
+          nullable: true
+        amount_cents:
+          type: integer
+          nullable: true
+        counterparty_name:
+          type: string
+          nullable: true
+        has_suggestion:
+          type: boolean
+          description: True if at least one field was extracted by OCR.
 
     ExportDocumentsRequest:
       type: object
