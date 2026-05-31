@@ -44,6 +44,6 @@
 - [x] MCP read tools — `searchVaultDocuments`, `getVaultDocumentById`, `getVaultDocumentHistory`, `listVaultAuditEvents` (PR #70)
 - [x] S3-compatible storage adapter — `S3DocumentStorage` + Sig V4, select via `NENE_VAULT_STORAGE_ADAPTER=s3` (PR #72)
 - [ ] Optional email inbound (mailbox → auto-upload via IMAP/MIME parser)
-- [ ] OCR assist — suggest metadata from PDF/image, human confirm (Phase 4+)
+- [x] OCR assist — suggest metadata from PDF/image, human confirm (PR #76)
 
 Last updated: 2026-05-31

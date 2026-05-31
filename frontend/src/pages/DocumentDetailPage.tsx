@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { useDocumentById } from '@/entities/document';
+import { useDocumentById, useOcrSuggest } from '@/entities/document';
 import { useDocumentHistory } from '@/entities/audit';
 import { authStore } from '@/entities/auth';
 import {
@@ -9,6 +9,7 @@ import {
   MetadataEditModal,
   DocumentHistoryTable,
 } from '@/features/document-detail';
+import type { OcrPrefill } from '@/features/document-detail';
 import { useTranslation } from '@/shared/i18n/use-translation';
 import { AppShell, Button, Stack, Text } from '@/shared/ui';
 import { env } from '@/shared/config/env';
@@ -25,6 +26,8 @@ export function DocumentDetailPage() {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const [modal, setModal] = useState<Modal>(null);
+  const [ocrPrefill, setOcrPrefill] = useState<OcrPrefill | undefined>(undefined);
+  const { suggest: ocrSuggest, isLoading: ocrLoading } = useOcrSuggest();
 
   const docId = id ?? '';
   const { data: doc, isLoading, isError } = useDocumentById(docId);
@@ -33,6 +36,15 @@ export function DocumentDetailPage() {
   function handleLogout() {
     authStore.clearSession();
     navigate('/login', { replace: true });
+  }
+
+  async function handleOcrSuggest() {
+    if (doc === undefined) return;
+    const prefill = await ocrSuggest(doc.id);
+    if (prefill !== null) {
+      setOcrPrefill(prefill);
+    }
+    setModal('metadata-edit');
   }
 
   function handleDownload() {
@@ -102,6 +114,18 @@ export function DocumentDetailPage() {
                 <Button
                   variant="secondary"
                   onClick={() => {
+                    void handleOcrSuggest();
+                  }}
+                  disabled={ocrLoading}
+                >
+                  {ocrLoading
+                    ? t('common.status.loading')
+                    : t('document.detail.ocr_suggest_button')}
+                </Button>
+                <Button
+                  variant="secondary"
+                  onClick={() => {
+                    setOcrPrefill(undefined);
                     setModal('metadata-edit');
                   }}
                 >
@@ -231,8 +255,10 @@ export function DocumentDetailPage() {
       {modal === 'metadata-edit' && doc !== undefined && (
         <MetadataEditModal
           doc={doc}
+          {...(ocrPrefill !== undefined && { ocrPrefill })}
           onClose={() => {
             setModal(null);
+            setOcrPrefill(undefined);
           }}
         />
       )}

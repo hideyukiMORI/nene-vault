@@ -15,19 +15,34 @@ const metadataSchema = z.object({
 
 export type MetadataFormValues = z.infer<typeof metadataSchema>;
 
+export interface OcrPrefill {
+  transaction_date?: string | null;
+  amount_cents?: number | null;
+  counterparty_name?: string | null;
+}
+
 function tagsToString(tags: string[] | undefined): string {
   return (tags ?? []).join(', ');
 }
 
-export function useMetadataEditForm(doc: VaultDocument, onSuccess: () => void) {
+export function useMetadataEditForm(
+  doc: VaultDocument,
+  onSuccess: () => void,
+  ocrPrefill?: OcrPrefill,
+) {
   const mutation = useUpdateDocumentMetadata(onSuccess);
 
   const form = useForm<MetadataFormValues>({
     resolver: zodResolver(metadataSchema),
     defaultValues: {
-      transaction_date: doc.transaction_date ?? '',
-      amount_cents: doc.amount_cents !== null ? String(doc.amount_cents) : '',
-      counterparty_name: doc.counterparty_name,
+      transaction_date: ocrPrefill?.transaction_date ?? doc.transaction_date ?? '',
+      amount_cents:
+        ocrPrefill?.amount_cents != null
+          ? String(ocrPrefill.amount_cents)
+          : doc.amount_cents !== null
+            ? String(doc.amount_cents)
+            : '',
+      counterparty_name: ocrPrefill?.counterparty_name ?? doc.counterparty_name,
       category: doc.category,
       tags: tagsToString(doc.tags),
     },

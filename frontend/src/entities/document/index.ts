@@ -14,3 +14,5 @@ export {
   useRestoreDocument,
 } from './mutations';
 export type { UploadDocumentInput, UpdateMetadataInput, VoidDocumentInput } from './mutations';
+export { useOcrSuggest } from './ocr';
+export type { OcrPrefill } from './ocr';

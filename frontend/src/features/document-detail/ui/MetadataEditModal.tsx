@@ -2,17 +2,23 @@ import { useTranslation } from '@/shared/i18n/use-translation';
 import { Button, Input, Stack, Text } from '@/shared/ui';
 import type { VaultDocument } from '@/entities/document';
 import { useMetadataEditForm } from '../hooks/use-metadata-edit';
+import type { OcrPrefill } from '../hooks/use-metadata-edit';
 
 const CATEGORIES = ['invoice_received', 'contract', 'receipt', 'delivery_note', 'other'] as const;
 
 interface MetadataEditModalProps {
   doc: VaultDocument;
   onClose: () => void;
+  ocrPrefill?: OcrPrefill;
 }
 
-export function MetadataEditModal({ doc, onClose }: MetadataEditModalProps) {
+export function MetadataEditModal({ doc, onClose, ocrPrefill }: MetadataEditModalProps) {
   const { t } = useTranslation();
-  const { form, onSubmit, isSubmitting, submitError } = useMetadataEditForm(doc, onClose);
+  const { form, onSubmit, isSubmitting, submitError } = useMetadataEditForm(
+    doc,
+    onClose,
+    ocrPrefill,
+  );
   const { register } = form;
 
   return (
