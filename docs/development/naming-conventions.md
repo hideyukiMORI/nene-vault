@@ -242,7 +242,7 @@ for these roles.
 | API client | snake_case JSON passed through — **do not rename** API fields to camelCase |
 | Problem Details | parsed to `AppError` in `shared/api/errors.ts`; base `https://nene-vault.dev/problems/` |
 | Locale keys | dot-notation from `locales/*.json` (e.g. `document.list.title`); ja+en only (ADR 0005) |
-| Auth token | **not** in `localStorage` (httpOnly cookie or ADR) |
+| Auth token | JWT in `entities/auth` `authStore` (localStorage, same as NeNe Records); sent as `Authorization: Bearer` + `credentials: 'include'`. Migration to httpOnly cookie requires an ADR. |
 
 Full frontend standards: [`frontend-standards.md`](./frontend-standards.md).
 Self-review: [`../review/frontend.md`](../review/frontend.md).
@@ -287,7 +287,6 @@ If it is a product concept with a meaning, also update [`docs/explanation/glossa
 ```bash
 composer check
 composer openapi
-composer mcp
 ```
 
 Review checklists: [`docs/review/`](../review/).

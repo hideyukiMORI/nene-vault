@@ -83,8 +83,8 @@ NENE_VAULT_PORT=8090 NENE_VAULT_FRONTEND_PORT=5180 docker compose up
 
 ## Status
 
-**Phase 0 complete** — governance and product design done (PR #1, #2 merged 2026-05-30).
-Phase 1 (API) and Phase 2 (Admin UI) implemented; Docker development environment available.
+**Phase 1 (Document API) complete** — Auth, Organization, User, VaultSettings, Document upload/search/void/restore/history/download, Export CSV, Audit logging (PR #8–#26, 2026-05-30).
+**Phase 2 (Admin UI) in progress** — React/Vite scaffold implemented; page-level UI under development. Docker development environment available.
 
 ## Ecosystem
 

@@ -85,15 +85,14 @@ Record these in ADRs or product docs when they stabilize:
 3. If the conflict touches compliance behavior, treat it as a P0 issue — do not resolve by guessing.
 4. Keep `.cursor/rules/` as a short summary; do not duplicate full policy text there.
 
-## Verification commands (once runtime is scaffolded)
+## Verification commands
 
 ```bash
 composer check
 composer openapi
-composer mcp
 ```
 
-When `frontend/` exists (Phase 2+):
+Frontend (Phase 2+):
 
 ```bash
 npm run check --prefix frontend

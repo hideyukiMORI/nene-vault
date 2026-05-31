@@ -72,4 +72,4 @@ If a user explicitly says investigation only, no commit, no PR, or another narro
 
 ## Initial Issues Backlog
 
-Phase 0 bootstrap Issues are tracked in `docs/todo/current.md`. After governance lands, use GitHub Issues for all work — no direct `main` commits.
+Use GitHub Issues for all work. Current work board: `docs/todo/current.md`. No direct `main` commits.
