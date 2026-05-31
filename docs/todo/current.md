@@ -19,11 +19,12 @@
 - [x] Manifest export — CSV (PR #26)
 - [x] Tax advisor review package prepared (Issue #27)
 
-## In progress / gating
+## Compliance gate — Resolved ✅
 
-- [ ] **税理士 review gate** — maintainer-approved for Phase 2 development; licensed
-      professional sign-off still required before production use.
+- [x] **税理士 review gate** — licensed professional sign-off recorded 2026-05-31
+      (辻村 拓也 / 辻村総合会計事務所 / 公認会計士・税理士). Gate status: 🟢 Approved.
       See `docs/compliance-review/signoff-record.md`.
+      **Condition:** pre-production Review 3 required before operators go live.
 
 ## Phase 2 — Done
 
