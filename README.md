@@ -61,8 +61,8 @@ Then open:
 
 | Service  | URL                     | Notes                                  |
 |----------|-------------------------|----------------------------------------|
-| Frontend | http://localhost:5173   | Vite dev server (proxies API to `app`) |
-| API      | http://localhost:8080   | Apache + PHP 8.4                        |
+| Frontend | http://localhost:5186   | Vite dev server (proxies API to `app`) |
+| API      | http://localhost:8600   | Apache + PHP 8.4                        |
 
 First-run admin credentials come from `.env` (`ADMIN_EMAIL` / `ADMIN_PASSWORD`,
 default `admin@example.com` / `changeme123`). A `default` organization, its
@@ -74,11 +74,33 @@ vault settings, and a superadmin user are seeded automatically.
 docker compose --profile mysql -f docker-compose.yml -f docker-compose.mysql.yml up
 ```
 
-**Port conflicts:** if 8080 / 5173 are already in use (e.g. a sibling product's
-dev server), override the host ports:
+### Local port allocation (binding)
+
+NeNe Vault runs alongside sibling products on the same developer machine, so its
+host-published ports are **fixed in the "86 lane"** to never collide:
+
+| Service          | NeNe Vault host port | Env var                     |
+|------------------|----------------------|-----------------------------|
+| API (Apache/PHP) | **8600**             | `NENE_VAULT_PORT`           |
+| Frontend (Vite)  | **5186**             | `NENE_VAULT_FRONTEND_PORT`  |
+| MySQL            | **3386**             | `NENE_VAULT_MYSQL_PORT`     |
+
+Reserved by siblings — **do not reuse**:
+
+| Product       | API   | Frontend / DB |
+|---------------|-------|---------------|
+| NENE2         | 82**  | 3316          |
+| NeNe Clear    | 83**  | 5173          |
+| NeNe Profile  | 84**  | 3409          |
+| NeNe Invoice  | 85**  | 5185          |
+| NeNe Records  | 180** | —             |
+
+Container-internal ports (8080 / 5173 / 3306) are unchanged; only the host side
+differs. If you must temporarily override (e.g. running two Vault checkouts),
+set the env vars — but keep `.env` on the fixed allocation above:
 
 ```sh
-NENE_VAULT_PORT=8090 NENE_VAULT_FRONTEND_PORT=5180 docker compose up
+NENE_VAULT_PORT=8601 NENE_VAULT_FRONTEND_PORT=5187 docker compose up
 ```
 
 ## Status

@@ -4,7 +4,7 @@
       "command": "php",
       "args": ["tools/local-mcp-server.php"],
       "env": {
-        "NENE2_LOCAL_API_BASE_URL": "http://localhost:8080",
+        "NENE2_LOCAL_API_BASE_URL": "http://localhost:8600",
         "NENE2_LOCAL_JWT_SECRET": "${NENE2_LOCAL_JWT_SECRET}"
       }
     }

@@ -10,7 +10,7 @@ declare(strict_types=1);
  * OpenAPI contract: docs/openapi/openapi.yaml
  *
  * Environment variables:
- *   NENE2_LOCAL_API_BASE_URL   API base URL (default: http://localhost:8080)
+ *   NENE2_LOCAL_API_BASE_URL   API base URL (default: http://localhost:8600)
  *   NENE2_LOCAL_JWT_SECRET     JWT secret — required for authenticated tools
  *
  * Usage (Claude Desktop claude_desktop_config.json):
@@ -20,7 +20,7 @@ declare(strict_types=1);
  *       "command": "php",
  *       "args": ["/path/to/nene-vault/tools/local-mcp-server.php"],
  *       "env": {
- *         "NENE2_LOCAL_API_BASE_URL": "http://localhost:8080",
+ *         "NENE2_LOCAL_API_BASE_URL": "http://localhost:8600",
  *         "NENE2_LOCAL_JWT_SECRET": "your-vault-jwt-secret"
  *       }
  *     }
@@ -37,7 +37,7 @@ use Nene2\Mcp\NativeLocalMcpHttpClient;
 require dirname(__DIR__) . '/vendor/autoload.php';
 
 $root = dirname(__DIR__);
-$apiBaseUrl = (string) (getenv('NENE2_LOCAL_API_BASE_URL') ?: 'http://localhost:8080');
+$apiBaseUrl = (string) (getenv('NENE2_LOCAL_API_BASE_URL') ?: 'http://localhost:8600');
 
 $bearerToken = null;
 $jwtSecret = getenv('NENE2_LOCAL_JWT_SECRET');

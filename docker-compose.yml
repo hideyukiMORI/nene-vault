@@ -10,8 +10,13 @@
 ##
 ## First-run credentials (see .env / ADMIN_EMAIL / ADMIN_PASSWORD):
 ##   Admin login: admin@example.com / changeme123
-##   API base:    http://localhost:8080
-##   Frontend:    http://localhost:5173
+##   API base:    http://localhost:8600
+##   Frontend:    http://localhost:5186
+##
+## Fixed local ports (86 lane — unique across the NeNe portfolio; see README):
+##   8600 API · 5186 Frontend · 3386 MySQL
+## Container-internal ports (8080 / 5173 / 3306) are unchanged; only the
+## host-published port differs.
 
 services:
   # ── PHP backend (Apache + PHP 8.4) ──────────────────────────────────────────
@@ -21,7 +26,7 @@ services:
       dockerfile: Dockerfile
       target: dev
     ports:
-      - "${NENE_VAULT_PORT:-8080}:8080"
+      - "${NENE_VAULT_PORT:-8600}:8080"
     volumes:
       # Source + vendor (read-only); vendor resolved by host composer install
       - .:/var/www/html:ro
@@ -62,7 +67,7 @@ services:
       dockerfile: frontend/Dockerfile
       target: dev
     ports:
-      - "${NENE_VAULT_FRONTEND_PORT:-5173}:5173"
+      - "${NENE_VAULT_FRONTEND_PORT:-5186}:5173"
     volumes:
       # Mount entire repo so @locales alias resolves to /app/locales
       - .:/app:ro
@@ -83,7 +88,7 @@ services:
     image: mysql:8.0
     profiles: [mysql]
     ports:
-      - "${NENE_VAULT_MYSQL_PORT:-3307}:3306"
+      - "${NENE_VAULT_MYSQL_PORT:-3386}:3306"
     environment:
       MYSQL_ROOT_PASSWORD: "${MYSQL_ROOT_PASSWORD:-nene_vault_root}"
       MYSQL_DATABASE: "${DB_NAME:-nene_vault}"

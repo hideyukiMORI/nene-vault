@@ -49,8 +49,8 @@ Services:
 
 | Service | Default URL | Notes |
 |---|---|---|
-| API (Apache + PHP 8.4) | http://localhost:8080 | |
-| Admin UI (Vite) | http://localhost:5173 | Dev server; proxies `/admin`, `/health` to the API |
+| API (Apache + PHP 8.4) | http://localhost:8600 | Fixed "86 lane" — see README |
+| Admin UI (Vite) | http://localhost:5186 | Dev server; proxies `/admin`, `/health` to the API |
 
 On first start, `init.sh` bootstraps the SQLite schema and seeds the default
 organization and admin user.
@@ -148,7 +148,7 @@ The PHP process must be able to write to `var/` (SQLite DB) and
 
 ## First login
 
-Open http://localhost:5173 and log in with `ADMIN_EMAIL` / `ADMIN_PASSWORD` from
+Open http://localhost:5186 and log in with `ADMIN_EMAIL` / `ADMIN_PASSWORD` from
 `.env`. Change the password immediately after first login.
 
 ---

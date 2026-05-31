@@ -25,7 +25,7 @@ Write tools require `NENE2_LOCAL_JWT_SECRET` to be set in the server environment
 
 ## Prerequisites
 
-1. NeNe Vault running at a reachable URL (e.g. `http://localhost:8080`)
+1. NeNe Vault running at a reachable URL (e.g. `http://localhost:8600`)
 2. A bearer token — generate one with:
 
 ```sh
@@ -51,7 +51,7 @@ Add to `~/Library/Application Support/Claude/claude_desktop_config.json`
       "command": "php",
       "args": ["/absolute/path/to/nene-vault/tools/local-mcp-server.php"],
       "env": {
-        "NENE2_LOCAL_API_BASE_URL": "http://localhost:8080",
+        "NENE2_LOCAL_API_BASE_URL": "http://localhost:8600",
         "NENE2_LOCAL_JWT_SECRET": "your-vault-jwt-secret"
       }
     }
@@ -74,7 +74,7 @@ Add `.mcp.json` to the project root (already present in NeNe Vault):
       "command": "php",
       "args": ["tools/local-mcp-server.php"],
       "env": {
-        "NENE2_LOCAL_API_BASE_URL": "http://localhost:8080",
+        "NENE2_LOCAL_API_BASE_URL": "http://localhost:8600",
         "NENE2_LOCAL_JWT_SECRET": "your-vault-jwt-secret"
       }
     }
@@ -91,13 +91,13 @@ Claude Code picks up `.mcp.json` automatically when you open the project.
 ```sh
 # List available tools
 echo '{"jsonrpc":"2.0","id":1,"method":"tools/list"}' \
-  | NENE2_LOCAL_API_BASE_URL=http://localhost:8080 \
+  | NENE2_LOCAL_API_BASE_URL=http://localhost:8600 \
     NENE2_LOCAL_JWT_SECRET=your-secret \
     php tools/local-mcp-server.php
 
 # Search documents (read-only, no JWT secret required for read tools)
 echo '{"jsonrpc":"2.0","id":2,"method":"tools/call","params":{"name":"searchVaultDocuments","arguments":{"counterparty_name":"ACME","limit":5}}}' \
-  | NENE2_LOCAL_API_BASE_URL=http://localhost:8080 \
+  | NENE2_LOCAL_API_BASE_URL=http://localhost:8600 \
     NENE2_LOCAL_JWT_SECRET=your-secret \
     php tools/local-mcp-server.php
 ```
