@@ -24,6 +24,7 @@ use NeneVault\Document\VaultDocumentNotFoundExceptionHandler;
 use NeneVault\Export\ExportRouteRegistrar;
 use NeneVault\Export\ExportServiceProvider;
 use NeneVault\Http\HealthHandler;
+use NeneVault\Ocr\OcrExceptionHandler;
 use NeneVault\Ocr\OcrRouteRegistrar;
 use NeneVault\Ocr\OcrServiceProvider;
 use NeneVault\Organization\OrganizationNotFoundExceptionHandler;
@@ -165,6 +166,7 @@ final readonly class ApplicationServiceProvider implements ServiceProviderInterf
                     $c->get(UserEmailConflictExceptionHandler::class),
                     $c->get(InvalidUserRoleExceptionHandler::class),
                     $c->get(CannotDeleteSelfExceptionHandler::class),
+                    $c->get(OcrExceptionHandler::class),
                 ];
             },
         );

@@ -1,4 +1,5 @@
 import { useTranslation } from '@/shared/i18n/use-translation';
+import { formatDateTime } from '@/shared/lib/format';
 import { Text } from '@/shared/ui';
 import type { AuditEvent } from '@/entities/audit';
 
@@ -7,7 +8,7 @@ interface DocumentHistoryTableProps {
 }
 
 export function DocumentHistoryTable({ events }: DocumentHistoryTableProps) {
-  const { t } = useTranslation();
+  const { t, locale } = useTranslation();
 
   if (events.length === 0) {
     return <Text tone="muted">{t('document.history.no_history')}</Text>;
@@ -38,12 +39,14 @@ export function DocumentHistoryTable({ events }: DocumentHistoryTableProps) {
         <tbody>
           {events.map((event) => (
             <tr key={event.id} className="border-b border-border">
-              <td className="px-inline-md py-stack-sm font-medium">{event.action}</td>
+              <td className="px-inline-md py-stack-sm font-medium">
+                {t(`audit_event.action.${event.action}`)}
+              </td>
               <td className="px-inline-md py-stack-sm text-muted">
                 {event.actor_user_id !== null ? String(event.actor_user_id) : '—'}
               </td>
               <td className="px-inline-md py-stack-sm text-muted">
-                {event.created_at.slice(0, 16).replace('T', ' ')}
+                {formatDateTime(event.created_at, locale)}
               </td>
               <td className="px-inline-md py-stack-sm">
                 {event.before_json !== null ? (

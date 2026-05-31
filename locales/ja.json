@@ -478,7 +478,13 @@
     "org_not_found": "組織が見つかりません。",
     "org_inactive": "この組織は現在無効です。",
     "internal_server_error": "サーバーエラーが発生しました。しばらく後にもう一度お試しください。",
-    "invalid_credentials": "メールアドレスまたはパスワードが正しくありません。"
+    "invalid_credentials": "メールアドレスまたはパスワードが正しくありません。",
+    "invalid_document_state": "現在の状態ではこの操作を実行できません。",
+    "cannot_delete_self": "自分自身のアカウントは削除できません。",
+    "invalid_user_role": "指定された権限が正しくありません。",
+    "user_not_found": "指定されたユーザーが見つかりません。",
+    "user_email_conflict": "このメールアドレスは既に使用されています。",
+    "ocr_failed": "OCR の実行に失敗しました。サーバーの設定を確認してください。"
   },
 
   "compliance": {

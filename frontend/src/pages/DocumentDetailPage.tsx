@@ -11,19 +11,15 @@ import {
 } from '@/features/document-detail';
 import type { OcrPrefill } from '@/features/document-detail';
 import { useTranslation } from '@/shared/i18n/use-translation';
+import { formatJpy, formatDate, formatDateTime } from '@/shared/lib/format';
 import { AppShell, Button, Stack, Text } from '@/shared/ui';
 import { env } from '@/shared/config/env';
 
 type Modal = 'void' | 'restore' | 'metadata-edit' | null;
 
-function formatAmount(cents: number | null): string {
-  if (cents === null) return '—';
-  return new Intl.NumberFormat('ja-JP', { style: 'currency', currency: 'JPY' }).format(cents);
-}
-
 export function DocumentDetailPage() {
   const { id } = useParams<{ id: string }>();
-  const { t } = useTranslation();
+  const { t, locale } = useTranslation();
   const navigate = useNavigate();
   const [modal, setModal] = useState<Modal>(null);
   const [ocrPrefill, setOcrPrefill] = useState<OcrPrefill | undefined>(undefined);
@@ -162,13 +158,15 @@ export function DocumentDetailPage() {
                   <dt className="text-label-sm text-muted">
                     {t('document.metadata.transaction_date')}
                   </dt>
-                  <dd className="mt-stack-xs">{doc.transaction_date ?? '—'}</dd>
+                  <dd className="mt-stack-xs">{formatDate(doc.transaction_date)}</dd>
                 </div>
                 <div>
                   <dt className="text-label-sm text-muted">
                     {t('document.metadata.amount_cents')}
                   </dt>
-                  <dd className="mt-stack-xs tabular-nums">{formatAmount(doc.amount_cents)}</dd>
+                  <dd className="mt-stack-xs tabular-nums">
+                    {formatJpy(doc.amount_cents, locale)}
+                  </dd>
                 </div>
                 <div>
                   <dt className="text-label-sm text-muted">{t('document.metadata.category')}</dt>
@@ -180,13 +178,13 @@ export function DocumentDetailPage() {
                 </div>
                 <div>
                   <dt className="text-label-sm text-muted">{t('document.metadata.uploaded_at')}</dt>
-                  <dd className="mt-stack-xs">{doc.uploaded_at.slice(0, 16).replace('T', ' ')}</dd>
+                  <dd className="mt-stack-xs">{formatDateTime(doc.uploaded_at, locale)}</dd>
                 </div>
                 <div>
                   <dt className="text-label-sm text-muted">
                     {t('document.metadata.retention_expires_at')}
                   </dt>
-                  <dd className="mt-stack-xs">{doc.retention_expires_at}</dd>
+                  <dd className="mt-stack-xs">{formatDate(doc.retention_expires_at)}</dd>
                 </div>
                 {doc.tags.length > 0 && (
                   <div className="col-span-2">

@@ -6,6 +6,7 @@ import { authStore } from '@/entities/auth';
 import { useVaultSettings, useUpdateVaultSettings } from '@/entities/vault-settings';
 import { messageKeyForError } from '@/shared/i18n/map-problem-details';
 import { useTranslation } from '@/shared/i18n/use-translation';
+import { formatDateTime } from '@/shared/lib/format';
 import { AppShell, Button, Input, Stack, Text } from '@/shared/ui';
 import { useNavigate } from 'react-router-dom';
 
@@ -19,7 +20,7 @@ const settingsSchema = z.object({
 type SettingsFormValues = z.infer<typeof settingsSchema>;
 
 export function SettingsPage() {
-  const { t } = useTranslation();
+  const { t, locale } = useTranslation();
   const navigate = useNavigate();
   const { data: settings, isLoading } = useVaultSettings();
 
@@ -151,7 +152,7 @@ export function SettingsPage() {
                 {settings?.updated_at !== null && settings?.updated_at !== undefined && (
                   <Text tone="muted" className="text-label-xs">
                     {t('vault_settings.fields.updated_at_label')}:{' '}
-                    {settings.updated_at.slice(0, 16).replace('T', ' ')}
+                    {formatDateTime(settings.updated_at, locale)}
                   </Text>
                 )}
 

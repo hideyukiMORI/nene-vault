@@ -478,7 +478,13 @@
     "org_not_found": "Organization not found.",
     "org_inactive": "This organization is currently inactive.",
     "internal_server_error": "A server error occurred. Please try again later.",
-    "invalid_credentials": "The email or password is incorrect."
+    "invalid_credentials": "The email or password is incorrect.",
+    "invalid_document_state": "This action cannot be performed in the document's current state.",
+    "cannot_delete_self": "You cannot delete your own account.",
+    "invalid_user_role": "The specified role is invalid.",
+    "user_not_found": "The specified user was not found.",
+    "user_email_conflict": "This email address is already in use.",
+    "ocr_failed": "OCR could not be run. Check the server configuration."
   },
 
   "compliance": {
