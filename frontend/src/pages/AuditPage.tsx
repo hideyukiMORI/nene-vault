@@ -5,8 +5,7 @@ import type { ListAuditEventsParams } from '@/entities/audit';
 import { authStore } from '@/entities/auth';
 import { useTranslation } from '@/shared/i18n/use-translation';
 import { formatDateTime } from '@/shared/lib/format';
-import { AppShell, Button, Input, Stack, Text } from '@/shared/ui';
-import { Pagination } from '@/features/document-search';
+import { AppShell, Button, Field, Input, Pagination, Stack, Text } from '@/shared/ui';
 
 const PAGE_SIZE = 20;
 
@@ -62,10 +61,7 @@ export function AuditPage() {
 
         <div className="rounded-lg border border-border bg-surface-raised p-stack-md">
           <div className="grid grid-cols-3 gap-inline-md">
-            <div className="flex flex-col gap-stack-xs">
-              <label className="text-label-sm text-muted">
-                {t('audit_event.list.filter.entity_type_label')}
-              </label>
+            <Field label={t('audit_event.list.filter.entity_type_label')} labelTone="muted">
               <Input
                 type="text"
                 value={filterEntityType}
@@ -73,11 +69,8 @@ export function AuditPage() {
                   setFilterEntityType(e.target.value);
                 }}
               />
-            </div>
-            <div className="flex flex-col gap-stack-xs">
-              <label className="text-label-sm text-muted">
-                {t('audit_event.list.filter.entity_id_label')}
-              </label>
+            </Field>
+            <Field label={t('audit_event.list.filter.entity_id_label')} labelTone="muted">
               <Input
                 type="text"
                 value={filterEntityId}
@@ -85,11 +78,8 @@ export function AuditPage() {
                   setFilterEntityId(e.target.value);
                 }}
               />
-            </div>
-            <div className="flex flex-col gap-stack-xs">
-              <label className="text-label-sm text-muted">
-                {t('audit_event.list.filter.action_label')}
-              </label>
+            </Field>
+            <Field label={t('audit_event.list.filter.action_label')} labelTone="muted">
               <Input
                 type="text"
                 value={filterAction}
@@ -97,7 +87,7 @@ export function AuditPage() {
                   setFilterAction(e.target.value);
                 }}
               />
-            </div>
+            </Field>
           </div>
           <div className="mt-stack-md flex gap-inline-md">
             <Button variant="primary" onClick={handleSearch} disabled={isLoading}>

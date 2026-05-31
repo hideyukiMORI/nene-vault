@@ -8,8 +8,17 @@ import { useUsers, useCreateUser, useDeleteUser } from '@/entities/user';
 import type { User } from '@/entities/user';
 import { messageKeyForError } from '@/shared/i18n/map-problem-details';
 import { useTranslation } from '@/shared/i18n/use-translation';
-import { AppShell, Button, Input, Stack, Text } from '@/shared/ui';
-import { Pagination } from '@/features/document-search';
+import {
+  AppShell,
+  Button,
+  Field,
+  Input,
+  Modal,
+  Pagination,
+  Select,
+  Stack,
+  Text,
+} from '@/shared/ui';
 
 const PAGE_SIZE = 20;
 
@@ -39,91 +48,69 @@ function UserFormModal({ onClose }: { onClose: () => void }) {
       ? (messageKeyForError(mutation.error) ?? 'problem.internal_server_error')
       : null;
 
+  const requiredMarker = t('common.required_marker');
+
   return (
-    <div
-      role="dialog"
-      aria-modal="true"
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/50"
-    >
-      <div className="w-full max-w-md rounded-xl border border-border bg-surface shadow-lg">
-        <div className="flex items-center justify-between border-b border-border px-inline-lg py-stack-md">
-          <Text as="h2" className="text-heading-sm">
-            {t('user.form.create_title')}
-          </Text>
-          <button type="button" onClick={onClose} className="text-muted hover:text-foreground">
-            ✕
-          </button>
-        </div>
-        <form
-          onSubmit={(e) => {
-            void form.handleSubmit((values) => {
-              mutation.mutate(values);
-            })(e);
-          }}
-          className="p-inline-lg"
-        >
-          <Stack gap="md">
-            <div className="flex flex-col gap-stack-xs">
-              <label className="text-label-sm font-medium">{t('user.form.email_label')}</label>
-              <Input
-                type="email"
-                placeholder={t('user.form.email_placeholder')}
-                {...register('email')}
-              />
-              {errors.email !== undefined && (
-                <Text tone="danger" className="text-label-xs">
-                  {t('common.required_marker')}
-                </Text>
-              )}
-            </div>
-            <div className="flex flex-col gap-stack-xs">
-              <label className="text-label-sm font-medium">{t('user.form.password_label')}</label>
-              <Input
-                type="password"
-                placeholder={t('user.form.password_placeholder')}
-                {...register('password')}
-              />
-              {errors.password !== undefined && (
-                <Text tone="danger" className="text-label-xs">
-                  {t('common.required_marker')}
-                </Text>
-              )}
-            </div>
-            <div className="flex flex-col gap-stack-xs">
-              <label className="text-label-sm font-medium">{t('user.form.role_label')}</label>
-              <select
-                {...register('role')}
-                className="h-10 rounded-md border border-border bg-surface px-inline-sm text-body-sm focus:outline-none focus:ring-2 focus:ring-brand"
-              >
-                {ROLES.map((r) => (
-                  <option key={r} value={r}>
-                    {t(`user.role.${r}`)}
-                  </option>
-                ))}
-              </select>
-            </div>
-            {submitError !== null && (
-              <Text tone="danger" className="text-body-sm">
-                {t(submitError)}
-              </Text>
-            )}
-            <div className="flex justify-end gap-inline-md">
-              <Button
-                type="button"
-                variant="secondary"
-                onClick={onClose}
-                disabled={mutation.isPending}
-              >
-                {t('common.buttons.cancel')}
-              </Button>
-              <Button type="submit" variant="primary" disabled={mutation.isPending}>
-                {mutation.isPending ? t('common.status.saving') : t('common.buttons.invite')}
-              </Button>
-            </div>
-          </Stack>
-        </form>
-      </div>
-    </div>
+    <Modal title={t('user.form.create_title')} onClose={onClose}>
+      <form
+        onSubmit={(e) => {
+          void form.handleSubmit((values) => {
+            mutation.mutate(values);
+          })(e);
+        }}
+        className="p-inline-lg"
+      >
+        <Stack gap="md">
+          <Field
+            label={t('user.form.email_label')}
+            error={errors.email !== undefined ? requiredMarker : undefined}
+          >
+            <Input
+              type="email"
+              placeholder={t('user.form.email_placeholder')}
+              {...register('email')}
+            />
+          </Field>
+          <Field
+            label={t('user.form.password_label')}
+            error={errors.password !== undefined ? requiredMarker : undefined}
+          >
+            <Input
+              type="password"
+              placeholder={t('user.form.password_placeholder')}
+              {...register('password')}
+            />
+          </Field>
+          <Field label={t('user.form.role_label')}>
+            <Select {...register('role')}>
+              {ROLES.map((r) => (
+                <option key={r} value={r}>
+                  {t(`user.role.${r}`)}
+                </option>
+              ))}
+            </Select>
+          </Field>
+          {submitError !== null && (
+            <Text tone="danger" className="text-body-sm">
+              {t(submitError)}
+            </Text>
+          )}
+          <div className="flex justify-end gap-inline-md">
+            <Button
+              type="button"
+              variant="secondary"
+              onClick={onClose}
+              disabled={mutation.isPending}
+            >
+              {t('common.buttons.cancel')}
+            </Button>
+            <Button type="submit" variant="primary" disabled={mutation.isPending}>
+              {mutation.isPending ? t('common.status.saving') : t('common.buttons.invite')}
+            </Button>
+          </div>
+        </Stack>
+      </form>
+    </Modal>
   );
 }
 
