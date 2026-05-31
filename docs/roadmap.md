@@ -48,10 +48,10 @@ Operators self-host Vault to store and search **received** vendor documents with
 
 ## Phase 4: Ecosystem
 
-- MCP read tools (`searchVaultDocuments`, `getVaultDocument`)
-- Optional email inbound
+- MCP read tools (`searchVaultDocuments`, `getVaultDocument`, history, audit) ✅ (PR #70)
+- S3-compatible storage adapter (`DocumentStorageInterface`, Sig V4, MinIO/B2/DO Spaces) ✅ (PR #72)
+- Optional email inbound (IMAP → auto-upload)
 - OCR assist (suggest-only, human confirm)
-- Optional S3 storage adapter
 
 ## Not on this roadmap
 
