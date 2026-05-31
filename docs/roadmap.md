@@ -46,12 +46,12 @@ Operators self-host Vault to store and search **received** vendor documents with
 - 事務処理規程 template ✅ (PR #66)
 - Beside Invoice/Clear/Profile on same server — pending Tier A testing
 
-## Phase 4: Ecosystem
+## Phase 4: Ecosystem ✅
 
 - MCP read tools (`searchVaultDocuments`, `getVaultDocument`, history, audit) ✅ (PR #70)
 - S3-compatible storage adapter (`DocumentStorageInterface`, Sig V4, MinIO/B2/DO Spaces) ✅ (PR #72)
-- Optional email inbound (IMAP → auto-upload)
-- OCR assist (suggest-only, human confirm)
+- Email inbound (MIME parser + maildir dropbox → auto-upload, cron-friendly) ✅ (PR #74)
+- OCR assist (Tesseract → suggest date/amount/counterparty, human confirm) ✅ (PR #76)
 
 ## Not on this roadmap
 
