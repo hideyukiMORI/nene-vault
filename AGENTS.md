@@ -18,7 +18,7 @@ See [ADR 0009](docs/adr/0009-separate-from-billing-and-reconciliation.md).
 - **Canonical terms — single source of truth (binding):** `docs/terms.md` ← **START HERE for any identifier**
 - **Scope contract (binding):** `docs/explanation/scope-contract.md`
 - **Compliance (binding):** `docs/explanation/received-document-compliance.md`
-- **Compliance review gate:** `docs/compliance-review/` (Phase 2 dev unblocked by maintainer; licensed 税理士 sign-off still required before production use — see `signoff-record.md`)
+- **Compliance review gate:** `docs/compliance-review/` — 🟢 Approved (Review 2, 2026-05-31, 辻村 拓也 CPA/税理士). Development and test-environment implementation unblocked. Pre-production Review 3 required before operators go live.
 - **No competitor names (binding):** `docs/adr/0013-no-third-party-product-names.md`
 - **Naming rules:** `docs/development/naming-conventions.md`
 - **Backend standards:** `docs/development/backend-standards.md`
