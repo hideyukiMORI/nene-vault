@@ -61,4 +61,4 @@ Operators self-host Vault to store and search **received** vendor documents with
 
 See [`docs/explanation/scope-boundary.md`](./explanation/scope-boundary.md).
 
-Last updated: 2026-05-29
+Last updated: 2026-05-31

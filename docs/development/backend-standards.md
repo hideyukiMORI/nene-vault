@@ -150,7 +150,6 @@ Use `final readonly` classes and `declare(strict_types=1);` in every PHP file.
 ```bash
 composer check
 composer openapi
-composer mcp
 ```
 
 Self-review checklists: [`docs/review/compliance.md`](../review/compliance.md), [`docs/review/backend-api.md`](../review/backend-api.md), [`docs/review/database.md`](../review/database.md).

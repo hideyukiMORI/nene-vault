@@ -18,7 +18,7 @@ See [ADR 0009](docs/adr/0009-separate-from-billing-and-reconciliation.md).
 - **Canonical terms — single source of truth (binding):** `docs/terms.md` ← **START HERE for any identifier**
 - **Scope contract (binding):** `docs/explanation/scope-contract.md`
 - **Compliance (binding):** `docs/explanation/received-document-compliance.md`
-- **Compliance review gate:** `docs/compliance-review/` (税理士 sign-off blocks Phase 2 UI)
+- **Compliance review gate:** `docs/compliance-review/` (Phase 2 dev unblocked by maintainer; licensed 税理士 sign-off still required before production use — see `signoff-record.md`)
 - **No competitor names (binding):** `docs/adr/0013-no-third-party-product-names.md`
 - **Naming rules:** `docs/development/naming-conventions.md`
 - **Backend standards:** `docs/development/backend-standards.md`
@@ -49,4 +49,4 @@ See [ADR 0009](docs/adr/0009-separate-from-billing-and-reconciliation.md).
 
 ## Framework
 
-[NENE2](https://github.com/hideyukiMORI/NENE2) via Composer when runtime lands.
+[NENE2](https://github.com/hideyukiMORI/NENE2) via Composer (`vendor/hideyukimori/nene2/`). Runtime is fully implemented; see `docs/inheritance-from-nene2.md`.

@@ -18,7 +18,8 @@ before runtime code.
 
 ## Follow-up
 
-Phase 1 — Document upload API + search + storage adapter (Issue #4+).
-税理士 review gate before Phase 2 Admin UI.
+Phase 1 (Document API) — complete (PR #8–#26).
+Phase 2 (Admin UI) — scaffold implemented; page-level UI in progress.
+Compliance review gate — maintainer-approved to proceed with Phase 2 development; licensed 税理士 sign-off required before production use.
 
-Last updated: 2026-05-30
+Last updated: 2026-05-31
