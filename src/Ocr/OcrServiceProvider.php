@@ -7,6 +7,7 @@ namespace NeneVault\Ocr;
 use LogicException;
 use Nene2\DependencyInjection\ContainerBuilder;
 use Nene2\DependencyInjection\ServiceProviderInterface;
+use Nene2\Error\ProblemDetailsResponseFactory;
 use Nene2\Http\JsonResponseFactory;
 use NeneVault\Document\VaultDocumentRepositoryInterface;
 use NeneVault\DocumentVersion\DocumentStorageInterface;
@@ -90,6 +91,18 @@ final readonly class OcrServiceProvider implements ServiceProviderInterface
                     }
 
                     return new OcrRouteRegistrar($h);
+                },
+            )
+            ->set(
+                OcrExceptionHandler::class,
+                static function (ContainerInterface $c): OcrExceptionHandler {
+                    $pd = $c->get(ProblemDetailsResponseFactory::class);
+
+                    if (!$pd instanceof ProblemDetailsResponseFactory) {
+                        throw new LogicException('ProblemDetailsResponseFactory service is invalid.');
+                    }
+
+                    return new OcrExceptionHandler($pd);
                 },
             );
     }

@@ -1,4 +1,5 @@
 import { useTranslation } from '@/shared/i18n/use-translation';
+import { formatJpy, formatDate } from '@/shared/lib/format';
 import { Text } from '@/shared/ui';
 import type { VaultDocument } from '@/entities/document';
 
@@ -7,18 +8,8 @@ interface DocumentTableProps {
   onSelectDocument: (id: string) => void;
 }
 
-function formatAmount(cents: number | null): string {
-  if (cents === null) return '—';
-  return new Intl.NumberFormat('ja-JP', { style: 'currency', currency: 'JPY' }).format(cents);
-}
-
-function formatDate(date: string | null): string {
-  if (date === null) return '—';
-  return date;
-}
-
 export function DocumentTable({ documents, onSelectDocument }: DocumentTableProps) {
-  const { t } = useTranslation();
+  const { t, locale } = useTranslation();
 
   if (documents.length === 0) {
     return (
@@ -71,7 +62,7 @@ export function DocumentTable({ documents, onSelectDocument }: DocumentTableProp
               </td>
               <td className="px-inline-md py-stack-sm font-medium">{doc.counterparty_name}</td>
               <td className="px-inline-md py-stack-sm text-right tabular-nums">
-                {formatAmount(doc.amount_cents)}
+                {formatJpy(doc.amount_cents, locale)}
               </td>
               <td className="px-inline-md py-stack-sm">{t(`document.category.${doc.category}`)}</td>
               <td className="px-inline-md py-stack-sm">

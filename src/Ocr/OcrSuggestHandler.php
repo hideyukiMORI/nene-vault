@@ -25,14 +25,9 @@ final readonly class OcrSuggestHandler
         $params = $request->getAttribute(Router::PARAMETERS_ATTRIBUTE, []);
         $documentId = (string) ($params['id'] ?? '');
 
-        try {
-            $suggestion = $this->useCase->execute($documentId, $orgId);
-        } catch (OcrException $e) {
-            return $this->response->create(
-                ['error' => 'ocr_failed', 'message' => $e->getMessage()],
-                422,
-            );
-        }
+        // OcrException (→ 422) and VaultDocumentNotFoundException (→ 404) propagate
+        // to their registered domain exception handlers, which emit Problem Details.
+        $suggestion = $this->useCase->execute($documentId, $orgId);
 
         return $this->response->create([
             'document_id'      => $documentId,

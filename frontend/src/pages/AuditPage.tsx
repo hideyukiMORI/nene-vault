@@ -4,13 +4,14 @@ import { useAuditEvents } from '@/entities/audit';
 import type { ListAuditEventsParams } from '@/entities/audit';
 import { authStore } from '@/entities/auth';
 import { useTranslation } from '@/shared/i18n/use-translation';
+import { formatDateTime } from '@/shared/lib/format';
 import { AppShell, Button, Input, Stack, Text } from '@/shared/ui';
 import { Pagination } from '@/features/document-search';
 
 const PAGE_SIZE = 20;
 
 export function AuditPage() {
-  const { t } = useTranslation();
+  const { t, locale } = useTranslation();
   const navigate = useNavigate();
 
   const [filterEntityType, setFilterEntityType] = useState('');
@@ -146,7 +147,9 @@ export function AuditPage() {
                   <tbody>
                     {events.map((event) => (
                       <tr key={event.id} className="border-b border-border hover:bg-surface-raised">
-                        <td className="px-inline-md py-stack-sm font-medium">{event.action}</td>
+                        <td className="px-inline-md py-stack-sm font-medium">
+                          {t(`audit_event.action.${event.action}`)}
+                        </td>
                         <td className="px-inline-md py-stack-sm text-muted">
                           {event.entity_type}/{event.entity_id}
                         </td>
@@ -154,7 +157,7 @@ export function AuditPage() {
                           {event.actor_user_id !== null ? String(event.actor_user_id) : '—'}
                         </td>
                         <td className="px-inline-md py-stack-sm text-muted">
-                          {event.created_at.slice(0, 16).replace('T', ' ')}
+                          {formatDateTime(event.created_at, locale)}
                         </td>
                         <td className="px-inline-md py-stack-sm">
                           {event.before_json !== null ? (

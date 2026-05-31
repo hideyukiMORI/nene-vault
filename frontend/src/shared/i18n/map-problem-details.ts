@@ -14,6 +14,12 @@ const SLUG_TO_KEY: Record<string, string> = {
   'file-too-large': 'problem.file_too_large',
   'duplicate-file': 'problem.duplicate_file',
   'invalid-credentials': 'problem.invalid_credentials',
+  'invalid-document-state': 'problem.invalid_document_state',
+  'cannot-delete-self': 'problem.cannot_delete_self',
+  'invalid-user-role': 'problem.invalid_user_role',
+  'user-not-found': 'problem.user_not_found',
+  'user-email-conflict': 'problem.user_email_conflict',
+  'ocr-failed': 'problem.ocr_failed',
   'internal-server-error': 'problem.internal_server_error',
 };
 
