@@ -268,7 +268,7 @@
       "date_to_label": "取引年月日 (To)",
       "amount_min_label": "取引金額 (Min)",
       "amount_max_label": "取引金額 (Max)",
-      "counterparty_label": "取引先名",
+      "counterparty_label": "取引先名 (Counterparty)",
       "category_label": "Category",
       "include_voided_label": "Include voided",
       "search_button": "Search",
@@ -290,9 +290,9 @@
       "metadata_unconfirmed_badge": "Metadata unconfirmed"
     },
     "metadata": {
-      "transaction_date": "取引年月日",
-      "amount_cents": "取引金額",
-      "counterparty_name": "取引先名",
+      "transaction_date": "取引年月日 (Transaction Date)",
+      "amount_cents": "取引金額 (Amount, JPY)",
+      "counterparty_name": "取引先名 (Counterparty)",
       "category": "Category",
       "tags": "Tags",
       "source": "Source",
