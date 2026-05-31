@@ -194,11 +194,11 @@ Compliance-critical tests (retention block, hash verification, audit write, org 
 
 | Item | Rule | Example |
 | --- | --- | --- |
-| Tool `name` | Same as OpenAPI `operationId` | `searchDocuments`, `getDocumentById` |
-| Tool `title` | Short English Title Case | `Search Documents`, `Get Document` |
-| `safety` | `read` or `write` | `read` for search/get; `write` for upload/void |
+| Tool `name` | `{verb}VaultDocument{Noun}` or `{verb}Vault{Resource}` | `searchVaultDocuments`, `voidVaultDocument` |
+| Tool `title` | Short English Title Case | `Search Vault Documents`, `Void Vault Document` |
+| `safety` | `read` or `write` | `read` for search/get/ocr/export; `write` for metadata/void/restore |
 
-Catalog: `docs/mcp/tools.json`. Phase 4+ (read tools first per roadmap).
+Catalog: `docs/mcp/tools.json` (9 tools: 6 read, 3 write). Integration guide: `docs/mcp/README.md`.
 
 ---
 

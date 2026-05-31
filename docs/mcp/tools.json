@@ -159,6 +159,171 @@
         }
       },
       "responseSchemaRef": "#/components/schemas/AuditEventListResponse"
+    },
+    {
+      "name": "ocrSuggestVaultDocument",
+      "title": "OCR Suggest Document Metadata",
+      "description": "Run OCR on a document's current file and return suggested metadata (取引年月日, 取引金額, 取引先名). Suggestions are never applied automatically — the operator confirms via the metadata edit form. Returns null fields when not detected. Requires Tesseract on the server.",
+      "safety": "read",
+      "source": {
+        "type": "openapi",
+        "operationId": "ocrSuggestDocument",
+        "method": "GET",
+        "path": "/admin/vault/documents/{id}/ocr-suggest"
+      },
+      "inputSchema": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id"],
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Document ULID"
+          }
+        }
+      },
+      "responseSchemaRef": "#/components/schemas/OcrSuggestionResponse"
+    },
+    {
+      "name": "exportVaultDocumentsCsv",
+      "title": "Export Vault Documents CSV",
+      "description": "Export a manifest CSV of matched received documents. Returns CSV text with columns: document_id, version, transaction_date, amount_cents, counterparty_name, category, file_sha256, uploaded_at, voided_at. Suitable for tax audit responses (電帳法 §10). Each exported document is recorded in the audit log.",
+      "safety": "read",
+      "source": {
+        "type": "openapi",
+        "operationId": "exportDocuments",
+        "method": "POST",
+        "path": "/admin/vault/export"
+      },
+      "inputSchema": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "transaction_date_from": {
+            "type": "string",
+            "format": "date",
+            "description": "取引年月日 range start (YYYY-MM-DD)"
+          },
+          "transaction_date_to": {
+            "type": "string",
+            "format": "date",
+            "description": "取引年月日 range end (YYYY-MM-DD)"
+          },
+          "counterparty_name": {
+            "type": "string",
+            "description": "取引先名 partial match"
+          },
+          "include_voided": {
+            "type": "boolean",
+            "default": false
+          }
+        }
+      },
+      "responseSchemaRef": null
+    },
+    {
+      "name": "updateVaultDocumentMetadata",
+      "title": "Update Vault Document Metadata",
+      "description": "Update transaction_date, amount_cents, counterparty_name, category, or tags on a received document. File bytes are never changed. Records a document.metadata_changed audit event with before/after state. Requires NENE2_LOCAL_JWT_SECRET (write tool).",
+      "safety": "write",
+      "source": {
+        "type": "openapi",
+        "operationId": "updateDocumentMetadata",
+        "method": "PATCH",
+        "path": "/admin/vault/documents/{id}/metadata"
+      },
+      "inputSchema": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "counterparty_name", "category"],
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Document ULID"
+          },
+          "counterparty_name": {
+            "type": "string",
+            "description": "取引先名"
+          },
+          "category": {
+            "type": "string",
+            "enum": ["invoice_received", "contract", "receipt", "delivery_note", "other"],
+            "description": "Document category"
+          },
+          "transaction_date": {
+            "type": "string",
+            "format": "date",
+            "description": "取引年月日 (YYYY-MM-DD); null to clear"
+          },
+          "amount_cents": {
+            "type": "integer",
+            "minimum": 0,
+            "description": "取引金額 in integer JPY; null to clear"
+          },
+          "tags": {
+            "type": "array",
+            "items": { "type": "string" },
+            "description": "Tag list (replaces existing tags)"
+          }
+        }
+      },
+      "responseSchemaRef": "#/components/schemas/VaultDocumentResponse"
+    },
+    {
+      "name": "voidVaultDocument",
+      "title": "Void Vault Document",
+      "description": "Logically deactivate a received document with a mandatory reason. The file and metadata are retained for the full retention period — this is a logical void, not a delete. Records a document.voided audit event. Requires NENE2_LOCAL_JWT_SECRET (write tool).",
+      "safety": "write",
+      "source": {
+        "type": "openapi",
+        "operationId": "voidDocument",
+        "method": "POST",
+        "path": "/admin/vault/documents/{id}/void"
+      },
+      "inputSchema": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "void_reason"],
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Document ULID"
+          },
+          "void_reason": {
+            "type": "string",
+            "description": "Mandatory reason for voiding (recorded in audit log)"
+          },
+          "void_note": {
+            "type": "string",
+            "description": "Optional extended context"
+          }
+        }
+      },
+      "responseSchemaRef": "#/components/schemas/VaultDocumentResponse"
+    },
+    {
+      "name": "restoreVaultDocument",
+      "title": "Restore Voided Vault Document",
+      "description": "Return a voided document to active status. Records a document.restored audit event. Requires NENE2_LOCAL_JWT_SECRET (write tool).",
+      "safety": "write",
+      "source": {
+        "type": "openapi",
+        "operationId": "restoreDocument",
+        "method": "POST",
+        "path": "/admin/vault/documents/{id}/restore"
+      },
+      "inputSchema": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id"],
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Document ULID"
+          }
+        }
+      },
+      "responseSchemaRef": "#/components/schemas/VaultDocumentResponse"
     }
   ]
 }
