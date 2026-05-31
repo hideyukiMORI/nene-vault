@@ -363,7 +363,10 @@ Rules: **no hardcoded user-facing strings** — use `t('document.list.title')`. 
 follow `docs/development/locale-guide.md` (namespaces: `common`, `auth`,
 `navigation`, `document`, …). `ja` is default; detection order
 `localStorage['nene-vault.locale']` → `navigator.language` → `ja`. Statutory labels
-(取引年月日, 取引金額, 取引先名) stay Japanese in both locales. Missing key renders
+(取引年月日, 取引金額, 取引先名) follow the active locale — Japanese in `ja`, plain
+English in `en` (Transaction Date / Amount / Counterparty); the Japanese term is
+preserved in the `ja` catalog, `docs/terms.md`, and export manifest semantics
+(ADR 0005, revised 2026-05-31). Missing key renders
 the key (visible, not blank). `{{name}}` interpolation. Adding a string updates
 **both** `locales/*.json` (enforced by `composer locales`).
 

@@ -50,10 +50,12 @@ composer locales        # runs tools/validate-locales.php
 
 ## Rules
 
-1. **Statutory field labels stay Japanese in both locales.** 取引年月日, 取引金額,
-   取引先名 appear in Japanese even in `en.json` — they are legally traceable
-   terms (ADR 0005, ADR 0008). The English file may add a parenthetical gloss,
-   e.g. `"取引年月日 (Transaction Date)"`.
+1. **Statutory field labels follow the active locale** (ADR 0005, revised
+   2026-05-31). 取引年月日 / 取引金額 / 取引先名 stay Japanese in `ja.json`, and
+   render as plain English in `en.json` — "Transaction Date", "Amount (JPY)",
+   "Counterparty". The legally-traceable Japanese terminology is preserved in the
+   `ja` catalog, `docs/terms.md`, and the export manifest semantics; the UI label
+   is a display concern that follows the selected language.
 
 2. **API stays English.** Problem Details responses from the API are English
    (ADR 0008). The `problem.*` keys translate those for display only — they do
