@@ -13,6 +13,7 @@ This directory covers everything an operator needs to run NeNe Vault in producti
 | [search.md](./search.md) | 電帳法 search fields, UI walkthrough, quick-search guide |
 | [export.md](./export.md) | CSV/ZIP export, tax audit response (電帳法 §10) |
 | [jimu-shokirei-template.md](./jimu-shokirei-template.md) | 事務処理規程 template (customize and adopt) |
+| [email-inbound.md](./email-inbound.md) | Automatic import of email attachments (optional) |
 
 ## Compliance note
 
