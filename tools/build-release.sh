@@ -1,0 +1,98 @@
+#!/usr/bin/env bash
+# NeNe Vault — Release ZIP builder for Tier A shared hosting
+#
+# Usage:
+#   bash tools/build-release.sh [version]
+#   bash tools/build-release.sh 1.2.0
+#
+# Output:
+#   dist/nene-vault-{version}.zip
+#
+# Requirements:
+#   - Composer installed globally
+#   - Node.js + npm
+#   - zip (CLI utility)
+
+set -euo pipefail
+
+VERSION="${1:-$(git describe --tags --always 2>/dev/null || echo 'dev')}"
+ROOT="$(cd "$(dirname "$0")/.." && pwd)"
+DIST="$ROOT/dist"
+STAGING="$DIST/nene-vault-$VERSION"
+ZIP_FILE="$DIST/nene-vault-$VERSION.zip"
+
+echo "==> Building NeNe Vault $VERSION"
+
+# ── Cleanup ───────────────────────────────────────────────────────────────────
+rm -rf "$STAGING" "$ZIP_FILE"
+mkdir -p "$STAGING"
+
+# ── Frontend build ────────────────────────────────────────────────────────────
+echo "--> Building frontend..."
+cd "$ROOT/frontend"
+npm ci --silent
+npm run build --silent
+cd "$ROOT"
+
+echo "--> Frontend built to frontend/dist/"
+
+# ── PHP dependencies (no-dev) ─────────────────────────────────────────────────
+echo "--> Installing production Composer dependencies..."
+composer install --no-dev --optimize-autoloader --quiet
+
+# ── Stage files ───────────────────────────────────────────────────────────────
+echo "--> Staging release files..."
+
+# PHP application source
+rsync -a --exclude='*.test.*' \
+    "$ROOT/src/"       "$STAGING/src/"
+rsync -a \
+    "$ROOT/vendor/"    "$STAGING/vendor/"
+rsync -a \
+    "$ROOT/locales/"   "$STAGING/locales/"
+rsync -a \
+    "$ROOT/database/"  "$STAGING/database/"
+rsync -a \
+    "$ROOT/docker/"    "$STAGING/docker/"
+
+# Public HTML (PHP front controller + .htaccess + built frontend)
+rsync -a \
+    "$ROOT/public_html/"          "$STAGING/public_html/"
+rsync -a \
+    "$ROOT/frontend/dist/"        "$STAGING/public_html/"
+
+# Config files
+cp "$ROOT/phinx.php"        "$STAGING/phinx.php"
+cp "$ROOT/.env.example"     "$STAGING/.env.example"
+cp "$ROOT/phpstan.neon.dist" "$STAGING/phpstan.neon.dist" 2>/dev/null || true
+
+# Installer
+cp "$ROOT/install.php" "$STAGING/install.php"
+
+# var/ placeholder (empty, writable)
+mkdir -p "$STAGING/var"
+touch "$STAGING/var/.gitkeep"
+
+# Storage placeholder
+mkdir -p "$STAGING/storage/vault"
+touch "$STAGING/storage/vault/.gitkeep"
+
+# ── Create ZIP ────────────────────────────────────────────────────────────────
+echo "--> Creating ZIP archive..."
+cd "$DIST"
+zip -r "nene-vault-$VERSION.zip" "nene-vault-$VERSION/" -x "*/\.*" -q
+
+echo ""
+echo "==> Release ZIP: $ZIP_FILE"
+echo "    Contents: $(du -sh "$STAGING" | cut -f1) uncompressed"
+echo ""
+echo "Tier A installation:"
+echo "  1. Upload and extract nene-vault-$VERSION.zip to your web root"
+echo "  2. Set document root to public_html/"
+echo "  3. Visit install.php to complete setup"
+
+# ── Restore dev dependencies ──────────────────────────────────────────────────
+echo "--> Restoring dev Composer dependencies..."
+composer install --quiet
+
+echo "==> Done."

@@ -37,6 +37,6 @@
 
 - [x] Operator guide (storage, backup, retention, search, export) — `docs/operator/` (PR #66)
 - [x] 事務処理規程 template — `docs/operator/jimu-shokirei-template.md` (PR #66)
-- [ ] Web installer + release ZIP (Tier A shared hosting)
+- [x] Web installer + release ZIP (Tier A shared hosting) — `install.php` + `tools/build-release.sh` (PR #68)
 
 Last updated: 2026-05-31
