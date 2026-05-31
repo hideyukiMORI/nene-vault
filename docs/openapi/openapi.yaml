@@ -707,6 +707,56 @@ paths:
         '403':
           $ref: '#/components/responses/Forbidden'
 
+  /admin/vault/export:
+    post:
+      tags: [Export]
+      summary: Export documents
+      description: >
+        Exports matched documents as a manifest CSV (`format: csv`, default) or a ZIP
+        archive containing `manifest.csv` plus every matched document file
+        (`format: zip`). Requires `ExportDocuments` capability (admin / member).
+        Every exported document is recorded in the audit log.
+      operationId: exportDocuments
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ExportDocumentsRequest'
+            examples:
+              csv:
+                summary: Manifest CSV (default)
+                value:
+                  transaction_date_from: '2026-01-01'
+                  transaction_date_to: '2026-12-31'
+                  counterparty_name: '株式会社サンプル'
+                  include_voided: false
+              zip:
+                summary: ZIP bundle with document files
+                value:
+                  format: zip
+                  transaction_date_from: '2026-01-01'
+                  transaction_date_to: '2026-12-31'
+      responses:
+        '200':
+          description: >
+            Manifest CSV (`text/csv`) or ZIP archive (`application/zip`).
+            `Content-Disposition: attachment` with a timestamped filename.
+          content:
+            text/csv:
+              schema:
+                type: string
+            application/zip:
+              schema:
+                type: string
+                format: binary
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
 components:
   securitySchemes:
     bearerAuth:
@@ -1201,6 +1251,13 @@ components:
     ExportDocumentsRequest:
       type: object
       properties:
+        format:
+          type: string
+          enum: [csv, zip]
+          default: csv
+          description: >
+            `csv` — manifest CSV only (default).
+            `zip` — ZIP archive with `manifest.csv` + all matched document files.
         transaction_date_from:
           type: string
           format: date

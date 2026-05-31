@@ -9,6 +9,7 @@ use Nene2\DependencyInjection\ContainerBuilder;
 use Nene2\DependencyInjection\ServiceProviderInterface;
 use NeneVault\Audit\AuditRecorderInterface;
 use NeneVault\Document\VaultDocumentRepositoryInterface;
+use NeneVault\DocumentVersion\DocumentStorageInterface;
 use Psr\Container\ContainerInterface;
 use Psr\Http\Message\ResponseFactoryInterface;
 use Psr\Http\Message\StreamFactoryInterface;
@@ -22,17 +23,22 @@ final readonly class ExportServiceProvider implements ServiceProviderInterface
                 ExportDocumentsUseCaseInterface::class,
                 static function (ContainerInterface $c): ExportDocumentsUseCaseInterface {
                     $documents = $c->get(VaultDocumentRepositoryInterface::class);
+                    $storage = $c->get(DocumentStorageInterface::class);
                     $audit = $c->get(AuditRecorderInterface::class);
 
                     if (!$documents instanceof VaultDocumentRepositoryInterface) {
                         throw new LogicException('VaultDocumentRepositoryInterface service is invalid.');
                     }
 
+                    if (!$storage instanceof DocumentStorageInterface) {
+                        throw new LogicException('DocumentStorageInterface service is invalid.');
+                    }
+
                     if (!$audit instanceof AuditRecorderInterface) {
                         throw new LogicException('AuditRecorderInterface service is invalid.');
                     }
 
-                    return new ExportDocumentsUseCase($documents, $audit);
+                    return new ExportDocumentsUseCase($documents, $storage, $audit);
                 },
             )
             ->set(

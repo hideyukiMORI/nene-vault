@@ -423,6 +423,9 @@
       "date_to_label": "取引年月日 (To)",
       "counterparty_label": "取引先名 (Filter)",
       "include_voided_label": "Include voided",
+      "format_label": "Output format",
+      "format_zip": "ZIP (document files + manifest)",
+      "format_csv": "CSV only (manifest)",
       "submit": "Start Export"
     },
     "manifest": {

@@ -29,6 +29,8 @@ final readonly class ExportDocumentsHandler
 
         $body = JsonRequestBodyParser::parse($request);
 
+        $format = (is_string($body['format'] ?? null) && $body['format'] === 'zip') ? 'zip' : 'csv';
+
         $input = new ExportDocumentsInput(
             organizationId: $orgId,
             transactionDateFrom: $this->strOrNull($body['transaction_date_from'] ?? null),
@@ -36,17 +38,30 @@ final readonly class ExportDocumentsHandler
             counterpartyName: $this->strOrNull($body['counterparty_name'] ?? null),
             includeVoided: isset($body['include_voided']) && ($body['include_voided'] === true || $body['include_voided'] === '1' || $body['include_voided'] === 'true'),
             actorUserId: $actorUserId,
+            format: $format,
         );
 
-        $csv = $this->useCase->execute($input);
+        $output = $this->useCase->execute($input);
 
-        $filename = 'vault-manifest-' . date('Ymd-His') . '.csv';
+        $timestamp = date('Ymd-His');
+
+        if ($output->format === 'zip') {
+            $filename = 'vault-export-' . $timestamp . '.zip';
+
+            return $this->responseFactory->createResponse(200)
+                ->withHeader('Content-Type', 'application/zip')
+                ->withHeader('Content-Disposition', 'attachment; filename="' . $filename . '"')
+                ->withHeader('X-Content-Type-Options', 'nosniff')
+                ->withBody($this->streamFactory->createStream($output->payload));
+        }
+
+        $filename = 'vault-manifest-' . $timestamp . '.csv';
 
         return $this->responseFactory->createResponse(200)
             ->withHeader('Content-Type', 'text/csv; charset=utf-8')
             ->withHeader('Content-Disposition', 'attachment; filename="' . $filename . '"')
             ->withHeader('X-Content-Type-Options', 'nosniff')
-            ->withBody($this->streamFactory->createStream($csv));
+            ->withBody($this->streamFactory->createStream($output->payload));
     }
 
     private function strOrNull(mixed $v): ?string
