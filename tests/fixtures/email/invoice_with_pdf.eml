@@ -1,0 +1,23 @@
+From: ACME Corp <billing@acme.example>
+To: vault@example.com
+Subject: =?UTF-8?B?6KuL5rGC5pu4IDIwMjYtMDU=?=
+Date: Sun, 31 May 2026 10:00:00 +0900
+Message-ID: <20260531100000.abc123@acme.example>
+MIME-Version: 1.0
+Content-Type: multipart/mixed; boundary="boundary-abc123"
+
+--boundary-abc123
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+
+請求書を添付いたします。よろしくお願いいたします。
+
+--boundary-abc123
+Content-Type: application/pdf; name="invoice_2026_05.pdf"
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename="invoice_2026_05.pdf"
+
+JVBERi0xLjQKJcOkw7zDtsO8CjIgMCBvYmoKPDwgL0xlbmd0aCAzIDAgUiAvRmlsdGVyIC9GbGF0
+ZURlY29kZSA+PgpzdHJlYW0KeJxjYGBg+M9AAAQEAQIDAQQFBgcICQoLDA0ODxAREhMUFRYXGBka
+Gxwd
+--boundary-abc123--

@@ -1,0 +1,25 @@
+From: "山田 太郎" <yamada@supplier.example>
+To: vault@example.com
+Subject: =?UTF-8?B?6aCY5Y+O5pu4?=
+Date: Sat, 30 May 2026 15:30:00 +0900
+Message-ID: <abc.def.ghi@supplier.example>
+MIME-Version: 1.0
+Content-Type: multipart/mixed; boundary="==boundary=="
+
+--==boundary==
+Content-Type: text/plain; charset=utf-8
+
+領収書をお送りします。
+
+--==boundary==
+Content-Type: image/jpeg; name="receipt.jpg"
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename="receipt.jpg"
+
+/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAgGBgcGBQgHBwcJCQgKDBQNDAsLDBkSEw8UHRofHh0a
+HBwgJC4nICIsIxwcKDcpLDAxNDQ0Hyc5PTgyPC4zNDL/2wBDAQkJCQwLDBgNDRgyIRwhMjIyMjIy
+MjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjL/wAARCAABAAEDASIA
+AhEBAxEB/8QAFAABAAAAAAAAAAAAAAAAAAAACf/EABQQAQAAAAAAAAAAAAAAAAAAAAD/xAAUAQEAAAAA
+AAAAAAAAAAAAAAAA/8QAFBEBAAAAAAAAAAAAAAAAAAAAAP/aAAwDAQACEQMRAD8AJQAB/9k=
+
+--==boundary==--
