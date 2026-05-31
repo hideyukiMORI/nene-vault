@@ -33,10 +33,17 @@
 - [x] Docker Compose dev environment (PR #57, #58)
 - [x] Export ZIP bundling — manifest CSV + document files in single archive (PR #64)
 
-## Phase 3 — In progress
+## Phase 3 — Done
 
 - [x] Operator guide (storage, backup, retention, search, export) — `docs/operator/` (PR #66)
 - [x] 事務処理規程 template — `docs/operator/jimu-shokirei-template.md` (PR #66)
 - [x] Web installer + release ZIP (Tier A shared hosting) — `install.php` + `tools/build-release.sh` (PR #68)
+
+## Phase 4 — In progress
+
+- [x] MCP read tools — `searchVaultDocuments`, `getVaultDocumentById`, `getVaultDocumentHistory`, `listVaultAuditEvents` (PR #70)
+- [ ] Optional S3 storage adapter
+- [ ] Optional email inbound
+- [ ] OCR assist (suggest-only, human confirm)
 
 Last updated: 2026-05-31
