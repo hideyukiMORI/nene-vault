@@ -12,6 +12,7 @@ export function ExportPage() {
   const [dateTo, setDateTo] = useState('');
   const [counterparty, setCounterparty] = useState('');
   const [includeVoided, setIncludeVoided] = useState(false);
+  const [format, setFormat] = useState<'zip' | 'csv'>('zip');
   const [isExporting, setIsExporting] = useState(false);
   const [exportError, setExportError] = useState<string | null>(null);
   const [exportSuccess, setExportSuccess] = useState(false);
@@ -28,7 +29,7 @@ export function ExportPage() {
 
     try {
       const base = env.apiBaseUrl.replace(/\/$/, '');
-      const body: Record<string, unknown> = { include_voided: includeVoided };
+      const body: Record<string, unknown> = { include_voided: includeVoided, format };
       if (dateFrom !== '') body['transaction_date_from'] = dateFrom;
       if (dateTo !== '') body['transaction_date_to'] = dateTo;
       if (counterparty !== '') body['counterparty_name'] = counterparty;
@@ -123,6 +124,29 @@ export function ExportPage() {
                   }}
                   className="h-10 rounded-md border border-border bg-surface px-inline-sm text-body-sm focus:outline-none focus:ring-2 focus:ring-brand"
                 />
+              </div>
+
+              <div className="flex flex-col gap-stack-xs">
+                <span className="text-label-sm font-medium">{t('export.form.format_label')}</span>
+                <div className="flex flex-col gap-stack-xs">
+                  {(['zip', 'csv'] as const).map((f) => (
+                    <label key={f} className="flex items-center gap-inline-sm cursor-pointer">
+                      <input
+                        type="radio"
+                        name="export-format"
+                        value={f}
+                        checked={format === f}
+                        onChange={() => {
+                          setFormat(f);
+                        }}
+                        className="h-4 w-4 border-border text-brand focus:ring-brand"
+                      />
+                      <span className="text-body-sm">
+                        {t(f === 'zip' ? 'export.form.format_zip' : 'export.form.format_csv')}
+                      </span>
+                    </label>
+                  ))}
+                </div>
               </div>
 
               <label className="flex items-center gap-inline-sm cursor-pointer">

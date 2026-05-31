@@ -13,6 +13,7 @@ final readonly class ExportDocumentsInput
         public ?string $counterpartyName = null,
         public bool $includeVoided = false,
         public ?int $actorUserId = null,
+        public string $format = 'csv',
     ) {
     }
 }

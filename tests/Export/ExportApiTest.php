@@ -73,6 +73,56 @@ final class ExportApiTest extends TestCase
         $this->assertStringContainsString('33000', $dataJoined);
     }
 
+    public function test_export_zip_contains_manifest_and_file(): void
+    {
+        $handler = $this->handler();
+        $marker = 'ZipVendor-' . bin2hex(random_bytes(4));
+
+        $this->upload($handler, $marker, '2026-09-01', '42000');
+
+        $response = $handler->handle($this->jsonRequest('POST', '/admin/vault/export', [
+            'format' => 'zip',
+            'counterparty_name' => $marker,
+        ]));
+
+        $this->assertSame(200, $response->getStatusCode(), (string) $response->getBody());
+        $this->assertStringContainsString('application/zip', $response->getHeaderLine('Content-Type'));
+        $this->assertStringContainsString('.zip', $response->getHeaderLine('Content-Disposition'));
+
+        // Write ZIP bytes to a temp file and inspect
+        $zipBytes = (string) $response->getBody();
+        $tmpZip = tempnam(sys_get_temp_dir(), 'vault_test_zip_');
+        assert($tmpZip !== false);
+        file_put_contents($tmpZip, $zipBytes);
+
+        $zip = new \ZipArchive();
+        $opened = $zip->open($tmpZip);
+        $this->assertSame(true, $opened, 'ZIP should be openable');
+
+        // manifest.csv must exist
+        $manifestIndex = $zip->locateName('manifest.csv');
+        $this->assertNotFalse($manifestIndex, 'manifest.csv must be present in ZIP');
+
+        $csvContent = $zip->getFromIndex((int) $manifestIndex);
+        $this->assertIsString($csvContent);
+        $this->assertStringContainsString($marker, $csvContent);
+        $this->assertStringContainsString('42000', $csvContent);
+
+        // At least one document file under files/
+        $fileFound = false;
+        for ($i = 0; $i < $zip->numFiles; $i++) {
+            $name = $zip->getNameIndex($i);
+            if (is_string($name) && str_starts_with($name, 'files/')) {
+                $fileFound = true;
+                break;
+            }
+        }
+        $this->assertTrue($fileFound, 'ZIP must contain at least one file under files/');
+
+        $zip->close();
+        @unlink($tmpZip);
+    }
+
     public function test_export_requires_auth(): void
     {
         $response = $this->handler()->handle($this->jsonRequest('POST', '/admin/vault/export', [], auth: false));

@@ -6,6 +6,5 @@ namespace NeneVault\Export;
 
 interface ExportDocumentsUseCaseInterface
 {
-    /** Returns the manifest CSV content for the matching documents. */
-    public function execute(ExportDocumentsInput $input): string;
+    public function execute(ExportDocumentsInput $input): ExportDocumentsOutput;
 }

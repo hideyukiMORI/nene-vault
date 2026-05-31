@@ -76,6 +76,52 @@ final class ExportBoundaryTest extends ApiTestCase
         $this->assertStringContainsString('77777', $csv);
     }
 
+    // ── zip format ───────────────────────────────────────────────────────────
+
+    public function test_zip_export_returns_zip_content_type(): void
+    {
+        $marker = 'ZipBnd-' . uniqid();
+        $this->uploadDoc($this->handler(), self::$adminToken, $marker, '2026-09-01', '11111');
+
+        $response = $this->handler()->handle(
+            $this->request('POST', '/admin/vault/export', self::$adminToken, [
+                'format' => 'zip',
+                'counterparty_name' => $marker,
+            ]),
+        );
+
+        $this->assertSame(200, $response->getStatusCode(), (string) $response->getBody());
+        $this->assertStringContainsString('application/zip', $response->getHeaderLine('Content-Type'));
+        $this->assertStringContainsString('.zip', $response->getHeaderLine('Content-Disposition'));
+    }
+
+    public function test_zip_export_empty_result_contains_only_manifest(): void
+    {
+        $response = $this->handler()->handle(
+            $this->request('POST', '/admin/vault/export', self::$adminToken, [
+                'format' => 'zip',
+                'counterparty_name' => 'NO_SUCH_VENDOR_ZIP_' . uniqid(),
+            ]),
+        );
+
+        $this->assertSame(200, $response->getStatusCode());
+
+        $tmpZip = tempnam(sys_get_temp_dir(), 'vault_bnd_zip_');
+        assert($tmpZip !== false);
+        file_put_contents($tmpZip, (string) $response->getBody());
+
+        $zip = new \ZipArchive();
+        $this->assertSame(true, $zip->open($tmpZip));
+        $this->assertNotFalse($zip->locateName('manifest.csv'), 'manifest.csv must exist even in empty export');
+        // No files/ entries expected
+        for ($i = 0; $i < $zip->numFiles; $i++) {
+            $name = $zip->getNameIndex($i);
+            $this->assertFalse(is_string($name) && str_starts_with($name, 'files/'), 'Empty export must have no files/');
+        }
+        $zip->close();
+        @unlink($tmpZip);
+    }
+
     // ── role boundary ────────────────────────────────────────────────────────
 
     public function test_viewer_cannot_export(): void

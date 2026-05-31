@@ -423,6 +423,9 @@
       "date_to_label": "取引年月日（終了）",
       "counterparty_label": "取引先名（絞り込み）",
       "include_voided_label": "無効化済みを含む",
+      "format_label": "出力形式",
+      "format_zip": "ZIP（書類ファイル＋マニフェスト）",
+      "format_csv": "CSVのみ（マニフェスト）",
       "submit": "エクスポート開始"
     },
     "manifest": {

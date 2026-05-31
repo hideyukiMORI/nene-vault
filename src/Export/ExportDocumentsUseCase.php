@@ -9,11 +9,12 @@ use NeneVault\Audit\AuditRecorderInterface;
 use NeneVault\Document\DocumentSearchCriteria;
 use NeneVault\Document\VaultDocument;
 use NeneVault\Document\VaultDocumentRepositoryInterface;
+use NeneVault\DocumentVersion\DocumentStorageInterface;
 use NeneVault\DocumentVersion\DocumentVersion;
+use ZipArchive;
 
 final readonly class ExportDocumentsUseCase implements ExportDocumentsUseCaseInterface
 {
-    /** Hard cap to keep a single export bounded. */
     private const MAX_DOCUMENTS = 10000;
 
     /** @var list<string> */
@@ -31,11 +32,12 @@ final readonly class ExportDocumentsUseCase implements ExportDocumentsUseCaseInt
 
     public function __construct(
         private VaultDocumentRepositoryInterface $documents,
+        private DocumentStorageInterface $storage,
         private AuditRecorderInterface $audit,
     ) {
     }
 
-    public function execute(ExportDocumentsInput $input): string
+    public function execute(ExportDocumentsInput $input): ExportDocumentsOutput
     {
         $criteria = new DocumentSearchCriteria(
             organizationId: $input->organizationId,
@@ -49,14 +51,16 @@ final readonly class ExportDocumentsUseCase implements ExportDocumentsUseCaseInt
 
         $rows = $this->documents->search($criteria);
 
-        $csv = $this->buildCsv($rows);
+        $payload = $input->format === 'zip'
+            ? $this->buildZip($rows)
+            : $this->buildCsv($rows);
 
-        // Audit each included document (read-only export; §10 tax audit response)
         $filter = [
             'transaction_date_from' => $input->transactionDateFrom,
-            'transaction_date_to' => $input->transactionDateTo,
-            'counterparty_name' => $input->counterpartyName,
-            'include_voided' => $input->includeVoided,
+            'transaction_date_to'   => $input->transactionDateTo,
+            'counterparty_name'     => $input->counterpartyName,
+            'include_voided'        => $input->includeVoided,
+            'format'                => $input->format,
         ];
 
         foreach ($rows as [$document, $version]) {
@@ -72,7 +76,11 @@ final readonly class ExportDocumentsUseCase implements ExportDocumentsUseCaseInt
             );
         }
 
-        return $csv;
+        return new ExportDocumentsOutput(
+            format: $input->format,
+            payload: $payload,
+            documentCount: count($rows),
+        );
     }
 
     /**
@@ -106,5 +114,48 @@ final readonly class ExportDocumentsUseCase implements ExportDocumentsUseCaseInt
         assert($csv !== false);
 
         return $csv;
+    }
+
+    /**
+     * Builds a ZIP archive containing manifest.csv and all document files.
+     *
+     * ZIP structure:
+     *   manifest.csv
+     *   files/{document_id}/v{version_number}/{original_filename}
+     *
+     * @param list<array{0: VaultDocument, 1: DocumentVersion}> $rows
+     */
+    private function buildZip(array $rows): string
+    {
+        $tmp = tempnam(sys_get_temp_dir(), 'vault_zip_');
+        assert($tmp !== false);
+
+        $zip = new ZipArchive();
+        $opened = $zip->open($tmp, ZipArchive::OVERWRITE);
+        assert($opened === true);
+
+        $zip->addFromString('manifest.csv', $this->buildCsv($rows));
+
+        foreach ($rows as [$document, $version]) {
+            $absPath = $this->storage->resolveAbsolutePath($version->filePath);
+            $fileContents = @file_get_contents($absPath);
+            if ($fileContents !== false) {
+                $zipEntry = sprintf(
+                    'files/%s/v%d/%s',
+                    $document->id,
+                    $version->versionNumber,
+                    basename($version->filePath),
+                );
+                $zip->addFromString($zipEntry, $fileContents);
+            }
+        }
+
+        $zip->close();
+
+        $bytes = file_get_contents($tmp);
+        @unlink($tmp);
+        assert($bytes !== false);
+
+        return $bytes;
     }
 }

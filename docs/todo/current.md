@@ -21,17 +21,22 @@
 
 ## In progress / gating
 
-- [ ] **税理士 review gate** — package ready in `docs/compliance-review/`;
-      awaiting professional sign-off in `signoff-record.md`. **Blocks Phase 2 UI.**
+- [ ] **税理士 review gate** — maintainer-approved for Phase 2 development; licensed
+      professional sign-off still required before production use.
+      See `docs/compliance-review/signoff-record.md`.
 
-## Next (Phase 2, after sign-off)
+## Phase 2 — Done
 
-- [ ] Admin UI scaffold — React + Vite + ja/en locale integration
-- [ ] Export ZIP bundling (currently CSV only)
+- [x] Admin UI scaffold — React + Vite + ja/en locale integration (PR #31, #37)
+- [x] Frontend pages — Documents, Detail, Upload, Audit, Users, Settings, Export (PR #39–#48)
+- [x] Frontend tests — MSW + unit coverage (PR #51–#56)
+- [x] Docker Compose dev environment (PR #57, #58)
+- [x] Export ZIP bundling — manifest CSV + document files in single archive (PR #64)
+
+## Next (Phase 3)
+
 - [ ] Operator guide (storage, backup, retention, search) + 事務処理規程 template
+- [ ] Web installer + release ZIP (Tier A shared hosting)
+- [ ] Operator guide: backup, retention policy, search walkthrough
 
-## Blockers
-
-- Phase 2 admin UI is gated on the compliance sign-off above.
-
-Last updated: 2026-05-30
+Last updated: 2026-05-31

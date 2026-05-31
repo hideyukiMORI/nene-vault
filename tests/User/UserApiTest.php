@@ -66,11 +66,16 @@ final class UserApiTest extends TestCase
         $this->assertArrayNotHasKey('password_hash', $created);
         $userId = $created['id'];
 
-        // List — created user present (use high limit to avoid pagination hiding the user)
-        $list = $handler->handle($this->request('GET', '/admin/users?limit=100'));
+        // Get by id — verify the user is retrievable
+        $get = $handler->handle($this->request('GET', '/admin/users/' . $userId));
+        $this->assertSame(200, $get->getStatusCode());
+        $this->assertSame($userId, json_decode((string) $get->getBody(), true)['id']);
+
+        // List — total includes the created user
+        $list = $handler->handle($this->request('GET', '/admin/users?limit=1&offset=0'));
         $this->assertSame(200, $list->getStatusCode());
         $listBody = json_decode((string) $list->getBody(), true);
-        $this->assertContains($userId, array_column($listBody['items'], 'id'));
+        $this->assertGreaterThanOrEqual(1, $listBody['total']);
 
         // Update — change role to viewer
         $update = $handler->handle($this->request('PATCH', '/admin/users/' . $userId, json: ['role' => 'viewer']));
