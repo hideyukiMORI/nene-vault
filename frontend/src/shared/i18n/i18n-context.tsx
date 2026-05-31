@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useState, type ReactNode } from 'react';
+import { useCallback, useEffect, useMemo, useState, type ReactNode } from 'react';
 import { persistLocale, resolveInitialLocale, type SupportedLocale } from './locales';
 import { translate, type TranslateParams } from './translate';
 import { I18nContext } from './context';
@@ -6,9 +6,15 @@ import { I18nContext } from './context';
 export function I18nProvider({ children }: { children: ReactNode }) {
   const [locale, setLocaleState] = useState<SupportedLocale>(resolveInitialLocale);
 
+  // Keep <html lang> in sync with the active locale so native browser widgets
+  // (e.g. the type="date" picker placeholder 年/月/日 vs mm/dd/yyyy) follow the
+  // selected language — including on first mount, not only on toggle.
+  useEffect(() => {
+    document.documentElement.lang = locale;
+  }, [locale]);
+
   const setLocale = useCallback((next: SupportedLocale) => {
     persistLocale(next);
-    document.documentElement.lang = next;
     setLocaleState(next);
   }, []);
 
