@@ -8,17 +8,7 @@ import { useUsers, useCreateUser, useDeleteUser } from '@/entities/user';
 import type { User } from '@/entities/user';
 import { messageKeyForError } from '@/shared/i18n/map-problem-details';
 import { useTranslation } from '@/shared/i18n/use-translation';
-import {
-  AppShell,
-  Button,
-  Field,
-  Input,
-  Modal,
-  Pagination,
-  Select,
-  Stack,
-  Text,
-} from '@/shared/ui';
+import { AppShell, Button, Field, Input, Modal, Pagination, Select } from '@/shared/ui';
 
 const PAGE_SIZE = 20;
 
@@ -58,57 +48,46 @@ function UserFormModal({ onClose }: { onClose: () => void }) {
             mutation.mutate(values);
           })(e);
         }}
-        className="p-inline-lg"
+        className="modal-body stack-md"
       >
-        <Stack gap="md">
-          <Field
-            label={t('user.form.email_label')}
-            error={errors.email !== undefined ? requiredMarker : undefined}
-          >
-            <Input
-              type="email"
-              placeholder={t('user.form.email_placeholder')}
-              {...register('email')}
-            />
-          </Field>
-          <Field
-            label={t('user.form.password_label')}
-            error={errors.password !== undefined ? requiredMarker : undefined}
-          >
-            <Input
-              type="password"
-              placeholder={t('user.form.password_placeholder')}
-              {...register('password')}
-            />
-          </Field>
-          <Field label={t('user.form.role_label')}>
-            <Select {...register('role')}>
-              {ROLES.map((r) => (
-                <option key={r} value={r}>
-                  {t(`user.role.${r}`)}
-                </option>
-              ))}
-            </Select>
-          </Field>
-          {submitError !== null && (
-            <Text tone="danger" className="text-body-sm">
-              {t(submitError)}
-            </Text>
-          )}
-          <div className="flex justify-end gap-inline-md">
-            <Button
-              type="button"
-              variant="secondary"
-              onClick={onClose}
-              disabled={mutation.isPending}
-            >
-              {t('common.buttons.cancel')}
-            </Button>
-            <Button type="submit" variant="primary" disabled={mutation.isPending}>
-              {mutation.isPending ? t('common.status.saving') : t('common.buttons.invite')}
-            </Button>
-          </div>
-        </Stack>
+        <Field
+          label={t('user.form.email_label')}
+          error={errors.email !== undefined ? requiredMarker : undefined}
+        >
+          <Input
+            type="email"
+            placeholder={t('user.form.email_placeholder')}
+            {...register('email')}
+          />
+        </Field>
+        <Field
+          label={t('user.form.password_label')}
+          error={errors.password !== undefined ? requiredMarker : undefined}
+        >
+          <Input
+            type="password"
+            placeholder={t('user.form.password_placeholder')}
+            {...register('password')}
+          />
+        </Field>
+        <Field label={t('user.form.role_label')}>
+          <Select {...register('role')}>
+            {ROLES.map((r) => (
+              <option key={r} value={r}>
+                {t(`user.role.${r}`)}
+              </option>
+            ))}
+          </Select>
+        </Field>
+        {submitError !== null && <p className="field-error">{t(submitError)}</p>}
+        <div className="row end gap-sm">
+          <Button type="button" variant="secondary" onClick={onClose} disabled={mutation.isPending}>
+            {t('common.buttons.cancel')}
+          </Button>
+          <Button type="submit" variant="primary" disabled={mutation.isPending}>
+            {mutation.isPending ? t('common.status.saving') : t('common.buttons.invite')}
+          </Button>
+        </div>
       </form>
     </Modal>
   );
@@ -125,31 +104,27 @@ function UserRow({
 }) {
   const { t } = useTranslation();
   return (
-    <tr className="border-b border-border hover:bg-surface-raised">
-      <td className="px-inline-md py-stack-sm">{user.email}</td>
-      <td className="px-inline-md py-stack-sm">{t(`user.role.${user.role}`)}</td>
-      <td className="px-inline-md py-stack-sm">
-        <span
-          className={
-            user.status === 'active'
-              ? 'inline-flex rounded-full px-inline-sm py-stack-xs text-label-xs bg-success-muted text-success'
-              : 'inline-flex rounded-full px-inline-sm py-stack-xs text-label-xs bg-muted-bg text-muted'
-          }
-        >
+    <tr>
+      <td>
+        <span className="pri">{user.email}</span>
+      </td>
+      <td>{t(`user.role.${user.role}`)}</td>
+      <td>
+        <span className={user.status === 'active' ? 'badge badge-success' : 'badge badge-muted'}>
           {t(`user.status.${user.status}`)}
         </span>
       </td>
-      <td className="px-inline-md py-stack-sm text-muted">
+      <td className="muted mono">
         {user.created_at !== undefined ? user.created_at.slice(0, 10) : '—'}
       </td>
-      <td className="px-inline-md py-stack-sm">
+      <td>
         {user.id !== currentUserId && (
           <button
             type="button"
+            className="link is-danger"
             onClick={() => {
               onDelete(user.id, user.email);
             }}
-            className="text-danger text-label-sm hover:underline"
           >
             {t('common.buttons.delete')}
           </button>
@@ -184,83 +159,70 @@ export function UsersPage() {
   }
 
   return (
-    <AppShell onLogout={handleLogout}>
-      <Stack gap="lg">
-        <div className="flex items-center justify-between">
-          <Text as="h1" className="text-heading-md">
-            {t('user.list.title')}
-          </Text>
-          <Button
-            variant="primary"
-            onClick={() => {
-              setShowCreate(true);
-            }}
-          >
-            {t('user.list.invite_button')}
-          </Button>
+    <AppShell onLogout={handleLogout} userEmail={session?.email} userRole={session?.role}>
+      <div className="page-head">
+        <div className="titlebar">
+          <span className="eyebrow">{t('navigation.group_admin')}</span>
+          <h1 className="page-title">{t('user.list.title')}</h1>
         </div>
+        <Button
+          variant="primary"
+          onClick={() => {
+            setShowCreate(true);
+          }}
+        >
+          {t('user.list.invite_button')}
+        </Button>
+      </div>
 
-        {isError && <Text tone="danger">{t('common.status.error')}</Text>}
+      {isError && <div className="callout callout-danger">{t('common.status.error')}</div>}
 
-        {isLoading ? (
-          <Text tone="muted">{t('common.status.loading')}</Text>
-        ) : (
-          <div className="rounded-lg border border-border bg-surface">
-            {users.length === 0 ? (
-              <div className="flex items-center justify-center py-stack-xl">
-                <Text tone="muted">{t('user.list.empty')}</Text>
-              </div>
-            ) : (
-              <div className="overflow-x-auto">
-                <table className="w-full border-collapse text-body-sm">
-                  <thead>
-                    <tr className="border-b border-border bg-surface-raised">
-                      <th className="px-inline-md py-stack-sm text-left text-label-sm font-medium text-muted">
-                        {t('user.list.table.email')}
-                      </th>
-                      <th className="px-inline-md py-stack-sm text-left text-label-sm font-medium text-muted">
-                        {t('user.list.table.role')}
-                      </th>
-                      <th className="px-inline-md py-stack-sm text-left text-label-sm font-medium text-muted">
-                        {t('user.list.table.status')}
-                      </th>
-                      <th className="px-inline-md py-stack-sm text-left text-label-sm font-medium text-muted">
-                        {t('user.list.table.created_at')}
-                      </th>
-                      <th className="px-inline-md py-stack-sm text-left text-label-sm font-medium text-muted">
-                        {t('user.list.table.actions')}
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {users.map((user) => (
-                      <UserRow
-                        key={user.id}
-                        user={user}
-                        currentUserId={currentUserId}
-                        onDelete={handleDelete}
-                      />
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            )}
-            <Pagination
-              offset={offset}
-              limit={PAGE_SIZE}
-              total={total}
-              canPrev={offset > 0}
-              canNext={offset + PAGE_SIZE < total}
-              onPrev={() => {
-                setOffset((o) => Math.max(0, o - PAGE_SIZE));
-              }}
-              onNext={() => {
-                setOffset((o) => o + PAGE_SIZE);
-              }}
-            />
-          </div>
-        )}
-      </Stack>
+      {isLoading ? (
+        <div className="empty-state">{t('common.status.loading')}</div>
+      ) : (
+        <div className="card flush">
+          {users.length === 0 ? (
+            <div className="empty-state">{t('user.list.empty')}</div>
+          ) : (
+            <div className="tbl-wrap">
+              <table className="tbl">
+                <thead>
+                  <tr>
+                    <th>{t('user.list.table.email')}</th>
+                    <th>{t('user.list.table.role')}</th>
+                    <th>{t('user.list.table.status')}</th>
+                    <th>{t('user.list.table.created_at')}</th>
+                    <th>{t('user.list.table.actions')}</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {users.map((user) => (
+                    <UserRow
+                      key={user.id}
+                      user={user}
+                      currentUserId={currentUserId}
+                      onDelete={handleDelete}
+                    />
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+          <Pagination
+            offset={offset}
+            limit={PAGE_SIZE}
+            total={total}
+            canPrev={offset > 0}
+            canNext={offset + PAGE_SIZE < total}
+            onPrev={() => {
+              setOffset((o) => Math.max(0, o - PAGE_SIZE));
+            }}
+            onNext={() => {
+              setOffset((o) => o + PAGE_SIZE);
+            }}
+          />
+        </div>
+      )}
 
       {showCreate && (
         <UserFormModal

@@ -1,5 +1,5 @@
 import { useTranslation } from '@/shared/i18n/use-translation';
-import { Button, Field, Input, Modal, Stack, Text, Textarea } from '@/shared/ui';
+import { Button, Field, Input, Modal, Textarea } from '@/shared/ui';
 import { useVoidDocumentForm } from '../hooks/use-void-document';
 
 interface VoidModalProps {
@@ -21,48 +21,38 @@ export function VoidModal({ documentId, onClose }: VoidModalProps) {
         onSubmit={(e) => {
           void onSubmit(e);
         }}
-        className="p-inline-lg"
+        className="modal-body stack-md"
       >
-        <Stack gap="md">
-          <Text tone="muted" className="text-body-sm">
-            {t('document.void.description')}
-          </Text>
+        <p className="muted body-sm">{t('document.void.description')}</p>
 
-          <div className="rounded-md border border-warning bg-warning-muted p-stack-sm">
-            <Text className="text-label-sm text-warning">{t('document.void.warning')}</Text>
-          </div>
+        <div className="callout callout-warn">{t('document.void.warning')}</div>
 
-          <Field
-            label={t('document.void.reason_label')}
-            required
-            error={errors.void_reason !== undefined ? t('common.required_marker') : undefined}
-          >
-            <Input
-              type="text"
-              placeholder={t('document.void.reason_placeholder')}
-              {...register('void_reason')}
-            />
-          </Field>
+        <Field
+          label={t('document.void.reason_label')}
+          required
+          error={errors.void_reason !== undefined ? t('common.required_marker') : undefined}
+        >
+          <Input
+            type="text"
+            placeholder={t('document.void.reason_placeholder')}
+            {...register('void_reason')}
+          />
+        </Field>
 
-          <Field label={t('document.void.note_label')}>
-            <Textarea {...register('void_note')} />
-          </Field>
+        <Field label={t('document.void.note_label')}>
+          <Textarea {...register('void_note')} />
+        </Field>
 
-          {submitError !== null && (
-            <Text tone="danger" className="text-body-sm">
-              {t(submitError)}
-            </Text>
-          )}
+        {submitError !== null && <p className="field-error">{t(submitError)}</p>}
 
-          <div className="flex justify-end gap-inline-md">
-            <Button type="button" variant="secondary" onClick={onClose} disabled={isSubmitting}>
-              {t('common.buttons.cancel')}
-            </Button>
-            <Button type="submit" variant="danger" disabled={isSubmitting}>
-              {isSubmitting ? t('common.status.processing') : t('document.void.confirm_button')}
-            </Button>
-          </div>
-        </Stack>
+        <div className="row end gap-sm">
+          <Button type="button" variant="secondary" onClick={onClose} disabled={isSubmitting}>
+            {t('common.buttons.cancel')}
+          </Button>
+          <Button type="submit" variant="danger" disabled={isSubmitting}>
+            {isSubmitting ? t('common.status.processing') : t('document.void.confirm_button')}
+          </Button>
+        </div>
       </form>
     </Modal>
   );

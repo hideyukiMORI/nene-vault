@@ -2,12 +2,13 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { authStore } from '@/entities/auth';
 import { useTranslation } from '@/shared/i18n/use-translation';
-import { AppShell, Button, Field, Input, Stack, Text } from '@/shared/ui';
+import { AppShell, Button, Field, Input } from '@/shared/ui';
 import { env } from '@/shared/config/env';
 
 export function ExportPage() {
   const { t } = useTranslation();
   const navigate = useNavigate();
+  const session = authStore.getSession();
   const [dateFrom, setDateFrom] = useState('');
   const [dateTo, setDateTo] = useState('');
   const [counterparty, setCounterparty] = useState('');
@@ -70,109 +71,94 @@ export function ExportPage() {
   }
 
   return (
-    <AppShell onLogout={handleLogout}>
-      <div className="max-w-2xl">
-        <Stack gap="lg">
-          <Text as="h1" className="text-heading-md">
-            {t('export.title')}
-          </Text>
+    <AppShell
+      onLogout={handleLogout}
+      userEmail={session?.email}
+      userRole={session?.role}
+      width="narrow"
+    >
+      <div className="titlebar">
+        <span className="eyebrow">{t('navigation.export')}</span>
+        <h1 className="page-title">{t('export.title')}</h1>
+        <p className="lede">{t('export.description')}</p>
+      </div>
 
-          <Text tone="muted" className="text-body-sm">
-            {t('export.description')}
-          </Text>
+      <div className="card p-md stack-md">
+        <div className="grid-2">
+          <Field label={t('export.form.date_from_label')}>
+            <Input
+              type="date"
+              value={dateFrom}
+              onChange={(e) => {
+                setDateFrom(e.target.value);
+              }}
+            />
+          </Field>
+          <Field label={t('export.form.date_to_label')}>
+            <Input
+              type="date"
+              value={dateTo}
+              onChange={(e) => {
+                setDateTo(e.target.value);
+              }}
+            />
+          </Field>
+        </div>
 
-          <div className="rounded-lg border border-border bg-surface p-stack-md">
-            <Stack gap="md">
-              <div className="grid grid-cols-2 gap-inline-md">
-                <Field label={t('export.form.date_from_label')}>
-                  <Input
-                    type="date"
-                    value={dateFrom}
-                    onChange={(e) => {
-                      setDateFrom(e.target.value);
-                    }}
-                  />
-                </Field>
-                <Field label={t('export.form.date_to_label')}>
-                  <Input
-                    type="date"
-                    value={dateTo}
-                    onChange={(e) => {
-                      setDateTo(e.target.value);
-                    }}
-                  />
-                </Field>
-              </div>
+        <Field label={t('export.form.counterparty_label')}>
+          <Input
+            type="text"
+            value={counterparty}
+            onChange={(e) => {
+              setCounterparty(e.target.value);
+            }}
+          />
+        </Field>
 
-              <Field label={t('export.form.counterparty_label')}>
-                <Input
-                  type="text"
-                  value={counterparty}
-                  onChange={(e) => {
-                    setCounterparty(e.target.value);
-                  }}
-                />
-              </Field>
-
-              <Field label={t('export.form.format_label')}>
-                <div className="flex flex-col gap-stack-xs">
-                  {(['zip', 'csv'] as const).map((f) => (
-                    <label key={f} className="flex items-center gap-inline-sm cursor-pointer">
-                      <input
-                        type="radio"
-                        name="export-format"
-                        value={f}
-                        checked={format === f}
-                        onChange={() => {
-                          setFormat(f);
-                        }}
-                        className="h-4 w-4 border-border text-brand focus:ring-brand"
-                      />
-                      <span className="text-body-sm">
-                        {t(f === 'zip' ? 'export.form.format_zip' : 'export.form.format_csv')}
-                      </span>
-                    </label>
-                  ))}
-                </div>
-              </Field>
-
-              <label className="flex items-center gap-inline-sm cursor-pointer">
+        <Field label={t('export.form.format_label')}>
+          <div className="stack-xs">
+            {(['zip', 'csv'] as const).map((f) => (
+              <label key={f} className="radio">
                 <input
-                  type="checkbox"
-                  checked={includeVoided}
-                  onChange={(e) => {
-                    setIncludeVoided(e.target.checked);
+                  type="radio"
+                  name="export-format"
+                  value={f}
+                  checked={format === f}
+                  onChange={() => {
+                    setFormat(f);
                   }}
-                  className="h-4 w-4 rounded border-border text-brand focus:ring-brand"
                 />
-                <span className="text-body-sm">{t('export.form.include_voided_label')}</span>
+                <span>{t(f === 'zip' ? 'export.form.format_zip' : 'export.form.format_csv')}</span>
               </label>
-
-              {exportError !== null && (
-                <Text tone="danger" className="text-body-sm">
-                  {exportError}
-                </Text>
-              )}
-              {exportSuccess && (
-                <Text tone="success" className="text-body-sm">
-                  {t('export.messages.downloaded')}
-                </Text>
-              )}
-
-              <div>
-                <Button
-                  variant="primary"
-                  onClick={() => {
-                    void handleExport();
-                  }}
-                  disabled={isExporting}
-                >
-                  {isExporting ? t('common.status.processing') : t('export.form.submit')}
-                </Button>
-              </div>
-            </Stack>
+            ))}
           </div>
-        </Stack>
+        </Field>
+
+        <label className="checkbox">
+          <input
+            type="checkbox"
+            checked={includeVoided}
+            onChange={(e) => {
+              setIncludeVoided(e.target.checked);
+            }}
+          />
+          <span>{t('export.form.include_voided_label')}</span>
+        </label>
+
+        {exportError !== null && <p className="field-error">{exportError}</p>}
+        {exportSuccess && <p className="success body-sm">{t('export.messages.downloaded')}</p>}
+
+        <div>
+          <Button
+            variant="primary"
+            onClick={() => {
+              void handleExport();
+            }}
+            disabled={isExporting}
+          >
+            {isExporting ? t('common.status.processing') : t('export.form.submit')}
+          </Button>
+        </div>
       </div>
     </AppShell>
   );

@@ -1,6 +1,5 @@
 import { useTranslation } from '@/shared/i18n/use-translation';
 import { formatDateTime } from '@/shared/lib/format';
-import { Text } from '@/shared/ui';
 import type { AuditEvent } from '@/entities/audit';
 
 interface DocumentHistoryTableProps {
@@ -11,57 +10,41 @@ export function DocumentHistoryTable({ events }: DocumentHistoryTableProps) {
   const { t, locale } = useTranslation();
 
   if (events.length === 0) {
-    return <Text tone="muted">{t('document.history.no_history')}</Text>;
+    return <p className="muted body-sm">{t('document.history.no_history')}</p>;
   }
 
   return (
-    <div className="overflow-x-auto">
-      <table className="w-full border-collapse text-body-sm">
+    <div className="tbl-wrap">
+      <table className="tbl">
         <thead>
-          <tr className="border-b border-border bg-surface-raised">
-            <th className="px-inline-md py-stack-sm text-left text-label-sm font-medium text-muted">
-              {t('document.history.table.action')}
-            </th>
-            <th className="px-inline-md py-stack-sm text-left text-label-sm font-medium text-muted">
-              {t('document.history.table.actor')}
-            </th>
-            <th className="px-inline-md py-stack-sm text-left text-label-sm font-medium text-muted">
-              {t('document.history.table.timestamp')}
-            </th>
-            <th className="px-inline-md py-stack-sm text-left text-label-sm font-medium text-muted">
-              {t('document.history.table.before')}
-            </th>
-            <th className="px-inline-md py-stack-sm text-left text-label-sm font-medium text-muted">
-              {t('document.history.table.after')}
-            </th>
+          <tr>
+            <th>{t('document.history.table.action')}</th>
+            <th>{t('document.history.table.actor')}</th>
+            <th>{t('document.history.table.timestamp')}</th>
+            <th>{t('document.history.table.before')}</th>
+            <th>{t('document.history.table.after')}</th>
           </tr>
         </thead>
         <tbody>
           {events.map((event) => (
-            <tr key={event.id} className="border-b border-border">
-              <td className="px-inline-md py-stack-sm font-medium">
-                {t(`audit_event.action.${event.action}`)}
+            <tr key={event.id}>
+              <td>
+                <span className="pri">{t(`audit_event.action.${event.action}`)}</span>
               </td>
-              <td className="px-inline-md py-stack-sm text-muted">
+              <td className="muted mono">
                 {event.actor_user_id !== null ? String(event.actor_user_id) : '—'}
               </td>
-              <td className="px-inline-md py-stack-sm text-muted">
-                {formatDateTime(event.created_at, locale)}
-              </td>
-              <td className="px-inline-md py-stack-sm">
+              <td className="muted mono">{formatDateTime(event.created_at, locale)}</td>
+              <td>
                 {event.before_json !== null ? (
-                  <pre className="text-label-xs text-muted max-w-48 overflow-hidden text-ellipsis whitespace-pre-wrap">
-                    {JSON.stringify(event.before_json, null, 2)}
-                  </pre>
+                  <pre className="tbl-diff">{JSON.stringify(event.before_json, null, 2)}</pre>
                 ) : (
                   '—'
                 )}
               </td>
-              <td className="px-inline-md py-stack-sm">
+              <td>
                 {event.after_json !== null ? (
-                  <pre className="text-label-xs text-muted max-w-48 overflow-hidden text-ellipsis whitespace-pre-wrap">
-                    {JSON.stringify(event.after_json, null, 2)}
-                  </pre>
+                  <pre className="tbl-diff">{JSON.stringify(event.after_json, null, 2)}</pre>
                 ) : (
                   '—'
                 )}

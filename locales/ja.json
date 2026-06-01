@@ -98,7 +98,21 @@
     "users": "ユーザー管理",
     "export": "エクスポート",
     "logout": "ログアウト",
-    "language": "言語切替"
+    "language": "言語切替",
+    "group_admin": "管理・運用",
+    "menu": "メニュー",
+    "breadcrumb": "パンくずリスト"
+  },
+
+  "home": {
+    "eyebrow": "概況",
+    "title": "おかえりなさい",
+    "lede": "保管中の受取書類は法定保存期間まで改ざんなく保持され、すべての操作は監査ログに残ります。",
+    "quick_access": "クイックアクセス",
+    "link_documents": "検索・閲覧・アップロード",
+    "link_audit": "変更前・変更後の記録を確認",
+    "link_settings": "保存年数・外部連携",
+    "link_export": "ZIP / CSV で一括出力"
   },
 
   "organization": {

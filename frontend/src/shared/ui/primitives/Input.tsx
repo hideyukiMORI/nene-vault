@@ -9,11 +9,5 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(function Input(
   { className, ...rest },
   ref,
 ) {
-  return (
-    <input
-      ref={ref}
-      className={`rounded-md border border-border bg-surface-raised px-inline-md py-stack-sm font-sans text-body text-text-primary ${className ?? ''}`}
-      {...rest}
-    />
-  );
+  return <input ref={ref} className={`input ${className ?? ''}`} {...rest} />;
 });

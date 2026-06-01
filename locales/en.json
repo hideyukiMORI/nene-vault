@@ -95,7 +95,20 @@
     "users": "Users",
     "export": "Export",
     "logout": "Log Out",
-    "language": "Language"
+    "language": "Language",
+    "group_admin": "Administration",
+    "menu": "Menu",
+    "breadcrumb": "Breadcrumb"
+  },
+  "home": {
+    "eyebrow": "Overview",
+    "title": "Welcome back",
+    "lede": "Stored received documents are preserved without tampering until the end of the statutory retention period, and every action is recorded in the audit log.",
+    "quick_access": "Quick access",
+    "link_documents": "Search, view, and upload",
+    "link_audit": "Review before / after records",
+    "link_settings": "Retention years and integrations",
+    "link_export": "Bulk export as ZIP / CSV"
   },
   "organization": {
     "list": {

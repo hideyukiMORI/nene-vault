@@ -1,6 +1,6 @@
 import type { AuthSession } from '@/entities/auth';
 import { useTranslation } from '@/shared/i18n/use-translation';
-import { Button, Input, Stack, Text } from '@/shared/ui';
+import { BrandMark, Button, Field, Input } from '@/shared/ui';
 import { LanguageSwitcher } from '@/shared/ui/components/LanguageSwitcher';
 import { useLoginPage } from '../hooks/use-login';
 
@@ -14,24 +14,21 @@ export function LoginForm({ onLoggedIn }: LoginFormProps) {
     useLoginPage();
 
   return (
-    <div className="flex min-h-screen flex-col bg-surface">
-      <header className="flex justify-end p-inline-md">
+    <div className="center">
+      <div className="center-top">
         <LanguageSwitcher />
-      </header>
-      <form
-        className="m-auto w-full max-w-sm rounded-md border border-border bg-surface-raised p-inline-lg shadow-md"
-        onSubmit={handleSubmit(onLoggedIn)}
-        noValidate
-      >
-        <Stack gap="md">
-          <Text as="h1" className="text-heading-md">
-            {t('auth.login.title')}
-          </Text>
-
-          <label className="flex flex-col gap-stack-sm">
-            <Text as="span" tone="muted">
-              {t('auth.login.email_label')}
-            </Text>
+      </div>
+      <form className="center-card" onSubmit={handleSubmit(onLoggedIn)} noValidate>
+        <div className="head">
+          <div className="brand-lock">
+            <BrandMark size={46} className="text-seal" title="NeNe Vault" />
+            <div className="brand-name">
+              NeNe <span className="text-brass">Vault</span>
+            </div>
+          </div>
+        </div>
+        <div className="body stack-md">
+          <Field label={t('auth.login.email_label')}>
             <Input
               type="email"
               autoComplete="username"
@@ -39,12 +36,9 @@ export function LoginForm({ onLoggedIn }: LoginFormProps) {
               placeholder={t('auth.login.email_placeholder')}
               {...register('email')}
             />
-          </label>
+          </Field>
 
-          <label className="flex flex-col gap-stack-sm">
-            <Text as="span" tone="muted">
-              {t('auth.login.password_label')}
-            </Text>
+          <Field label={t('auth.login.password_label')}>
             <Input
               type="password"
               autoComplete="current-password"
@@ -52,14 +46,14 @@ export function LoginForm({ onLoggedIn }: LoginFormProps) {
               placeholder={t('auth.login.password_placeholder')}
               {...register('password')}
             />
-          </label>
+          </Field>
 
-          {submitError !== null && <Text tone="danger">{submitError}</Text>}
+          {submitError !== null && <p className="field-error">{submitError}</p>}
 
-          <Button type="submit" disabled={isSubmitting}>
+          <Button type="submit" disabled={isSubmitting} className="w-full">
             {isSubmitting ? t('auth.login.logging_in') : t('auth.login.submit')}
           </Button>
-        </Stack>
+        </div>
       </form>
     </div>
   );

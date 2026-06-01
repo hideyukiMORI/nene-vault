@@ -1,4 +1,5 @@
 // Public barrel for the design system. Features and pages import from here only.
+export { BrandMark } from './primitives/BrandMark';
 export { Button } from './primitives/Button';
 export { Input } from './primitives/Input';
 export { Select } from './primitives/Select';

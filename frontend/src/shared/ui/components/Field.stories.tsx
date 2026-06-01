@@ -1,7 +1,7 @@
 /**
  * Field — labelled form field wrapper (label + control + optional hint/error).
  *
- * In:  label, required, hint, error, labelTone, children (the control)
+ * In:  label, required, hint, error, children (the control)
  * Out: none (purely presentational; the control inside owns its own events)
  *
  * Does not: register with a form, validate, or fetch.
@@ -41,4 +41,3 @@ export const WithHint: Story = {
 export const WithError: Story = {
   args: { label: 'Counterparty', error: 'This field is required.' },
 };
-export const MutedLabel: Story = { args: { label: 'Counterparty', labelTone: 'muted' } };

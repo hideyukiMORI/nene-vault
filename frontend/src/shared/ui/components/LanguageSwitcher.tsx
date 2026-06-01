@@ -10,10 +10,9 @@ export function LanguageSwitcher() {
   const { locale, setLocale, t } = useTranslation();
 
   return (
-    <label className="flex items-center gap-stack-sm font-sans text-body text-text-muted">
+    <label className="lang">
       {t('navigation.language')}
       <select
-        className="rounded-md border border-border bg-surface-raised px-inline-sm py-stack-sm text-text-primary"
         value={locale}
         onChange={(e) => {
           setLocale(e.target.value as SupportedLocale);

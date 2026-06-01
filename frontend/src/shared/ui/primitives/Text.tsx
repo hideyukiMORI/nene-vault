@@ -8,15 +8,13 @@ export interface TextProps {
 }
 
 const TONE_CLASS: Record<NonNullable<TextProps['tone']>, string> = {
-  primary: 'text-text-primary',
-  muted: 'text-text-muted',
-  danger: 'text-danger',
-  success: 'text-success',
+  primary: '',
+  muted: 'muted',
+  danger: 'danger',
+  success: 'success',
 };
 
 export function Text({ as = 'p', tone = 'primary', children, className }: TextProps) {
   const Tag = as;
-  return (
-    <Tag className={`font-sans text-body ${TONE_CLASS[tone]} ${className ?? ''}`}>{children}</Tag>
-  );
+  return <Tag className={`${TONE_CLASS[tone]} ${className ?? ''}`.trim()}>{children}</Tag>;
 }

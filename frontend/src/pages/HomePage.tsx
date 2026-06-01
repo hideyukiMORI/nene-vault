@@ -1,7 +1,82 @@
+import type { ReactNode } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { authStore } from '@/entities/auth';
 import { useTranslation } from '@/shared/i18n/use-translation';
-import { AppShell, Stack, Text } from '@/shared/ui';
+import { AppShell } from '@/shared/ui';
+
+interface QuickLink {
+  to: string;
+  titleKey: string;
+  subKey: string;
+  icon: ReactNode;
+}
+
+const DocIcon = (
+  <svg
+    viewBox="0 0 24 24"
+    fill="none"
+    strokeWidth="1.7"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+  >
+    <path d="M6 2.5h7l5 5V21a.5.5 0 0 1-.5.5h-11A.5.5 0 0 1 6 21Z" />
+    <path d="M13 2.5V8h5" />
+    <path d="M9 13h6M9 16.5h6" />
+  </svg>
+);
+const AuditIcon = (
+  <svg
+    viewBox="0 0 24 24"
+    fill="none"
+    strokeWidth="1.7"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+  >
+    <path d="M4 5h16M4 12h16M4 19h10" />
+    <circle cx="18" cy="19" r="2.4" />
+  </svg>
+);
+const SettingsIcon = (
+  <svg
+    viewBox="0 0 24 24"
+    fill="none"
+    strokeWidth="1.7"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+  >
+    <path d="M5 7h14M5 12h14M5 17h14" />
+  </svg>
+);
+const ExportIcon = (
+  <svg
+    viewBox="0 0 24 24"
+    fill="none"
+    strokeWidth="1.7"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+  >
+    <path d="M12 3v11" />
+    <path d="m8 10 4 4 4-4" />
+    <path d="M4 17v2.5a.5.5 0 0 0 .5.5h15a.5.5 0 0 0 .5-.5V17" />
+  </svg>
+);
+
+const LINKS: QuickLink[] = [
+  {
+    to: '/documents',
+    titleKey: 'document.list.title',
+    subKey: 'home.link_documents',
+    icon: DocIcon,
+  },
+  { to: '/audit', titleKey: 'navigation.audit_events', subKey: 'home.link_audit', icon: AuditIcon },
+  {
+    to: '/settings',
+    titleKey: 'navigation.settings',
+    subKey: 'home.link_settings',
+    icon: SettingsIcon,
+  },
+  { to: '/export', titleKey: 'navigation.export', subKey: 'home.link_export', icon: ExportIcon },
+];
 
 export function HomePage() {
   const { t } = useTranslation();
@@ -14,51 +89,38 @@ export function HomePage() {
   }
 
   return (
-    <AppShell onLogout={handleLogout}>
-      <Stack gap="lg">
-        <div>
-          <Text as="h1" className="text-heading-md">
-            NeNe Vault
-          </Text>
-          {session !== null && (
-            <Text tone="muted" className="mt-stack-xs">
-              {session.email}
-            </Text>
-          )}
-        </div>
+    <AppShell onLogout={handleLogout} userEmail={session?.email} userRole={session?.role}>
+      <div className="titlebar">
+        <span className="eyebrow">{t('home.eyebrow')}</span>
+        <h1 className="page-title">{t('home.title')}</h1>
+        <p className="lede">{t('home.lede')}</p>
+      </div>
 
-        <div className="grid grid-cols-2 gap-inline-lg">
-          <button
-            type="button"
-            onClick={() => {
-              navigate('/documents');
-            }}
-            className="rounded-lg border border-border bg-surface-raised p-stack-lg text-left hover:bg-surface transition-colors"
-          >
-            <Text as="h2" className="text-heading-sm">
-              {t('navigation.documents')}
-            </Text>
-            <Text tone="muted" className="mt-stack-xs text-body-sm">
-              {t('document.list.title')}
-            </Text>
-          </button>
-
-          <button
-            type="button"
-            onClick={() => {
-              navigate('/audit');
-            }}
-            className="rounded-lg border border-border bg-surface-raised p-stack-lg text-left hover:bg-surface transition-colors"
-          >
-            <Text as="h2" className="text-heading-sm">
-              {t('navigation.audit_events')}
-            </Text>
-            <Text tone="muted" className="mt-stack-xs text-body-sm">
-              {t('audit_event.list.title')}
-            </Text>
-          </button>
+      <div>
+        <div className="row gap-sm mb-stack-sm">
+          <span className="tick" />
+          <h2 className="subtitle">{t('home.quick_access')}</h2>
         </div>
-      </Stack>
+        <div className="grid-2">
+          {LINKS.map((link) => (
+            <button
+              key={link.to}
+              type="button"
+              className="qlink"
+              onClick={() => {
+                navigate(link.to);
+              }}
+            >
+              <span className="ic">{link.icon}</span>
+              <span className="flex1">
+                <b>{t(link.titleKey)}</b>
+                <span>{t(link.subKey)}</span>
+              </span>
+              <span className="arr">→</span>
+            </button>
+          ))}
+        </div>
+      </div>
     </AppShell>
   );
 }

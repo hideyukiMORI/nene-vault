@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512" fill="none">
+  <!-- Maskable app icon: full-bleed rail field, brand seal in "on-dark" vermilion -->
+  <rect width="512" height="512" fill="#272D37"/>
+  <g transform="translate(106 106) scale(8.82)" fill="none">
+    <circle cx="17" cy="17" r="14.4" fill="none" stroke="#D27A5E" stroke-width="1.9"/>
+    <circle cx="17" cy="17" r="11" fill="none" stroke="#D27A5E" stroke-width="1.05"/>
+    <circle cx="17" cy="14.2" r="3.15" fill="#D27A5E"/>
+    <path d="M15.3 15.9 14 22.4h6l-1.3-6.5Z" fill="#D27A5E"/>
+  </g>
+</svg>

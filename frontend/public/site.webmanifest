@@ -1,0 +1,24 @@
+{
+  "name": "NeNe Vault — 受取書類アーカイブ",
+  "short_name": "NeNe Vault",
+  "description": "受取書類アーカイブ（電子帳簿保存法対応）",
+  "lang": "ja",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#faf6ee",
+  "theme_color": "#272d37",
+  "icons": [
+    {
+      "src": "/icon.svg",
+      "type": "image/svg+xml",
+      "sizes": "any",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/favicon.svg",
+      "type": "image/svg+xml",
+      "sizes": "any"
+    }
+  ]
+}

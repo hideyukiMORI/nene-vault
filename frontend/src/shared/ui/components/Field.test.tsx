@@ -25,7 +25,7 @@ describe('Field', () => {
       </Field>,
     );
     // required marker resolves the common.required_marker locale key
-    expect(container.querySelector('.text-danger')).not.toBeNull();
+    expect(container.querySelector('.req')).not.toBeNull();
   });
 
   it('renders hint text when provided', () => {

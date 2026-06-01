@@ -39,7 +39,9 @@ describe('DocumentTable', () => {
   it('marks date-uncertain with an asterisk', () => {
     const doc = { ...mockDocument, date_uncertain: true, transaction_date: '2026-03-31' };
     renderWithProviders(<DocumentTable documents={[doc]} onSelectDocument={vi.fn()} />);
-    expect(screen.getByText(/2026-03-31 \*/)).toBeInTheDocument();
+    expect(screen.getByText('2026-03-31')).toBeInTheDocument();
+    // the uncertain marker renders as a separate faint asterisk node
+    expect(screen.getByText('*')).toBeInTheDocument();
   });
 
   it('calls onSelectDocument with the document id when detail link is clicked', async () => {

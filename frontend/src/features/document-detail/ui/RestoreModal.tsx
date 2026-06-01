@@ -1,7 +1,7 @@
 import { useRestoreDocument } from '@/entities/document';
 import { messageKeyForError } from '@/shared/i18n/map-problem-details';
 import { useTranslation } from '@/shared/i18n/use-translation';
-import { Button, Modal, Stack, Text } from '@/shared/ui';
+import { Button, Modal } from '@/shared/ui';
 
 interface RestoreModalProps {
   documentId: string;
@@ -18,39 +18,26 @@ export function RestoreModal({ documentId, onClose }: RestoreModalProps) {
 
   return (
     <Modal title={t('document.restore.title')} onClose={onClose}>
-      <div className="p-inline-lg">
-        <Stack gap="md">
-          <Text tone="muted" className="text-body-sm">
-            {t('document.restore.description')}
-          </Text>
-          {submitError !== null && (
-            <Text tone="danger" className="text-body-sm">
-              {t(submitError)}
-            </Text>
-          )}
-          <div className="flex justify-end gap-inline-md">
-            <Button
-              type="button"
-              variant="secondary"
-              onClick={onClose}
-              disabled={mutation.isPending}
-            >
-              {t('common.buttons.cancel')}
-            </Button>
-            <Button
-              type="button"
-              variant="primary"
-              disabled={mutation.isPending}
-              onClick={() => {
-                mutation.mutate(documentId);
-              }}
-            >
-              {mutation.isPending
-                ? t('common.status.processing')
-                : t('document.restore.confirm_button')}
-            </Button>
-          </div>
-        </Stack>
+      <div className="modal-body stack-md">
+        <p className="muted body-sm">{t('document.restore.description')}</p>
+        {submitError !== null && <p className="field-error">{t(submitError)}</p>}
+        <div className="row end gap-sm">
+          <Button type="button" variant="secondary" onClick={onClose} disabled={mutation.isPending}>
+            {t('common.buttons.cancel')}
+          </Button>
+          <Button
+            type="button"
+            variant="primary"
+            disabled={mutation.isPending}
+            onClick={() => {
+              mutation.mutate(documentId);
+            }}
+          >
+            {mutation.isPending
+              ? t('common.status.processing')
+              : t('document.restore.confirm_button')}
+          </Button>
+        </div>
       </div>
     </Modal>
   );

@@ -1,51 +1,35 @@
 import type { ReactNode } from 'react';
-import { Text } from '@/shared/ui/primitives/Text';
+import { useTranslation } from '@/shared/i18n/use-translation';
 
 export interface ModalProps {
   /** Optional header title. When set, a bordered header with a close button is rendered. */
   title?: ReactNode;
   onClose: () => void;
   children: ReactNode;
-  /** Panel max width. */
+  /** Panel max width: 'sm' (432) or 'md'/'lg' (520, default). */
   size?: 'sm' | 'md' | 'lg';
 }
 
-const SIZE_CLASS: Record<NonNullable<ModalProps['size']>, string> = {
-  sm: 'max-w-md',
-  md: 'max-w-lg',
-  lg: 'max-w-2xl',
-};
-
 /**
- * Centered modal dialog: fixed overlay + panel, with an optional header (title +
- * close button). Replaces the hand-rolled `role="dialog"` overlays across the app.
- *
- * The body padding differs by header presence to match the prior layouts:
- * with a header the children supply their own padding (forms use `p-inline-lg`);
- * without a header the panel pads the body directly.
+ * Centered modal dialog: fixed overlay + framed panel, with an optional header
+ * (title + close button). Forms inside supply their own `.modal-body` padding.
  */
 export function Modal({ title, onClose, children, size = 'sm' }: ModalProps) {
+  const { t } = useTranslation();
   const hasHeader = title !== undefined && title !== null;
+  const panelClass = size === 'sm' ? 'modal modal-sm' : 'modal';
 
   return (
-    <div
-      role="dialog"
-      aria-modal="true"
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/50"
-    >
-      <div
-        className={`w-full ${SIZE_CLASS[size]} rounded-xl border border-border bg-surface shadow-lg`}
-      >
+    <div role="dialog" aria-modal="true" className="modal-overlay">
+      <div className={panelClass}>
         {hasHeader && (
-          <div className="flex items-center justify-between border-b border-border px-inline-lg py-stack-md">
-            <Text as="h2" className="text-heading-sm">
-              {title}
-            </Text>
+          <div className="modal-header">
+            <h2>{title}</h2>
             <button
               type="button"
               onClick={onClose}
-              aria-label="Close"
-              className="text-muted hover:text-foreground"
+              aria-label={t('common.buttons.close')}
+              className="modal-close"
             >
               ✕
             </button>

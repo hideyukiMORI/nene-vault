@@ -30,19 +30,19 @@ export function Pagination({
   const to = Math.min(offset + limit, total);
 
   return (
-    <div className="flex items-center justify-between py-stack-sm">
-      <span className="text-body-sm text-muted">
+    <div className="pagination">
+      <span>
         {t('common.pagination.showing', {
           from: String(from),
           to: String(to),
           total: String(total),
         })}
       </span>
-      <div className="flex gap-inline-sm">
-        <Button variant="secondary" onClick={onPrev} disabled={!canPrev}>
+      <div className="row gap-sm">
+        <Button variant="secondary" size="sm" onClick={onPrev} disabled={!canPrev}>
           {t('common.buttons.previous')}
         </Button>
-        <Button variant="secondary" onClick={onNext} disabled={!canNext}>
+        <Button variant="secondary" size="sm" onClick={onNext} disabled={!canNext}>
           {t('common.buttons.next')}
         </Button>
       </div>
