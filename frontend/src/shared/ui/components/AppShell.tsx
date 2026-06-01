@@ -1,4 +1,4 @@
-import { useEffect, useState, type ReactNode } from 'react';
+import type { ReactNode } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useTranslation } from '@/shared/i18n/use-translation';
 import { BrandMark } from '@/shared/ui/primitives/BrandMark';
@@ -114,7 +114,6 @@ export function AppShell({
   const { t } = useTranslation();
   const navigate = useNavigate();
   const { pathname } = useLocation();
-  const [drawerOpen, setDrawerOpen] = useState(false);
 
   const nav: NavItem[] = [
     { to: '/', labelKey: 'navigation.home', icon: HomeIcon },
@@ -141,21 +140,6 @@ export function AppShell({
   const activeItem = [...nav].reverse().find((n) => isActive(n.to));
   const leafLabel = activeItem !== undefined ? t(activeItem.labelKey) : '';
 
-  // Close the mobile drawer on route change and on Escape.
-  useEffect(() => {
-    setDrawerOpen(false);
-  }, [pathname]);
-  useEffect(() => {
-    if (!drawerOpen) return;
-    const onKey = (e: KeyboardEvent): void => {
-      if (e.key === 'Escape') setDrawerOpen(false);
-    };
-    window.addEventListener('keydown', onKey);
-    return () => {
-      window.removeEventListener('keydown', onKey);
-    };
-  }, [drawerOpen]);
-
   const go = (to: string): void => {
     navigate(to);
   };
@@ -165,7 +149,7 @@ export function AppShell({
 
   return (
     <div className="layout">
-      <aside id="app-rail" className={drawerOpen ? 'rail is-open' : 'rail'}>
+      <aside className="rail">
         <div className="rail-brand">
           <BrandMark size={34} className="brand-mark text-seal-bright" title="NeNe Vault" />
           <div>
@@ -221,37 +205,8 @@ export function AppShell({
         </div>
       </aside>
 
-      <button
-        type="button"
-        className={drawerOpen ? 'nav-scrim is-open' : 'nav-scrim'}
-        aria-label={t('common.buttons.close')}
-        onClick={() => {
-          setDrawerOpen(false);
-        }}
-      />
-
       <div className="main">
         <header className="topbar">
-          <button
-            type="button"
-            className="rail-toggle"
-            aria-label={t('navigation.home')}
-            aria-expanded={drawerOpen}
-            aria-controls="app-rail"
-            onClick={() => {
-              setDrawerOpen((v) => !v);
-            }}
-          >
-            <svg
-              viewBox="0 0 24 24"
-              fill="none"
-              strokeWidth="1.8"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            >
-              <path d="M4 7h16M4 12h16M4 17h16" />
-            </svg>
-          </button>
           <nav className="crumbs" aria-label={t('navigation.breadcrumb')}>
             {pathname === '/' || leafLabel === '' ? (
               <b>{t('navigation.home')}</b>

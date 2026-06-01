@@ -110,7 +110,7 @@ export function AuditPage() {
             <div className="empty-state">{t('audit_event.list.empty')}</div>
           ) : (
             <div className="tbl-wrap">
-              <table className="tbl">
+              <table className="tbl tbl-cards">
                 <thead>
                   <tr>
                     <th>{t('audit_event.list.table.action')}</th>
@@ -124,17 +124,19 @@ export function AuditPage() {
                 <tbody>
                   {events.map((event) => (
                     <tr key={event.id}>
-                      <td>
+                      <td className="cell-title">
                         <span className="pri">{t(`audit_event.action.${event.action}`)}</span>
                       </td>
-                      <td className="muted mono">
+                      <td className="muted mono" data-label={t('audit_event.list.table.entity')}>
                         {event.entity_type}/{event.entity_id}
                       </td>
-                      <td className="muted mono">
+                      <td className="muted mono" data-label={t('audit_event.list.table.actor')}>
                         {event.actor_user_id !== null ? String(event.actor_user_id) : '—'}
                       </td>
-                      <td className="muted mono">{formatDateTime(event.created_at, locale)}</td>
-                      <td>
+                      <td className="muted mono" data-label={t('audit_event.list.table.timestamp')}>
+                        {formatDateTime(event.created_at, locale)}
+                      </td>
+                      <td data-label={t('audit_event.list.table.before')}>
                         {event.before_json !== null ? (
                           <pre className="tbl-diff">
                             {JSON.stringify(event.before_json, null, 2)}
@@ -143,7 +145,7 @@ export function AuditPage() {
                           '—'
                         )}
                       </td>
-                      <td>
+                      <td data-label={t('audit_event.list.table.after')}>
                         {event.after_json !== null ? (
                           <pre className="tbl-diff">
                             {JSON.stringify(event.after_json, null, 2)}

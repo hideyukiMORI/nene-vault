@@ -105,19 +105,19 @@ function UserRow({
   const { t } = useTranslation();
   return (
     <tr>
-      <td>
+      <td className="cell-title">
         <span className="pri">{user.email}</span>
       </td>
-      <td>{t(`user.role.${user.role}`)}</td>
-      <td>
+      <td data-label={t('user.list.table.role')}>{t(`user.role.${user.role}`)}</td>
+      <td data-label={t('user.list.table.status')}>
         <span className={user.status === 'active' ? 'badge badge-success' : 'badge badge-muted'}>
           {t(`user.status.${user.status}`)}
         </span>
       </td>
-      <td className="muted mono">
+      <td className="muted mono" data-label={t('user.list.table.created_at')}>
         {user.created_at !== undefined ? user.created_at.slice(0, 10) : '—'}
       </td>
-      <td>
+      <td data-label={t('user.list.table.actions')}>
         {user.id !== currentUserId && (
           <button
             type="button"
@@ -185,7 +185,7 @@ export function UsersPage() {
             <div className="empty-state">{t('user.list.empty')}</div>
           ) : (
             <div className="tbl-wrap">
-              <table className="tbl">
+              <table className="tbl tbl-cards">
                 <thead>
                   <tr>
                     <th>{t('user.list.table.email')}</th>
