@@ -13,10 +13,11 @@ audit trail of the gate itself.
 
 | Field | Value |
 | --- | --- |
-| **Gate status** | 🟢 Approved — licensed professional sign-off recorded (Review 2) |
-| **Package reviewed** | `2026-tax-advisor-review-package.md` |
+| **Gate status** | 🟢 Approved for dev/test (Review 2) · 🔲 **Pre-production Review 3 open** |
+| **Package reviewed** | `2026-tax-advisor-review-package.md` (R1/R2) · `2026-review-3-preprod-package.md` (R3) |
 | **Phase 2 UI development** | ✅ Unblocked by maintainer decision (Review 1) |
-| **Phase 2 UI production ship** | ✅ Unblocked by licensed professional sign-off (Review 2, 2026-05-31) |
+| **Dev / test implementation** | ✅ Unblocked by licensed professional sign-off (Review 2, 2026-05-31) |
+| **Production go-live** | 🔲 Blocked until **Review 3** (pre-prod output verification) is recorded — Review 2 condition |
 
 ---
 

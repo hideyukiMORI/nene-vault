@@ -20,7 +20,8 @@ posture, and the record of their sign-off.
 
 | File | Purpose |
 | --- | --- |
-| `2026-tax-advisor-review-package.md` | The review package: statutory basis → implementation evidence, posture to confirm, known limits, open questions |
+| `2026-tax-advisor-review-package.md` | Review 1/2 package: statutory basis → implementation evidence, posture to confirm, known limits, open questions |
+| `2026-review-3-preprod-package.md` | Review 3 package: pre-production output verification (manifest CSV / ZIP / retention samples) per Review 2's go-live condition |
 | `signoff-record.md` | Sign-off record the professional completes (name, credential, date, findings) |
 
 ## How to use

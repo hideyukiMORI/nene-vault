@@ -1,6 +1,7 @@
 # Current TODO
 
-**Phase 1 — Document API complete; compliance review gate open.**
+**All roadmap phases (0–4) complete; compliance gate approved. Remaining work is the
+pre-production go-live gate (税理士 Review 3) and Tier A live testing.**
 
 ## Done
 
@@ -40,11 +41,26 @@
 - [x] 事務処理規程 template — `docs/operator/jimu-shokirei-template.md` (PR #66)
 - [x] Web installer + release ZIP (Tier A shared hosting) — `install.php` + `tools/build-release.sh` (PR #68)
 
-## Phase 4 — In progress
+## Phase 4 — Done
 
 - [x] MCP read tools — `searchVaultDocuments`, `getVaultDocumentById`, `getVaultDocumentHistory`, `listVaultAuditEvents` (PR #70)
+- [x] MCP write tools + OCR/export integration guide (PR #80)
 - [x] S3-compatible storage adapter — `S3DocumentStorage` + Sig V4, select via `NENE_VAULT_STORAGE_ADAPTER=s3` (PR #72)
 - [x] Optional email inbound (mailbox → auto-upload via IMAP/MIME parser) — `src/Email/` + `tools/email-inbound.php` (PR #74)
 - [x] OCR assist — suggest metadata from PDF/image, human confirm (PR #76)
 
-Last updated: 2026-05-31
+## Go-live gate — Open 🔲
+
+These are the only items between the current (complete, all-green) codebase and
+production use by operators. Both come from Review 2's recorded conditions
+(`docs/compliance-review/signoff-record.md`).
+
+- [ ] **税理士 Review 3** — pre-production final verification of test-environment
+      output samples (manifest CSV, export ZIP, retention dates) before any operator
+      goes live. Engineering package: `docs/compliance-review/2026-review-3-preprod-package.md`.
+- [ ] **Tier A live testing** — verify `install.php` + release ZIP on real shared
+      hosting alongside sibling products (roadmap Phase 0/3 "pending Tier A testing").
+- [ ] **Standing P0 watch** — on any 電帳法 amendment / 国税庁 guidance, open a P0
+      Issue and add a new review block to `signoff-record.md` (Review 2 condition 2).
+
+Last updated: 2026-06-01
