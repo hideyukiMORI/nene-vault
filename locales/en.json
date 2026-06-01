@@ -374,14 +374,32 @@
     }
   },
   "audit_event": {
+    "summary": {
+      "created": "New record",
+      "fields": "{{count}} fields",
+      "more": "{{count}} more"
+    },
+    "detail": {
+      "record": "Audit record",
+      "entity": "Target entity",
+      "params": "Change parameters",
+      "view_diff": "Diff",
+      "view_json": "JSON",
+      "tag_added": "Added",
+      "tag_changed": "Changed",
+      "no_params": "No change parameters were recorded.",
+      "created_values": "Values at creation"
+    },
     "list": {
       "title": "Audit Log",
+      "lede": "Every change to documents, settings, and users is recorded with its before/after diff. Records cannot be deleted. Select a row to view the full change parameters.",
       "table": {
         "action": "Action",
         "entity": "Target",
         "actor": "Actor",
         "before": "Before",
         "after": "After",
+        "changes": "Changes",
         "timestamp": "Time"
       },
       "filter": {

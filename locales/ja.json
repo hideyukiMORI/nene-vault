@@ -383,14 +383,32 @@
   },
 
   "audit_event": {
+    "summary": {
+      "created": "新規登録",
+      "fields": "{{count}} 項目",
+      "more": "他 {{count}} 項目"
+    },
+    "detail": {
+      "record": "監査記録",
+      "entity": "対象エンティティ",
+      "params": "変更パラメータ",
+      "view_diff": "差分",
+      "view_json": "JSON",
+      "tag_added": "新規",
+      "tag_changed": "変更",
+      "no_params": "記録された変更パラメータはありません",
+      "created_values": "作成時の値"
+    },
     "list": {
       "title": "監査ログ",
+      "lede": "書類・設定・ユーザーに対するすべての変更が、変更前・変更後の差分とともに記録されます。記録は削除できません。行を選択すると変更パラメータの全文を確認できます。",
       "table": {
         "action": "操作",
         "entity": "対象",
         "actor": "操作者",
         "before": "変更前",
         "after": "変更後",
+        "changes": "変更内容",
         "timestamp": "日時"
       },
       "filter": {
