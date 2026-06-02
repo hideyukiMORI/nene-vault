@@ -12,7 +12,7 @@ import {
 import type { OcrPrefill } from '@/features/document-detail';
 import { useTranslation } from '@/shared/i18n/use-translation';
 import { formatJpy, formatDate, formatDateTime } from '@/shared/lib/format';
-import { AppShell, Button } from '@/shared/ui';
+import { AppShell, Button, Callout, EmptyState } from '@/shared/ui';
 import { env } from '@/shared/config/env';
 
 type Modal = 'void' | 'restore' | 'metadata-edit' | null;
@@ -73,8 +73,8 @@ export function DocumentDetailPage() {
         ← {t('navigation.documents')}
       </button>
 
-      {isLoading && <div className="empty-state">{t('common.status.loading')}</div>}
-      {isError && <div className="callout callout-danger">{t('common.status.error')}</div>}
+      {isLoading && <EmptyState>{t('common.status.loading')}</EmptyState>}
+      {isError && <Callout tone="danger">{t('common.status.error')}</Callout>}
 
       {doc !== undefined && (
         <>

@@ -7,7 +7,7 @@ import { useVaultSettings, useUpdateVaultSettings } from '@/entities/vault-setti
 import { messageKeyForError } from '@/shared/i18n/map-problem-details';
 import { useTranslation } from '@/shared/i18n/use-translation';
 import { formatDateTime } from '@/shared/lib/format';
-import { AppShell, Button, Field, Input } from '@/shared/ui';
+import { AppShell, Button, Callout, EmptyState, Field, Input } from '@/shared/ui';
 import { useNavigate } from 'react-router-dom';
 
 const settingsSchema = z.object({
@@ -79,7 +79,7 @@ export function SettingsPage() {
       </div>
 
       {isLoading ? (
-        <div className="empty-state">{t('common.status.loading')}</div>
+        <EmptyState>{t('common.status.loading')}</EmptyState>
       ) : (
         <form
           className="card p-md stack-md"
@@ -110,9 +110,7 @@ export function SettingsPage() {
               {...register('retention_years')}
             />
             {retentionWarn && (
-              <div className="callout callout-warn">
-                {t('vault_settings.fields.retention_warning')}
-              </div>
+              <Callout tone="warn">{t('vault_settings.fields.retention_warning')}</Callout>
             )}
           </Field>
 

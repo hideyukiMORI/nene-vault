@@ -1,5 +1,5 @@
 import { useTranslation } from '@/shared/i18n/use-translation';
-import { Button, Field, Input, Modal, Textarea } from '@/shared/ui';
+import { Button, Callout, Field, Input, Modal, Textarea } from '@/shared/ui';
 import { useVoidDocumentForm } from '../hooks/use-void-document';
 
 interface VoidModalProps {
@@ -25,7 +25,7 @@ export function VoidModal({ documentId, onClose }: VoidModalProps) {
       >
         <p className="muted body-sm">{t('document.void.description')}</p>
 
-        <div className="callout callout-warn">{t('document.void.warning')}</div>
+        <Callout tone="warn">{t('document.void.warning')}</Callout>
 
         <Field
           label={t('document.void.reason_label')}

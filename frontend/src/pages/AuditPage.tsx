@@ -5,7 +5,7 @@ import type { ListAuditEventsParams, AuditEvent, AuditDiffField } from '@/entiti
 import { authStore } from '@/entities/auth';
 import { useTranslation } from '@/shared/i18n/use-translation';
 import { formatDateTime } from '@/shared/lib/format';
-import { AppShell, Button, Field, Input, Pagination } from '@/shared/ui';
+import { AppShell, Button, Callout, EmptyState, Field, Input, Pagination } from '@/shared/ui';
 
 const PAGE_SIZE = 20;
 
@@ -335,14 +335,14 @@ export function AuditPage() {
         </div>
       </div>
 
-      {isError && <div className="callout callout-danger">{t('common.status.error')}</div>}
+      {isError && <Callout tone="danger">{t('common.status.error')}</Callout>}
 
       {isLoading ? (
-        <div className="empty-state">{t('common.status.loading')}</div>
+        <EmptyState>{t('common.status.loading')}</EmptyState>
       ) : (
         <div className="card flush">
           {events.length === 0 ? (
-            <div className="empty-state">{t('audit_event.list.empty')}</div>
+            <EmptyState>{t('audit_event.list.empty')}</EmptyState>
           ) : (
             <div className="tbl-wrap">
               <table className="tbl audit-table">

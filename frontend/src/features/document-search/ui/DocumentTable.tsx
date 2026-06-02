@@ -1,5 +1,6 @@
 import { useTranslation } from '@/shared/i18n/use-translation';
 import { formatJpy, formatDate } from '@/shared/lib/format';
+import { EmptyState } from '@/shared/ui';
 import type { VaultDocument } from '@/entities/document';
 
 interface DocumentTableProps {
@@ -11,7 +12,7 @@ export function DocumentTable({ documents, onSelectDocument }: DocumentTableProp
   const { t, locale } = useTranslation();
 
   if (documents.length === 0) {
-    return <div className="empty-state">{t('document.list.empty')}</div>;
+    return <EmptyState>{t('document.list.empty')}</EmptyState>;
   }
 
   const labels = {

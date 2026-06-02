@@ -1,6 +1,6 @@
 import type { UseFormReturn } from 'react-hook-form';
 import { useTranslation } from '@/shared/i18n/use-translation';
-import { Button, Field, Input, Select } from '@/shared/ui';
+import { Button, Checkbox, Field, Input, Select } from '@/shared/ui';
 import type { SearchFormValues } from '../hooks/use-document-search';
 
 interface DocumentSearchFormProps {
@@ -67,10 +67,10 @@ export function DocumentSearchForm({
       </div>
 
       <div className="row between wrap gap-md">
-        <label className="checkbox">
-          <input type="checkbox" {...register('include_voided')} />
-          <span>{t('document.search.include_voided_label')}</span>
-        </label>
+        <Checkbox
+          label={t('document.search.include_voided_label')}
+          {...register('include_voided')}
+        />
         <div className="row gap-sm">
           <Button type="button" variant="secondary" onClick={onReset}>
             {t('document.search.reset_button')}

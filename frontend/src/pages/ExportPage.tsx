@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { authStore } from '@/entities/auth';
 import { useTranslation } from '@/shared/i18n/use-translation';
-import { AppShell, Button, Field, Input } from '@/shared/ui';
+import { AppShell, Button, Checkbox, Field, Input } from '@/shared/ui';
 import { env } from '@/shared/config/env';
 
 export function ExportPage() {
@@ -134,16 +134,13 @@ export function ExportPage() {
           </div>
         </Field>
 
-        <label className="checkbox">
-          <input
-            type="checkbox"
-            checked={includeVoided}
-            onChange={(e) => {
-              setIncludeVoided(e.target.checked);
-            }}
-          />
-          <span>{t('export.form.include_voided_label')}</span>
-        </label>
+        <Checkbox
+          label={t('export.form.include_voided_label')}
+          checked={includeVoided}
+          onChange={(e) => {
+            setIncludeVoided(e.target.checked);
+          }}
+        />
 
         {exportError !== null && <p className="field-error">{exportError}</p>}
         {exportSuccess && <p className="success body-sm">{t('export.messages.downloaded')}</p>}

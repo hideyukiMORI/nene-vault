@@ -4,7 +4,7 @@ import { useDocumentSearch, DocumentSearchForm, DocumentTable } from '@/features
 import { DocumentUploadModal } from '@/features/document-upload';
 import { authStore } from '@/entities/auth';
 import { useTranslation } from '@/shared/i18n/use-translation';
-import { AppShell, Button, Pagination } from '@/shared/ui';
+import { AppShell, Button, Callout, EmptyState, Pagination } from '@/shared/ui';
 
 export function DocumentsPage() {
   const { t } = useTranslation();
@@ -53,10 +53,10 @@ export function DocumentsPage() {
 
       <DocumentSearchForm form={form} onSubmit={onSubmit} onReset={onReset} isLoading={isLoading} />
 
-      {isError && <div className="callout callout-danger">{t('common.status.error')}</div>}
+      {isError && <Callout tone="danger">{t('common.status.error')}</Callout>}
 
       {isLoading ? (
-        <div className="empty-state">{t('common.status.loading')}</div>
+        <EmptyState>{t('common.status.loading')}</EmptyState>
       ) : (
         <div className="card flush">
           <DocumentTable

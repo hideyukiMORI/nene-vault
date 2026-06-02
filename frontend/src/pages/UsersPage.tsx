@@ -8,7 +8,17 @@ import { useUsers, useCreateUser, useDeleteUser } from '@/entities/user';
 import type { User } from '@/entities/user';
 import { messageKeyForError } from '@/shared/i18n/map-problem-details';
 import { useTranslation } from '@/shared/i18n/use-translation';
-import { AppShell, Button, Field, Input, Modal, Pagination, Select } from '@/shared/ui';
+import {
+  AppShell,
+  Button,
+  Callout,
+  EmptyState,
+  Field,
+  Input,
+  Modal,
+  Pagination,
+  Select,
+} from '@/shared/ui';
 
 const PAGE_SIZE = 20;
 
@@ -175,14 +185,14 @@ export function UsersPage() {
         </Button>
       </div>
 
-      {isError && <div className="callout callout-danger">{t('common.status.error')}</div>}
+      {isError && <Callout tone="danger">{t('common.status.error')}</Callout>}
 
       {isLoading ? (
-        <div className="empty-state">{t('common.status.loading')}</div>
+        <EmptyState>{t('common.status.loading')}</EmptyState>
       ) : (
         <div className="card flush">
           {users.length === 0 ? (
-            <div className="empty-state">{t('user.list.empty')}</div>
+            <EmptyState>{t('user.list.empty')}</EmptyState>
           ) : (
             <div className="tbl-wrap">
               <table className="tbl tbl-cards">
