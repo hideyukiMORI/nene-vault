@@ -6,10 +6,13 @@ namespace NeneVault\VaultSettings;
 
 use LogicException;
 use Nene2\Database\DatabaseQueryExecutorInterface;
+use Nene2\Database\DatabaseTransactionManagerInterface;
 use Nene2\DependencyInjection\ContainerBuilder;
 use Nene2\DependencyInjection\ServiceProviderInterface;
 use Nene2\Http\JsonResponseFactory;
+use NeneVault\Audit\AuditRecorder;
 use NeneVault\Audit\AuditRecorderInterface;
+use NeneVault\Audit\PdoAuditEventRepository;
 use Psr\Container\ContainerInterface;
 
 final readonly class VaultSettingsServiceProvider implements ServiceProviderInterface
@@ -42,43 +45,65 @@ final readonly class VaultSettingsServiceProvider implements ServiceProviderInte
                 },
             )
             ->set(
-                GetVaultSettingsHandler::class,
-                static function (ContainerInterface $c): GetVaultSettingsHandler {
+                GetVaultSettingsUseCaseInterface::class,
+                static function (ContainerInterface $c): GetVaultSettingsUseCaseInterface {
                     $repo = $c->get(VaultSettingsRepositoryInterface::class);
-                    $json = $c->get(JsonResponseFactory::class);
 
                     if (!$repo instanceof VaultSettingsRepositoryInterface) {
                         throw new LogicException('VaultSettingsRepositoryInterface service is invalid.');
+                    }
+
+                    return new GetVaultSettingsUseCase($repo);
+                },
+            )
+            ->set(
+                GetVaultSettingsHandler::class,
+                static function (ContainerInterface $c): GetVaultSettingsHandler {
+                    $useCase = $c->get(GetVaultSettingsUseCaseInterface::class);
+                    $json = $c->get(JsonResponseFactory::class);
+
+                    if (!$useCase instanceof GetVaultSettingsUseCaseInterface) {
+                        throw new LogicException('GetVaultSettingsUseCaseInterface service is invalid.');
                     }
 
                     if (!$json instanceof JsonResponseFactory) {
                         throw new LogicException('JsonResponseFactory service is invalid.');
                     }
 
-                    return new GetVaultSettingsHandler($repo, $json);
+                    return new GetVaultSettingsHandler($useCase, $json);
+                },
+            )
+            ->set(
+                UpdateVaultSettingsUseCaseInterface::class,
+                static function (ContainerInterface $c): UpdateVaultSettingsUseCaseInterface {
+                    $tx = $c->get(DatabaseTransactionManagerInterface::class);
+
+                    if (!$tx instanceof DatabaseTransactionManagerInterface) {
+                        throw new LogicException('DatabaseTransactionManagerInterface service is invalid.');
+                    }
+
+                    return new UpdateVaultSettingsUseCase(
+                        $tx,
+                        static fn (DatabaseQueryExecutorInterface $e): VaultSettingsRepositoryInterface => new PdoVaultSettingsRepository($e),
+                        static fn (DatabaseQueryExecutorInterface $e): AuditRecorderInterface => new AuditRecorder(new PdoAuditEventRepository($e)),
+                    );
                 },
             )
             ->set(
                 UpdateVaultSettingsHandler::class,
                 static function (ContainerInterface $c): UpdateVaultSettingsHandler {
-                    $repo = $c->get(VaultSettingsRepositoryInterface::class);
+                    $useCase = $c->get(UpdateVaultSettingsUseCaseInterface::class);
                     $json = $c->get(JsonResponseFactory::class);
 
-                    if (!$repo instanceof VaultSettingsRepositoryInterface) {
-                        throw new LogicException('VaultSettingsRepositoryInterface service is invalid.');
+                    if (!$useCase instanceof UpdateVaultSettingsUseCaseInterface) {
+                        throw new LogicException('UpdateVaultSettingsUseCaseInterface service is invalid.');
                     }
 
                     if (!$json instanceof JsonResponseFactory) {
                         throw new LogicException('JsonResponseFactory service is invalid.');
                     }
 
-                    $audit = $c->get(AuditRecorderInterface::class);
-
-                    if (!$audit instanceof AuditRecorderInterface) {
-                        throw new LogicException('AuditRecorderInterface service is invalid.');
-                    }
-
-                    return new UpdateVaultSettingsHandler($repo, $json, $audit);
+                    return new UpdateVaultSettingsHandler($useCase, $json);
                 },
             )
             ->set(

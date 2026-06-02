@@ -11,7 +11,9 @@ interface UserRepositoryInterface
     public function findByEmail(string $email): ?User;
 
     /** @return list<User> */
-    public function listByOrganizationId(int $organizationId): array;
+    public function listByOrganizationId(int $organizationId, int $limit, int $offset): array;
+
+    public function countByOrganizationId(int $organizationId): int;
 
     public function create(string $email, string $passwordHash, string $role, ?int $organizationId): User;
 

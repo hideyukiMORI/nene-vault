@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace NeneVault\Export;
 
+use Closure;
+use Nene2\Database\DatabaseQueryExecutorInterface;
+use Nene2\Database\DatabaseTransactionManagerInterface;
 use NeneVault\Audit\AuditAction;
 use NeneVault\Audit\AuditRecorderInterface;
 use NeneVault\Document\DocumentSearchCriteria;
@@ -30,10 +33,14 @@ final readonly class ExportDocumentsUseCase implements ExportDocumentsUseCaseInt
         'voided_at',
     ];
 
+    /**
+     * @param Closure(DatabaseQueryExecutorInterface): AuditRecorderInterface $auditRecorder
+     */
     public function __construct(
         private VaultDocumentRepositoryInterface $documents,
         private DocumentStorageInterface $storage,
-        private AuditRecorderInterface $audit,
+        private DatabaseTransactionManagerInterface $transactionManager,
+        private Closure $auditRecorder,
     ) {
     }
 
@@ -63,18 +70,25 @@ final readonly class ExportDocumentsUseCase implements ExportDocumentsUseCaseInt
             'format'                => $input->format,
         ];
 
-        foreach ($rows as [$document, $version]) {
-            $this->audit->record(
-                action: AuditAction::DOCUMENT_EXPORTED,
-                entityType: 'vault_document',
-                entityId: $document->id,
-                actorUserId: $input->actorUserId,
-                organizationId: $input->organizationId,
-                beforeJson: null,
-                afterJson: null,
-                metadataJson: ['export_filter' => $filter],
-            );
-        }
+        // One audit event per exported document — recorded atomically as a group.
+        $this->transactionManager->transactional(
+            function (DatabaseQueryExecutorInterface $executor) use ($rows, $filter, $input): void {
+                $audit = ($this->auditRecorder)($executor);
+
+                foreach ($rows as [$document, $version]) {
+                    $audit->record(
+                        action: AuditAction::DOCUMENT_EXPORTED,
+                        entityType: 'vault_document',
+                        entityId: $document->id,
+                        actorUserId: $input->actorUserId,
+                        organizationId: $input->organizationId,
+                        beforeJson: null,
+                        afterJson: null,
+                        metadataJson: ['export_filter' => $filter],
+                    );
+                }
+            },
+        );
 
         return new ExportDocumentsOutput(
             format: $input->format,

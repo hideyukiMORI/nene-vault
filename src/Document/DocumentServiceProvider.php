@@ -4,20 +4,25 @@ declare(strict_types=1);
 
 namespace NeneVault\Document;
 
+use Closure;
 use LogicException;
 use Nene2\Database\DatabaseQueryExecutorInterface;
+use Nene2\Database\DatabaseTransactionManagerInterface;
 use Nene2\DependencyInjection\ContainerBuilder;
 use Nene2\DependencyInjection\ServiceProviderInterface;
 use Nene2\Error\ProblemDetailsResponseFactory;
 use Nene2\Http\JsonResponseFactory;
 use NeneVault\Audit\AuditEventRepositoryInterface;
+use NeneVault\Audit\AuditRecorder;
 use NeneVault\Audit\AuditRecorderInterface;
+use NeneVault\Audit\PdoAuditEventRepository;
 use NeneVault\DocumentVersion\DocumentStorageInterface;
 use NeneVault\DocumentVersion\DocumentVersionRepositoryInterface;
 use NeneVault\DocumentVersion\LocalFilesystemDocumentStorage;
 use NeneVault\DocumentVersion\PdoDocumentVersionRepository;
 use NeneVault\DocumentVersion\S3DocumentStorage;
 use NeneVault\DocumentVersion\S3DocumentStorageConfig;
+use NeneVault\VaultSettings\PdoVaultSettingsRepository;
 use NeneVault\VaultSettings\VaultSettingsRepositoryInterface;
 use Psr\Container\ContainerInterface;
 use Psr\Http\Message\ResponseFactoryInterface;
@@ -81,40 +86,21 @@ final readonly class DocumentServiceProvider implements ServiceProviderInterface
             ->set(
                 UploadDocumentUseCaseInterface::class,
                 static function (ContainerInterface $c): UploadDocumentUseCaseInterface {
-                    $documents = $c->get(VaultDocumentRepositoryInterface::class);
-                    $versions = $c->get(DocumentVersionRepositoryInterface::class);
                     $storage = $c->get(DocumentStorageInterface::class);
-                    $settings = $c->get(VaultSettingsRepositoryInterface::class);
-                    $audit = $c->get(AuditRecorderInterface::class);
-
-                    if (!$documents instanceof VaultDocumentRepositoryInterface) {
-                        throw new LogicException('VaultDocumentRepositoryInterface service is invalid.');
-                    }
-
-                    if (!$versions instanceof DocumentVersionRepositoryInterface) {
-                        throw new LogicException('DocumentVersionRepositoryInterface service is invalid.');
-                    }
 
                     if (!$storage instanceof DocumentStorageInterface) {
                         throw new LogicException('DocumentStorageInterface service is invalid.');
                     }
 
-                    if (!$settings instanceof VaultSettingsRepositoryInterface) {
-                        throw new LogicException('VaultSettingsRepositoryInterface service is invalid.');
-                    }
-
-                    if (!$audit instanceof AuditRecorderInterface) {
-                        throw new LogicException('AuditRecorderInterface service is invalid.');
-                    }
-
                     $maxMb = (int) (getenv('NENE_VAULT_MAX_FILE_SIZE_MB') ?: 20);
 
                     return new UploadDocumentUseCase(
-                        $documents,
-                        $versions,
+                        self::tx($c),
+                        self::documentRepositoryFactory(),
+                        self::versionRepositoryFactory(),
                         $storage,
-                        $settings,
-                        $audit,
+                        self::settingsRepositoryFactory(),
+                        self::auditRecorderFactory(),
                         $maxMb * 1024 * 1024,
                     );
                 },
@@ -152,9 +138,10 @@ final readonly class DocumentServiceProvider implements ServiceProviderInterface
                 UpdateDocumentMetadataUseCaseInterface::class,
                 static function (ContainerInterface $c): UpdateDocumentMetadataUseCaseInterface {
                     return new UpdateDocumentMetadataUseCase(
-                        self::repo($c),
-                        self::versionRepo($c),
-                        self::audit($c),
+                        self::tx($c),
+                        self::documentRepositoryFactory(),
+                        self::versionRepositoryFactory(),
+                        self::auditRecorderFactory(),
                     );
                 },
             )
@@ -162,9 +149,10 @@ final readonly class DocumentServiceProvider implements ServiceProviderInterface
                 VoidDocumentUseCaseInterface::class,
                 static function (ContainerInterface $c): VoidDocumentUseCaseInterface {
                     return new VoidDocumentUseCase(
-                        self::repo($c),
-                        self::versionRepo($c),
-                        self::audit($c),
+                        self::tx($c),
+                        self::documentRepositoryFactory(),
+                        self::versionRepositoryFactory(),
+                        self::auditRecorderFactory(),
                     );
                 },
             )
@@ -172,9 +160,10 @@ final readonly class DocumentServiceProvider implements ServiceProviderInterface
                 RestoreDocumentUseCaseInterface::class,
                 static function (ContainerInterface $c): RestoreDocumentUseCaseInterface {
                     return new RestoreDocumentUseCase(
-                        self::repo($c),
-                        self::versionRepo($c),
-                        self::audit($c),
+                        self::tx($c),
+                        self::documentRepositoryFactory(),
+                        self::versionRepositoryFactory(),
+                        self::auditRecorderFactory(),
                     );
                 },
             )
@@ -470,15 +459,39 @@ final readonly class DocumentServiceProvider implements ServiceProviderInterface
         return $r;
     }
 
-    private static function audit(ContainerInterface $c): AuditRecorderInterface
+    private static function tx(ContainerInterface $c): DatabaseTransactionManagerInterface
     {
-        $a = $c->get(AuditRecorderInterface::class);
+        $t = $c->get(DatabaseTransactionManagerInterface::class);
 
-        if (!$a instanceof AuditRecorderInterface) {
-            throw new LogicException('AuditRecorderInterface service is invalid.');
+        if (!$t instanceof DatabaseTransactionManagerInterface) {
+            throw new LogicException('DatabaseTransactionManagerInterface service is invalid.');
         }
 
-        return $a;
+        return $t;
+    }
+
+    /** @return Closure(DatabaseQueryExecutorInterface): VaultDocumentRepositoryInterface */
+    private static function documentRepositoryFactory(): Closure
+    {
+        return static fn (DatabaseQueryExecutorInterface $e): VaultDocumentRepositoryInterface => new PdoVaultDocumentRepository($e);
+    }
+
+    /** @return Closure(DatabaseQueryExecutorInterface): DocumentVersionRepositoryInterface */
+    private static function versionRepositoryFactory(): Closure
+    {
+        return static fn (DatabaseQueryExecutorInterface $e): DocumentVersionRepositoryInterface => new PdoDocumentVersionRepository($e);
+    }
+
+    /** @return Closure(DatabaseQueryExecutorInterface): VaultSettingsRepositoryInterface */
+    private static function settingsRepositoryFactory(): Closure
+    {
+        return static fn (DatabaseQueryExecutorInterface $e): VaultSettingsRepositoryInterface => new PdoVaultSettingsRepository($e);
+    }
+
+    /** @return Closure(DatabaseQueryExecutorInterface): AuditRecorderInterface */
+    private static function auditRecorderFactory(): Closure
+    {
+        return static fn (DatabaseQueryExecutorInterface $e): AuditRecorderInterface => new AuditRecorder(new PdoAuditEventRepository($e));
     }
 
     private static function json(ContainerInterface $c): JsonResponseFactory

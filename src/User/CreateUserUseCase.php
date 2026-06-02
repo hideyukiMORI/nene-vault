@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace NeneVault\User;
 
+use Closure;
+use Nene2\Database\DatabaseQueryExecutorInterface;
+use Nene2\Database\DatabaseTransactionManagerInterface;
 use NeneVault\Audit\AuditAction;
 use NeneVault\Audit\AuditRecorderInterface;
 use NeneVault\Auth\Role;
@@ -12,9 +15,14 @@ use NeneVault\Auth\UserRepositoryInterface;
 
 final readonly class CreateUserUseCase implements CreateUserUseCaseInterface
 {
+    /**
+     * @param Closure(DatabaseQueryExecutorInterface): UserRepositoryInterface $userRepository
+     * @param Closure(DatabaseQueryExecutorInterface): AuditRecorderInterface  $auditRecorder
+     */
     public function __construct(
-        private UserRepositoryInterface $users,
-        private AuditRecorderInterface $audit,
+        private DatabaseTransactionManagerInterface $transactionManager,
+        private Closure $userRepository,
+        private Closure $auditRecorder,
     ) {
     }
 
@@ -32,23 +40,30 @@ final readonly class CreateUserUseCase implements CreateUserUseCaseInterface
             throw new InvalidUserRoleException($role);
         }
 
-        if ($this->users->findByEmail($email) !== null) {
-            throw new UserEmailConflictException($email);
-        }
+        return $this->transactionManager->transactional(
+            function (DatabaseQueryExecutorInterface $executor) use ($email, $password, $role, $organizationId, $actorUserId): User {
+                $users = ($this->userRepository)($executor);
+                $audit = ($this->auditRecorder)($executor);
 
-        $passwordHash = password_hash($password, PASSWORD_BCRYPT);
-        $user = $this->users->create($email, $passwordHash, $role, $organizationId);
+                if ($users->findByEmail($email) !== null) {
+                    throw new UserEmailConflictException($email);
+                }
 
-        $this->audit->record(
-            action: AuditAction::USER_CREATED,
-            entityType: 'user',
-            entityId: (string) $user->id,
-            actorUserId: $actorUserId,
-            organizationId: $organizationId,
-            beforeJson: null,
-            afterJson: UserPresenter::present($user),
+                $passwordHash = password_hash($password, PASSWORD_BCRYPT);
+                $user = $users->create($email, $passwordHash, $role, $organizationId);
+
+                $audit->record(
+                    action: AuditAction::USER_CREATED,
+                    entityType: 'user',
+                    entityId: (string) $user->id,
+                    actorUserId: $actorUserId,
+                    organizationId: $organizationId,
+                    beforeJson: null,
+                    afterJson: UserPresenter::present($user),
+                );
+
+                return $user;
+            },
         );
-
-        return $user;
     }
 }

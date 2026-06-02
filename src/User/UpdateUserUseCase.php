@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace NeneVault\User;
 
+use Closure;
+use Nene2\Database\DatabaseQueryExecutorInterface;
+use Nene2\Database\DatabaseTransactionManagerInterface;
 use NeneVault\Audit\AuditAction;
 use NeneVault\Audit\AuditRecorderInterface;
 use NeneVault\Auth\Role;
@@ -12,9 +15,14 @@ use NeneVault\Auth\UserRepositoryInterface;
 
 final readonly class UpdateUserUseCase implements UpdateUserUseCaseInterface
 {
+    /**
+     * @param Closure(DatabaseQueryExecutorInterface): UserRepositoryInterface $userRepository
+     * @param Closure(DatabaseQueryExecutorInterface): AuditRecorderInterface  $auditRecorder
+     */
     public function __construct(
-        private UserRepositoryInterface $users,
-        private AuditRecorderInterface $audit,
+        private DatabaseTransactionManagerInterface $transactionManager,
+        private Closure $userRepository,
+        private Closure $auditRecorder,
     ) {
     }
 
@@ -26,52 +34,61 @@ final readonly class UpdateUserUseCase implements UpdateUserUseCaseInterface
         ?string $status,
         ?int $actorUserId,
     ): User {
-        $user = $this->users->findById($id);
-
-        // Org-scoped: only users in the resolved organization are visible
-        if ($user === null || $user->organizationId !== $organizationId) {
-            throw new UserNotFoundException($id);
-        }
-
-        $before = UserPresenter::present($user);
-
         if ($role !== null) {
             $roleEnum = Role::tryFrom($role);
 
             if ($roleEnum === null || $roleEnum === Role::Superadmin) {
                 throw new InvalidUserRoleException($role);
             }
-
-            $this->users->updateRole($id, $role);
         }
 
-        if ($email !== null && $email !== $user->email) {
-            $existing = $this->users->findByEmail($email);
+        return $this->transactionManager->transactional(
+            function (DatabaseQueryExecutorInterface $executor) use ($id, $organizationId, $email, $role, $status, $actorUserId): User {
+                $users = ($this->userRepository)($executor);
+                $audit = ($this->auditRecorder)($executor);
 
-            if ($existing !== null && $existing->id !== $id) {
-                throw new UserEmailConflictException($email);
-            }
+                $user = $users->findById($id);
 
-            $this->users->updateEmail($id, $email);
-        }
+                // Org-scoped: only users in the resolved organization are visible
+                if ($user === null || $user->organizationId !== $organizationId) {
+                    throw new UserNotFoundException($id);
+                }
 
-        if ($status !== null) {
-            $this->users->updateStatus($id, $status);
-        }
+                $before = UserPresenter::present($user);
 
-        $updated = $this->users->findById($id);
-        assert($updated !== null);
+                if ($role !== null) {
+                    $users->updateRole($id, $role);
+                }
 
-        $this->audit->record(
-            action: AuditAction::USER_UPDATED,
-            entityType: 'user',
-            entityId: (string) $id,
-            actorUserId: $actorUserId,
-            organizationId: $organizationId,
-            beforeJson: $before,
-            afterJson: UserPresenter::present($updated),
+                if ($email !== null && $email !== $user->email) {
+                    $existing = $users->findByEmail($email);
+
+                    if ($existing !== null && $existing->id !== $id) {
+                        throw new UserEmailConflictException($email);
+                    }
+
+                    $users->updateEmail($id, $email);
+                }
+
+                if ($status !== null) {
+                    $users->updateStatus($id, $status);
+                }
+
+                $updated = $users->findById($id);
+                assert($updated !== null);
+
+                $audit->record(
+                    action: AuditAction::USER_UPDATED,
+                    entityType: 'user',
+                    entityId: (string) $id,
+                    actorUserId: $actorUserId,
+                    organizationId: $organizationId,
+                    beforeJson: $before,
+                    afterJson: UserPresenter::present($updated),
+                );
+
+                return $updated;
+            },
         );
-
-        return $updated;
     }
 }

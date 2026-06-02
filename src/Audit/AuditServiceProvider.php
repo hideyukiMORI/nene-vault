@@ -41,20 +41,32 @@ final readonly class AuditServiceProvider implements ServiceProviderInterface
                 },
             )
             ->set(
-                ListAuditEventsHandler::class,
-                static function (ContainerInterface $c): ListAuditEventsHandler {
+                ListAuditEventsUseCaseInterface::class,
+                static function (ContainerInterface $c): ListAuditEventsUseCaseInterface {
                     $repo = $c->get(AuditEventRepositoryInterface::class);
-                    $json = $c->get(JsonResponseFactory::class);
 
                     if (!$repo instanceof AuditEventRepositoryInterface) {
                         throw new LogicException('AuditEventRepositoryInterface service is invalid.');
+                    }
+
+                    return new ListAuditEventsUseCase($repo);
+                },
+            )
+            ->set(
+                ListAuditEventsHandler::class,
+                static function (ContainerInterface $c): ListAuditEventsHandler {
+                    $useCase = $c->get(ListAuditEventsUseCaseInterface::class);
+                    $json = $c->get(JsonResponseFactory::class);
+
+                    if (!$useCase instanceof ListAuditEventsUseCaseInterface) {
+                        throw new LogicException('ListAuditEventsUseCaseInterface service is invalid.');
                     }
 
                     if (!$json instanceof JsonResponseFactory) {
                         throw new LogicException('JsonResponseFactory service is invalid.');
                     }
 
-                    return new ListAuditEventsHandler($repo, $json);
+                    return new ListAuditEventsHandler($useCase, $json);
                 },
             )
             ->set(

@@ -42,14 +42,24 @@ final readonly class PdoUserRepository implements UserRepositoryInterface
     }
 
     /** @return list<User> */
-    public function listByOrganizationId(int $organizationId): array
+    public function listByOrganizationId(int $organizationId, int $limit, int $offset): array
     {
         $rows = $this->query->fetchAll(
-            'SELECT ' . self::SELECT_COLUMNS . ' FROM users WHERE organization_id = ? ORDER BY id ASC',
-            [$organizationId],
+            'SELECT ' . self::SELECT_COLUMNS . ' FROM users WHERE organization_id = ? ORDER BY id ASC LIMIT ? OFFSET ?',
+            [$organizationId, $limit, $offset],
         );
 
         return array_map($this->mapRow(...), $rows);
+    }
+
+    public function countByOrganizationId(int $organizationId): int
+    {
+        $row = $this->query->fetchOne(
+            'SELECT COUNT(*) AS cnt FROM users WHERE organization_id = ?',
+            [$organizationId],
+        );
+
+        return $row !== null ? (int) $row['cnt'] : 0;
     }
 
     public function create(

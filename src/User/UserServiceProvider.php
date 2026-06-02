@@ -4,12 +4,18 @@ declare(strict_types=1);
 
 namespace NeneVault\User;
 
+use Closure;
 use LogicException;
+use Nene2\Database\DatabaseQueryExecutorInterface;
+use Nene2\Database\DatabaseTransactionManagerInterface;
 use Nene2\DependencyInjection\ContainerBuilder;
 use Nene2\DependencyInjection\ServiceProviderInterface;
 use Nene2\Error\ProblemDetailsResponseFactory;
 use Nene2\Http\JsonResponseFactory;
+use NeneVault\Audit\AuditRecorder;
 use NeneVault\Audit\AuditRecorderInterface;
+use NeneVault\Audit\PdoAuditEventRepository;
+use NeneVault\Auth\PdoUserRepository;
 use NeneVault\Auth\UserRepositoryInterface;
 use Psr\Container\ContainerInterface;
 use Psr\Http\Message\ResponseFactoryInterface;
@@ -22,27 +28,51 @@ final readonly class UserServiceProvider implements ServiceProviderInterface
             ->set(
                 CreateUserUseCaseInterface::class,
                 static fn (ContainerInterface $c): CreateUserUseCaseInterface
-                    => new CreateUserUseCase(self::users($c), self::audit($c)),
+                    => new CreateUserUseCase(self::tx($c), self::usersFactory(), self::auditFactory()),
             )
             ->set(
                 UpdateUserUseCaseInterface::class,
                 static fn (ContainerInterface $c): UpdateUserUseCaseInterface
-                    => new UpdateUserUseCase(self::users($c), self::audit($c)),
+                    => new UpdateUserUseCase(self::tx($c), self::usersFactory(), self::auditFactory()),
             )
             ->set(
                 DeleteUserUseCaseInterface::class,
                 static fn (ContainerInterface $c): DeleteUserUseCaseInterface
-                    => new DeleteUserUseCase(self::users($c), self::audit($c)),
+                    => new DeleteUserUseCase(self::tx($c), self::usersFactory(), self::auditFactory()),
+            )
+            ->set(
+                ListUsersUseCaseInterface::class,
+                static fn (ContainerInterface $c): ListUsersUseCaseInterface
+                    => new ListUsersUseCase(self::users($c)),
+            )
+            ->set(
+                GetUserByIdUseCaseInterface::class,
+                static fn (ContainerInterface $c): GetUserByIdUseCaseInterface
+                    => new GetUserByIdUseCase(self::users($c)),
             )
             ->set(
                 ListUsersHandler::class,
-                static fn (ContainerInterface $c): ListUsersHandler
-                    => new ListUsersHandler(self::users($c), self::json($c)),
+                static function (ContainerInterface $c): ListUsersHandler {
+                    $uc = $c->get(ListUsersUseCaseInterface::class);
+
+                    if (!$uc instanceof ListUsersUseCaseInterface) {
+                        throw new LogicException('ListUsersUseCaseInterface service is invalid.');
+                    }
+
+                    return new ListUsersHandler($uc, self::json($c));
+                },
             )
             ->set(
                 GetUserByIdHandler::class,
-                static fn (ContainerInterface $c): GetUserByIdHandler
-                    => new GetUserByIdHandler(self::users($c), self::json($c)),
+                static function (ContainerInterface $c): GetUserByIdHandler {
+                    $uc = $c->get(GetUserByIdUseCaseInterface::class);
+
+                    if (!$uc instanceof GetUserByIdUseCaseInterface) {
+                        throw new LogicException('GetUserByIdUseCaseInterface service is invalid.');
+                    }
+
+                    return new GetUserByIdHandler($uc, self::json($c));
+                },
             )
             ->set(
                 CreateUserHandler::class,
@@ -130,15 +160,27 @@ final readonly class UserServiceProvider implements ServiceProviderInterface
         return $r;
     }
 
-    private static function audit(ContainerInterface $c): AuditRecorderInterface
+    private static function tx(ContainerInterface $c): DatabaseTransactionManagerInterface
     {
-        $a = $c->get(AuditRecorderInterface::class);
+        $t = $c->get(DatabaseTransactionManagerInterface::class);
 
-        if (!$a instanceof AuditRecorderInterface) {
-            throw new LogicException('AuditRecorderInterface service is invalid.');
+        if (!$t instanceof DatabaseTransactionManagerInterface) {
+            throw new LogicException('DatabaseTransactionManagerInterface service is invalid.');
         }
 
-        return $a;
+        return $t;
+    }
+
+    /** @return Closure(DatabaseQueryExecutorInterface): UserRepositoryInterface */
+    private static function usersFactory(): Closure
+    {
+        return static fn (DatabaseQueryExecutorInterface $e): UserRepositoryInterface => new PdoUserRepository($e);
+    }
+
+    /** @return Closure(DatabaseQueryExecutorInterface): AuditRecorderInterface */
+    private static function auditFactory(): Closure
+    {
+        return static fn (DatabaseQueryExecutorInterface $e): AuditRecorderInterface => new AuditRecorder(new PdoAuditEventRepository($e));
     }
 
     private static function json(ContainerInterface $c): JsonResponseFactory

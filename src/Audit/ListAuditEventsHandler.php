@@ -5,6 +5,9 @@ declare(strict_types=1);
 namespace NeneVault\Audit;
 
 use Nene2\Http\JsonResponseFactory;
+use Nene2\Http\PaginationQueryParser;
+use Nene2\Http\PaginationResponse;
+use NeneVault\Auth\RequestContext;
 use NeneVault\Auth\Role;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -12,7 +15,7 @@ use Psr\Http\Message\ServerRequestInterface;
 final readonly class ListAuditEventsHandler
 {
     public function __construct(
-        private AuditEventRepositoryInterface $repository,
+        private ListAuditEventsUseCaseInterface $useCase,
         private JsonResponseFactory $response,
     ) {
     }
@@ -20,46 +23,32 @@ final readonly class ListAuditEventsHandler
     public function handle(ServerRequestInterface $request): ResponseInterface
     {
         $params = $request->getQueryParams();
-        $limit = min(100, max(1, (int) ($params['limit'] ?? 20)));
-        $offset = max(0, (int) ($params['offset'] ?? 0));
+        $pagination = PaginationQueryParser::parse($request);
 
-        $claims = $request->getAttribute('nene2.auth.claims');
-        $role = Role::tryFrom((string) ($claims['role'] ?? ''));
-        $resolvedOrgId = $request->getAttribute('nene2.org.id');
-
-        $filters = [];
+        $role = RequestContext::role($request);
+        $resolvedOrgId = RequestContext::organizationIdOrNull($request);
 
         // Superadmin sees all audit events; admin/member/viewer see their org only
-        if ($role !== Role::Superadmin && is_int($resolvedOrgId)) {
-            $filters['organization_id'] = $resolvedOrgId;
-        }
+        $organizationId = $role !== Role::Superadmin && is_int($resolvedOrgId) ? $resolvedOrgId : null;
 
-        // Optional filters from query string
-        if (isset($params['entity_type']) && is_string($params['entity_type'])) {
-            $filters['entity_type'] = $params['entity_type'];
-        }
+        $output = $this->useCase->execute(new ListAuditEventsInput(
+            organizationId: $organizationId,
+            entityType: isset($params['entity_type']) && is_string($params['entity_type']) ? $params['entity_type'] : null,
+            entityId: isset($params['entity_id']) && is_string($params['entity_id']) ? $params['entity_id'] : null,
+            action: isset($params['action']) && is_string($params['action']) ? $params['action'] : null,
+            actorUserId: isset($params['actor_user_id']) && is_numeric($params['actor_user_id']) ? (int) $params['actor_user_id'] : null,
+            limit: $pagination->limit,
+            offset: $pagination->offset,
+        ));
 
-        if (isset($params['entity_id']) && is_string($params['entity_id'])) {
-            $filters['entity_id'] = $params['entity_id'];
-        }
-
-        if (isset($params['action']) && is_string($params['action'])) {
-            $filters['action'] = $params['action'];
-        }
-
-        if (isset($params['actor_user_id']) && is_numeric($params['actor_user_id'])) {
-            $filters['actor_user_id'] = (int) $params['actor_user_id'];
-        }
-
-        $items = $this->repository->findByCriteria($filters, $limit, $offset);
-        $total = $this->repository->countByCriteria($filters);
-
-        return $this->response->create([
-            'items'  => array_map($this->toArray(...), $items),
-            'total'  => $total,
-            'limit'  => $limit,
-            'offset' => $offset,
-        ]);
+        return $this->response->create(
+            (new PaginationResponse(
+                items: array_map($this->toArray(...), $output->items),
+                limit: $output->limit,
+                offset: $output->offset,
+                total: $output->total,
+            ))->toArray(),
+        );
     }
 
     /** @return array<string, mixed> */

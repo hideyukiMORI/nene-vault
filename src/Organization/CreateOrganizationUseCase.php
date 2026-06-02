@@ -4,60 +4,77 @@ declare(strict_types=1);
 
 namespace NeneVault\Organization;
 
+use Closure;
+use Nene2\Database\DatabaseQueryExecutorInterface;
+use Nene2\Database\DatabaseTransactionManagerInterface;
 use NeneVault\Audit\AuditAction;
 use NeneVault\Audit\AuditRecorderInterface;
 use NeneVault\VaultSettings\VaultSettingsSeederInterface;
 
 final readonly class CreateOrganizationUseCase implements CreateOrganizationUseCaseInterface
 {
+    /**
+     * @param Closure(DatabaseQueryExecutorInterface): OrganizationRepositoryInterface $organizationRepository
+     * @param Closure(DatabaseQueryExecutorInterface): VaultSettingsSeederInterface    $settingsSeeder
+     * @param Closure(DatabaseQueryExecutorInterface): AuditRecorderInterface          $auditRecorder
+     */
     public function __construct(
-        private OrganizationRepositoryInterface $organizations,
-        private VaultSettingsSeederInterface $settingsSeeder,
-        private AuditRecorderInterface $audit,
+        private DatabaseTransactionManagerInterface $transactionManager,
+        private Closure $organizationRepository,
+        private Closure $settingsSeeder,
+        private Closure $auditRecorder,
     ) {
     }
 
     public function execute(CreateOrganizationInput $input): CreateOrganizationOutput
     {
-        $existing = $this->organizations->findBySlug($input->slug);
+        return $this->transactionManager->transactional(
+            function (DatabaseQueryExecutorInterface $executor) use ($input): CreateOrganizationOutput {
+                $organizations = ($this->organizationRepository)($executor);
+                $settingsSeeder = ($this->settingsSeeder)($executor);
+                $audit = ($this->auditRecorder)($executor);
 
-        if ($existing !== null) {
-            throw new OrganizationSlugConflictException($input->slug);
-        }
+                $existing = $organizations->findBySlug($input->slug);
 
-        $id = $this->organizations->save(new Organization(
-            name: $input->name,
-            slug: $input->slug,
-            plan: $input->plan,
-            isActive: $input->isActive,
-            externalId: $input->externalId,
-            customDomain: $input->customDomain,
-        ));
+                if ($existing !== null) {
+                    throw new OrganizationSlugConflictException($input->slug);
+                }
 
-        $this->settingsSeeder->seed($id);
+                $id = $organizations->save(new Organization(
+                    name: $input->name,
+                    slug: $input->slug,
+                    plan: $input->plan,
+                    isActive: $input->isActive,
+                    externalId: $input->externalId,
+                    customDomain: $input->customDomain,
+                ));
 
-        $org = $this->organizations->findById($id);
-        assert($org !== null);
+                $settingsSeeder->seed($id);
 
-        $this->audit->record(
-            action: AuditAction::ORGANIZATION_CREATED,
-            entityType: 'organization',
-            entityId: (string) $id,
-            actorUserId: $input->actorUserId,
-            organizationId: null,
-            beforeJson: null,
-            afterJson: $this->toAuditArray($org),
-        );
+                $org = $organizations->findById($id);
+                assert($org !== null);
 
-        return new CreateOrganizationOutput(
-            id: $org->id ?? $id,
-            name: $org->name,
-            slug: $org->slug,
-            plan: $org->plan,
-            isActive: $org->isActive,
-            externalId: $org->externalId,
-            customDomain: $org->customDomain,
-            createdAt: $org->createdAt ?? '',
+                $audit->record(
+                    action: AuditAction::ORGANIZATION_CREATED,
+                    entityType: 'organization',
+                    entityId: (string) $id,
+                    actorUserId: $input->actorUserId,
+                    organizationId: null,
+                    beforeJson: null,
+                    afterJson: $this->toAuditArray($org),
+                );
+
+                return new CreateOrganizationOutput(
+                    id: $org->id ?? $id,
+                    name: $org->name,
+                    slug: $org->slug,
+                    plan: $org->plan,
+                    isActive: $org->isActive,
+                    externalId: $org->externalId,
+                    customDomain: $org->customDomain,
+                    createdAt: $org->createdAt ?? '',
+                );
+            },
         );
     }
 

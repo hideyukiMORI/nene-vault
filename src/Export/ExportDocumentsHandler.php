@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace NeneVault\Export;
 
 use Nene2\Http\JsonRequestBodyParser;
+use NeneVault\Auth\RequestContext;
 use Psr\Http\Message\ResponseFactoryInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -21,11 +22,9 @@ final readonly class ExportDocumentsHandler
 
     public function handle(ServerRequestInterface $request): ResponseInterface
     {
-        $orgId = $request->getAttribute('nene2.org.id');
-        assert(is_int($orgId));
+        $orgId = RequestContext::organizationId($request);
 
-        $claims = $request->getAttribute('nene2.auth.claims');
-        $actorUserId = is_array($claims) && isset($claims['user_id']) ? (int) $claims['user_id'] : null;
+        $actorUserId = RequestContext::actorUserId($request);
 
         $body = JsonRequestBodyParser::parse($request);
 

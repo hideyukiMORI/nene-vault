@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace NeneVault\Tests\Document;
 
+use Nene2\Database\DatabaseQueryExecutorInterface;
 use NeneVault\Audit\AuditRecorder;
+use NeneVault\Audit\AuditRecorderInterface;
 use NeneVault\Document\DuplicateFileException;
 use NeneVault\Document\FileTooLargeException;
 use NeneVault\Document\MimeTypeNotAllowedException;
@@ -16,6 +18,7 @@ use NeneVault\DocumentVersion\DocumentStorageInterface;
 use NeneVault\DocumentVersion\DocumentVersion;
 use NeneVault\DocumentVersion\DocumentVersionRepositoryInterface;
 use NeneVault\Tests\Audit\InMemoryAuditEventRepository;
+use NeneVault\Tests\Support\SynchronousTransactionManager;
 use NeneVault\VaultSettings\VaultSettings;
 use NeneVault\VaultSettings\VaultSettingsRepositoryInterface;
 use PHPUnit\Framework\TestCase;
@@ -31,7 +34,15 @@ final class UploadDocumentUseCaseTest extends TestCase
         $storage = new FakeDocumentStorage('abc123sha');
         $settings = new FakeVaultSettingsRepository(retentionYears: 10);
         $auditRepo = new InMemoryAuditEventRepository();
-        $useCase = new UploadDocumentUseCase($docs, $versions, $storage, $settings, new AuditRecorder($auditRepo), self::MAX_BYTES);
+        $useCase = new UploadDocumentUseCase(
+            new SynchronousTransactionManager(),
+            static fn (DatabaseQueryExecutorInterface $e): VaultDocumentRepositoryInterface => $docs,
+            static fn (DatabaseQueryExecutorInterface $e): DocumentVersionRepositoryInterface => $versions,
+            $storage,
+            static fn (DatabaseQueryExecutorInterface $e): VaultSettingsRepositoryInterface => $settings,
+            static fn (DatabaseQueryExecutorInterface $e): AuditRecorderInterface => new AuditRecorder($auditRepo),
+            self::MAX_BYTES,
+        );
 
         $output = $useCase->execute($this->input(transactionDate: '2026-03-31', amountCents: 110000));
 
@@ -88,11 +99,12 @@ final class UploadDocumentUseCaseTest extends TestCase
         $versions->markSha('dup-sha');
         $storage = new FakeDocumentStorage('dup-sha');
         $useCase = new UploadDocumentUseCase(
-            new InMemoryVaultDocumentRepository(),
-            $versions,
+            new SynchronousTransactionManager(),
+            static fn (DatabaseQueryExecutorInterface $e): VaultDocumentRepositoryInterface => new InMemoryVaultDocumentRepository(),
+            static fn (DatabaseQueryExecutorInterface $e): DocumentVersionRepositoryInterface => $versions,
             $storage,
-            new FakeVaultSettingsRepository(10),
-            new AuditRecorder(new InMemoryAuditEventRepository()),
+            static fn (DatabaseQueryExecutorInterface $e): VaultSettingsRepositoryInterface => new FakeVaultSettingsRepository(10),
+            static fn (DatabaseQueryExecutorInterface $e): AuditRecorderInterface => new AuditRecorder(new InMemoryAuditEventRepository()),
             self::MAX_BYTES,
         );
 
@@ -106,11 +118,12 @@ final class UploadDocumentUseCaseTest extends TestCase
         $versions->markSha('dup-sha');
         $storage = new FakeDocumentStorage('dup-sha');
         $useCase = new UploadDocumentUseCase(
-            new InMemoryVaultDocumentRepository(),
-            $versions,
+            new SynchronousTransactionManager(),
+            static fn (DatabaseQueryExecutorInterface $e): VaultDocumentRepositoryInterface => new InMemoryVaultDocumentRepository(),
+            static fn (DatabaseQueryExecutorInterface $e): DocumentVersionRepositoryInterface => $versions,
             $storage,
-            new FakeVaultSettingsRepository(10),
-            new AuditRecorder(new InMemoryAuditEventRepository()),
+            static fn (DatabaseQueryExecutorInterface $e): VaultSettingsRepositoryInterface => new FakeVaultSettingsRepository(10),
+            static fn (DatabaseQueryExecutorInterface $e): AuditRecorderInterface => new AuditRecorder(new InMemoryAuditEventRepository()),
             self::MAX_BYTES,
         );
 
@@ -122,11 +135,12 @@ final class UploadDocumentUseCaseTest extends TestCase
     {
         $docs = new InMemoryVaultDocumentRepository();
         $useCase = new UploadDocumentUseCase(
-            $docs,
-            new InMemoryDocumentVersionRepository(),
+            new SynchronousTransactionManager(),
+            static fn (DatabaseQueryExecutorInterface $e): VaultDocumentRepositoryInterface => $docs,
+            static fn (DatabaseQueryExecutorInterface $e): DocumentVersionRepositoryInterface => new InMemoryDocumentVersionRepository(),
             new FakeDocumentStorage('x'),
-            new FakeVaultSettingsRepository(retentionYears: 7),
-            new AuditRecorder(new InMemoryAuditEventRepository()),
+            static fn (DatabaseQueryExecutorInterface $e): VaultSettingsRepositoryInterface => new FakeVaultSettingsRepository(retentionYears: 7),
+            static fn (DatabaseQueryExecutorInterface $e): AuditRecorderInterface => new AuditRecorder(new InMemoryAuditEventRepository()),
             self::MAX_BYTES,
         );
 
@@ -138,11 +152,12 @@ final class UploadDocumentUseCaseTest extends TestCase
     private function makeUseCase(): UploadDocumentUseCase
     {
         return new UploadDocumentUseCase(
-            new InMemoryVaultDocumentRepository(),
-            new InMemoryDocumentVersionRepository(),
+            new SynchronousTransactionManager(),
+            static fn (DatabaseQueryExecutorInterface $e): VaultDocumentRepositoryInterface => new InMemoryVaultDocumentRepository(),
+            static fn (DatabaseQueryExecutorInterface $e): DocumentVersionRepositoryInterface => new InMemoryDocumentVersionRepository(),
             new FakeDocumentStorage('sha'),
-            new FakeVaultSettingsRepository(10),
-            new AuditRecorder(new InMemoryAuditEventRepository()),
+            static fn (DatabaseQueryExecutorInterface $e): VaultSettingsRepositoryInterface => new FakeVaultSettingsRepository(10),
+            static fn (DatabaseQueryExecutorInterface $e): AuditRecorderInterface => new AuditRecorder(new InMemoryAuditEventRepository()),
             self::MAX_BYTES,
         );
     }

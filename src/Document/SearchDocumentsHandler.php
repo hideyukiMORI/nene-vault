@@ -5,6 +5,9 @@ declare(strict_types=1);
 namespace NeneVault\Document;
 
 use Nene2\Http\JsonResponseFactory;
+use Nene2\Http\PaginationQueryParser;
+use Nene2\Http\PaginationResponse;
+use NeneVault\Auth\RequestContext;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
@@ -18,13 +21,10 @@ final readonly class SearchDocumentsHandler
 
     public function handle(ServerRequestInterface $request): ResponseInterface
     {
-        $orgId = $request->getAttribute('nene2.org.id');
-        assert(is_int($orgId));
+        $orgId = RequestContext::organizationId($request);
 
         $q = $request->getQueryParams();
-
-        $limit = min(100, max(1, (int) ($q['limit'] ?? 20)));
-        $offset = max(0, (int) ($q['offset'] ?? 0));
+        $pagination = PaginationQueryParser::parse($request);
 
         $criteria = new DocumentSearchCriteria(
             organizationId: $orgId,
@@ -35,21 +35,23 @@ final readonly class SearchDocumentsHandler
             counterpartyName: $this->strOrNull($q['counterparty_name'] ?? null),
             category: $this->strOrNull($q['category'] ?? null),
             includeVoided: isset($q['include_voided']) && ($q['include_voided'] === '1' || $q['include_voided'] === 'true'),
-            limit: $limit,
-            offset: $offset,
+            limit: $pagination->limit,
+            offset: $pagination->offset,
         );
 
         $output = $this->useCase->execute($criteria);
 
-        return $this->response->create([
-            'items'  => array_map(
-                static fn (array $pair) => VaultDocumentPresenter::present($pair[0], $pair[1]),
-                $output->items,
-            ),
-            'total'  => $output->total,
-            'limit'  => $output->limit,
-            'offset' => $output->offset,
-        ]);
+        return $this->response->create(
+            (new PaginationResponse(
+                items: array_map(
+                    static fn (array $pair) => VaultDocumentPresenter::present($pair[0], $pair[1]),
+                    $output->items,
+                ),
+                limit: $output->limit,
+                offset: $output->offset,
+                total: $output->total,
+            ))->toArray(),
+        );
     }
 
     private function strOrNull(mixed $v): ?string

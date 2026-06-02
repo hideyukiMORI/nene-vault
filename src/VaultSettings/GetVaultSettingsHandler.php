@@ -5,27 +5,21 @@ declare(strict_types=1);
 namespace NeneVault\VaultSettings;
 
 use Nene2\Http\JsonResponseFactory;
+use NeneVault\Auth\RequestContext;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
 final readonly class GetVaultSettingsHandler
 {
     public function __construct(
-        private VaultSettingsRepositoryInterface $settings,
+        private GetVaultSettingsUseCaseInterface $useCase,
         private JsonResponseFactory $response,
     ) {
     }
 
     public function handle(ServerRequestInterface $request): ResponseInterface
     {
-        $orgId = $request->getAttribute('nene2.org.id');
-        assert(is_int($orgId));
-
-        $settings = $this->settings->findByOrganizationId($orgId);
-
-        if ($settings === null) {
-            $settings = new VaultSettings(organizationId: $orgId);
-        }
+        $settings = $this->useCase->execute(RequestContext::organizationId($request));
 
         return $this->response->create($this->toArray($settings));
     }

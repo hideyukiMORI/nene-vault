@@ -6,11 +6,15 @@ namespace NeneVault\Organization;
 
 use LogicException;
 use Nene2\Database\DatabaseQueryExecutorInterface;
+use Nene2\Database\DatabaseTransactionManagerInterface;
 use Nene2\DependencyInjection\ContainerBuilder;
 use Nene2\DependencyInjection\ServiceProviderInterface;
 use Nene2\Error\ProblemDetailsResponseFactory;
 use Nene2\Http\JsonResponseFactory;
+use NeneVault\Audit\AuditRecorder;
 use NeneVault\Audit\AuditRecorderInterface;
+use NeneVault\Audit\PdoAuditEventRepository;
+use NeneVault\VaultSettings\PdoVaultSettingsRepository;
 use NeneVault\VaultSettings\VaultSettingsSeederInterface;
 use Psr\Container\ContainerInterface;
 use Psr\Http\Message\ResponseFactoryInterface;
@@ -36,24 +40,18 @@ final readonly class OrganizationServiceProvider implements ServiceProviderInter
             ->set(
                 CreateOrganizationUseCaseInterface::class,
                 static function (ContainerInterface $c): CreateOrganizationUseCaseInterface {
-                    $repo = $c->get(OrganizationRepositoryInterface::class);
-                    $seeder = $c->get(VaultSettingsSeederInterface::class);
+                    $tx = $c->get(DatabaseTransactionManagerInterface::class);
 
-                    if (!$repo instanceof OrganizationRepositoryInterface) {
-                        throw new LogicException('OrganizationRepositoryInterface service is invalid.');
+                    if (!$tx instanceof DatabaseTransactionManagerInterface) {
+                        throw new LogicException('DatabaseTransactionManagerInterface service is invalid.');
                     }
 
-                    if (!$seeder instanceof VaultSettingsSeederInterface) {
-                        throw new LogicException('VaultSettingsSeederInterface service is invalid.');
-                    }
-
-                    $audit = $c->get(AuditRecorderInterface::class);
-
-                    if (!$audit instanceof AuditRecorderInterface) {
-                        throw new LogicException('AuditRecorderInterface service is invalid.');
-                    }
-
-                    return new CreateOrganizationUseCase($repo, $seeder, $audit);
+                    return new CreateOrganizationUseCase(
+                        $tx,
+                        static fn (DatabaseQueryExecutorInterface $e): OrganizationRepositoryInterface => new PdoOrganizationRepository($e),
+                        static fn (DatabaseQueryExecutorInterface $e): VaultSettingsSeederInterface => new PdoVaultSettingsRepository($e),
+                        static fn (DatabaseQueryExecutorInterface $e): AuditRecorderInterface => new AuditRecorder(new PdoAuditEventRepository($e)),
+                    );
                 },
             )
             ->set(
@@ -83,36 +81,33 @@ final readonly class OrganizationServiceProvider implements ServiceProviderInter
             ->set(
                 UpdateOrganizationUseCaseInterface::class,
                 static function (ContainerInterface $c): UpdateOrganizationUseCaseInterface {
-                    $repo = $c->get(OrganizationRepositoryInterface::class);
+                    $tx = $c->get(DatabaseTransactionManagerInterface::class);
 
-                    if (!$repo instanceof OrganizationRepositoryInterface) {
-                        throw new LogicException('OrganizationRepositoryInterface service is invalid.');
+                    if (!$tx instanceof DatabaseTransactionManagerInterface) {
+                        throw new LogicException('DatabaseTransactionManagerInterface service is invalid.');
                     }
 
-                    $audit = $c->get(AuditRecorderInterface::class);
-
-                    if (!$audit instanceof AuditRecorderInterface) {
-                        throw new LogicException('AuditRecorderInterface service is invalid.');
-                    }
-
-                    return new UpdateOrganizationUseCase($repo, $audit);
+                    return new UpdateOrganizationUseCase(
+                        $tx,
+                        static fn (DatabaseQueryExecutorInterface $e): OrganizationRepositoryInterface => new PdoOrganizationRepository($e),
+                        static fn (DatabaseQueryExecutorInterface $e): AuditRecorderInterface => new AuditRecorder(new PdoAuditEventRepository($e)),
+                    );
                 },
             )
             ->set(
                 DeleteOrganizationUseCaseInterface::class,
                 static function (ContainerInterface $c): DeleteOrganizationUseCaseInterface {
-                    $repo = $c->get(OrganizationRepositoryInterface::class);
-                    $audit = $c->get(AuditRecorderInterface::class);
+                    $tx = $c->get(DatabaseTransactionManagerInterface::class);
 
-                    if (!$repo instanceof OrganizationRepositoryInterface) {
-                        throw new LogicException('OrganizationRepositoryInterface service is invalid.');
+                    if (!$tx instanceof DatabaseTransactionManagerInterface) {
+                        throw new LogicException('DatabaseTransactionManagerInterface service is invalid.');
                     }
 
-                    if (!$audit instanceof AuditRecorderInterface) {
-                        throw new LogicException('AuditRecorderInterface service is invalid.');
-                    }
-
-                    return new DeleteOrganizationUseCase($repo, $audit);
+                    return new DeleteOrganizationUseCase(
+                        $tx,
+                        static fn (DatabaseQueryExecutorInterface $e): OrganizationRepositoryInterface => new PdoOrganizationRepository($e),
+                        static fn (DatabaseQueryExecutorInterface $e): AuditRecorderInterface => new AuditRecorder(new PdoAuditEventRepository($e)),
+                    );
                 },
             )
             // ── Handlers ──

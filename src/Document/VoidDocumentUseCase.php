@@ -4,16 +4,25 @@ declare(strict_types=1);
 
 namespace NeneVault\Document;
 
+use Closure;
+use Nene2\Database\DatabaseQueryExecutorInterface;
+use Nene2\Database\DatabaseTransactionManagerInterface;
 use NeneVault\Audit\AuditAction;
 use NeneVault\Audit\AuditRecorderInterface;
 use NeneVault\DocumentVersion\DocumentVersionRepositoryInterface;
 
 final readonly class VoidDocumentUseCase implements VoidDocumentUseCaseInterface
 {
+    /**
+     * @param Closure(DatabaseQueryExecutorInterface): VaultDocumentRepositoryInterface   $documentRepository
+     * @param Closure(DatabaseQueryExecutorInterface): DocumentVersionRepositoryInterface $versionRepository
+     * @param Closure(DatabaseQueryExecutorInterface): AuditRecorderInterface             $auditRecorder
+     */
     public function __construct(
-        private VaultDocumentRepositoryInterface $documents,
-        private DocumentVersionRepositoryInterface $versions,
-        private AuditRecorderInterface $audit,
+        private DatabaseTransactionManagerInterface $transactionManager,
+        private Closure $documentRepository,
+        private Closure $versionRepository,
+        private Closure $auditRecorder,
     ) {
     }
 
@@ -27,37 +36,45 @@ final readonly class VoidDocumentUseCase implements VoidDocumentUseCaseInterface
         ?string $voidNote,
         ?int $actorUserId,
     ): array {
-        $document = $this->documents->findById($documentId, $organizationId);
+        return $this->transactionManager->transactional(
+            function (DatabaseQueryExecutorInterface $executor) use ($documentId, $organizationId, $voidReason, $voidNote, $actorUserId): array {
+                $documents = ($this->documentRepository)($executor);
+                $versions = ($this->versionRepository)($executor);
+                $audit = ($this->auditRecorder)($executor);
 
-        if ($document === null) {
-            throw new VaultDocumentNotFoundException($documentId);
-        }
+                $document = $documents->findById($documentId, $organizationId);
 
-        if ($document->status !== 'active') {
-            throw new InvalidDocumentStateException($documentId, $document->status, 'voided');
-        }
+                if ($document === null) {
+                    throw new VaultDocumentNotFoundException($documentId);
+                }
 
-        $beforeJson = ['status' => $document->status];
+                if ($document->status !== 'active') {
+                    throw new InvalidDocumentStateException($documentId, $document->status, 'voided');
+                }
 
-        $this->documents->void($documentId, $organizationId, $actorUserId ?? 0, $voidReason, $voidNote);
+                $beforeJson = ['status' => $document->status];
 
-        $updated = $this->documents->findById($documentId, $organizationId);
-        assert($updated !== null);
+                $documents->void($documentId, $organizationId, $actorUserId ?? 0, $voidReason, $voidNote);
 
-        $version = $this->versions->findById($updated->currentVersionId, $organizationId);
-        assert($version !== null);
+                $updated = $documents->findById($documentId, $organizationId);
+                assert($updated !== null);
 
-        $this->audit->record(
-            action: AuditAction::DOCUMENT_VOIDED,
-            entityType: 'vault_document',
-            entityId: $documentId,
-            actorUserId: $actorUserId,
-            organizationId: $organizationId,
-            beforeJson: $beforeJson,
-            afterJson: ['status' => $updated->status],
-            metadataJson: ['void_reason' => $voidReason, 'void_note' => $voidNote],
+                $version = $versions->findById($updated->currentVersionId, $organizationId);
+                assert($version !== null);
+
+                $audit->record(
+                    action: AuditAction::DOCUMENT_VOIDED,
+                    entityType: 'vault_document',
+                    entityId: $documentId,
+                    actorUserId: $actorUserId,
+                    organizationId: $organizationId,
+                    beforeJson: $beforeJson,
+                    afterJson: ['status' => $updated->status],
+                    metadataJson: ['void_reason' => $voidReason, 'void_note' => $voidNote],
+                );
+
+                return [$updated, $version];
+            },
         );
-
-        return [$updated, $version];
     }
 }

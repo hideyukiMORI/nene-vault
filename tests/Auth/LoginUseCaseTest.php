@@ -104,9 +104,13 @@ final class LoginUseCaseTest extends TestCase
             {
                 return null;
             }
-            public function listByOrganizationId(int $organizationId): array
+            public function listByOrganizationId(int $organizationId, int $limit, int $offset): array
             {
                 return [];
+            }
+            public function countByOrganizationId(int $organizationId): int
+            {
+                return 0;
             }
             public function create(string $email, string $passwordHash, string $role, ?int $organizationId): User
             {

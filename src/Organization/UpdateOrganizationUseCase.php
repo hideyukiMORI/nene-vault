@@ -4,59 +4,74 @@ declare(strict_types=1);
 
 namespace NeneVault\Organization;
 
+use Closure;
+use Nene2\Database\DatabaseQueryExecutorInterface;
+use Nene2\Database\DatabaseTransactionManagerInterface;
 use NeneVault\Audit\AuditAction;
 use NeneVault\Audit\AuditRecorderInterface;
 
 final readonly class UpdateOrganizationUseCase implements UpdateOrganizationUseCaseInterface
 {
+    /**
+     * @param Closure(DatabaseQueryExecutorInterface): OrganizationRepositoryInterface $organizationRepository
+     * @param Closure(DatabaseQueryExecutorInterface): AuditRecorderInterface          $auditRecorder
+     */
     public function __construct(
-        private OrganizationRepositoryInterface $organizations,
-        private AuditRecorderInterface $audit,
+        private DatabaseTransactionManagerInterface $transactionManager,
+        private Closure $organizationRepository,
+        private Closure $auditRecorder,
     ) {
     }
 
     public function execute(UpdateOrganizationInput $input): UpdateOrganizationOutput
     {
-        $org = $this->organizations->findById($input->id);
+        return $this->transactionManager->transactional(
+            function (DatabaseQueryExecutorInterface $executor) use ($input): UpdateOrganizationOutput {
+                $organizations = ($this->organizationRepository)($executor);
+                $audit = ($this->auditRecorder)($executor);
 
-        if ($org === null) {
-            throw new OrganizationNotFoundException($input->id);
-        }
+                $org = $organizations->findById($input->id);
 
-        $beforeJson = $this->toAuditArray($org);
+                if ($org === null) {
+                    throw new OrganizationNotFoundException($input->id);
+                }
 
-        $this->organizations->update(new Organization(
-            name: $input->name,
-            slug: $input->slug,
-            plan: $input->plan,
-            isActive: $input->isActive,
-            id: $input->id,
-            externalId: $input->externalId,
-            customDomain: $input->customDomain,
-        ));
+                $beforeJson = $this->toAuditArray($org);
 
-        $refreshed = $this->organizations->findById($input->id);
-        assert($refreshed !== null);
+                $organizations->update(new Organization(
+                    name: $input->name,
+                    slug: $input->slug,
+                    plan: $input->plan,
+                    isActive: $input->isActive,
+                    id: $input->id,
+                    externalId: $input->externalId,
+                    customDomain: $input->customDomain,
+                ));
 
-        $this->audit->record(
-            action: AuditAction::ORGANIZATION_UPDATED,
-            entityType: 'organization',
-            entityId: (string) $input->id,
-            actorUserId: $input->actorUserId,
-            organizationId: null,
-            beforeJson: $beforeJson,
-            afterJson: $this->toAuditArray($refreshed),
-        );
+                $refreshed = $organizations->findById($input->id);
+                assert($refreshed !== null);
 
-        return new UpdateOrganizationOutput(
-            id: $refreshed->id ?? $input->id,
-            name: $refreshed->name,
-            slug: $refreshed->slug,
-            plan: $refreshed->plan,
-            isActive: $refreshed->isActive,
-            externalId: $refreshed->externalId,
-            customDomain: $refreshed->customDomain,
-            updatedAt: $refreshed->updatedAt ?? '',
+                $audit->record(
+                    action: AuditAction::ORGANIZATION_UPDATED,
+                    entityType: 'organization',
+                    entityId: (string) $input->id,
+                    actorUserId: $input->actorUserId,
+                    organizationId: null,
+                    beforeJson: $beforeJson,
+                    afterJson: $this->toAuditArray($refreshed),
+                );
+
+                return new UpdateOrganizationOutput(
+                    id: $refreshed->id ?? $input->id,
+                    name: $refreshed->name,
+                    slug: $refreshed->slug,
+                    plan: $refreshed->plan,
+                    isActive: $refreshed->isActive,
+                    externalId: $refreshed->externalId,
+                    customDomain: $refreshed->customDomain,
+                    updatedAt: $refreshed->updatedAt ?? '',
+                );
+            },
         );
     }
 

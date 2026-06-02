@@ -4,16 +4,25 @@ declare(strict_types=1);
 
 namespace NeneVault\Document;
 
+use Closure;
+use Nene2\Database\DatabaseQueryExecutorInterface;
+use Nene2\Database\DatabaseTransactionManagerInterface;
 use NeneVault\Audit\AuditAction;
 use NeneVault\Audit\AuditRecorderInterface;
 use NeneVault\DocumentVersion\DocumentVersionRepositoryInterface;
 
 final readonly class RestoreDocumentUseCase implements RestoreDocumentUseCaseInterface
 {
+    /**
+     * @param Closure(DatabaseQueryExecutorInterface): VaultDocumentRepositoryInterface   $documentRepository
+     * @param Closure(DatabaseQueryExecutorInterface): DocumentVersionRepositoryInterface $versionRepository
+     * @param Closure(DatabaseQueryExecutorInterface): AuditRecorderInterface             $auditRecorder
+     */
     public function __construct(
-        private VaultDocumentRepositoryInterface $documents,
-        private DocumentVersionRepositoryInterface $versions,
-        private AuditRecorderInterface $audit,
+        private DatabaseTransactionManagerInterface $transactionManager,
+        private Closure $documentRepository,
+        private Closure $versionRepository,
+        private Closure $auditRecorder,
     ) {
     }
 
@@ -22,36 +31,44 @@ final readonly class RestoreDocumentUseCase implements RestoreDocumentUseCaseInt
      */
     public function execute(string $documentId, int $organizationId, ?int $actorUserId): array
     {
-        $document = $this->documents->findById($documentId, $organizationId);
+        return $this->transactionManager->transactional(
+            function (DatabaseQueryExecutorInterface $executor) use ($documentId, $organizationId, $actorUserId): array {
+                $documents = ($this->documentRepository)($executor);
+                $versions = ($this->versionRepository)($executor);
+                $audit = ($this->auditRecorder)($executor);
 
-        if ($document === null) {
-            throw new VaultDocumentNotFoundException($documentId);
-        }
+                $document = $documents->findById($documentId, $organizationId);
 
-        if ($document->status !== 'voided') {
-            throw new InvalidDocumentStateException($documentId, $document->status, 'restored');
-        }
+                if ($document === null) {
+                    throw new VaultDocumentNotFoundException($documentId);
+                }
 
-        $beforeJson = ['status' => $document->status];
+                if ($document->status !== 'voided') {
+                    throw new InvalidDocumentStateException($documentId, $document->status, 'restored');
+                }
 
-        $this->documents->restore($documentId, $organizationId);
+                $beforeJson = ['status' => $document->status];
 
-        $updated = $this->documents->findById($documentId, $organizationId);
-        assert($updated !== null);
+                $documents->restore($documentId, $organizationId);
 
-        $version = $this->versions->findById($updated->currentVersionId, $organizationId);
-        assert($version !== null);
+                $updated = $documents->findById($documentId, $organizationId);
+                assert($updated !== null);
 
-        $this->audit->record(
-            action: AuditAction::DOCUMENT_RESTORED,
-            entityType: 'vault_document',
-            entityId: $documentId,
-            actorUserId: $actorUserId,
-            organizationId: $organizationId,
-            beforeJson: $beforeJson,
-            afterJson: ['status' => $updated->status],
+                $version = $versions->findById($updated->currentVersionId, $organizationId);
+                assert($version !== null);
+
+                $audit->record(
+                    action: AuditAction::DOCUMENT_RESTORED,
+                    entityType: 'vault_document',
+                    entityId: $documentId,
+                    actorUserId: $actorUserId,
+                    organizationId: $organizationId,
+                    beforeJson: $beforeJson,
+                    afterJson: ['status' => $updated->status],
+                );
+
+                return [$updated, $version];
+            },
         );
-
-        return [$updated, $version];
     }
 }

@@ -9,6 +9,7 @@ use Nene2\Http\JsonResponseFactory;
 use Nene2\Routing\Router;
 use Nene2\Validation\ValidationError;
 use Nene2\Validation\ValidationException;
+use NeneVault\Auth\RequestContext;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
@@ -47,8 +48,7 @@ final readonly class UpdateOrganizationHandler
             throw new ValidationException($errors);
         }
 
-        $claims = $request->getAttribute('nene2.auth.claims');
-        $actorUserId = is_array($claims) && isset($claims['user_id']) ? (int) $claims['user_id'] : null;
+        $actorUserId = RequestContext::actorUserId($request);
 
         $output = $this->useCase->execute(new UpdateOrganizationInput(
             id: $id,

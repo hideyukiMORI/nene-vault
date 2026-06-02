@@ -4,15 +4,23 @@ declare(strict_types=1);
 
 namespace NeneVault\User;
 
+use Closure;
+use Nene2\Database\DatabaseQueryExecutorInterface;
+use Nene2\Database\DatabaseTransactionManagerInterface;
 use NeneVault\Audit\AuditAction;
 use NeneVault\Audit\AuditRecorderInterface;
 use NeneVault\Auth\UserRepositoryInterface;
 
 final readonly class DeleteUserUseCase implements DeleteUserUseCaseInterface
 {
+    /**
+     * @param Closure(DatabaseQueryExecutorInterface): UserRepositoryInterface $userRepository
+     * @param Closure(DatabaseQueryExecutorInterface): AuditRecorderInterface  $auditRecorder
+     */
     public function __construct(
-        private UserRepositoryInterface $users,
-        private AuditRecorderInterface $audit,
+        private DatabaseTransactionManagerInterface $transactionManager,
+        private Closure $userRepository,
+        private Closure $auditRecorder,
     ) {
     }
 
@@ -22,24 +30,31 @@ final readonly class DeleteUserUseCase implements DeleteUserUseCaseInterface
             throw new CannotDeleteSelfException();
         }
 
-        $user = $this->users->findById($id);
+        $this->transactionManager->transactional(
+            function (DatabaseQueryExecutorInterface $executor) use ($id, $organizationId, $actorUserId): void {
+                $users = ($this->userRepository)($executor);
+                $audit = ($this->auditRecorder)($executor);
 
-        if ($user === null || $user->organizationId !== $organizationId) {
-            throw new UserNotFoundException($id);
-        }
+                $user = $users->findById($id);
 
-        $before = UserPresenter::present($user);
+                if ($user === null || $user->organizationId !== $organizationId) {
+                    throw new UserNotFoundException($id);
+                }
 
-        $this->users->delete($id);
+                $before = UserPresenter::present($user);
 
-        $this->audit->record(
-            action: AuditAction::USER_DELETED,
-            entityType: 'user',
-            entityId: (string) $id,
-            actorUserId: $actorUserId,
-            organizationId: $organizationId,
-            beforeJson: $before,
-            afterJson: null,
+                $users->delete($id);
+
+                $audit->record(
+                    action: AuditAction::USER_DELETED,
+                    entityType: 'user',
+                    entityId: (string) $id,
+                    actorUserId: $actorUserId,
+                    organizationId: $organizationId,
+                    beforeJson: $before,
+                    afterJson: null,
+                );
+            },
         );
     }
 }

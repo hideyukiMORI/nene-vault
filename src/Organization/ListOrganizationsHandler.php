@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace NeneVault\Organization;
 
 use Nene2\Http\JsonResponseFactory;
+use Nene2\Http\PaginationQueryParser;
+use Nene2\Http\PaginationResponse;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
@@ -18,18 +20,18 @@ final readonly class ListOrganizationsHandler
 
     public function handle(ServerRequestInterface $request): ResponseInterface
     {
-        $params = $request->getQueryParams();
-        $limit = min(100, max(1, (int) ($params['limit'] ?? 20)));
-        $offset = max(0, (int) ($params['offset'] ?? 0));
+        $pagination = PaginationQueryParser::parse($request);
 
-        $output = $this->useCase->execute(new ListOrganizationsInput($limit, $offset));
+        $output = $this->useCase->execute(new ListOrganizationsInput($pagination->limit, $pagination->offset));
 
-        return $this->response->create([
-            'items'  => array_map(fn (Organization $o) => $this->toArray($o), $output->items),
-            'total'  => $output->total,
-            'limit'  => $output->limit,
-            'offset' => $output->offset,
-        ]);
+        return $this->response->create(
+            (new PaginationResponse(
+                items: array_map(fn (Organization $o) => $this->toArray($o), $output->items),
+                limit: $output->limit,
+                offset: $output->offset,
+                total: $output->total,
+            ))->toArray(),
+        );
     }
 
     /** @return array<string, mixed> */
