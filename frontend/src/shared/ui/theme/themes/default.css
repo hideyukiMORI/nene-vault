@@ -1231,10 +1231,13 @@
     stroke: currentColor;
     display: block;
   }
+  /* keep the chevron vertically centered even when 対象/変更内容 wrap and the
+     row grows tall; the base `table.tbl tbody td { vertical-align: top }` rule
+     would otherwise win on specificity, so !important guarantees we override it */
   td.chev-cell {
-    width: 1%;
-    text-align: right;
-    vertical-align: middle;
+    width: 34px;
+    text-align: center;
+    vertical-align: middle !important;
     line-height: 0;
   }
 
