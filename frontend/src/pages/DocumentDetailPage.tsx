@@ -1,6 +1,11 @@
 import { useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { useDocumentById, useOcrSuggest } from '@/entities/document';
+import {
+  useDocumentById,
+  useDocumentFile,
+  fetchDocumentBlob,
+  useOcrSuggest,
+} from '@/entities/document';
 import { useDocumentHistory } from '@/entities/audit';
 import { authStore } from '@/entities/auth';
 import {
@@ -8,12 +13,12 @@ import {
   RestoreModal,
   MetadataEditModal,
   DocumentHistoryTable,
+  DocumentPreview,
 } from '@/features/document-detail';
 import type { OcrPrefill } from '@/features/document-detail';
 import { useTranslation } from '@/shared/i18n/use-translation';
 import { formatJpy, formatDate, formatDateTime } from '@/shared/lib/format';
 import { AppShell, Button, Callout, EmptyState } from '@/shared/ui';
-import { env } from '@/shared/config/env';
 
 type Modal = 'void' | 'restore' | 'metadata-edit' | null;
 
@@ -30,6 +35,23 @@ export function DocumentDetailPage() {
   const { data: doc, isLoading, isError } = useDocumentById(docId);
   const { data: history } = useDocumentHistory(docId);
 
+  // The download/preview endpoint is keyed by the version's ULID, which only the
+  // history response carries — the document detail exposes just the ordinal number.
+  const currentVersion =
+    doc !== undefined
+      ? history?.versions.find((v) => v.version_number === doc.version_number)
+      : undefined;
+  const file = useDocumentFile(
+    doc !== undefined && currentVersion !== undefined
+      ? {
+          documentId: doc.id,
+          versionId: currentVersion.id,
+          sha256: currentVersion.file_sha256,
+          mimeType: currentVersion.mime_type,
+        }
+      : undefined,
+  );
+
   function handleLogout() {
     authStore.clearSession();
     navigate('/login', { replace: true });
@@ -44,16 +66,19 @@ export function DocumentDetailPage() {
     setModal('metadata-edit');
   }
 
-  function handleDownload() {
-    if (doc === undefined) return;
-    const base = env.apiBaseUrl.replace(/\/$/, '');
-    const url = `${base}/admin/vault/documents/${doc.id}/versions/${String(doc.version_number)}/download`;
+  async function handleDownload() {
+    if (doc === undefined || currentVersion === undefined) return;
+    // Reuse the already-fetched, integrity-verified bytes when available; otherwise
+    // fetch through the authenticated client (a plain <a href> would drop the bearer token).
+    const blob = file.blob ?? (await fetchDocumentBlob(doc.id, currentVersion.id));
+    const objectUrl = URL.createObjectURL(blob);
     const a = document.createElement('a');
-    a.href = url;
+    a.href = objectUrl;
     a.download = doc.original_filename ?? `document-${doc.id}`;
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
+    URL.revokeObjectURL(objectUrl);
   }
 
   return (
@@ -102,7 +127,13 @@ export function DocumentDetailPage() {
             </div>
 
             <div className="row gap-sm wrap">
-              <Button variant="secondary" onClick={handleDownload}>
+              <Button
+                variant="secondary"
+                onClick={() => {
+                  void handleDownload();
+                }}
+                disabled={currentVersion === undefined}
+              >
                 {t('document.detail.download_button')}
               </Button>
               <Button
@@ -194,6 +225,9 @@ export function DocumentDetailPage() {
             <div className="row gap-sm mb-stack-md">
               <span className="tick" />
               <h2 className="subtitle">{t('document.detail.file_section')}</h2>
+            </div>
+            <div className="preview-block">
+              <DocumentPreview file={file} />
             </div>
             <dl className="dl">
               <div>

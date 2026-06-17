@@ -295,6 +295,15 @@
       "date_uncertain_badge": "Date uncertain",
       "metadata_unconfirmed_badge": "Metadata unconfirmed"
     },
+    "preview": {
+      "loading": "Loading preview…",
+      "error": "Could not retrieve the file.",
+      "integrity_verified": "Integrity verified (SHA-256 match)",
+      "integrity_mismatch": "Integrity error: does not match the stored hash. Preview hidden.",
+      "image_alt": "Received document preview",
+      "pdf_title": "PDF preview",
+      "unsupported": "This format cannot be previewed. Please download to view."
+    },
     "metadata": {
       "transaction_date": "Transaction Date",
       "amount_cents": "Amount (JPY)",

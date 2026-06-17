@@ -67,6 +67,7 @@ immutable, and traceable** — Vault does not pretend to be the ledger.
 | D8 | Multi-tenant isolation, RBAC, audit events for upload/void/metadata change | ADR 0006 |
 | D9 | Admin UI + REST API + MCP (read-heavy; write with auth) | NENE2 inheritance |
 | D10 | Tier A installer + release ZIP beside other NeNe back-office apps | ADR 0003 |
+| D11 | Display **integrity-verified inline preview** of stored bytes (image/PDF) in the Admin UI; SHA-256 is re-checked client-side and bytes are hidden on mismatch | 可視性の確保 · 税務調査の現場提示 |
 
 ---
 

@@ -303,6 +303,15 @@
       "date_uncertain_badge": "日付未確定",
       "metadata_unconfirmed_badge": "メタデータ未確認"
     },
+    "preview": {
+      "loading": "プレビューを読み込み中…",
+      "error": "ファイルを取得できませんでした。",
+      "integrity_verified": "整合性検証済み（SHA-256 一致）",
+      "integrity_mismatch": "整合性エラー：保存されたハッシュと一致しません。プレビューを表示しません。",
+      "image_alt": "受領書類のプレビュー",
+      "pdf_title": "PDF プレビュー",
+      "unsupported": "この形式はプレビューに対応していません。ダウンロードしてご確認ください。"
+    },
     "metadata": {
       "transaction_date": "取引年月日",
       "amount_cents": "取引金額",

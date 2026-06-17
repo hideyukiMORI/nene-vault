@@ -569,6 +569,31 @@
     border-bottom: 1px solid var(--color-line);
   }
 
+  /* ---- document preview ---- */
+  .preview-block {
+    margin-bottom: 18px;
+  }
+  .preview-frame {
+    display: block;
+    width: 100%;
+    max-height: 560px;
+    object-fit: contain;
+    background: var(--color-surface-muted, #f4f1ea);
+    border: 1px solid var(--color-line);
+    border-radius: var(--radius-sm);
+  }
+  .preview-pdf {
+    height: 560px;
+  }
+  .preview-empty {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 160px;
+    color: var(--color-text-muted, #6b6456);
+    font-size: var(--text-sm);
+  }
+
   /* ---- buttons ---- */
   .btn {
     font: inherit;

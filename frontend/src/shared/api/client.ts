@@ -60,6 +60,31 @@ async function request<T>(path: string, options: RequestOptions = {}): Promise<T
   return (await response.json()) as T;
 }
 
+async function requestBlob(path: string, signal?: AbortSignal): Promise<Blob> {
+  const base = env.apiBaseUrl.replace(/\/$/, '');
+  const url = `${base}${path}`;
+  const headers: Record<string, string> = {};
+
+  const token = authStore.getToken();
+  if (token !== null) {
+    headers['Authorization'] = `Bearer ${token}`;
+  }
+
+  const init: RequestInit = { method: 'GET', headers, credentials: 'include' };
+  if (signal !== undefined) {
+    init.signal = signal;
+  }
+
+  const response = await fetch(url, init);
+
+  if (!response.ok) {
+    handleAuthError(response, path);
+    throw await parseProblemDetails(response);
+  }
+
+  return await response.blob();
+}
+
 async function uploadFormData<T>(path: string, formData: FormData): Promise<T> {
   const base = env.apiBaseUrl.replace(/\/$/, '');
   const url = `${base}${path}`;
@@ -100,5 +125,8 @@ export const apiClient = {
   },
   upload<T>(path: string, formData: FormData): Promise<T> {
     return uploadFormData<T>(path, formData);
+  },
+  getBlob(path: string, signal?: AbortSignal): Promise<Blob> {
+    return requestBlob(path, signal);
   },
 };
