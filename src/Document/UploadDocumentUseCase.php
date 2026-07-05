@@ -5,10 +5,11 @@ declare(strict_types=1);
 namespace NeneVault\Document;
 
 use Closure;
+use Nene2\Audit\AuditEvent;
+use Nene2\Audit\AuditRecorderFactoryInterface;
 use Nene2\Database\DatabaseQueryExecutorInterface;
 use Nene2\Database\DatabaseTransactionManagerInterface;
 use NeneVault\Audit\AuditAction;
-use NeneVault\Audit\AuditRecorderInterface;
 use NeneVault\DocumentVersion\DocumentStorageInterface;
 use NeneVault\DocumentVersion\DocumentVersion;
 use NeneVault\DocumentVersion\DocumentVersionRepositoryInterface;
@@ -26,7 +27,6 @@ final readonly class UploadDocumentUseCase implements UploadDocumentUseCaseInter
      * @param Closure(DatabaseQueryExecutorInterface): VaultDocumentRepositoryInterface    $documentRepository
      * @param Closure(DatabaseQueryExecutorInterface): DocumentVersionRepositoryInterface  $versionRepository
      * @param Closure(DatabaseQueryExecutorInterface): VaultSettingsRepositoryInterface    $settingsRepository
-     * @param Closure(DatabaseQueryExecutorInterface): AuditRecorderInterface              $auditRecorder
      */
     public function __construct(
         private DatabaseTransactionManagerInterface $transactionManager,
@@ -34,7 +34,7 @@ final readonly class UploadDocumentUseCase implements UploadDocumentUseCaseInter
         private Closure $versionRepository,
         private DocumentStorageInterface $storage,
         private Closure $settingsRepository,
-        private Closure $auditRecorder,
+        private AuditRecorderFactoryInterface $auditRecorderFactory,
         private int $maxFileSizeBytes,
     ) {
     }
@@ -59,7 +59,7 @@ final readonly class UploadDocumentUseCase implements UploadDocumentUseCaseInter
                 $documents = ($this->documentRepository)($executor);
                 $versions = ($this->versionRepository)($executor);
                 $settings = ($this->settingsRepository)($executor);
-                $audit = ($this->auditRecorder)($executor);
+                $audit = $this->auditRecorderFactory->forExecutor($executor);
 
                 // Duplicate detection (§3.5)
                 if (!$input->confirmDuplicate && $versions->existsBySha256($sha256, $input->organizationId)) {
@@ -124,17 +124,19 @@ final readonly class UploadDocumentUseCase implements UploadDocumentUseCaseInter
 
                 $documents->save($document);
 
-                // 6. Audit (ADR 0014) — no secrets in snapshot; file_path excluded
-                $audit->record(
+                // 6. Audit (ADR 0014) — no secrets in snapshot; file_path excluded.
+                // AuditTableConfig has no `source` column axis: fold the upload channel
+                // into metadata (AuditEventPresenter derives it back out on read).
+                $audit->record(new AuditEvent(
                     action: AuditAction::DOCUMENT_UPLOADED,
                     entityType: 'vault_document',
                     entityId: $documentId,
-                    actorUserId: $input->actorUserId,
+                    actorId: $input->actorUserId,
                     organizationId: $input->organizationId,
-                    beforeJson: null,
-                    afterJson: $this->toAuditArray($document, $sha256, $versionNumber),
-                    source: $input->source,
-                );
+                    before: null,
+                    after: $this->toAuditArray($document, $sha256, $versionNumber),
+                    metadata: ['source' => $input->source],
+                ));
 
                 return new UploadDocumentOutput(
                     document: $document,

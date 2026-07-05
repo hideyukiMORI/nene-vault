@@ -6,16 +6,14 @@ namespace NeneVault\Document;
 
 use Closure;
 use LogicException;
+use Nene2\Audit\AuditEventRepositoryInterface;
+use Nene2\Audit\AuditRecorderFactoryInterface;
 use Nene2\Database\DatabaseQueryExecutorInterface;
 use Nene2\Database\DatabaseTransactionManagerInterface;
 use Nene2\DependencyInjection\ContainerBuilder;
 use Nene2\DependencyInjection\ServiceProviderInterface;
 use Nene2\Error\ProblemDetailsResponseFactory;
 use Nene2\Http\JsonResponseFactory;
-use NeneVault\Audit\AuditEventRepositoryInterface;
-use NeneVault\Audit\AuditRecorder;
-use NeneVault\Audit\AuditRecorderInterface;
-use NeneVault\Audit\PdoAuditEventRepository;
 use NeneVault\DocumentVersion\DocumentStorageInterface;
 use NeneVault\DocumentVersion\DocumentVersionRepositoryInterface;
 use NeneVault\DocumentVersion\LocalFilesystemDocumentStorage;
@@ -100,7 +98,7 @@ final readonly class DocumentServiceProvider implements ServiceProviderInterface
                         self::versionRepositoryFactory(),
                         $storage,
                         self::settingsRepositoryFactory(),
-                        self::auditRecorderFactory(),
+                        self::auditRecorderFactory($c),
                         $maxMb * 1024 * 1024,
                     );
                 },
@@ -141,7 +139,7 @@ final readonly class DocumentServiceProvider implements ServiceProviderInterface
                         self::tx($c),
                         self::documentRepositoryFactory(),
                         self::versionRepositoryFactory(),
-                        self::auditRecorderFactory(),
+                        self::auditRecorderFactory($c),
                     );
                 },
             )
@@ -152,7 +150,7 @@ final readonly class DocumentServiceProvider implements ServiceProviderInterface
                         self::tx($c),
                         self::documentRepositoryFactory(),
                         self::versionRepositoryFactory(),
-                        self::auditRecorderFactory(),
+                        self::auditRecorderFactory($c),
                     );
                 },
             )
@@ -163,7 +161,7 @@ final readonly class DocumentServiceProvider implements ServiceProviderInterface
                         self::tx($c),
                         self::documentRepositoryFactory(),
                         self::versionRepositoryFactory(),
-                        self::auditRecorderFactory(),
+                        self::auditRecorderFactory($c),
                     );
                 },
             )
@@ -488,10 +486,15 @@ final readonly class DocumentServiceProvider implements ServiceProviderInterface
         return static fn (DatabaseQueryExecutorInterface $e): VaultSettingsRepositoryInterface => new PdoVaultSettingsRepository($e);
     }
 
-    /** @return Closure(DatabaseQueryExecutorInterface): AuditRecorderInterface */
-    private static function auditRecorderFactory(): Closure
+    private static function auditRecorderFactory(ContainerInterface $c): AuditRecorderFactoryInterface
     {
-        return static fn (DatabaseQueryExecutorInterface $e): AuditRecorderInterface => new AuditRecorder(new PdoAuditEventRepository($e));
+        $f = $c->get(AuditRecorderFactoryInterface::class);
+
+        if (!$f instanceof AuditRecorderFactoryInterface) {
+            throw new LogicException('AuditRecorderFactoryInterface service is invalid.');
+        }
+
+        return $f;
     }
 
     private static function json(ContainerInterface $c): JsonResponseFactory

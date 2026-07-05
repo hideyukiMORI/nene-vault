@@ -5,22 +5,22 @@ declare(strict_types=1);
 namespace NeneVault\User;
 
 use Closure;
+use Nene2\Audit\AuditEvent;
+use Nene2\Audit\AuditRecorderFactoryInterface;
 use Nene2\Database\DatabaseQueryExecutorInterface;
 use Nene2\Database\DatabaseTransactionManagerInterface;
 use NeneVault\Audit\AuditAction;
-use NeneVault\Audit\AuditRecorderInterface;
 use NeneVault\Auth\UserRepositoryInterface;
 
 final readonly class DeleteUserUseCase implements DeleteUserUseCaseInterface
 {
     /**
      * @param Closure(DatabaseQueryExecutorInterface): UserRepositoryInterface $userRepository
-     * @param Closure(DatabaseQueryExecutorInterface): AuditRecorderInterface  $auditRecorder
      */
     public function __construct(
         private DatabaseTransactionManagerInterface $transactionManager,
         private Closure $userRepository,
-        private Closure $auditRecorder,
+        private AuditRecorderFactoryInterface $auditRecorderFactory,
     ) {
     }
 
@@ -33,7 +33,7 @@ final readonly class DeleteUserUseCase implements DeleteUserUseCaseInterface
         $this->transactionManager->transactional(
             function (DatabaseQueryExecutorInterface $executor) use ($id, $organizationId, $actorUserId): void {
                 $users = ($this->userRepository)($executor);
-                $audit = ($this->auditRecorder)($executor);
+                $audit = $this->auditRecorderFactory->forExecutor($executor);
 
                 $user = $users->findById($id);
 
@@ -45,15 +45,15 @@ final readonly class DeleteUserUseCase implements DeleteUserUseCaseInterface
 
                 $users->delete($id);
 
-                $audit->record(
+                $audit->record(new AuditEvent(
                     action: AuditAction::USER_DELETED,
                     entityType: 'user',
                     entityId: (string) $id,
-                    actorUserId: $actorUserId,
+                    actorId: $actorUserId,
                     organizationId: $organizationId,
-                    beforeJson: $before,
-                    afterJson: null,
-                );
+                    before: $before,
+                    after: null,
+                ));
             },
         );
     }

@@ -43,29 +43,11 @@ final readonly class ListAuditEventsHandler
 
         return $this->response->create(
             (new PaginationResponse(
-                items: array_map($this->toArray(...), $output->items),
+                items: array_map(AuditEventPresenter::toArray(...), $output->items),
                 limit: $output->limit,
                 offset: $output->offset,
                 total: $output->total,
             ))->toArray(),
         );
-    }
-
-    /** @return array<string, mixed> */
-    private function toArray(AuditEvent $e): array
-    {
-        return [
-            'id'              => $e->id,
-            'action'          => $e->action,
-            'entity_type'     => $e->entityType,
-            'entity_id'       => $e->entityId,
-            'actor_user_id'   => $e->actorUserId,
-            'organization_id' => $e->organizationId,
-            'before_json'     => $e->beforeJson,
-            'after_json'      => $e->afterJson,
-            'source'          => $e->source,
-            'metadata_json'   => $e->metadataJson,
-            'created_at'      => $e->createdAt,
-        ];
     }
 }

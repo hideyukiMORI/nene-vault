@@ -5,14 +5,12 @@ declare(strict_types=1);
 namespace NeneVault\VaultSettings;
 
 use LogicException;
+use Nene2\Audit\AuditRecorderFactoryInterface;
 use Nene2\Database\DatabaseQueryExecutorInterface;
 use Nene2\Database\DatabaseTransactionManagerInterface;
 use Nene2\DependencyInjection\ContainerBuilder;
 use Nene2\DependencyInjection\ServiceProviderInterface;
 use Nene2\Http\JsonResponseFactory;
-use NeneVault\Audit\AuditRecorder;
-use NeneVault\Audit\AuditRecorderInterface;
-use NeneVault\Audit\PdoAuditEventRepository;
 use Psr\Container\ContainerInterface;
 
 final readonly class VaultSettingsServiceProvider implements ServiceProviderInterface
@@ -82,10 +80,16 @@ final readonly class VaultSettingsServiceProvider implements ServiceProviderInte
                         throw new LogicException('DatabaseTransactionManagerInterface service is invalid.');
                     }
 
+                    $audit = $c->get(AuditRecorderFactoryInterface::class);
+
+                    if (!$audit instanceof AuditRecorderFactoryInterface) {
+                        throw new LogicException('AuditRecorderFactoryInterface service is invalid.');
+                    }
+
                     return new UpdateVaultSettingsUseCase(
                         $tx,
                         static fn (DatabaseQueryExecutorInterface $e): VaultSettingsRepositoryInterface => new PdoVaultSettingsRepository($e),
-                        static fn (DatabaseQueryExecutorInterface $e): AuditRecorderInterface => new AuditRecorder(new PdoAuditEventRepository($e)),
+                        $audit,
                     );
                 },
             )

@@ -5,14 +5,12 @@ declare(strict_types=1);
 namespace NeneVault\Tests\Organization;
 
 use Nene2\Database\DatabaseQueryExecutorInterface;
-use NeneVault\Audit\AuditRecorder;
-use NeneVault\Audit\AuditRecorderInterface;
 use NeneVault\Organization\CreateOrganizationInput;
 use NeneVault\Organization\CreateOrganizationUseCase;
 use NeneVault\Organization\Organization;
 use NeneVault\Organization\OrganizationRepositoryInterface;
 use NeneVault\Organization\OrganizationSlugConflictException;
-use NeneVault\Tests\Audit\InMemoryAuditEventRepository;
+use NeneVault\Tests\Audit\InMemoryAuditRecorderFactory;
 use NeneVault\Tests\Support\SynchronousTransactionManager;
 use NeneVault\VaultSettings\VaultSettingsSeederInterface;
 use PHPUnit\Framework\TestCase;
@@ -23,12 +21,12 @@ final class CreateOrganizationUseCaseTest extends TestCase
     {
         $repo = new InMemoryOrganizationRepository();
         $seeder = new InMemoryVaultSettingsSeeder();
-        $auditRepo = new InMemoryAuditEventRepository();
+        $auditFactory = new InMemoryAuditRecorderFactory();
         $useCase = new CreateOrganizationUseCase(
             new SynchronousTransactionManager(),
             static fn (DatabaseQueryExecutorInterface $e): OrganizationRepositoryInterface => $repo,
             static fn (DatabaseQueryExecutorInterface $e): VaultSettingsSeederInterface => $seeder,
-            static fn (DatabaseQueryExecutorInterface $e): AuditRecorderInterface => new AuditRecorder($auditRepo),
+            $auditFactory,
         );
 
         $output = $useCase->execute(new CreateOrganizationInput(
@@ -46,22 +44,22 @@ final class CreateOrganizationUseCaseTest extends TestCase
     {
         $repo = new InMemoryOrganizationRepository();
         $seeder = new InMemoryVaultSettingsSeeder();
-        $auditRepo = new InMemoryAuditEventRepository();
+        $auditFactory = new InMemoryAuditRecorderFactory();
         $useCase = new CreateOrganizationUseCase(
             new SynchronousTransactionManager(),
             static fn (DatabaseQueryExecutorInterface $e): OrganizationRepositoryInterface => $repo,
             static fn (DatabaseQueryExecutorInterface $e): VaultSettingsSeederInterface => $seeder,
-            static fn (DatabaseQueryExecutorInterface $e): AuditRecorderInterface => new AuditRecorder($auditRepo),
+            $auditFactory,
         );
 
         $useCase->execute(new CreateOrganizationInput(name: 'Test', slug: 'test', actorUserId: 7));
 
-        $events = $auditRepo->all();
+        $events = $auditFactory->all();
         $this->assertCount(1, $events);
         $this->assertSame('organization.created', $events[0]->action);
-        $this->assertSame(7, $events[0]->actorUserId);
-        $this->assertNull($events[0]->beforeJson);
-        $this->assertNotNull($events[0]->afterJson);
+        $this->assertSame(7, $events[0]->actorId);
+        $this->assertNull($events[0]->before);
+        $this->assertNotNull($events[0]->after);
     }
 
     public function test_throws_when_slug_already_exists(): void
@@ -72,7 +70,7 @@ final class CreateOrganizationUseCaseTest extends TestCase
             new SynchronousTransactionManager(),
             static fn (DatabaseQueryExecutorInterface $e): OrganizationRepositoryInterface => $repo,
             static fn (DatabaseQueryExecutorInterface $e): VaultSettingsSeederInterface => $seeder,
-            static fn (DatabaseQueryExecutorInterface $e): AuditRecorderInterface => new AuditRecorder(new InMemoryAuditEventRepository()),
+            new InMemoryAuditRecorderFactory(),
         );
 
         $useCase->execute(new CreateOrganizationInput(name: 'First', slug: 'acme'));

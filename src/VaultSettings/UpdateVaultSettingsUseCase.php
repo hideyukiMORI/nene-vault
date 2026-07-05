@@ -5,21 +5,21 @@ declare(strict_types=1);
 namespace NeneVault\VaultSettings;
 
 use Closure;
+use Nene2\Audit\AuditEvent;
+use Nene2\Audit\AuditRecorderFactoryInterface;
 use Nene2\Database\DatabaseQueryExecutorInterface;
 use Nene2\Database\DatabaseTransactionManagerInterface;
 use NeneVault\Audit\AuditAction;
-use NeneVault\Audit\AuditRecorderInterface;
 
 final readonly class UpdateVaultSettingsUseCase implements UpdateVaultSettingsUseCaseInterface
 {
     /**
      * @param Closure(DatabaseQueryExecutorInterface): VaultSettingsRepositoryInterface $settingsRepository
-     * @param Closure(DatabaseQueryExecutorInterface): AuditRecorderInterface           $auditRecorder
      */
     public function __construct(
         private DatabaseTransactionManagerInterface $transactionManager,
         private Closure $settingsRepository,
-        private Closure $auditRecorder,
+        private AuditRecorderFactoryInterface $auditRecorderFactory,
     ) {
     }
 
@@ -28,7 +28,7 @@ final readonly class UpdateVaultSettingsUseCase implements UpdateVaultSettingsUs
         return $this->transactionManager->transactional(
             function (DatabaseQueryExecutorInterface $executor) use ($input): VaultSettings {
                 $settings = ($this->settingsRepository)($executor);
-                $audit = ($this->auditRecorder)($executor);
+                $audit = $this->auditRecorderFactory->forExecutor($executor);
 
                 $current = $settings->findByOrganizationId($input->organizationId);
                 $beforeJson = $current !== null ? $this->toAuditArray($current) : null;
@@ -50,15 +50,15 @@ final readonly class UpdateVaultSettingsUseCase implements UpdateVaultSettingsUs
 
                 $refreshed = $settings->findByOrganizationId($input->organizationId) ?? $updated;
 
-                $audit->record(
+                $audit->record(new AuditEvent(
                     action: AuditAction::VAULT_SETTINGS_CHANGED,
                     entityType: 'vault_settings',
                     entityId: (string) $input->organizationId,
-                    actorUserId: $input->actorUserId,
+                    actorId: $input->actorUserId,
                     organizationId: $input->organizationId,
-                    beforeJson: $beforeJson,
-                    afterJson: $this->toAuditArray($refreshed),
-                );
+                    before: $beforeJson,
+                    after: $this->toAuditArray($refreshed),
+                ));
 
                 return $refreshed;
             },

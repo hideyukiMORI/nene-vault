@@ -5,21 +5,21 @@ declare(strict_types=1);
 namespace NeneVault\Organization;
 
 use Closure;
+use Nene2\Audit\AuditEvent;
+use Nene2\Audit\AuditRecorderFactoryInterface;
 use Nene2\Database\DatabaseQueryExecutorInterface;
 use Nene2\Database\DatabaseTransactionManagerInterface;
 use NeneVault\Audit\AuditAction;
-use NeneVault\Audit\AuditRecorderInterface;
 
 final readonly class DeleteOrganizationUseCase implements DeleteOrganizationUseCaseInterface
 {
     /**
      * @param Closure(DatabaseQueryExecutorInterface): OrganizationRepositoryInterface $organizationRepository
-     * @param Closure(DatabaseQueryExecutorInterface): AuditRecorderInterface          $auditRecorder
      */
     public function __construct(
         private DatabaseTransactionManagerInterface $transactionManager,
         private Closure $organizationRepository,
-        private Closure $auditRecorder,
+        private AuditRecorderFactoryInterface $auditRecorderFactory,
     ) {
     }
 
@@ -28,7 +28,7 @@ final readonly class DeleteOrganizationUseCase implements DeleteOrganizationUseC
         $this->transactionManager->transactional(
             function (DatabaseQueryExecutorInterface $executor) use ($id, $actorUserId): void {
                 $organizations = ($this->organizationRepository)($executor);
-                $audit = ($this->auditRecorder)($executor);
+                $audit = $this->auditRecorderFactory->forExecutor($executor);
 
                 $org = $organizations->findById($id);
 
@@ -49,15 +49,15 @@ final readonly class DeleteOrganizationUseCase implements DeleteOrganizationUseC
 
                 $organizations->delete($id);
 
-                $audit->record(
+                $audit->record(new AuditEvent(
                     action: AuditAction::ORGANIZATION_DELETED,
                     entityType: 'organization',
                     entityId: (string) $id,
-                    actorUserId: $actorUserId,
+                    actorId: $actorUserId,
                     organizationId: null,
-                    beforeJson: $beforeJson,
-                    afterJson: null,
-                );
+                    before: $beforeJson,
+                    after: null,
+                ));
             },
         );
     }

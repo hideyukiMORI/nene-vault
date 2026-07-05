@@ -6,15 +6,13 @@ namespace NeneVault\User;
 
 use Closure;
 use LogicException;
+use Nene2\Audit\AuditRecorderFactoryInterface;
 use Nene2\Database\DatabaseQueryExecutorInterface;
 use Nene2\Database\DatabaseTransactionManagerInterface;
 use Nene2\DependencyInjection\ContainerBuilder;
 use Nene2\DependencyInjection\ServiceProviderInterface;
 use Nene2\Error\ProblemDetailsResponseFactory;
 use Nene2\Http\JsonResponseFactory;
-use NeneVault\Audit\AuditRecorder;
-use NeneVault\Audit\AuditRecorderInterface;
-use NeneVault\Audit\PdoAuditEventRepository;
 use NeneVault\Auth\PdoUserRepository;
 use NeneVault\Auth\UserRepositoryInterface;
 use Psr\Container\ContainerInterface;
@@ -28,17 +26,17 @@ final readonly class UserServiceProvider implements ServiceProviderInterface
             ->set(
                 CreateUserUseCaseInterface::class,
                 static fn (ContainerInterface $c): CreateUserUseCaseInterface
-                    => new CreateUserUseCase(self::tx($c), self::usersFactory(), self::auditFactory()),
+                    => new CreateUserUseCase(self::tx($c), self::usersFactory(), self::auditFactory($c)),
             )
             ->set(
                 UpdateUserUseCaseInterface::class,
                 static fn (ContainerInterface $c): UpdateUserUseCaseInterface
-                    => new UpdateUserUseCase(self::tx($c), self::usersFactory(), self::auditFactory()),
+                    => new UpdateUserUseCase(self::tx($c), self::usersFactory(), self::auditFactory($c)),
             )
             ->set(
                 DeleteUserUseCaseInterface::class,
                 static fn (ContainerInterface $c): DeleteUserUseCaseInterface
-                    => new DeleteUserUseCase(self::tx($c), self::usersFactory(), self::auditFactory()),
+                    => new DeleteUserUseCase(self::tx($c), self::usersFactory(), self::auditFactory($c)),
             )
             ->set(
                 ListUsersUseCaseInterface::class,
@@ -177,10 +175,15 @@ final readonly class UserServiceProvider implements ServiceProviderInterface
         return static fn (DatabaseQueryExecutorInterface $e): UserRepositoryInterface => new PdoUserRepository($e);
     }
 
-    /** @return Closure(DatabaseQueryExecutorInterface): AuditRecorderInterface */
-    private static function auditFactory(): Closure
+    private static function auditFactory(ContainerInterface $c): AuditRecorderFactoryInterface
     {
-        return static fn (DatabaseQueryExecutorInterface $e): AuditRecorderInterface => new AuditRecorder(new PdoAuditEventRepository($e));
+        $f = $c->get(AuditRecorderFactoryInterface::class);
+
+        if (!$f instanceof AuditRecorderFactoryInterface) {
+            throw new LogicException('AuditRecorderFactoryInterface service is invalid.');
+        }
+
+        return $f;
     }
 
     private static function json(ContainerInterface $c): JsonResponseFactory

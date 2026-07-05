@@ -4,7 +4,8 @@ declare(strict_types=1);
 
 namespace NeneVault\Document;
 
-use NeneVault\Audit\AuditEventRepositoryInterface;
+use Nene2\Audit\AuditEventRepositoryInterface;
+use Nene2\Audit\AuditQuery;
 use NeneVault\DocumentVersion\DocumentVersionRepositoryInterface;
 
 final readonly class GetDocumentHistoryUseCase implements GetDocumentHistoryUseCaseInterface
@@ -19,7 +20,7 @@ final readonly class GetDocumentHistoryUseCase implements GetDocumentHistoryUseC
     }
 
     /**
-     * @return array{versions: list<\NeneVault\DocumentVersion\DocumentVersion>, audit_events: list<\NeneVault\Audit\AuditEvent>}
+     * @return array{versions: list<\NeneVault\DocumentVersion\DocumentVersion>, audit_events: list<\Nene2\Audit\AuditEvent>}
      */
     public function execute(string $documentId, int $organizationId): array
     {
@@ -31,12 +32,12 @@ final readonly class GetDocumentHistoryUseCase implements GetDocumentHistoryUseC
 
         $versions = $this->versions->listByDocumentId($documentId, $organizationId);
 
-        $auditEvents = $this->auditEvents->findByCriteria(
-            [
-                'organization_id' => $organizationId,
-                'entity_type' => 'vault_document',
-                'entity_id' => $documentId,
-            ],
+        $auditEvents = $this->auditEvents->query(
+            new AuditQuery(
+                organizationId: $organizationId,
+                entityType: 'vault_document',
+                entityId: $documentId,
+            ),
             self::MAX_EVENTS,
             0,
         );

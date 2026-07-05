@@ -5,8 +5,6 @@ declare(strict_types=1);
 namespace NeneVault\Tests\Document;
 
 use Nene2\Database\DatabaseQueryExecutorInterface;
-use NeneVault\Audit\AuditRecorder;
-use NeneVault\Audit\AuditRecorderInterface;
 use NeneVault\Document\DuplicateFileException;
 use NeneVault\Document\FileTooLargeException;
 use NeneVault\Document\MimeTypeNotAllowedException;
@@ -17,7 +15,7 @@ use NeneVault\Document\VaultDocumentRepositoryInterface;
 use NeneVault\DocumentVersion\DocumentStorageInterface;
 use NeneVault\DocumentVersion\DocumentVersion;
 use NeneVault\DocumentVersion\DocumentVersionRepositoryInterface;
-use NeneVault\Tests\Audit\InMemoryAuditEventRepository;
+use NeneVault\Tests\Audit\InMemoryAuditRecorderFactory;
 use NeneVault\Tests\Support\SynchronousTransactionManager;
 use NeneVault\VaultSettings\VaultSettings;
 use NeneVault\VaultSettings\VaultSettingsRepositoryInterface;
@@ -33,14 +31,14 @@ final class UploadDocumentUseCaseTest extends TestCase
         $versions = new InMemoryDocumentVersionRepository();
         $storage = new FakeDocumentStorage('abc123sha');
         $settings = new FakeVaultSettingsRepository(retentionYears: 10);
-        $auditRepo = new InMemoryAuditEventRepository();
+        $auditFactory = new InMemoryAuditRecorderFactory();
         $useCase = new UploadDocumentUseCase(
             new SynchronousTransactionManager(),
             static fn (DatabaseQueryExecutorInterface $e): VaultDocumentRepositoryInterface => $docs,
             static fn (DatabaseQueryExecutorInterface $e): DocumentVersionRepositoryInterface => $versions,
             $storage,
             static fn (DatabaseQueryExecutorInterface $e): VaultSettingsRepositoryInterface => $settings,
-            static fn (DatabaseQueryExecutorInterface $e): AuditRecorderInterface => new AuditRecorder($auditRepo),
+            $auditFactory,
             self::MAX_BYTES,
         );
 
@@ -57,13 +55,13 @@ final class UploadDocumentUseCaseTest extends TestCase
         $this->assertCount(1, $docs->all());
         $this->assertCount(1, $versions->all());
 
-        $events = $auditRepo->all();
+        $events = $auditFactory->all();
         $this->assertCount(1, $events);
         $this->assertSame('document.uploaded', $events[0]->action);
-        $this->assertNull($events[0]->beforeJson);
-        $this->assertSame('abc123sha', $events[0]->afterJson['file_sha256'] ?? null);
+        $this->assertNull($events[0]->before);
+        $this->assertSame('abc123sha', $events[0]->after['file_sha256'] ?? null);
         // No storage path in the audit snapshot
-        $this->assertArrayNotHasKey('file_path', $events[0]->afterJson ?? []);
+        $this->assertArrayNotHasKey('file_path', $events[0]->after ?? []);
     }
 
     public function test_null_transaction_date_sets_date_uncertain(): void
@@ -104,7 +102,7 @@ final class UploadDocumentUseCaseTest extends TestCase
             static fn (DatabaseQueryExecutorInterface $e): DocumentVersionRepositoryInterface => $versions,
             $storage,
             static fn (DatabaseQueryExecutorInterface $e): VaultSettingsRepositoryInterface => new FakeVaultSettingsRepository(10),
-            static fn (DatabaseQueryExecutorInterface $e): AuditRecorderInterface => new AuditRecorder(new InMemoryAuditEventRepository()),
+            new InMemoryAuditRecorderFactory(),
             self::MAX_BYTES,
         );
 
@@ -123,7 +121,7 @@ final class UploadDocumentUseCaseTest extends TestCase
             static fn (DatabaseQueryExecutorInterface $e): DocumentVersionRepositoryInterface => $versions,
             $storage,
             static fn (DatabaseQueryExecutorInterface $e): VaultSettingsRepositoryInterface => new FakeVaultSettingsRepository(10),
-            static fn (DatabaseQueryExecutorInterface $e): AuditRecorderInterface => new AuditRecorder(new InMemoryAuditEventRepository()),
+            new InMemoryAuditRecorderFactory(),
             self::MAX_BYTES,
         );
 
@@ -140,7 +138,7 @@ final class UploadDocumentUseCaseTest extends TestCase
             static fn (DatabaseQueryExecutorInterface $e): DocumentVersionRepositoryInterface => new InMemoryDocumentVersionRepository(),
             new FakeDocumentStorage('x'),
             static fn (DatabaseQueryExecutorInterface $e): VaultSettingsRepositoryInterface => new FakeVaultSettingsRepository(retentionYears: 7),
-            static fn (DatabaseQueryExecutorInterface $e): AuditRecorderInterface => new AuditRecorder(new InMemoryAuditEventRepository()),
+            new InMemoryAuditRecorderFactory(),
             self::MAX_BYTES,
         );
 
@@ -157,7 +155,7 @@ final class UploadDocumentUseCaseTest extends TestCase
             static fn (DatabaseQueryExecutorInterface $e): DocumentVersionRepositoryInterface => new InMemoryDocumentVersionRepository(),
             new FakeDocumentStorage('sha'),
             static fn (DatabaseQueryExecutorInterface $e): VaultSettingsRepositoryInterface => new FakeVaultSettingsRepository(10),
-            static fn (DatabaseQueryExecutorInterface $e): AuditRecorderInterface => new AuditRecorder(new InMemoryAuditEventRepository()),
+            new InMemoryAuditRecorderFactory(),
             self::MAX_BYTES,
         );
     }
