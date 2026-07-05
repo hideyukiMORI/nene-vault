@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace NeneVault\Export;
 
-use Closure;
+use Nene2\Audit\AuditEvent;
+use Nene2\Audit\AuditRecorderFactoryInterface;
 use Nene2\Database\DatabaseQueryExecutorInterface;
 use Nene2\Database\DatabaseTransactionManagerInterface;
 use NeneVault\Audit\AuditAction;
-use NeneVault\Audit\AuditRecorderInterface;
 use NeneVault\Document\DocumentSearchCriteria;
 use NeneVault\Document\VaultDocument;
 use NeneVault\Document\VaultDocumentRepositoryInterface;
@@ -33,14 +33,11 @@ final readonly class ExportDocumentsUseCase implements ExportDocumentsUseCaseInt
         'voided_at',
     ];
 
-    /**
-     * @param Closure(DatabaseQueryExecutorInterface): AuditRecorderInterface $auditRecorder
-     */
     public function __construct(
         private VaultDocumentRepositoryInterface $documents,
         private DocumentStorageInterface $storage,
         private DatabaseTransactionManagerInterface $transactionManager,
-        private Closure $auditRecorder,
+        private AuditRecorderFactoryInterface $auditRecorderFactory,
     ) {
     }
 
@@ -73,19 +70,19 @@ final readonly class ExportDocumentsUseCase implements ExportDocumentsUseCaseInt
         // One audit event per exported document — recorded atomically as a group.
         $this->transactionManager->transactional(
             function (DatabaseQueryExecutorInterface $executor) use ($rows, $filter, $input): void {
-                $audit = ($this->auditRecorder)($executor);
+                $audit = $this->auditRecorderFactory->forExecutor($executor);
 
                 foreach ($rows as [$document, $version]) {
-                    $audit->record(
+                    $audit->record(new AuditEvent(
                         action: AuditAction::DOCUMENT_EXPORTED,
                         entityType: 'vault_document',
                         entityId: $document->id,
-                        actorUserId: $input->actorUserId,
+                        actorId: $input->actorUserId,
                         organizationId: $input->organizationId,
-                        beforeJson: null,
-                        afterJson: null,
-                        metadataJson: ['export_filter' => $filter],
-                    );
+                        before: null,
+                        after: null,
+                        metadata: ['export_filter' => $filter],
+                    ));
                 }
             },
         );

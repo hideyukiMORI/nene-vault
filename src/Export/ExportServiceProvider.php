@@ -5,13 +5,10 @@ declare(strict_types=1);
 namespace NeneVault\Export;
 
 use LogicException;
-use Nene2\Database\DatabaseQueryExecutorInterface;
+use Nene2\Audit\AuditRecorderFactoryInterface;
 use Nene2\Database\DatabaseTransactionManagerInterface;
 use Nene2\DependencyInjection\ContainerBuilder;
 use Nene2\DependencyInjection\ServiceProviderInterface;
-use NeneVault\Audit\AuditRecorder;
-use NeneVault\Audit\AuditRecorderInterface;
-use NeneVault\Audit\PdoAuditEventRepository;
 use NeneVault\Document\VaultDocumentRepositoryInterface;
 use NeneVault\DocumentVersion\DocumentStorageInterface;
 use Psr\Container\ContainerInterface;
@@ -29,6 +26,7 @@ final readonly class ExportServiceProvider implements ServiceProviderInterface
                     $documents = $c->get(VaultDocumentRepositoryInterface::class);
                     $storage = $c->get(DocumentStorageInterface::class);
                     $tx = $c->get(DatabaseTransactionManagerInterface::class);
+                    $audit = $c->get(AuditRecorderFactoryInterface::class);
 
                     if (!$documents instanceof VaultDocumentRepositoryInterface) {
                         throw new LogicException('VaultDocumentRepositoryInterface service is invalid.');
@@ -42,11 +40,15 @@ final readonly class ExportServiceProvider implements ServiceProviderInterface
                         throw new LogicException('DatabaseTransactionManagerInterface service is invalid.');
                     }
 
+                    if (!$audit instanceof AuditRecorderFactoryInterface) {
+                        throw new LogicException('AuditRecorderFactoryInterface service is invalid.');
+                    }
+
                     return new ExportDocumentsUseCase(
                         $documents,
                         $storage,
                         $tx,
-                        static fn (DatabaseQueryExecutorInterface $e): AuditRecorderInterface => new AuditRecorder(new PdoAuditEventRepository($e)),
+                        $audit,
                     );
                 },
             )

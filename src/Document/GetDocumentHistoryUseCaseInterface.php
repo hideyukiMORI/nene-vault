@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace NeneVault\Document;
 
-use NeneVault\Audit\AuditEvent;
+use Nene2\Audit\AuditEvent;
 use NeneVault\DocumentVersion\DocumentVersion;
 
 interface GetDocumentHistoryUseCaseInterface

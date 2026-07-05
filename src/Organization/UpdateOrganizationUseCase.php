@@ -5,21 +5,21 @@ declare(strict_types=1);
 namespace NeneVault\Organization;
 
 use Closure;
+use Nene2\Audit\AuditEvent;
+use Nene2\Audit\AuditRecorderFactoryInterface;
 use Nene2\Database\DatabaseQueryExecutorInterface;
 use Nene2\Database\DatabaseTransactionManagerInterface;
 use NeneVault\Audit\AuditAction;
-use NeneVault\Audit\AuditRecorderInterface;
 
 final readonly class UpdateOrganizationUseCase implements UpdateOrganizationUseCaseInterface
 {
     /**
      * @param Closure(DatabaseQueryExecutorInterface): OrganizationRepositoryInterface $organizationRepository
-     * @param Closure(DatabaseQueryExecutorInterface): AuditRecorderInterface          $auditRecorder
      */
     public function __construct(
         private DatabaseTransactionManagerInterface $transactionManager,
         private Closure $organizationRepository,
-        private Closure $auditRecorder,
+        private AuditRecorderFactoryInterface $auditRecorderFactory,
     ) {
     }
 
@@ -28,7 +28,7 @@ final readonly class UpdateOrganizationUseCase implements UpdateOrganizationUseC
         return $this->transactionManager->transactional(
             function (DatabaseQueryExecutorInterface $executor) use ($input): UpdateOrganizationOutput {
                 $organizations = ($this->organizationRepository)($executor);
-                $audit = ($this->auditRecorder)($executor);
+                $audit = $this->auditRecorderFactory->forExecutor($executor);
 
                 $org = $organizations->findById($input->id);
 
@@ -51,15 +51,15 @@ final readonly class UpdateOrganizationUseCase implements UpdateOrganizationUseC
                 $refreshed = $organizations->findById($input->id);
                 assert($refreshed !== null);
 
-                $audit->record(
+                $audit->record(new AuditEvent(
                     action: AuditAction::ORGANIZATION_UPDATED,
                     entityType: 'organization',
                     entityId: (string) $input->id,
-                    actorUserId: $input->actorUserId,
+                    actorId: $input->actorUserId,
                     organizationId: null,
-                    beforeJson: $beforeJson,
-                    afterJson: $this->toAuditArray($refreshed),
-                );
+                    before: $beforeJson,
+                    after: $this->toAuditArray($refreshed),
+                ));
 
                 return new UpdateOrganizationOutput(
                     id: $refreshed->id ?? $input->id,

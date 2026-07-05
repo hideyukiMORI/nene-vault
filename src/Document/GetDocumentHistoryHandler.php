@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace NeneVault\Document;
 
+use Nene2\Audit\AuditEvent;
 use Nene2\Http\JsonResponseFactory;
 use Nene2\Routing\Router;
-use NeneVault\Audit\AuditEvent;
 use NeneVault\Auth\RequestContext;
 use NeneVault\DocumentVersion\DocumentVersion;
 use Psr\Http\Message\ResponseInterface;
@@ -59,11 +59,11 @@ final readonly class GetDocumentHistoryHandler
             'action'        => $e->action,
             'entity_type'   => $e->entityType,
             'entity_id'     => $e->entityId,
-            'actor_user_id' => $e->actorUserId,
-            'before_json'   => $e->beforeJson,
-            'after_json'    => $e->afterJson,
-            'metadata_json' => $e->metadataJson,
-            'created_at'    => $e->createdAt,
+            'actor_user_id' => $e->actorId !== null ? (int) $e->actorId : null,
+            'before_json'   => $e->before,
+            'after_json'    => $e->after,
+            'metadata_json' => $e->metadata,
+            'created_at'    => $e->occurredAt,
         ];
     }
 }

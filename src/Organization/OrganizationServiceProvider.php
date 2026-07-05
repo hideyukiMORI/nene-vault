@@ -5,15 +5,13 @@ declare(strict_types=1);
 namespace NeneVault\Organization;
 
 use LogicException;
+use Nene2\Audit\AuditRecorderFactoryInterface;
 use Nene2\Database\DatabaseQueryExecutorInterface;
 use Nene2\Database\DatabaseTransactionManagerInterface;
 use Nene2\DependencyInjection\ContainerBuilder;
 use Nene2\DependencyInjection\ServiceProviderInterface;
 use Nene2\Error\ProblemDetailsResponseFactory;
 use Nene2\Http\JsonResponseFactory;
-use NeneVault\Audit\AuditRecorder;
-use NeneVault\Audit\AuditRecorderInterface;
-use NeneVault\Audit\PdoAuditEventRepository;
 use NeneVault\VaultSettings\PdoVaultSettingsRepository;
 use NeneVault\VaultSettings\VaultSettingsSeederInterface;
 use Psr\Container\ContainerInterface;
@@ -50,7 +48,7 @@ final readonly class OrganizationServiceProvider implements ServiceProviderInter
                         $tx,
                         static fn (DatabaseQueryExecutorInterface $e): OrganizationRepositoryInterface => new PdoOrganizationRepository($e),
                         static fn (DatabaseQueryExecutorInterface $e): VaultSettingsSeederInterface => new PdoVaultSettingsRepository($e),
-                        static fn (DatabaseQueryExecutorInterface $e): AuditRecorderInterface => new AuditRecorder(new PdoAuditEventRepository($e)),
+                        self::auditFactory($c),
                     );
                 },
             )
@@ -90,7 +88,7 @@ final readonly class OrganizationServiceProvider implements ServiceProviderInter
                     return new UpdateOrganizationUseCase(
                         $tx,
                         static fn (DatabaseQueryExecutorInterface $e): OrganizationRepositoryInterface => new PdoOrganizationRepository($e),
-                        static fn (DatabaseQueryExecutorInterface $e): AuditRecorderInterface => new AuditRecorder(new PdoAuditEventRepository($e)),
+                        self::auditFactory($c),
                     );
                 },
             )
@@ -106,7 +104,7 @@ final readonly class OrganizationServiceProvider implements ServiceProviderInter
                     return new DeleteOrganizationUseCase(
                         $tx,
                         static fn (DatabaseQueryExecutorInterface $e): OrganizationRepositoryInterface => new PdoOrganizationRepository($e),
-                        static fn (DatabaseQueryExecutorInterface $e): AuditRecorderInterface => new AuditRecorder(new PdoAuditEventRepository($e)),
+                        self::auditFactory($c),
                     );
                 },
             )
@@ -234,5 +232,16 @@ final readonly class OrganizationServiceProvider implements ServiceProviderInter
                     );
                 },
             );
+    }
+
+    private static function auditFactory(ContainerInterface $c): AuditRecorderFactoryInterface
+    {
+        $f = $c->get(AuditRecorderFactoryInterface::class);
+
+        if (!$f instanceof AuditRecorderFactoryInterface) {
+            throw new LogicException('AuditRecorderFactoryInterface service is invalid.');
+        }
+
+        return $f;
     }
 }

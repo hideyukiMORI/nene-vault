@@ -5,10 +5,11 @@ declare(strict_types=1);
 namespace NeneVault\Document;
 
 use Closure;
+use Nene2\Audit\AuditEvent;
+use Nene2\Audit\AuditRecorderFactoryInterface;
 use Nene2\Database\DatabaseQueryExecutorInterface;
 use Nene2\Database\DatabaseTransactionManagerInterface;
 use NeneVault\Audit\AuditAction;
-use NeneVault\Audit\AuditRecorderInterface;
 use NeneVault\DocumentVersion\DocumentVersionRepositoryInterface;
 
 final readonly class RestoreDocumentUseCase implements RestoreDocumentUseCaseInterface
@@ -16,13 +17,12 @@ final readonly class RestoreDocumentUseCase implements RestoreDocumentUseCaseInt
     /**
      * @param Closure(DatabaseQueryExecutorInterface): VaultDocumentRepositoryInterface   $documentRepository
      * @param Closure(DatabaseQueryExecutorInterface): DocumentVersionRepositoryInterface $versionRepository
-     * @param Closure(DatabaseQueryExecutorInterface): AuditRecorderInterface             $auditRecorder
      */
     public function __construct(
         private DatabaseTransactionManagerInterface $transactionManager,
         private Closure $documentRepository,
         private Closure $versionRepository,
-        private Closure $auditRecorder,
+        private AuditRecorderFactoryInterface $auditRecorderFactory,
     ) {
     }
 
@@ -35,7 +35,7 @@ final readonly class RestoreDocumentUseCase implements RestoreDocumentUseCaseInt
             function (DatabaseQueryExecutorInterface $executor) use ($documentId, $organizationId, $actorUserId): array {
                 $documents = ($this->documentRepository)($executor);
                 $versions = ($this->versionRepository)($executor);
-                $audit = ($this->auditRecorder)($executor);
+                $audit = $this->auditRecorderFactory->forExecutor($executor);
 
                 $document = $documents->findById($documentId, $organizationId);
 
@@ -57,15 +57,15 @@ final readonly class RestoreDocumentUseCase implements RestoreDocumentUseCaseInt
                 $version = $versions->findById($updated->currentVersionId, $organizationId);
                 assert($version !== null);
 
-                $audit->record(
+                $audit->record(new AuditEvent(
                     action: AuditAction::DOCUMENT_RESTORED,
                     entityType: 'vault_document',
                     entityId: $documentId,
-                    actorUserId: $actorUserId,
+                    actorId: $actorUserId,
                     organizationId: $organizationId,
-                    beforeJson: $beforeJson,
-                    afterJson: ['status' => $updated->status],
-                );
+                    before: $beforeJson,
+                    after: ['status' => $updated->status],
+                ));
 
                 return [$updated, $version];
             },

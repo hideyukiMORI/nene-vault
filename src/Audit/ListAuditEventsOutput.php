@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace NeneVault\Audit;
 
+use Nene2\Audit\AuditEvent;
+
 final readonly class ListAuditEventsOutput
 {
     /**

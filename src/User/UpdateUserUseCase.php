@@ -5,10 +5,11 @@ declare(strict_types=1);
 namespace NeneVault\User;
 
 use Closure;
+use Nene2\Audit\AuditEvent;
+use Nene2\Audit\AuditRecorderFactoryInterface;
 use Nene2\Database\DatabaseQueryExecutorInterface;
 use Nene2\Database\DatabaseTransactionManagerInterface;
 use NeneVault\Audit\AuditAction;
-use NeneVault\Audit\AuditRecorderInterface;
 use NeneVault\Auth\Role;
 use NeneVault\Auth\User;
 use NeneVault\Auth\UserRepositoryInterface;
@@ -17,12 +18,11 @@ final readonly class UpdateUserUseCase implements UpdateUserUseCaseInterface
 {
     /**
      * @param Closure(DatabaseQueryExecutorInterface): UserRepositoryInterface $userRepository
-     * @param Closure(DatabaseQueryExecutorInterface): AuditRecorderInterface  $auditRecorder
      */
     public function __construct(
         private DatabaseTransactionManagerInterface $transactionManager,
         private Closure $userRepository,
-        private Closure $auditRecorder,
+        private AuditRecorderFactoryInterface $auditRecorderFactory,
     ) {
     }
 
@@ -45,7 +45,7 @@ final readonly class UpdateUserUseCase implements UpdateUserUseCaseInterface
         return $this->transactionManager->transactional(
             function (DatabaseQueryExecutorInterface $executor) use ($id, $organizationId, $email, $role, $status, $actorUserId): User {
                 $users = ($this->userRepository)($executor);
-                $audit = ($this->auditRecorder)($executor);
+                $audit = $this->auditRecorderFactory->forExecutor($executor);
 
                 $user = $users->findById($id);
 
@@ -77,15 +77,15 @@ final readonly class UpdateUserUseCase implements UpdateUserUseCaseInterface
                 $updated = $users->findById($id);
                 assert($updated !== null);
 
-                $audit->record(
+                $audit->record(new AuditEvent(
                     action: AuditAction::USER_UPDATED,
                     entityType: 'user',
                     entityId: (string) $id,
-                    actorUserId: $actorUserId,
+                    actorId: $actorUserId,
                     organizationId: $organizationId,
-                    beforeJson: $before,
-                    afterJson: UserPresenter::present($updated),
-                );
+                    before: $before,
+                    after: UserPresenter::present($updated),
+                ));
 
                 return $updated;
             },

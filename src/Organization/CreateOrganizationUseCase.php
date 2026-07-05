@@ -5,10 +5,11 @@ declare(strict_types=1);
 namespace NeneVault\Organization;
 
 use Closure;
+use Nene2\Audit\AuditEvent;
+use Nene2\Audit\AuditRecorderFactoryInterface;
 use Nene2\Database\DatabaseQueryExecutorInterface;
 use Nene2\Database\DatabaseTransactionManagerInterface;
 use NeneVault\Audit\AuditAction;
-use NeneVault\Audit\AuditRecorderInterface;
 use NeneVault\VaultSettings\VaultSettingsSeederInterface;
 
 final readonly class CreateOrganizationUseCase implements CreateOrganizationUseCaseInterface
@@ -16,13 +17,12 @@ final readonly class CreateOrganizationUseCase implements CreateOrganizationUseC
     /**
      * @param Closure(DatabaseQueryExecutorInterface): OrganizationRepositoryInterface $organizationRepository
      * @param Closure(DatabaseQueryExecutorInterface): VaultSettingsSeederInterface    $settingsSeeder
-     * @param Closure(DatabaseQueryExecutorInterface): AuditRecorderInterface          $auditRecorder
      */
     public function __construct(
         private DatabaseTransactionManagerInterface $transactionManager,
         private Closure $organizationRepository,
         private Closure $settingsSeeder,
-        private Closure $auditRecorder,
+        private AuditRecorderFactoryInterface $auditRecorderFactory,
     ) {
     }
 
@@ -32,7 +32,7 @@ final readonly class CreateOrganizationUseCase implements CreateOrganizationUseC
             function (DatabaseQueryExecutorInterface $executor) use ($input): CreateOrganizationOutput {
                 $organizations = ($this->organizationRepository)($executor);
                 $settingsSeeder = ($this->settingsSeeder)($executor);
-                $audit = ($this->auditRecorder)($executor);
+                $audit = $this->auditRecorderFactory->forExecutor($executor);
 
                 $existing = $organizations->findBySlug($input->slug);
 
@@ -54,15 +54,15 @@ final readonly class CreateOrganizationUseCase implements CreateOrganizationUseC
                 $org = $organizations->findById($id);
                 assert($org !== null);
 
-                $audit->record(
+                $audit->record(new AuditEvent(
                     action: AuditAction::ORGANIZATION_CREATED,
                     entityType: 'organization',
                     entityId: (string) $id,
-                    actorUserId: $input->actorUserId,
+                    actorId: $input->actorUserId,
                     organizationId: null,
-                    beforeJson: null,
-                    afterJson: $this->toAuditArray($org),
-                );
+                    before: null,
+                    after: $this->toAuditArray($org),
+                ));
 
                 return new CreateOrganizationOutput(
                     id: $org->id ?? $id,

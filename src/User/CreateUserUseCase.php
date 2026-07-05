@@ -5,10 +5,11 @@ declare(strict_types=1);
 namespace NeneVault\User;
 
 use Closure;
+use Nene2\Audit\AuditEvent;
+use Nene2\Audit\AuditRecorderFactoryInterface;
 use Nene2\Database\DatabaseQueryExecutorInterface;
 use Nene2\Database\DatabaseTransactionManagerInterface;
 use NeneVault\Audit\AuditAction;
-use NeneVault\Audit\AuditRecorderInterface;
 use NeneVault\Auth\Role;
 use NeneVault\Auth\User;
 use NeneVault\Auth\UserRepositoryInterface;
@@ -17,12 +18,11 @@ final readonly class CreateUserUseCase implements CreateUserUseCaseInterface
 {
     /**
      * @param Closure(DatabaseQueryExecutorInterface): UserRepositoryInterface $userRepository
-     * @param Closure(DatabaseQueryExecutorInterface): AuditRecorderInterface  $auditRecorder
      */
     public function __construct(
         private DatabaseTransactionManagerInterface $transactionManager,
         private Closure $userRepository,
-        private Closure $auditRecorder,
+        private AuditRecorderFactoryInterface $auditRecorderFactory,
     ) {
     }
 
@@ -43,7 +43,7 @@ final readonly class CreateUserUseCase implements CreateUserUseCaseInterface
         return $this->transactionManager->transactional(
             function (DatabaseQueryExecutorInterface $executor) use ($email, $password, $role, $organizationId, $actorUserId): User {
                 $users = ($this->userRepository)($executor);
-                $audit = ($this->auditRecorder)($executor);
+                $audit = $this->auditRecorderFactory->forExecutor($executor);
 
                 if ($users->findByEmail($email) !== null) {
                     throw new UserEmailConflictException($email);
@@ -52,15 +52,15 @@ final readonly class CreateUserUseCase implements CreateUserUseCaseInterface
                 $passwordHash = password_hash($password, PASSWORD_BCRYPT);
                 $user = $users->create($email, $passwordHash, $role, $organizationId);
 
-                $audit->record(
+                $audit->record(new AuditEvent(
                     action: AuditAction::USER_CREATED,
                     entityType: 'user',
                     entityId: (string) $user->id,
-                    actorUserId: $actorUserId,
+                    actorId: $actorUserId,
                     organizationId: $organizationId,
-                    beforeJson: null,
-                    afterJson: UserPresenter::present($user),
-                );
+                    before: null,
+                    after: UserPresenter::present($user),
+                ));
 
                 return $user;
             },

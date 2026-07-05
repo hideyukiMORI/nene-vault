@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace NeneVault\Audit;
 
+use Nene2\Audit\AuditEventRepositoryInterface;
+use Nene2\Audit\AuditQuery;
+
 final readonly class ListAuditEventsUseCase implements ListAuditEventsUseCaseInterface
 {
     public function __construct(
@@ -13,31 +16,17 @@ final readonly class ListAuditEventsUseCase implements ListAuditEventsUseCaseInt
 
     public function execute(ListAuditEventsInput $input): ListAuditEventsOutput
     {
-        $filters = [];
-
-        if ($input->organizationId !== null) {
-            $filters['organization_id'] = $input->organizationId;
-        }
-
-        if ($input->entityType !== null) {
-            $filters['entity_type'] = $input->entityType;
-        }
-
-        if ($input->entityId !== null) {
-            $filters['entity_id'] = $input->entityId;
-        }
-
-        if ($input->action !== null) {
-            $filters['action'] = $input->action;
-        }
-
-        if ($input->actorUserId !== null) {
-            $filters['actor_user_id'] = $input->actorUserId;
-        }
+        $query = new AuditQuery(
+            organizationId: $input->organizationId,
+            entityType: $input->entityType,
+            entityId: $input->entityId,
+            action: $input->action,
+            actorId: $input->actorUserId,
+        );
 
         return new ListAuditEventsOutput(
-            items: $this->repository->findByCriteria($filters, $input->limit, $input->offset),
-            total: $this->repository->countByCriteria($filters),
+            items: $this->repository->query($query, $input->limit, $input->offset),
+            total: $this->repository->count($query),
             limit: $input->limit,
             offset: $input->offset,
         );
