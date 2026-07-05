@@ -9,6 +9,7 @@ use Nene2\Auth\LocalBearerTokenVerifier;
 use Nene2\Auth\TokenIssuerInterface;
 use Nene2\Auth\TokenVerifierInterface;
 use Nene2\Config\AppConfig;
+use Nene2\Config\AppEnvironment;
 use Nene2\Config\ConfigLoader;
 use Nene2\Database\DatabaseConnectionFactoryInterface;
 use Nene2\Database\DatabaseQueryExecutorInterface;
@@ -45,6 +46,8 @@ use Psr\Log\LoggerInterface;
 final readonly class RuntimeServiceProvider implements ServiceProviderInterface
 {
     public const PROJECT_ROOT = 'nene-vault.project_root';
+
+    private const DEFAULT_DEV_SECRET = 'nene-vault-dev-secret';
 
     public function register(ContainerBuilder $builder): void
     {
@@ -186,7 +189,7 @@ final readonly class RuntimeServiceProvider implements ServiceProviderInterface
                         throw new LogicException('Application config service is invalid.');
                     }
 
-                    return new LocalBearerTokenVerifier($config->localJwtSecret ?? 'nene-vault-dev-secret');
+                    return new LocalBearerTokenVerifier(self::resolveJwtSecret($config));
                 },
             )
             ->set(
@@ -344,5 +347,27 @@ final readonly class RuntimeServiceProvider implements ServiceProviderInterface
                 },
             )
             ->set(ResponseEmitter::class, static fn (): ResponseEmitter => new ResponseEmitter());
+    }
+
+    /**
+     * Resolve the local JWT signing key, failing closed in production. When the key
+     * (`NENE2_LOCAL_JWT_SECRET`) is unset or blank, production refuses to boot rather
+     * than falling back to the public dev constant — which would let anyone forge a
+     * token. Dev/test keep the convenience fallback.
+     */
+    private static function resolveJwtSecret(AppConfig $config): string
+    {
+        if ($config->localJwtSecret !== null && $config->localJwtSecret !== '') {
+            return $config->localJwtSecret;
+        }
+
+        if ($config->environment === AppEnvironment::Production) {
+            throw new LogicException(
+                'NENE2_LOCAL_JWT_SECRET must be set in production. '
+                . 'Generate one with: php -r "echo bin2hex(random_bytes(32));"',
+            );
+        }
+
+        return self::DEFAULT_DEV_SECRET;
     }
 }
