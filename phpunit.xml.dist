@@ -25,5 +25,15 @@
         <env name="DB_NAME" value="var/nene_vault_test.sqlite"/>
         <env name="NENE_VAULT_STORAGE_PATH" value="/tmp/nene-vault-test"/>
         <env name="NENE_VAULT_MAX_FILE_SIZE_MB" value="20"/>
+        <!--
+          Opt in to the framework's development JWT secret so any test that boots the
+          runtime container (RuntimeServiceProvider -> GuardedJwtSecretResolver) can
+          resolve a secret without a real NENE2_LOCAL_JWT_SECRET. APP_ENV is test
+          here, so production fail-closed behaviour is unaffected. This enables the
+          injected dev secret; it does NOT disable authentication. (This suite already
+          sets NENE2_LOCAL_JWT_SECRET above, so the configured secret is used and this
+          opt-in path is not currently exercised — kept for defense in depth.)
+        -->
+        <env name="NENE2_ALLOW_DEV_SECRET" value="1"/>
     </php>
 </phpunit>
