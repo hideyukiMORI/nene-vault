@@ -15,6 +15,8 @@ declare(strict_types=1);
 
 use Nene2\Install\DatabaseSchemaApplier;
 use Nene2\Install\EnvironmentWriter;
+use Nene2\Install\ReInstallationGuard;
+use NeneVault\Install\DatabaseProvisioningProbe;
 use NeneVault\Install\InstallEnvironment;
 use Phinx\Config\Config;
 
@@ -86,6 +88,42 @@ function readEnvFile(): array
     }
 
     return $result;
+}
+
+function markerPath(): string
+{
+    return projectRoot() . '/var/.installed';
+}
+
+/** Refuse the installer with a 403 and a short explanation, then stop. */
+function refuseInstall(string $message): never
+{
+    http_response_code(403);
+    echo '<!DOCTYPE html><meta charset="utf-8">'
+        . '<body style="font:15px/1.6 system-ui,sans-serif;color:#1a1a2e;max-width:640px;margin:48px auto;padding:0 16px">'
+        . '<h1 style="font-size:20px">NeNe Vault Installer</h1>'
+        . '<p style="color:#dc2626">' . h($message) . '</p></body>';
+    exit;
+}
+
+// ── Re-installation guard ─────────────────────────────────────────────────────
+// Refuse a second run so a stray visit cannot overwrite .env or recreate the admin.
+// The .installed marker is primary; if it was lost (ephemeral var/ wiped on redeploy)
+// the DB probe (existing users) is the defence-in-depth layer. Only wired when the
+// toolkit is available — without vendor the requirements screen blocks first anyway.
+$reinstallGuard = null;
+if (is_file($vaultAutoload)) {
+    $reinstallGuard = new ReInstallationGuard(
+        markerPath(),
+        DatabaseProvisioningProbe::fromEnvFile(envPath(), projectRoot()),
+    );
+
+    if ($reinstallGuard->isBlocked()) {
+        refuseInstall(
+            'NeNe Vault is already installed. For security, delete install.php. '
+            . 'To reinstall, first remove var/.installed and the existing database.',
+        );
+    }
 }
 
 // ── Step 1: Requirements check ───────────────────────────────────────────────
@@ -326,6 +364,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $setupResult = runSetup();
 
                 if ($setupResult['ok']) {
+                    // Provisioning succeeded — drop the marker so a later run is refused.
+                    $reinstallGuard?->markInstalled(date('c'));
                     $step = 5;
                 } else {
                     $step = 4;
