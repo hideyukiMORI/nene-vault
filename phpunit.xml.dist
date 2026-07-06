@@ -13,18 +13,29 @@
             <directory>src</directory>
         </include>
     </source>
+    <!--
+        force="true" makes this suite hermetic: PHPUnit overwrites any value already
+        present in the shell environment instead of deferring to it. Without force,
+        an operator's exported shell var (e.g. ORG_SLUG or NENE2_LOCAL_JWT_SECRET in
+        ~/.bashrc) silently overrides these defaults and produces phantom failures —
+        most visibly a tenant-slug mismatch that yields 403 org-access-denied across
+        the boundary tests. See issue #18. Every value below is a fixed test-only
+        value; keep every runtime-behaviour env forced so the run cannot be polluted
+        from outside.
+    -->
     <php>
-        <env name="APP_ENV" value="test"/>
-        <env name="APP_DEBUG" value="false"/>
-        <env name="NENE2_LOCAL_JWT_SECRET" value="nene-vault-test-secret"/>
-        <env name="PROBLEM_DETAILS_BASE_URL" value="https://nene-vault.dev/problems/"/>
-        <env name="TENANT_RESOLUTION" value="single"/>
-        <env name="ORG_SLUG" value="test-org"/>
-        <env name="DB_ENV" value="test"/>
-        <env name="DB_ADAPTER" value="sqlite"/>
-        <env name="DB_NAME" value="var/nene_vault_test.sqlite"/>
-        <env name="NENE_VAULT_STORAGE_PATH" value="/tmp/nene-vault-test"/>
-        <env name="NENE_VAULT_MAX_FILE_SIZE_MB" value="20"/>
+        <env name="APP_ENV" value="test" force="true"/>
+        <env name="APP_DEBUG" value="false" force="true"/>
+        <!-- Fixed test-only signing secret; forced so a shell-exported secret can't diverge sign/verify. -->
+        <env name="NENE2_LOCAL_JWT_SECRET" value="nene-vault-test-secret" force="true"/>
+        <env name="PROBLEM_DETAILS_BASE_URL" value="https://nene-vault.dev/problems/" force="true"/>
+        <env name="TENANT_RESOLUTION" value="single" force="true"/>
+        <env name="ORG_SLUG" value="test-org" force="true"/>
+        <env name="DB_ENV" value="test" force="true"/>
+        <env name="DB_ADAPTER" value="sqlite" force="true"/>
+        <env name="DB_NAME" value="var/nene_vault_test.sqlite" force="true"/>
+        <env name="NENE_VAULT_STORAGE_PATH" value="/tmp/nene-vault-test" force="true"/>
+        <env name="NENE_VAULT_MAX_FILE_SIZE_MB" value="20" force="true"/>
         <!--
           Opt in to the framework's development JWT secret so any test that boots the
           runtime container (RuntimeServiceProvider -> GuardedJwtSecretResolver) can
@@ -34,6 +45,6 @@
           sets NENE2_LOCAL_JWT_SECRET above, so the configured secret is used and this
           opt-in path is not currently exercised — kept for defense in depth.)
         -->
-        <env name="NENE2_ALLOW_DEV_SECRET" value="1"/>
+        <env name="NENE2_ALLOW_DEV_SECRET" value="1" force="true"/>
     </php>
 </phpunit>
