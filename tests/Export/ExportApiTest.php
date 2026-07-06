@@ -123,6 +123,55 @@ final class ExportApiTest extends TestCase
         @unlink($tmpZip);
     }
 
+    public function test_export_csv_neutralizes_formula_injection_and_has_bom(): void
+    {
+        $handler = $this->handler();
+
+        // Attacker-controlled counterparty text that would be a live formula when
+        // the CSV is opened in Excel / LibreOffice / Google Sheets.
+        $payload = '=cmd|/c calc!A1-' . bin2hex(random_bytes(4));
+
+        $this->upload($handler, $payload, '2026-11-01', '15000');
+
+        $response = $handler->handle($this->jsonRequest('POST', '/admin/vault/export', [
+            'transaction_date_from' => '2026-11-01',
+            'transaction_date_to' => '2026-11-30',
+            'counterparty_name' => $payload,
+        ]));
+
+        $this->assertSame(200, $response->getStatusCode(), (string) $response->getBody());
+
+        $csv = (string) $response->getBody();
+
+        // Framework default: UTF-8 BOM (Excel-JP safe).
+        $this->assertStringStartsWith("\xEF\xBB\xBF", $csv);
+
+        // The raw formula must never appear as a live cell; it is neutralised with
+        // a leading single quote so the spreadsheet renders it as text.
+        $this->assertStringNotContainsString(",{$payload},", $csv);
+        $this->assertStringContainsString("'" . $payload, $csv);
+
+        // Round-trip: parsing the neutralised CSV must recover the quoted value
+        // exactly, and amount_cents must stay a plain numeric cell (not neutralised).
+        $body = substr($csv, 3); // strip BOM
+        $lines = array_values(array_filter(explode("\n", trim($body))));
+        $header = str_getcsv($lines[0], ',', '"', '');
+        $counterpartyCol = array_search('counterparty_name', $header, true);
+        $amountCol = array_search('amount_cents', $header, true);
+        $this->assertNotFalse($counterpartyCol);
+
+        $matched = null;
+        foreach (array_slice($lines, 1) as $line) {
+            $cells = str_getcsv($line, ',', '"', '');
+            if (($cells[$counterpartyCol] ?? null) === "'" . $payload) {
+                $matched = $cells;
+                break;
+            }
+        }
+        $this->assertNotNull($matched, 'neutralised counterparty row must round-trip');
+        $this->assertSame('15000', $matched[$amountCol], 'numeric amount must stay un-neutralised');
+    }
+
     public function test_export_requires_auth(): void
     {
         $response = $this->handler()->handle($this->jsonRequest('POST', '/admin/vault/export', [], auth: false));

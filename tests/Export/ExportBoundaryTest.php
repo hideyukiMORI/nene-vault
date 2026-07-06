@@ -39,7 +39,9 @@ final class ExportBoundaryTest extends ApiTestCase
         );
 
         $this->assertSame(200, $response->getStatusCode(), (string) $response->getBody());
+        // CsvWriter emits a UTF-8 BOM by framework default; strip it before parsing.
         $csv  = (string) $response->getBody();
+        $csv  = str_starts_with($csv, "\xEF\xBB\xBF") ? substr($csv, 3) : $csv;
         $cols = str_getcsv(explode("\n", trim($csv))[0], separator: ',', enclosure: '"', escape: '');
         $this->assertContains('document_id', $cols);
         $this->assertContains('file_sha256', $cols);
