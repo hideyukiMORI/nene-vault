@@ -8,6 +8,7 @@ use Nene2\Audit\AuditEvent;
 use Nene2\Audit\AuditRecorderFactoryInterface;
 use Nene2\Database\DatabaseQueryExecutorInterface;
 use Nene2\Database\DatabaseTransactionManagerInterface;
+use Nene2\Export\CsvWriter;
 use NeneVault\Audit\AuditAction;
 use NeneVault\Document\DocumentSearchCriteria;
 use NeneVault\Document\VaultDocument;
@@ -102,21 +103,14 @@ final readonly class ExportDocumentsUseCase implements ExportDocumentsUseCaseInt
         $handle = fopen('php://temp', 'r+');
         assert($handle !== false);
 
-        fputcsv($handle, self::MANIFEST_HEADER, escape: '');
-
-        foreach ($rows as [$document, $version]) {
-            fputcsv($handle, [
-                $document->id,
-                (string) $version->versionNumber,
-                $document->transactionDate ?? '',
-                $document->amountCents !== null ? (string) $document->amountCents : '',
-                $document->counterpartyName,
-                $document->category,
-                $version->fileSha256,
-                $document->uploadedAt ?? '',
-                $document->voidedAt ?? '',
-            ], escape: '');
-        }
+        // Nene2\Export\CsvWriter applies safe defaults framework-wide (ADR 0015):
+        // formula-injection neutralisation of string cells, RFC 4180 quoting, and
+        // a UTF-8 BOM. counterparty_name / category are user-controlled text, so
+        // this closes the previous formula-injection exposure. amount_cents and the
+        // version number are passed as native ints so genuine numeric values (incl.
+        // negative amounts) stay numeric and are never mistaken for a formula.
+        $writer = new CsvWriter($handle, self::MANIFEST_HEADER);
+        $writer->writeAll($this->manifestRows($rows));
 
         rewind($handle);
         $csv = stream_get_contents($handle);
@@ -125,6 +119,28 @@ final readonly class ExportDocumentsUseCase implements ExportDocumentsUseCaseInt
         assert($csv !== false);
 
         return $csv;
+    }
+
+    /**
+     * @param list<array{0: VaultDocument, 1: DocumentVersion}> $rows
+     *
+     * @return iterable<list<string|int|null>>
+     */
+    private function manifestRows(array $rows): iterable
+    {
+        foreach ($rows as [$document, $version]) {
+            yield [
+                $document->id,
+                $version->versionNumber,
+                $document->transactionDate ?? '',
+                $document->amountCents,
+                $document->counterpartyName,
+                $document->category,
+                $version->fileSha256,
+                $document->uploadedAt ?? '',
+                $document->voidedAt ?? '',
+            ];
+        }
     }
 
     /**
