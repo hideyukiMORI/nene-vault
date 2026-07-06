@@ -1,0 +1,72 @@
+{
+    "version": 1,
+    "allow": [],
+    "ignore": [
+        {
+            "rule": "D4",
+            "file": "src/Auth/LoginUseCase.php",
+            "message": "Raw current-time read time(). Inject Nene2\\Http\\ClockInterface (Nene2\\Http\\UtcClock in production) instead of reading the wall clock directly.",
+            "count": 2
+        },
+        {
+            "rule": "D4",
+            "file": "src/Auth/PdoUserRepository.php",
+            "message": "Raw current-time read date() with no explicit timestamp. Inject Nene2\\Http\\ClockInterface (Nene2\\Http\\UtcClock in production) instead of reading the wall clock directly.",
+            "count": 5
+        },
+        {
+            "rule": "D4",
+            "file": "src/Document/PdoVaultDocumentRepository.php",
+            "message": "Raw current-time read date() with no explicit timestamp. Inject Nene2\\Http\\ClockInterface (Nene2\\Http\\UtcClock in production) instead of reading the wall clock directly.",
+            "count": 2
+        },
+        {
+            "rule": "D4",
+            "file": "src/Document/UploadDocumentUseCase.php",
+            "message": "Raw current-time read date() with no explicit timestamp. Inject Nene2\\Http\\ClockInterface (Nene2\\Http\\UtcClock in production) instead of reading the wall clock directly.",
+            "count": 2
+        },
+        {
+            "rule": "D4",
+            "file": "src/Document/UploadDocumentUseCase.php",
+            "message": "Raw current-time read time(). Inject Nene2\\Http\\ClockInterface (Nene2\\Http\\UtcClock in production) instead of reading the wall clock directly.",
+            "count": 1
+        },
+        {
+            "rule": "D4",
+            "file": "src/DocumentVersion/PdoDocumentVersionRepository.php",
+            "message": "Raw current-time read date() with no explicit timestamp. Inject Nene2\\Http\\ClockInterface (Nene2\\Http\\UtcClock in production) instead of reading the wall clock directly.",
+            "count": 1
+        },
+        {
+            "rule": "D4",
+            "file": "src/DocumentVersion/S3DocumentStorage.php",
+            "message": "Raw current-time read gmdate() with no explicit timestamp. Inject Nene2\\Http\\ClockInterface (Nene2\\Http\\UtcClock in production) instead of reading the wall clock directly.",
+            "count": 1
+        },
+        {
+            "rule": "D4",
+            "file": "src/Export/ExportDocumentsHandler.php",
+            "message": "Raw current-time read date() with no explicit timestamp. Inject Nene2\\Http\\ClockInterface (Nene2\\Http\\UtcClock in production) instead of reading the wall clock directly.",
+            "count": 1
+        },
+        {
+            "rule": "D4",
+            "file": "src/Organization/PdoOrganizationRepository.php",
+            "message": "Raw current-time read date() with no explicit timestamp. Inject Nene2\\Http\\ClockInterface (Nene2\\Http\\UtcClock in production) instead of reading the wall clock directly.",
+            "count": 2
+        },
+        {
+            "rule": "D4",
+            "file": "src/Support/Ulid.php",
+            "message": "Raw current-time read microtime(). Inject Nene2\\Http\\ClockInterface (Nene2\\Http\\UtcClock in production) instead of reading the wall clock directly.",
+            "count": 1
+        },
+        {
+            "rule": "D4",
+            "file": "src/VaultSettings/PdoVaultSettingsRepository.php",
+            "message": "Raw current-time read date() with no explicit timestamp. Inject Nene2\\Http\\ClockInterface (Nene2\\Http\\UtcClock in production) instead of reading the wall clock directly.",
+            "count": 2
+        }
+    ]
+}
