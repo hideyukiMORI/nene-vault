@@ -13,10 +13,22 @@
 
 declare(strict_types=1);
 
+use Nene2\Install\EnvironmentWriter;
+use NeneVault\Install\InstallEnvironment;
+
 const INSTALLER_VERSION = '1.0';
 const MIN_PHP = '8.4.1';
 
 // ── Bootstrap ────────────────────────────────────────────────────────────────
+
+// Composer autoloader is required to reach the NENE2 installer toolkit
+// (EnvironmentWriter and friends). It may be absent on a freshly extracted
+// archive — in that case the requirements screen tells the operator to run
+// `composer install` first, so we only require it when present.
+$vaultAutoload = dirname(__FILE__) . '/vendor/autoload.php';
+if (is_file($vaultAutoload)) {
+    require_once $vaultAutoload;
+}
 
 session_start();
 
@@ -128,19 +140,6 @@ function checkRequirements(): array
     ];
 
     return $checks;
-}
-
-// ── Step 3: Write .env ────────────────────────────────────────────────────────
-
-/** @param array<string, string> $values */
-function writeEnvFile(array $values): bool
-{
-    $lines = [];
-    foreach ($values as $key => $val) {
-        $lines[] = $key . '=' . $val;
-    }
-
-    return file_put_contents(envPath(), implode("\n", $lines) . "\n") !== false;
 }
 
 // ── Step 4: Run setup ─────────────────────────────────────────────────────────
@@ -281,35 +280,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         if (empty($errors)) {
             $db = $_SESSION['db'] ?? [];
-            $jwtSecret = post('jwt_secret') ?: randomSecret();
+            $jwtSecret = post('jwt_secret') ?: EnvironmentWriter::generateSecret(32);
             $storagePath = post('storage_path', 'storage/vault');
 
-            $env = [
-                'APP_ENV'                    => 'production',
-                'APP_DEBUG'                  => 'false',
-                'APP_NAME'                   => 'NeNe Vault',
-                'NENE2_LOCAL_JWT_SECRET'     => $jwtSecret,
-                'PROBLEM_DETAILS_BASE_URL'   => 'https://nene-vault.dev/problems/',
-                'NENE_VAULT_STORAGE_PATH'    => $storagePath,
-                'NENE_VAULT_MAX_FILE_SIZE_MB' => '20',
-                'TENANT_RESOLUTION'          => 'single',
-                'ORG_SLUG'                   => $orgSlug,
-                'DB_ENV'                     => 'production',
-                'DB_ADAPTER'                 => $db['adapter'] ?? 'sqlite',
-                'DB_HOST'                    => $db['host'] ?? '127.0.0.1',
-                'DB_PORT'                    => $db['port'] ?? '3306',
-                'DB_NAME'                    => ($db['adapter'] ?? 'sqlite') === 'sqlite'
-                    ? ($db['name'] ?: 'var/nene_vault.sqlite')
-                    : ($db['name'] ?? 'nene_vault'),
-                'DB_USER'                    => $db['user'] ?? '',
-                'DB_PASSWORD'               => $db['password'] ?? '',
-                'DB_CHARSET'                 => 'utf8mb4',
-                'ORG_NAME'                   => $orgName,
-                'ADMIN_EMAIL'                => $adminEmail,
-                'ADMIN_PASSWORD'             => $adminPassword,
-            ];
+            $envValues = InstallEnvironment::values(
+                jwtSecret: $jwtSecret,
+                storagePath: $storagePath,
+                orgSlug: $orgSlug,
+                orgName: $orgName,
+                adminEmail: $adminEmail,
+                adminPassword: $adminPassword,
+                db: $db,
+            );
 
-            if (writeEnvFile($env)) {
+            try {
+                // EnvironmentWriter restricts the file to 0640 (fail-closed) and escapes
+                // values, so the DB password / JWT secret are neither world-readable nor
+                // able to inject extra .env lines.
+                (new EnvironmentWriter())->write(envPath(), $envValues);
+
                 $setupResult = runSetup();
 
                 if ($setupResult['ok']) {
@@ -317,8 +306,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 } else {
                     $step = 4;
                 }
-            } else {
-                $errors[] = 'Failed to write .env file. Check directory permissions.';
+            } catch (Throwable $e) {
+                $errors[] = 'Failed to write .env file: ' . $e->getMessage();
             }
         }
     }
