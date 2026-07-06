@@ -185,7 +185,7 @@ function checkRequirements(): array
 // ── Step 4: Run setup ─────────────────────────────────────────────────────────
 
 /** @return array{ok: bool, messages: list<string>} */
-function runSetup(): array
+function runSetup(string $adminPassword): array
 {
     $root = projectRoot();
     $messages = [];
@@ -196,6 +196,12 @@ function runSetup(): array
         putenv($k . '=' . $v);
         $_ENV[$k] = $v;
     }
+
+    // The admin password is intentionally absent from .env (writing it would leave
+    // at-rest plaintext in a shared-host file). Hand it to the seed step in memory
+    // only — seed-initial.php reads ADMIN_PASSWORD via getenv() and hashes it.
+    putenv('ADMIN_PASSWORD=' . $adminPassword);
+    $_ENV['ADMIN_PASSWORD'] = $adminPassword;
 
     // Bootstrap schema
     $adapter = $env['DB_ADAPTER'] ?? 'sqlite';
@@ -351,7 +357,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 orgSlug: $orgSlug,
                 orgName: $orgName,
                 adminEmail: $adminEmail,
-                adminPassword: $adminPassword,
                 db: $db,
             );
 
@@ -361,7 +366,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 // able to inject extra .env lines.
                 (new EnvironmentWriter())->write(envPath(), $envValues);
 
-                $setupResult = runSetup();
+                // The admin password is handed to setup in memory, never written to .env.
+                $setupResult = runSetup($adminPassword);
 
                 if ($setupResult['ok']) {
                     // Provisioning succeeded — drop the marker so a later run is refused.

@@ -12,6 +12,10 @@ namespace NeneVault\Install;
  * which restricts the file to 0640 (fail-closed) and escapes the values — so a DB
  * password or JWT secret containing spaces, quotes, `#` or `$` survives a round-trip
  * and no value can inject an extra `.env` line.
+ *
+ * The admin password is deliberately NOT part of this map: persisting it would leave
+ * it as at-rest plaintext in `.env`. The installer hands it to the seed step in memory
+ * (a process-scoped `putenv`) instead, so it never touches disk.
  */
 final class InstallEnvironment
 {
@@ -26,7 +30,6 @@ final class InstallEnvironment
         string $orgSlug,
         string $orgName,
         string $adminEmail,
-        string $adminPassword,
         array $db,
     ): array {
         $adapter = $db['adapter'] ?? 'sqlite';
@@ -53,7 +56,6 @@ final class InstallEnvironment
             'DB_CHARSET'                  => 'utf8mb4',
             'ORG_NAME'                    => $orgName,
             'ADMIN_EMAIL'                 => $adminEmail,
-            'ADMIN_PASSWORD'              => $adminPassword,
         ];
     }
 }

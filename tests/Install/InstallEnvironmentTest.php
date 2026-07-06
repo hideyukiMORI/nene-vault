@@ -42,13 +42,28 @@ final class InstallEnvironmentTest extends TestCase
             orgSlug: 'default',
             orgName: 'Acme',
             adminEmail: 'admin@example.com',
-            adminPassword: 'p@ss word',
             db: ['adapter' => 'sqlite', 'name' => 'var/nene_vault.sqlite'],
         ));
 
         $perms = fileperms($path) & 0777;
         self::assertSame(0, $perms & 0007, 'The .env file must not be world-readable.');
         self::assertSame(0640, $perms);
+    }
+
+    public function test_admin_password_is_never_persisted_to_env(): void
+    {
+        $values = InstallEnvironment::values(
+            jwtSecret: 'deadbeef',
+            storagePath: 'storage/vault',
+            orgSlug: 'default',
+            orgName: 'Acme',
+            adminEmail: 'admin@example.com',
+            db: ['adapter' => 'sqlite', 'name' => 'var/nene_vault.sqlite'],
+        );
+
+        self::assertArrayNotHasKey('ADMIN_PASSWORD', $values);
+        self::assertArrayHasKey('NENE2_LOCAL_JWT_SECRET', $values);
+        self::assertArrayHasKey('ADMIN_EMAIL', $values);
     }
 
     public function test_password_with_metacharacters_round_trips_without_injection(): void
@@ -62,7 +77,6 @@ final class InstallEnvironmentTest extends TestCase
             orgSlug: 'default',
             orgName: 'Acme',
             adminEmail: 'admin@example.com',
-            adminPassword: 'x',
             db: ['adapter' => 'mysql', 'host' => 'db', 'port' => '3306', 'name' => 'vault', 'user' => 'u', 'password' => $nasty],
         ));
 
