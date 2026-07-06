@@ -13,8 +13,10 @@
 
 declare(strict_types=1);
 
+use Nene2\Install\DatabaseSchemaApplier;
 use Nene2\Install\EnvironmentWriter;
 use NeneVault\Install\InstallEnvironment;
+use Phinx\Config\Config;
 
 const INSTALLER_VERSION = '1.0';
 const MIN_PHP = '8.4.1';
@@ -192,18 +194,40 @@ function runSetup(): array
     } else {
         $messages[] = 'Running Phinx migrations (MySQL)...';
 
-        $cmd = escapeshellcmd($root . '/vendor/bin/phinx')
-            . ' migrate -c ' . escapeshellarg($root . '/phinx.php')
-            . ' -e ' . escapeshellarg($env['DB_ENV'] ?? 'local');
+        // Apply pending migrations in-process via phinx's Manager API instead of
+        // shelling out to vendor/bin/phinx. Shared hosting often disables exec(),
+        // and `composer install --no-dev` used to drop phinx entirely (it was a
+        // dev-only dependency) breaking the shell-out — phinx is now in `require`
+        // and DatabaseSchemaApplier drives the same engine without a subprocess.
+        try {
+            $migrationOutput = (new DatabaseSchemaApplier())->apply(new Config([
+                'paths' => ['migrations' => $root . '/database/migrations'],
+                'environments' => [
+                    'default_environment' => 'install',
+                    'install' => [
+                        'adapter' => 'mysql',
+                        'host' => $env['DB_HOST'] ?? '127.0.0.1',
+                        'port' => (int) ($env['DB_PORT'] ?? 3306),
+                        'name' => $env['DB_NAME'] ?? 'nene_vault',
+                        'user' => $env['DB_USER'] ?? '',
+                        'pass' => $env['DB_PASSWORD'] ?? '',
+                        'charset' => $env['DB_CHARSET'] ?? 'utf8mb4',
+                    ],
+                ],
+                // Keep in step with phinx.php (creation-ordered migrations).
+                'version_order' => 'creation',
+            ]));
 
-        exec($cmd . ' 2>&1', $output, $code);
-        $messages = array_merge($messages, $output);
+            foreach (explode("\n", trim($migrationOutput)) as $line) {
+                if ($line !== '') {
+                    $messages[] = $line;
+                }
+            }
 
-        if ($code !== 0) {
-            return ['ok' => false, 'messages' => $messages];
+            $messages[] = 'Migrations complete.';
+        } catch (Throwable $e) {
+            return ['ok' => false, 'messages' => array_merge($messages, [$e->getMessage()])];
         }
-
-        $messages[] = 'Migrations complete.';
     }
 
     // Seed initial data
