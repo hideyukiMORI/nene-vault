@@ -37,13 +37,15 @@
         "openapi": "php tools/validate-openapi.php",
         "mcp": "php vendor/hideyukimori/nene2/tools/validate-mcp-tools.php",
         "mcp:server": "php tools/local-mcp-server.php",
+        "conformance": "php vendor/hideyukimori/nene2/tools/conformance.php --root=.",
         "check": [
             "@test",
             "@analyse",
             "@cs",
             "@locales",
             "@openapi",
-            "@mcp"
+            "@mcp",
+            "@conformance"
         ]
     },
     "config": {
