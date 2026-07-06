@@ -5,7 +5,8 @@
     "license": "MIT",
     "require": {
         "php": ">=8.4.1 <9.0",
-        "hideyukimori/nene2": "@dev"
+        "hideyukimori/nene2": "@dev",
+        "robmorgan/phinx": "^0.16.11"
     },
     "repositories": [
         {
@@ -52,7 +53,6 @@
         "friendsofphp/php-cs-fixer": "^3.95",
         "phpstan/phpstan": "^2.1",
         "phpunit/phpunit": "^13.1",
-        "robmorgan/phinx": "^0.16.11",
         "symfony/yaml": "^8.0"
     }
 }

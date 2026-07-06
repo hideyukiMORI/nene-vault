@@ -13,10 +13,26 @@
 
 declare(strict_types=1);
 
+use Nene2\Install\DatabaseSchemaApplier;
+use Nene2\Install\EnvironmentWriter;
+use Nene2\Install\ReInstallationGuard;
+use NeneVault\Install\DatabaseProvisioningProbe;
+use NeneVault\Install\InstallEnvironment;
+use Phinx\Config\Config;
+
 const INSTALLER_VERSION = '1.0';
 const MIN_PHP = '8.4.1';
 
 // ── Bootstrap ────────────────────────────────────────────────────────────────
+
+// Composer autoloader is required to reach the NENE2 installer toolkit
+// (EnvironmentWriter and friends). It may be absent on a freshly extracted
+// archive — in that case the requirements screen tells the operator to run
+// `composer install` first, so we only require it when present.
+$vaultAutoload = dirname(__FILE__) . '/vendor/autoload.php';
+if (is_file($vaultAutoload)) {
+    require_once $vaultAutoload;
+}
 
 session_start();
 
@@ -72,6 +88,42 @@ function readEnvFile(): array
     }
 
     return $result;
+}
+
+function markerPath(): string
+{
+    return projectRoot() . '/var/.installed';
+}
+
+/** Refuse the installer with a 403 and a short explanation, then stop. */
+function refuseInstall(string $message): never
+{
+    http_response_code(403);
+    echo '<!DOCTYPE html><meta charset="utf-8">'
+        . '<body style="font:15px/1.6 system-ui,sans-serif;color:#1a1a2e;max-width:640px;margin:48px auto;padding:0 16px">'
+        . '<h1 style="font-size:20px">NeNe Vault Installer</h1>'
+        . '<p style="color:#dc2626">' . h($message) . '</p></body>';
+    exit;
+}
+
+// ── Re-installation guard ─────────────────────────────────────────────────────
+// Refuse a second run so a stray visit cannot overwrite .env or recreate the admin.
+// The .installed marker is primary; if it was lost (ephemeral var/ wiped on redeploy)
+// the DB probe (existing users) is the defence-in-depth layer. Only wired when the
+// toolkit is available — without vendor the requirements screen blocks first anyway.
+$reinstallGuard = null;
+if (is_file($vaultAutoload)) {
+    $reinstallGuard = new ReInstallationGuard(
+        markerPath(),
+        DatabaseProvisioningProbe::fromEnvFile(envPath(), projectRoot()),
+    );
+
+    if ($reinstallGuard->isBlocked()) {
+        refuseInstall(
+            'NeNe Vault is already installed. For security, delete install.php. '
+            . 'To reinstall, first remove var/.installed and the existing database.',
+        );
+    }
 }
 
 // ── Step 1: Requirements check ───────────────────────────────────────────────
@@ -130,23 +182,10 @@ function checkRequirements(): array
     return $checks;
 }
 
-// ── Step 3: Write .env ────────────────────────────────────────────────────────
-
-/** @param array<string, string> $values */
-function writeEnvFile(array $values): bool
-{
-    $lines = [];
-    foreach ($values as $key => $val) {
-        $lines[] = $key . '=' . $val;
-    }
-
-    return file_put_contents(envPath(), implode("\n", $lines) . "\n") !== false;
-}
-
 // ── Step 4: Run setup ─────────────────────────────────────────────────────────
 
 /** @return array{ok: bool, messages: list<string>} */
-function runSetup(): array
+function runSetup(string $adminPassword): array
 {
     $root = projectRoot();
     $messages = [];
@@ -157,6 +196,12 @@ function runSetup(): array
         putenv($k . '=' . $v);
         $_ENV[$k] = $v;
     }
+
+    // The admin password is intentionally absent from .env (writing it would leave
+    // at-rest plaintext in a shared-host file). Hand it to the seed step in memory
+    // only — seed-initial.php reads ADMIN_PASSWORD via getenv() and hashes it.
+    putenv('ADMIN_PASSWORD=' . $adminPassword);
+    $_ENV['ADMIN_PASSWORD'] = $adminPassword;
 
     // Bootstrap schema
     $adapter = $env['DB_ADAPTER'] ?? 'sqlite';
@@ -193,18 +238,40 @@ function runSetup(): array
     } else {
         $messages[] = 'Running Phinx migrations (MySQL)...';
 
-        $cmd = escapeshellcmd($root . '/vendor/bin/phinx')
-            . ' migrate -c ' . escapeshellarg($root . '/phinx.php')
-            . ' -e ' . escapeshellarg($env['DB_ENV'] ?? 'local');
+        // Apply pending migrations in-process via phinx's Manager API instead of
+        // shelling out to vendor/bin/phinx. Shared hosting often disables exec(),
+        // and `composer install --no-dev` used to drop phinx entirely (it was a
+        // dev-only dependency) breaking the shell-out — phinx is now in `require`
+        // and DatabaseSchemaApplier drives the same engine without a subprocess.
+        try {
+            $migrationOutput = (new DatabaseSchemaApplier())->apply(new Config([
+                'paths' => ['migrations' => $root . '/database/migrations'],
+                'environments' => [
+                    'default_environment' => 'install',
+                    'install' => [
+                        'adapter' => 'mysql',
+                        'host' => $env['DB_HOST'] ?? '127.0.0.1',
+                        'port' => (int) ($env['DB_PORT'] ?? 3306),
+                        'name' => $env['DB_NAME'] ?? 'nene_vault',
+                        'user' => $env['DB_USER'] ?? '',
+                        'pass' => $env['DB_PASSWORD'] ?? '',
+                        'charset' => $env['DB_CHARSET'] ?? 'utf8mb4',
+                    ],
+                ],
+                // Keep in step with phinx.php (creation-ordered migrations).
+                'version_order' => 'creation',
+            ]));
 
-        exec($cmd . ' 2>&1', $output, $code);
-        $messages = array_merge($messages, $output);
+            foreach (explode("\n", trim($migrationOutput)) as $line) {
+                if ($line !== '') {
+                    $messages[] = $line;
+                }
+            }
 
-        if ($code !== 0) {
-            return ['ok' => false, 'messages' => $messages];
+            $messages[] = 'Migrations complete.';
+        } catch (Throwable $e) {
+            return ['ok' => false, 'messages' => array_merge($messages, [$e->getMessage()])];
         }
-
-        $messages[] = 'Migrations complete.';
     }
 
     // Seed initial data
@@ -281,44 +348,36 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         if (empty($errors)) {
             $db = $_SESSION['db'] ?? [];
-            $jwtSecret = post('jwt_secret') ?: randomSecret();
+            $jwtSecret = post('jwt_secret') ?: EnvironmentWriter::generateSecret(32);
             $storagePath = post('storage_path', 'storage/vault');
 
-            $env = [
-                'APP_ENV'                    => 'production',
-                'APP_DEBUG'                  => 'false',
-                'APP_NAME'                   => 'NeNe Vault',
-                'NENE2_LOCAL_JWT_SECRET'     => $jwtSecret,
-                'PROBLEM_DETAILS_BASE_URL'   => 'https://nene-vault.dev/problems/',
-                'NENE_VAULT_STORAGE_PATH'    => $storagePath,
-                'NENE_VAULT_MAX_FILE_SIZE_MB' => '20',
-                'TENANT_RESOLUTION'          => 'single',
-                'ORG_SLUG'                   => $orgSlug,
-                'DB_ENV'                     => 'production',
-                'DB_ADAPTER'                 => $db['adapter'] ?? 'sqlite',
-                'DB_HOST'                    => $db['host'] ?? '127.0.0.1',
-                'DB_PORT'                    => $db['port'] ?? '3306',
-                'DB_NAME'                    => ($db['adapter'] ?? 'sqlite') === 'sqlite'
-                    ? ($db['name'] ?: 'var/nene_vault.sqlite')
-                    : ($db['name'] ?? 'nene_vault'),
-                'DB_USER'                    => $db['user'] ?? '',
-                'DB_PASSWORD'               => $db['password'] ?? '',
-                'DB_CHARSET'                 => 'utf8mb4',
-                'ORG_NAME'                   => $orgName,
-                'ADMIN_EMAIL'                => $adminEmail,
-                'ADMIN_PASSWORD'             => $adminPassword,
-            ];
+            $envValues = InstallEnvironment::values(
+                jwtSecret: $jwtSecret,
+                storagePath: $storagePath,
+                orgSlug: $orgSlug,
+                orgName: $orgName,
+                adminEmail: $adminEmail,
+                db: $db,
+            );
 
-            if (writeEnvFile($env)) {
-                $setupResult = runSetup();
+            try {
+                // EnvironmentWriter restricts the file to 0640 (fail-closed) and escapes
+                // values, so the DB password / JWT secret are neither world-readable nor
+                // able to inject extra .env lines.
+                (new EnvironmentWriter())->write(envPath(), $envValues);
+
+                // The admin password is handed to setup in memory, never written to .env.
+                $setupResult = runSetup($adminPassword);
 
                 if ($setupResult['ok']) {
+                    // Provisioning succeeded — drop the marker so a later run is refused.
+                    $reinstallGuard?->markInstalled(date('c'));
                     $step = 5;
                 } else {
                     $step = 4;
                 }
-            } else {
-                $errors[] = 'Failed to write .env file. Check directory permissions.';
+            } catch (Throwable $e) {
+                $errors[] = 'Failed to write .env file: ' . $e->getMessage();
             }
         }
     }
