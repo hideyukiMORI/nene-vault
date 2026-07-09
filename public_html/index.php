@@ -5,11 +5,16 @@ declare(strict_types=1);
 use Nene2\Http\ResponseEmitter;
 use NeneVault\Http\AuthorizationHeaderFallback;
 use NeneVault\Http\RuntimeContainerFactory;
+use NeneVault\Support\EnvFileLoader;
 use Nyholm\Psr7\Factory\Psr17Factory;
 use Nyholm\Psr7Server\ServerRequestCreator;
 use Psr\Http\Server\RequestHandlerInterface;
 
 require dirname(__DIR__) . '/vendor/autoload.php';
+
+// Tier A: .env values must reach raw getenv() readers (ORG_SLUG tenant
+// resolution etc.) — shared hosting provides no process env (#124).
+EnvFileLoader::load(dirname(__DIR__));
 
 $container = (new RuntimeContainerFactory(dirname(__DIR__)))->create();
 $psr17Factory = $container->get(Psr17Factory::class);

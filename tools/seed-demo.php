@@ -36,6 +36,7 @@ use NeneVault\Document\RestoreDocumentUseCaseInterface;
 use NeneVault\Document\UploadDocumentUseCaseInterface;
 use NeneVault\Document\VoidDocumentUseCaseInterface;
 use NeneVault\Http\RuntimeContainerFactory;
+use NeneVault\Support\EnvFileLoader;
 use NeneVault\Organization\CreateOrganizationInput;
 use NeneVault\Organization\CreateOrganizationUseCaseInterface;
 use NeneVault\Organization\OrganizationRepositoryInterface;
@@ -49,6 +50,7 @@ if (PHP_SAPI !== 'cli') {
 }
 
 $root = dirname(__DIR__);
+EnvFileLoader::load($root);
 
 $fail = static function (string $message): never {
     fwrite(STDERR, $message . PHP_EOL);
