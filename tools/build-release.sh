@@ -48,6 +48,17 @@ rsync -a --exclude='*.test.*' \
     "$ROOT/src/"       "$STAGING/src/"
 rsync -a \
     "$ROOT/vendor/"    "$STAGING/vendor/"
+
+# Path-repository packages (hideyukimori/nene2) are SYMLINKS in vendor/;
+# rsync -a keeps them as links and zip silently drops them — the shipped zip
+# then contains no framework at all (#122). Dereference into real files.
+find "$STAGING/vendor" -maxdepth 3 -type l | while read -r link; do
+    # Relative link targets only resolve from the ORIGINAL vendor tree.
+    src="$ROOT/vendor/${link#"$STAGING/vendor/"}"
+    real="$(readlink -f "$src")"
+    rm "$link"
+    rsync -a --exclude='.git/' --exclude='node_modules/' "$real/" "$link/"
+done
 rsync -a \
     "$ROOT/locales/"   "$STAGING/locales/"
 rsync -a \
