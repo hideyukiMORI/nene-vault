@@ -66,8 +66,9 @@ Target `vault.ayane.co.jp` (same shape as invoice/clear; DB `_nene_vault`).
 1. `bash tools/build-release.sh` on the dev machine (vendor `--no-dev`, SPA
    built into `public_html/`, installer included; the zip keeps `.htaccess`).
 2. rsync so only `public_html/` is inside the docroot (vendor one level up).
-3. Run `install.php` once (requirements → DB → app settings → admin), then
-   **delete it** — it self-unlinks on success.
+3. Open `https://…/install.php` (it now lives in `public_html/`, #120) and
+   walk the wizard: requirements → database (connection-tested) → org/admin.
+   It self-unlinks on success.
 4. `.env`: MySQL `_nene_vault` credentials, `APP_DEBUG=false`, real
    `NENE2_LOCAL_JWT_SECRET`, `TENANT_RESOLUTION=single`, `ORG_SLUG=demo`,
    demo passwords as above.

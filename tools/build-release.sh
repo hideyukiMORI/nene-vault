@@ -67,7 +67,8 @@ cp "$ROOT/.env.example"     "$STAGING/.env.example"
 cp "$ROOT/phpstan.neon.dist" "$STAGING/phpstan.neon.dist" 2>/dev/null || true
 
 # Installer
-cp "$ROOT/install.php" "$STAGING/install.php"
+# install.php now lives in public_html/ (web-reachable with the documented docroot, #120)
+# and is staged with the rest of public_html below.
 
 # var/ placeholder (empty, writable)
 mkdir -p "$STAGING/var"
