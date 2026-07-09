@@ -3,6 +3,19 @@
 **All roadmap phases (0–4) complete; compliance gate approved. Remaining work is the
 pre-production go-live gate (税理士 Review 3) and Tier A live testing.**
 
+> **2026-07-10: the prospect demo is live at `https://vault.ayane.co.jp`**
+> (org `ayane`, seeded via `tools/seed-demo.php` — ~20 generated received
+> invoices, void/restore history; runbook [`docs/demo.md`](../demo.md)).
+> Shipping it surfaced and fixed four real Tier A bugs the same day:
+> #120 installer unreachable with the documented docroot (ported to the
+> invoice/clear wizard shape in `public_html/`), #122 release zip shipped no
+> framework (path-repo symlink never dereferenced), #124 `.env` never reached
+> raw `getenv()` readers (org resolution 404'd on shared hosting), and the
+> HETEML `Authorization`-stripping fix (#118, `X-Authorization` mirror).
+> Owner cron step: register `~/bin/reseed-vault-demo.sh` (nightly) in the
+> HETEML panel. Disposable-org demo (`Nene2\Demo`) is blocked on host-based
+> tenant resolution — decision escalated to the coordinator (see #118).
+
 ## Done
 
 - [x] Governance bootstrap, product definition (PR #1, #2)
