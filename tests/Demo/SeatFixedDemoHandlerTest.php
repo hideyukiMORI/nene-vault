@@ -107,20 +107,20 @@ final class SeatFixedDemoHandlerTest extends TestCase
         return (new Psr17Factory())->createServerRequest('GET', '/demo/standard');
     }
 
-    private function demoAdmin(): User
+    private function demoViewer(): User
     {
         return new User(
             id: 7,
-            email: 'demo-admin@nene-vault.dev',
+            email: 'demo-viewer@nene-vault.dev',
             passwordHash: 'x',
-            role: 'admin',
+            role: 'viewer',
             organizationId: 2,
         );
     }
 
     public function test_fail_close_when_demo_mode_is_off(): void
     {
-        $response = $this->handler(false, $this->demoAdmin())->handle($this->request());
+        $response = $this->handler(false, $this->demoViewer())->handle($this->request());
 
         self::assertSame(404, $response->getStatusCode());
     }
@@ -130,18 +130,20 @@ final class SeatFixedDemoHandlerTest extends TestCase
         self::assertSame(404, $this->handler(true, null)->handle($this->request())->getStatusCode());
     }
 
-    public function test_fail_close_for_a_non_admin_or_orgless_account(): void
+    public function test_fail_close_for_a_non_viewer_or_orgless_account(): void
     {
-        $viewer = new User(id: 8, email: 'demo-admin@nene-vault.dev', passwordHash: 'x', role: 'viewer', organizationId: 2);
-        self::assertSame(404, $this->handler(true, $viewer)->handle($this->request())->getStatusCode());
+        // An admin behind the viewer email must never be seated (#130): a
+        // shared-org admin token would be a public upload endpoint.
+        $admin = new User(id: 8, email: 'demo-viewer@nene-vault.dev', passwordHash: 'x', role: 'admin', organizationId: 2);
+        self::assertSame(404, $this->handler(true, $admin)->handle($this->request())->getStatusCode());
 
-        $orgless = new User(id: 9, email: 'demo-admin@nene-vault.dev', passwordHash: 'x', role: 'admin', organizationId: null);
+        $orgless = new User(id: 9, email: 'demo-viewer@nene-vault.dev', passwordHash: 'x', role: 'viewer', organizationId: null);
         self::assertSame(404, $this->handler(true, $orgless)->handle($this->request())->getStatusCode());
     }
 
     public function test_seat_page_stores_the_auth_session_and_lands_in_the_spa(): void
     {
-        $response = $this->handler(true, $this->demoAdmin())->handle($this->request());
+        $response = $this->handler(true, $this->demoViewer())->handle($this->request());
 
         self::assertSame(200, $response->getStatusCode());
         $html = (string) $response->getBody();
@@ -156,20 +158,20 @@ final class SeatFixedDemoHandlerTest extends TestCase
         $session = json_decode($m[1] ?? '', true);
         self::assertIsArray($session);
         self::assertSame(7, $session['userId']);
-        self::assertSame('demo-admin@nene-vault.dev', $session['email']);
-        self::assertSame('admin', $session['role']);
+        self::assertSame('demo-viewer@nene-vault.dev', $session['email']);
+        self::assertSame('viewer', $session['role']);
         self::assertSame(2, $session['orgId']);
 
         $claims = (new LocalBearerTokenVerifier('seat-test-secret'))->verify((string) $session['token']);
         self::assertSame(7, $claims['user_id']);
         self::assertSame(2, $claims['org_id']);
-        self::assertSame('admin', $claims['role']);
+        self::assertSame('viewer', $claims['role']);
         self::assertEqualsWithDelta(86400, (int) $claims['exp'] - (int) $claims['iat'], 5);
     }
 
     public function test_page_specific_csp_matches_the_script_nonce(): void
     {
-        $response = $this->handler(true, $this->demoAdmin())->handle($this->request());
+        $response = $this->handler(true, $this->demoViewer())->handle($this->request());
 
         $csp = $response->getHeaderLine('Content-Security-Policy');
         self::assertStringContainsString("default-src 'none'", $csp);
