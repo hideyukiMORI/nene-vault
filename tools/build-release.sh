@@ -80,7 +80,10 @@ touch "$STAGING/storage/vault/.gitkeep"
 # ── Create ZIP ────────────────────────────────────────────────────────────────
 echo "--> Creating ZIP archive..."
 cd "$DIST"
-zip -r "nene-vault-$VERSION.zip" "nene-vault-$VERSION/" -x "*/\.*" -q
+# Exclude dot-directories but KEEP required dotfiles: the blanket "*/\.*"
+# pattern silently dropped public_html/.htaccess and .env.example from the
+# Tier A zip (#118) — without .htaccess Apache serves no routes at all.
+zip -r "nene-vault-$VERSION.zip" "nene-vault-$VERSION/" -x "*/.git/*" -x "*/.gitkeep" -q
 
 echo ""
 echo "==> Release ZIP: $ZIP_FILE"
