@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace NeneVault;
 
 use LogicException;
+use Nene2\Auth\TokenIssuerInterface;
+use Nene2\Config\AppConfig;
 use Nene2\DependencyInjection\ContainerBuilder;
 use Nene2\DependencyInjection\ServiceProviderInterface;
 use Nene2\Http\JsonResponseFactory;
@@ -13,6 +15,9 @@ use NeneVault\Audit\AuditRouteRegistrar;
 use NeneVault\Audit\AuditServiceProvider;
 use NeneVault\Auth\AuthRouteRegistrar;
 use NeneVault\Auth\InvalidCredentialsExceptionHandler;
+use NeneVault\Auth\UserRepositoryInterface;
+use NeneVault\Demo\DemoRouteRegistrar;
+use NeneVault\Demo\SeatFixedDemoHandler;
 use NeneVault\Document\DocumentRouteRegistrar;
 use NeneVault\Document\DocumentServiceProvider;
 use NeneVault\Document\DuplicateFileExceptionHandler;
@@ -39,6 +44,7 @@ use NeneVault\User\UserRouteRegistrar;
 use NeneVault\User\UserServiceProvider;
 use NeneVault\VaultSettings\VaultSettingsRouteRegistrar;
 use NeneVault\VaultSettings\VaultSettingsServiceProvider;
+use Nyholm\Psr7\Factory\Psr17Factory;
 use Psr\Container\ContainerInterface;
 
 final readonly class ApplicationServiceProvider implements ServiceProviderInterface
@@ -84,6 +90,47 @@ final readonly class ApplicationServiceProvider implements ServiceProviderInterf
             },
         );
 
+        // Fixed-demo seat (#127)
+        $builder->set(
+            SeatFixedDemoHandler::class,
+            static function (ContainerInterface $c): SeatFixedDemoHandler {
+                $config = $c->get(AppConfig::class);
+                $users = $c->get(UserRepositoryInterface::class);
+                $issuer = $c->get(TokenIssuerInterface::class);
+                $psr17 = $c->get(Psr17Factory::class);
+
+                if (!$config instanceof AppConfig) {
+                    throw new LogicException('AppConfig service is invalid.');
+                }
+
+                if (!$users instanceof UserRepositoryInterface) {
+                    throw new LogicException('UserRepositoryInterface service is invalid.');
+                }
+
+                if (!$issuer instanceof TokenIssuerInterface) {
+                    throw new LogicException('TokenIssuerInterface service is invalid.');
+                }
+
+                if (!$psr17 instanceof Psr17Factory) {
+                    throw new LogicException('Psr17Factory service is invalid.');
+                }
+
+                return new SeatFixedDemoHandler($config->demo, $users, $issuer, $psr17);
+            },
+        );
+        $builder->set(
+            DemoRouteRegistrar::class,
+            static function (ContainerInterface $c): DemoRouteRegistrar {
+                $handler = $c->get(SeatFixedDemoHandler::class);
+
+                if (!$handler instanceof SeatFixedDemoHandler) {
+                    throw new LogicException('SeatFixedDemoHandler service is invalid.');
+                }
+
+                return new DemoRouteRegistrar($handler);
+            },
+        );
+
         // Route registrars
         $builder->set(
             self::ROUTE_REGISTRARS,
@@ -97,6 +144,7 @@ final readonly class ApplicationServiceProvider implements ServiceProviderInterf
                 $user = $c->get(UserRouteRegistrar::class);
                 $export = $c->get(ExportRouteRegistrar::class);
                 $ocr = $c->get(OcrRouteRegistrar::class);
+                $demo = $c->get(DemoRouteRegistrar::class);
 
                 if (!$health instanceof HealthHandler) {
                     throw new LogicException('HealthHandler service is invalid.');
@@ -134,6 +182,10 @@ final readonly class ApplicationServiceProvider implements ServiceProviderInterf
                     throw new LogicException('OcrRouteRegistrar service is invalid.');
                 }
 
+                if (!$demo instanceof DemoRouteRegistrar) {
+                    throw new LogicException('DemoRouteRegistrar service is invalid.');
+                }
+
                 return [
                     static fn ($router) => $router->get('/health', $health->handle(...)),
                     static fn ($router) => $auth->register($router),
@@ -144,6 +196,7 @@ final readonly class ApplicationServiceProvider implements ServiceProviderInterf
                     static fn ($router) => $user->register($router),
                     static fn ($router) => $export->register($router),
                     static fn ($router) => $ocr->register($router),
+                    static fn ($router) => $demo($router),
                 ];
             },
         );

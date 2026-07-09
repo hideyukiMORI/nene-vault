@@ -33,6 +33,9 @@ final readonly class OrgResolverMiddleware implements MiddlewareInterface
      * @var list<string>
      */
     private const BYPASS_PREFIXES = [
+        // Fixed-demo seat page (#127): org-less at entry — it looks the demo
+        // org up itself and mints the session the SPA then uses.
+        '/demo/',
         '/health',
         '/admin/organizations',
         '/admin/auth/',
