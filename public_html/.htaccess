@@ -1,6 +1,12 @@
 Options -MultiViews -Indexes
 RewriteEngine On
 
+# Some CGI/FastCGI hosts have Apache itself drop the Authorization header;
+# re-deliver it as an env var so PHP still sees it. Front proxies that strip
+# it before Apache (HETEML) are covered by the SPA's X-Authorization mirror +
+# AuthorizationHeaderFallback (#118).
+RewriteRule .* - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization}]
+
 # Serve existing static files (JS, CSS, images, fonts) directly
 RewriteCond %{REQUEST_FILENAME} -f
 RewriteRule ^ - [L]

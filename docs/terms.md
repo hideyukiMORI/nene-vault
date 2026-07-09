@@ -467,6 +467,8 @@ Base URL: `https://nene-vault.dev/problems/`
 | `NENE_VAULT_PORT` | Optional | HTTP port (default 8080) | `PORT`, `VAULT_PORT`, `APP_PORT` |
 | `NENE_VAULT_APP_ENV` | Optional | `local` / `test` / `production` | `APP_ENV`, `ENV`, `ENVIRONMENT` |
 | `NENE_VAULT_MAX_FILE_SIZE_MB` | Optional | Max upload size in MB (default 20) | `MAX_FILE_SIZE`, `UPLOAD_LIMIT` |
+| `NENE_VAULT_DEMO_ADMIN_PASSWORD` | Optional | Fixed hand-out demo admin password for `tools/seed-demo.php` (#118) | `DEMO_PASSWORD`, `DEMO_ADMIN_PASS` |
+| `NENE_VAULT_DEMO_VIEWER_PASSWORD` | Optional | Fixed hand-out demo viewer password for `tools/seed-demo.php` (#118) | `DEMO_VIEWER_PASS` |
 | `DB_HOST` | Required | Database host | `DATABASE_HOST`, `MYSQL_HOST` |
 | `DB_PORT` | Optional | Database port | `DATABASE_PORT`, `MYSQL_PORT` |
 | `DB_NAME` | Required | Database name | `DATABASE_NAME`, `MYSQL_DATABASE` |

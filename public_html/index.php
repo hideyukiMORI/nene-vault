@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use Nene2\Http\ResponseEmitter;
+use NeneVault\Http\AuthorizationHeaderFallback;
 use NeneVault\Http\RuntimeContainerFactory;
 use Nyholm\Psr7\Factory\Psr17Factory;
 use Nyholm\Psr7Server\ServerRequestCreator;
@@ -21,6 +22,10 @@ $serverRequestCreator = new ServerRequestCreator(
 );
 
 $request = $serverRequestCreator->fromGlobals();
+
+// Shared-hosting front proxies (HETEML) strip the Authorization header; adopt
+// the SPA's X-Authorization mirror when the standard header is absent (#118).
+$request = AuthorizationHeaderFallback::apply($request);
 $application = $container->get(RequestHandlerInterface::class);
 assert($application instanceof RequestHandlerInterface);
 $response = $application->handle($request);

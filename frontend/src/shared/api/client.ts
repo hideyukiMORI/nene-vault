@@ -32,6 +32,9 @@ async function request<T>(path: string, options: RequestOptions = {}): Promise<T
   const token = authStore.getToken();
   if (token !== null) {
     headers['Authorization'] = `Bearer ${token}`;
+    // Shared-hosting front proxies (HETEML) strip the standard Authorization
+    // header; the backend adopts this mirror when it is absent (#118).
+    headers['X-Authorization'] = `Bearer ${token}`;
   }
 
   const init: RequestInit = {
@@ -68,6 +71,9 @@ async function uploadFormData<T>(path: string, formData: FormData): Promise<T> {
   const token = authStore.getToken();
   if (token !== null) {
     headers['Authorization'] = `Bearer ${token}`;
+    // Shared-hosting front proxies (HETEML) strip the standard Authorization
+    // header; the backend adopts this mirror when it is absent (#118).
+    headers['X-Authorization'] = `Bearer ${token}`;
   }
 
   const response = await fetch(url, {
