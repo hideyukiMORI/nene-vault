@@ -11,6 +11,7 @@ use Nene2\DependencyInjection\ContainerBuilder;
 use Nene2\DependencyInjection\ServiceProviderInterface;
 use Nene2\Http\JsonResponseFactory;
 use Nene2\Http\RequestScopedHolder;
+use Nene2\Http\UtcClock;
 use NeneVault\Audit\AuditRouteRegistrar;
 use NeneVault\Audit\AuditServiceProvider;
 use NeneVault\Auth\AuthRouteRegistrar;
@@ -115,7 +116,7 @@ final readonly class ApplicationServiceProvider implements ServiceProviderInterf
                     throw new LogicException('Psr17Factory service is invalid.');
                 }
 
-                return new SeatFixedDemoHandler($config->demo, $users, $issuer, $psr17);
+                return new SeatFixedDemoHandler($config->demo, $users, $issuer, $psr17, new UtcClock());
             },
         );
         $builder->set(
