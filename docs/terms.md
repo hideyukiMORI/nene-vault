@@ -304,6 +304,7 @@ Admin routes are under `/admin/vault/…` (vault-scoped namespace).
 | Canonical form | Method | Description | DO NOT use |
 | --- | --- | --- | --- |
 | `/health` | GET | Health check (unauthenticated) | `/api/health`, `/ping`, `/status` |
+| `/demo/standard` | GET | Fixed-demo auto-login seat page (unauthenticated; DEMO_MODE-gated, #127) | `/demo`, `/demo/login`, `/auto-login` |
 | `/admin/auth/login` | POST | Login, issue JWT (unauthenticated) | `/login`, `/auth/login`, `/admin/login` |
 | `/admin/vault/documents` | GET | Search documents | `/admin/documents`, `/vault/documents` |
 | `/admin/vault/documents` | POST | Upload document | — |
@@ -468,6 +469,7 @@ Base URL: `https://nene-vault.dev/problems/`
 | `NENE_VAULT_APP_ENV` | Optional | `local` / `test` / `production` | `APP_ENV`, `ENV`, `ENVIRONMENT` |
 | `NENE_VAULT_MAX_FILE_SIZE_MB` | Optional | Max upload size in MB (default 20) | `MAX_FILE_SIZE`, `UPLOAD_LIMIT` |
 | `NENE_VAULT_DEMO_ADMIN_PASSWORD` | Optional | Fixed hand-out demo admin password for `tools/seed-demo.php` (#118) | `DEMO_PASSWORD`, `DEMO_ADMIN_PASS` |
+| `DEMO_MODE` | Optional | Strict opt-in gate for the demo seat route (`Nene2\Config\ConfigLoader`-parsed; #127) | `DEMO`, `DEMO_ENABLED` |
 | `NENE_VAULT_DEMO_VIEWER_PASSWORD` | Optional | Fixed hand-out demo viewer password for `tools/seed-demo.php` (#118) | `DEMO_VIEWER_PASS` |
 | `DB_HOST` | Required | Database host | `DATABASE_HOST`, `MYSQL_HOST` |
 | `DB_PORT` | Optional | Database port | `DATABASE_PORT`, `MYSQL_PORT` |

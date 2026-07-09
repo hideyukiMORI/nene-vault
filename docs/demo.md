@@ -35,6 +35,15 @@ version rows and audit events are authentic. PDF bodies are romanized
 (base-14 fonts carry no CJK); the Japanese vendor names live in the searchable
 metadata, which is what the 電帳法 search showcase exercises.
 
+## 2.5 Auto-login (`/demo/standard`, #127)
+
+With `DEMO_MODE=1` in `.env`, opening `https://…/demo/standard` seats the
+visitor straight into the demo org as `demo-admin` (a one-shot page stores a
+normal 24 h session in the SPA and lands on the dashboard) — the same
+"hand out one URL" experience as the invoice/clear demos, without the
+disposable-org module. Fail-close: 404 while `DEMO_MODE` is unset or the
+demo admin is not seeded.
+
 ## 3. Showcase walkthrough (the 見せ場)
 
 1. **Search** — filter by counterparty (e.g. 大和建設株式会社), by period
