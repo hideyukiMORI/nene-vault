@@ -6,6 +6,7 @@ namespace NeneVault\Demo;
 
 use Nene2\Auth\TokenIssuerInterface;
 use Nene2\Demo\DemoConfig;
+use Nene2\Http\ClockInterface;
 use NeneVault\Auth\Role;
 use NeneVault\Auth\UserRepositoryInterface;
 use Nyholm\Psr7\Factory\Psr17Factory;
@@ -42,6 +43,7 @@ final readonly class SeatFixedDemoHandler
         private UserRepositoryInterface $users,
         private TokenIssuerInterface $tokenIssuer,
         private Psr17Factory $psr17,
+        private ClockInterface $clock,
     ) {
     }
 
@@ -57,7 +59,7 @@ final readonly class SeatFixedDemoHandler
             return $this->notFound();
         }
 
-        $now = time();
+        $now = $this->clock->now()->getTimestamp();
         $token = $this->tokenIssuer->issue([
             'sub' => $admin->email,
             'user_id' => $admin->id,

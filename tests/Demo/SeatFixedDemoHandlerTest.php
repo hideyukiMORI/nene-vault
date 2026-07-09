@@ -98,6 +98,7 @@ final class SeatFixedDemoHandlerTest extends TestCase
             $users,
             new LocalBearerTokenVerifier('seat-test-secret'),
             new Psr17Factory(),
+            new \Nene2\Http\UtcClock(),
         );
     }
 
