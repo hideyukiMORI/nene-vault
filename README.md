@@ -52,6 +52,11 @@ without becoming accounting software or expense workflow. Built on
 
 ## Quick start (Docker)
 
+> **Tier A (shared hosting):** deploy without Docker via the web installer —
+> build a release ZIP with `tools/build-release.sh` (or download one from GitHub
+> Releases), upload it, and open `install.php`. See
+> [`docs/operator/installation.md`](./docs/operator/installation.md).
+
 ```sh
 composer install            # once, on the host — resolves the ../NENE2 path dependency
 cp .env.example .env        # customise ADMIN_EMAIL / ADMIN_PASSWORD if desired
@@ -106,8 +111,23 @@ NENE_VAULT_PORT=8601 NENE_VAULT_FRONTEND_PORT=5187 docker compose up
 
 ## Status
 
-**Phase 1 (Document API) complete** — Auth, Organization, User, VaultSettings, Document upload/search/void/restore/history/download, Export CSV, Audit logging (PR #8–#26, 2026-05-30).
-**Phase 2 (Admin UI) in progress** — React/Vite scaffold implemented; page-level UI under development. Docker development environment available.
+**All roadmap phases (0–4) complete; compliance gate approved.** See
+[`docs/roadmap.md`](./docs/roadmap.md) and [`docs/todo/current.md`](./docs/todo/current.md).
+
+| Phase | Scope | Status |
+| --- | --- | --- |
+| 0 | Governance & foundation — ADRs, scope contract, NENE2 scaffold | ✅ Complete |
+| 1 | Document API — auth, multi-tenancy, upload/search/void/restore/history, SHA-256 download, audit logging, CSV export (PR #8–#26) | ✅ Complete |
+| 2 | Admin UI + Export — React/Vite pages, ja/en UI, frontend tests, Docker dev env, export ZIP (PR #39–#64) | ✅ Complete |
+| 3 | Tier A shared hosting — web installer + release ZIP, operator guide, 事務処理規程 template (PR #66, #68) | ✅ Complete |
+| 4 | Ecosystem — MCP read/write tools, S3-compatible storage, email inbound, OCR assist (PR #70–#80) | ✅ Complete |
+
+**Compliance gate: 🟢 Approved** — licensed 税理士 sign-off recorded 2026-05-31
+(Review 2, [`docs/compliance-review/signoff-record.md`](./docs/compliance-review/signoff-record.md)).
+
+**Remaining before production go-live:** pre-production 税理士 Review 3 and
+Tier A live testing on real shared hosting — see
+[`docs/todo/current.md`](./docs/todo/current.md).
 
 ## Ecosystem
 
