@@ -11,8 +11,8 @@ RewriteRule .* - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization}]
 RewriteCond %{REQUEST_FILENAME} -f
 RewriteRule ^ - [L]
 
-# API and health routes → PHP front controller
-RewriteRule ^(admin|health) index.php [QSA,L]
+# API, health and demo-seat routes → PHP front controller (#127)
+RewriteRule ^(admin|health|demo) index.php [QSA,L]
 
 # All other routes → SPA index.html (if present) or PHP front controller
 RewriteCond %{DOCUMENT_ROOT}/index.html -f
