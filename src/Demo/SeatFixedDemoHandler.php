@@ -14,8 +14,9 @@ use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
 /**
- * Auto-login for the fixed demo organization (#127): `GET /demo/standard`
- * mints a normal 24 h access token for the seeded demo admin and serves a
+ * Auto-login for the fixed demo organization (#127, viewer-scoped per #130):
+ * `GET /demo/standard` mints a normal 24 h access token for the seeded demo
+ * VIEWER and serves a
  * one-shot seat page whose nonce'd inline script stores the SPA's
  * `AuthSession` JSON in `localStorage` and replaces into the app — the
  * invoice/clear "open one URL, land signed in" experience, without the
@@ -25,8 +26,10 @@ use Psr\Http\Message\ServerRequestInterface;
  * resolves to the served org, so a token whose `org_id` is that org passes
  * the capability org-scope check.
  *
- * Fail-close: 404 while `DEMO_MODE` is off, and 404 when the demo admin
- * account is absent (not a demo deployment). The page carries its own
+ * Fail-close: 404 while `DEMO_MODE` is off, and 404 when the demo viewer
+ * account is absent (not a demo deployment). The shared-org admin token this
+ * page must NEVER mint again would make the URL a public upload endpoint
+ * (#130) — the disposable-org adoption is the real fix. The page carries its own
  * per-response CSP — the app-wide policy would block the inline script (the
  * trap invoice hit; the security-headers middleware only fills absent
  * headers). Only server-generated values are embedded; nothing from the
@@ -34,7 +37,7 @@ use Psr\Http\Message\ServerRequestInterface;
  */
 final readonly class SeatFixedDemoHandler
 {
-    public const string DEMO_ADMIN_EMAIL = 'demo-admin@nene-vault.dev';
+    public const string DEMO_VIEWER_EMAIL = 'demo-viewer@nene-vault.dev';
 
     private const int TOKEN_TTL_SECONDS = 86400; // mirror LoginUseCase
 
@@ -53,28 +56,32 @@ final readonly class SeatFixedDemoHandler
             return $this->notFound();
         }
 
-        $admin = $this->users->findByEmail(self::DEMO_ADMIN_EMAIL);
+        // Seat as VIEWER (#130): every visitor shares the one fixed org, so a
+        // public admin token would be a public upload endpoint. Read covers
+        // the showcase (search / SHA-256 / audit / export); the upload demo
+        // uses the hand-out admin credentials on the login form.
+        $viewer = $this->users->findByEmail(self::DEMO_VIEWER_EMAIL);
 
-        if ($admin === null || $admin->organizationId === null || Role::tryFrom($admin->role) !== Role::Admin) {
+        if ($viewer === null || $viewer->organizationId === null || Role::tryFrom($viewer->role) !== Role::Viewer) {
             return $this->notFound();
         }
 
         $now = $this->clock->now()->getTimestamp();
         $token = $this->tokenIssuer->issue([
-            'sub' => $admin->email,
-            'user_id' => $admin->id,
-            'role' => $admin->role,
-            'org_id' => $admin->organizationId,
+            'sub' => $viewer->email,
+            'user_id' => $viewer->id,
+            'role' => $viewer->role,
+            'org_id' => $viewer->organizationId,
             'iat' => $now,
             'exp' => $now + self::TOKEN_TTL_SECONDS,
         ]);
 
         $session = json_encode([
             'token' => $token,
-            'userId' => $admin->id,
-            'email' => $admin->email,
-            'role' => $admin->role,
-            'orgId' => $admin->organizationId,
+            'userId' => $viewer->id,
+            'email' => $viewer->email,
+            'role' => $viewer->role,
+            'orgId' => $viewer->organizationId,
         ], JSON_THROW_ON_ERROR | JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP);
 
         $nonce = base64_encode(random_bytes(18));

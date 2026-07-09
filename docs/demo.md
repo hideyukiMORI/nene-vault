@@ -38,11 +38,13 @@ metadata, which is what the 電帳法 search showcase exercises.
 ## 2.5 Auto-login (`/demo/standard`, #127)
 
 With `DEMO_MODE=1` in `.env`, opening `https://…/demo/standard` seats the
-visitor straight into the demo org as `demo-admin` (a one-shot page stores a
-normal 24 h session in the SPA and lands on the dashboard) — the same
-"hand out one URL" experience as the invoice/clear demos, without the
-disposable-org module. Fail-close: 404 while `DEMO_MODE` is unset or the
-demo admin is not seeded.
+visitor straight into the demo org as **`demo-viewer` (read-only, #130)** —
+one URL, land signed in. Read covers the showcase (search, SHA-256 verified
+download, audit trail, export); the upload demo uses the hand-out **admin**
+credentials on the login form. The seat never mints an admin token: all
+visitors share the one fixed org, so a public admin session would be a
+public upload endpoint. Fail-close: 404 while `DEMO_MODE` is unset or the
+demo viewer is not seeded.
 
 ## 3. Showcase walkthrough (the 見せ場)
 
