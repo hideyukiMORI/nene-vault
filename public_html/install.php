@@ -625,6 +625,140 @@ function installer_css(): string
     CSS;
 }
 
+/**
+ * Standalone part page for the design handoff export (#131): one component
+ * family per file, wrapped in the installer stylesheet on a neutral canvas.
+ * CLI-only — never served at runtime.
+ */
+function render_parts_page(string $title, string $bodyHtml): string
+{
+    $css = installer_css();
+    $t = h($title);
+
+    return <<<HTML
+    <!DOCTYPE html>
+    <html lang="ja">
+    <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>NeNe Vault installer parts — {$t}</title>
+    <style>{$css}
+    body{padding:48px}
+    .part-canvas{max-width:640px;margin:0 auto}
+    .part-h{font-size:13px;font-weight:700;color:var(--fg-subtle);letter-spacing:.08em;text-transform:uppercase;margin:34px 0 14px;padding-bottom:6px;border-bottom:1px solid var(--border)}
+    .part-h:first-child{margin-top:0}
+    .part-dark{background:linear-gradient(157deg,var(--brand-strong) 0%,var(--brand-deep) 100%);border-radius:10px;padding:34px}
+    </style>
+    </head>
+    <body>
+    <div class="part-canvas">
+    <h1 style="font-size:20px;margin-bottom:6px">{$t}</h1>
+    {$bodyHtml}
+    </div>
+    </body>
+    </html>
+    HTML;
+}
+
+/**
+ * The part catalog: every reusable component family in its states, built from
+ * the same ico()/markup vocabulary the real screens use.
+ *
+ * @return array<string, array{string, string}> file basename => [title, body]
+ */
+function installer_parts(): array
+{
+    $field = static fn (string $label, string $inner, string $under = ''): string => '<div class="field"><label class="label">' . $label . '</label>' . $inner . $under . '</div>';
+
+    return [
+        'parts-01-buttons' => ['ボタン', ''
+            . '<div class="part-h">Primary / Ghost / Back</div>'
+            . '<div class="btn-row"><a class="btn btn-ghost btn-back" href="#">' . ico('back') . '</a>'
+            . '<button class="btn btn-primary">接続テストして次へ' . ico('arrow') . '</button></div>'
+            . '<div class="part-h">Block / Large</div>'
+            . '<a class="btn btn-primary btn-block" href="#">セットアップを開始' . ico('arrow') . '</a>'
+            . '<div style="height:12px"></div>'
+            . '<a class="btn btn-primary btn-block btn-lg" href="#">' . ico('login') . '管理画面にログイン</a>'],
+        'parts-02-form-fields' => ['フォーム部品', ''
+            . '<div class="part-h">標準入力＋ツールチップ＋ヒント</div>'
+            . $field('データベース名<span class="req">*</span><span class="tip" tabindex="0">?<span class="tip-body">コントロールパネルで作成済みのデータベース名。</span></span>',
+                '<input class="input mono" value="yourname_vault">',
+                '<p class="hint">事前に作成した<b>空のデータベース</b>を指定します。</p>')
+            . '<div class="part-h">エラー状態</div>'
+            . $field('管理者メールアドレス<span class="req">*</span>',
+                '<input class="input is-error" value="admin@example">',
+                '<p class="err-text">' . ico('warn') . '有効なメールアドレスを入力してください。</p>')
+            . '<div class="part-h">パスワード（表示切替つき）</div>'
+            . $field('管理者パスワード<span class="opt">（12 文字以上）</span><span class="req">*</span>',
+                '<div class="pw-wrap"><input class="input" type="password" value="secret-password"><button type="button" class="pw-eye" aria-label="パスワード表示切替">' . ico('eye') . '</button></div>')
+            . '<div class="part-h">セレクト / 2 カラム行</div>'
+            . $field('データベースの種類', '<select class="select"><option>MySQL（推奨・共有ホスティング）</option><option>SQLite（お試し・単一ファイル）</option></select>')
+            . '<div class="form-row2">'
+            . $field('ホスト<span class="req">*</span>', '<input class="input mono" value="mysqlXXX.phy.heteml.lan">')
+            . $field('ポート<span class="req">*</span>', '<input class="input mono" value="3306">')
+            . '</div>'],
+        'parts-03-alerts' => ['アラート', ''
+            . '<div class="part-h">OK</div>'
+            . '<div class="alert ok">' . ico('check') . '<div class="a-body"><div class="a-title">すべての要件を満たしています</div><div class="a-text">このサーバーでインストールを続行できます。</div></div></div>'
+            . '<div class="part-h">Error（技術詳細つき）</div>'
+            . '<div class="alert error">' . ico('warn') . '<div class="a-body"><div class="a-title">データベースに接続できませんでした</div><div class="a-text">ホスト名・ポート・ユーザー名・パスワードをご確認ください。</div><details open><summary>技術的な詳細を表示</summary><div class="det">SQLSTATE[HY000] [1045] Access denied for user</div></details></div></div>'
+            . '<div class="part-h">Warn</div>'
+            . '<div class="alert warn">' . ico('warn') . '<div class="a-body"><div class="a-title">SQLite はお試し向けです</div><div class="a-text">同時アクセスに弱いため、本番運用では MySQL を推奨します。</div></div></div>'],
+        'parts-04-requirements' => ['要件チェックリスト', ''
+            . '<ul class="reqs">'
+            . '<li class="pass"><span class="ic">' . ico('check') . '</span><div class="rq-body"><div class="rq-t">PHP 8.4.1 以上</div><div class="rq-d">現在: 8.4.23</div></div></li>'
+            . '<li class="pass"><span class="ic">' . ico('check') . '</span><div class="rq-body"><div class="rq-t">PHP 拡張モジュール</div><div class="rq-d">pdo / pdo_sqlite / pdo_mysql / zip / mbstring / json</div></div></li>'
+            . '<li class="fail"><span class="ic">' . ico('x') . '</span><div class="rq-body"><div class="rq-t">var/ ディレクトリへの書き込み権限</div><div class="rq-d">書き込み不可</div><div class="rq-fix"><b>解決方法:</b> パーミッションを「書き込み可（755 または 775）」に変更してください。</div></div></li>'
+            . '</ul>'],
+        'parts-05-stepper' => ['ステッパー', ''
+            . '<div class="part-h">サイドバー版（ダークパネル上）</div>'
+            . '<div class="part-dark"><ul class="vstep">'
+            . '<li class="done"><div class="vs-rail"><span class="vs-dot">' . ico('check') . '</span><span class="vs-line"></span></div><div class="vs-body"><div class="vs-t">データベース</div><div class="vs-d">接続情報の入力</div></div></li>'
+            . '<li class="active"><div class="vs-rail"><span class="vs-dot">2</span><span class="vs-line"></span></div><div class="vs-body"><div class="vs-t">アプリ設定</div><div class="vs-d">組織と管理者の作成</div></div></li>'
+            . '<li><div class="vs-rail"><span class="vs-dot">3</span><span class="vs-line"></span></div><div class="vs-body"><div class="vs-t">完了</div><div class="vs-d">セットアップ終了</div></div></li>'
+            . '</ul></div>'
+            . '<div class="part-h">モバイル横並び版</div>'
+            . '<div class="hstep" style="display:flex"><div class="hs done">1. データベース</div><div class="hs active">2. アプリ設定</div><div class="hs">3. 完了</div></div>'],
+        'parts-06-host-help' => ['ホスト記入例チップ＋コンパネ図', ''
+            . '<div class="host-help"><div class="hh-q">' . ico('help') . 'お使いのレンタルサーバーは？</div>'
+            . '<div class="hh-sub">選ぶと、ホスト名の<b>記入例</b>を自動入力します。</div>'
+            . '<div class="host-chips"><button type="button" class="host-chip on">ヘテムル</button><button type="button" class="host-chip">さくら</button><button type="button" class="host-chip">エックスサーバー</button><button type="button" class="host-chip">ConoHa WING</button><button type="button" class="host-chip">その他 / わからない</button></div>'
+            . '<button type="button" class="linkbtn cp-toggle open">コントロールパネルのどこを見る？</button>'
+            . '<div class="cp-diagram"><div class="cp-bar"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="cp-url">https://cp.your-host.example/database</span></div>'
+            . '<div class="cp-grid"><div class="cp-menu"><div class="cp-mi"><span class="cp-bullet"></span>ドメイン</div><div class="cp-mi"><span class="cp-bullet"></span>メール</div><div class="cp-mi hot"><span class="cp-bullet"></span>データベース</div><div class="cp-mi"><span class="cp-bullet"></span>FTP</div></div>'
+            . '<div class="cp-body"><div class="cp-h">データベース情報</div><div class="cp-kv"><span class="k">ホスト名</span><span class="v hl">mysqlXXX.phy.heteml.lan</span><span class="k">データベース名</span><span class="v">_nene_vault</span><span class="k">ユーザー名</span><span class="v">_nene_vault</span><span class="k">ポート</span><span class="v">3306</span></div>'
+            . '<div class="cp-note">黄色の<b>ホスト名</b>を下のフォームにそのまま貼り付けてください。</div></div></div></div></div>'],
+        'parts-07-loading' => ['ローディング（サブステップ全状態）', ''
+            . '<div class="ld-h">インストールしています</div>'
+            . '<div class="ld-sub">スキーマ作成から初期データ投入までを順に実行しています。</div>'
+            . '<div class="ld-bar"><span style="width:55%"></span></div>'
+            . '<ul class="substeps">'
+            . '<li class="ss-done"><span class="ss-ic">' . ico('check') . '</span><div><div class="ss-t">設定を保存しています</div><div class="ss-d">.env を書き出し中</div></div><span class="ss-meta">完了</span></li>'
+            . '<li class="ss-active"><span class="ss-ic"><span class="spinner"></span></span><div><div class="ss-t">テーブルを作成しています</div><div class="ss-d">スキーマを適用中</div></div><span class="ss-meta">実行中…</span></li>'
+            . '<li class="ss-pending"><span class="ss-ic"></span><div><div class="ss-t">組織と管理者を作成しています</div><div class="ss-d">初期データを投入中</div></div><span class="ss-meta">待機中</span></li>'
+            . '<li class="ss-active"><span class="ss-ic" style="color:var(--danger)">' . ico('x') . '</span><div><div class="ss-t">（失敗例）テーブルを作成しています</div><div class="ss-d">スキーマを適用中</div></div><span class="ss-meta">失敗</span></li>'
+            . '</ul>'
+            . '<div class="ld-warn">' . ico('warn') . 'このページを閉じたり、ボタンを二度押ししないでください。</div>'],
+        'parts-08-completion' => ['完了画面の部品', ''
+            . '<div class="part-h">完了マーク</div>'
+            . '<div class="done-mark">' . ico('check') . '</div>'
+            . '<div class="part-h">セキュリティ警告カード</div>'
+            . '<div class="sec-warn"><span class="sw-ico">' . ico('trash') . '</span><div><div class="sw-t">install.php は自動的に削除されました</div><div class="sw-d">もしファイルが残っている場合は、FTP またはファイルマネージャから<b>手動で削除</b>してください。</div></div></div>'
+            . '<div class="part-h">次のステップ・リスト</div>'
+            . '<ol class="next-list">'
+            . '<li><span class="nl-n">1</span><div><b>管理画面にログイン</b><div class="nl-d">先ほど設定した管理者メール・パスワードで。</div></div></li>'
+            . '<li><span class="nl-n">2</span><div><b>最初の受取書類をアップロード</b><div class="nl-d">PDF / JPEG / PNG。SHA-256 と保存期間が自動で記録されます。</div></div></li>'
+            . '</ol>'],
+        'parts-09-brand-panel' => ['ブランドパネル（サイドバー）', ''
+            . '<div class="part-dark" style="max-width:420px">'
+            . '<div class="iz-bs-top" style="margin-bottom:26px"><span class="mono-mark">' . ico('mark') . '</span><div><div class="abt-name">NeNe Vault</div><div class="abt-sub">Setup Wizard</div></div></div>'
+            . '<div class="iz-bs-mid"><h2>受け取った書類を、<br>証拠能力ごと保管する。</h2>'
+            . '<p class="lead">電子帳簿保存法に対応した受取書類アーカイブ。SHA-256 検証・改ざん不可の版管理・完全な監査証跡。</p></div>'
+            . '<div class="iz-trust" style="margin-top:26px"><span class="tb">' . ico('shield') . '電子帳簿保存法対応</span><span class="tb">' . ico('server') . 'セルフホスト</span><span class="tb">' . ico('oss') . 'オープンソース（MIT）</span></div>'
+            . '</div>'],
+    ];
+}
+
 // -------------------------------------------------------------------------
 // CLI: pattern export for a future design handoff
 // -------------------------------------------------------------------------
@@ -667,6 +801,16 @@ if (PHP_SAPI === 'cli') {
         file_put_contents($outDir . '/' . $name . '.html', render_installer_page($state));
         fwrite(STDOUT, "  {$name}.html\n");
     }
+
+    $links = array_map(static fn (string $n): string => "<li><a href=\"{$n}.html\">{$n}</a></li>", array_keys($patterns));
+    foreach (installer_parts() as $name => [$title, $body]) {
+        file_put_contents($outDir . '/' . $name . '.html', render_parts_page($title, $body));
+        $links[] = "<li><a href=\"{$name}.html\">{$name} — " . h($title) . '</a></li>';
+        fwrite(STDOUT, "  {$name}.html\n");
+    }
+    file_put_contents($outDir . '/index.html', render_parts_page('パターン索引', '<ul style="line-height:2.2">' . implode('', $links) . '</ul>'));
+    fwrite(STDOUT, "  index.html\n");
+
     copy(__DIR__ . '/installer.js', $outDir . '/installer.js');
     fwrite(STDOUT, "Exported to {$outDir}\n");
     exit(0);
