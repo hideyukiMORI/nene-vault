@@ -7,6 +7,7 @@ namespace NeneVault;
 use LogicException;
 use Nene2\Auth\TokenIssuerInterface;
 use Nene2\Config\AppConfig;
+use Nene2\Demo\DemoRouteRegistrar;
 use Nene2\DependencyInjection\ContainerBuilder;
 use Nene2\DependencyInjection\ServiceProviderInterface;
 use Nene2\Http\JsonResponseFactory;
@@ -17,7 +18,8 @@ use NeneVault\Audit\AuditServiceProvider;
 use NeneVault\Auth\AuthRouteRegistrar;
 use NeneVault\Auth\InvalidCredentialsExceptionHandler;
 use NeneVault\Auth\UserRepositoryInterface;
-use NeneVault\Demo\DemoRouteRegistrar;
+use NeneVault\Demo\DemoServiceProvider;
+use NeneVault\Demo\GuidedDemoRouteRegistrar;
 use NeneVault\Demo\SeatFixedDemoHandler;
 use NeneVault\Document\DocumentRouteRegistrar;
 use NeneVault\Document\DocumentServiceProvider;
@@ -75,7 +77,8 @@ final readonly class ApplicationServiceProvider implements ServiceProviderInterf
             ->addProvider(new DocumentServiceProvider())
             ->addProvider(new UserServiceProvider())
             ->addProvider(new ExportServiceProvider())
-            ->addProvider(new OcrServiceProvider());
+            ->addProvider(new OcrServiceProvider())
+            ->addProvider(new DemoServiceProvider());
 
         // Health handler
         $builder->set(
@@ -91,7 +94,7 @@ final readonly class ApplicationServiceProvider implements ServiceProviderInterf
             },
         );
 
-        // Fixed-demo seat (#127)
+        // Fixed-demo seat (#127; served at /demo/guided since #141)
         $builder->set(
             SeatFixedDemoHandler::class,
             static function (ContainerInterface $c): SeatFixedDemoHandler {
@@ -120,15 +123,15 @@ final readonly class ApplicationServiceProvider implements ServiceProviderInterf
             },
         );
         $builder->set(
-            DemoRouteRegistrar::class,
-            static function (ContainerInterface $c): DemoRouteRegistrar {
+            GuidedDemoRouteRegistrar::class,
+            static function (ContainerInterface $c): GuidedDemoRouteRegistrar {
                 $handler = $c->get(SeatFixedDemoHandler::class);
 
                 if (!$handler instanceof SeatFixedDemoHandler) {
                     throw new LogicException('SeatFixedDemoHandler service is invalid.');
                 }
 
-                return new DemoRouteRegistrar($handler);
+                return new GuidedDemoRouteRegistrar($handler);
             },
         );
 
@@ -145,7 +148,8 @@ final readonly class ApplicationServiceProvider implements ServiceProviderInterf
                 $user = $c->get(UserRouteRegistrar::class);
                 $export = $c->get(ExportRouteRegistrar::class);
                 $ocr = $c->get(OcrRouteRegistrar::class);
-                $demo = $c->get(DemoRouteRegistrar::class);
+                $guidedDemo = $c->get(GuidedDemoRouteRegistrar::class);
+                $disposableDemo = $c->get(DemoRouteRegistrar::class);
 
                 if (!$health instanceof HealthHandler) {
                     throw new LogicException('HealthHandler service is invalid.');
@@ -183,7 +187,11 @@ final readonly class ApplicationServiceProvider implements ServiceProviderInterf
                     throw new LogicException('OcrRouteRegistrar service is invalid.');
                 }
 
-                if (!$demo instanceof DemoRouteRegistrar) {
+                if (!$guidedDemo instanceof GuidedDemoRouteRegistrar) {
+                    throw new LogicException('GuidedDemoRouteRegistrar service is invalid.');
+                }
+
+                if (!$disposableDemo instanceof DemoRouteRegistrar) {
                     throw new LogicException('DemoRouteRegistrar service is invalid.');
                 }
 
@@ -197,7 +205,8 @@ final readonly class ApplicationServiceProvider implements ServiceProviderInterf
                     static fn ($router) => $user->register($router),
                     static fn ($router) => $export->register($router),
                     static fn ($router) => $ocr->register($router),
-                    static fn ($router) => $demo($router),
+                    static fn ($router) => $guidedDemo($router),
+                    static fn ($router) => $disposableDemo($router),
                 ];
             },
         );

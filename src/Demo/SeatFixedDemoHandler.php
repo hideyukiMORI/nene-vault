@@ -14,22 +14,25 @@ use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
 /**
- * Auto-login for the fixed demo organization (#127, viewer-scoped per #130):
- * `GET /demo/standard` mints a normal 24 h access token for the seeded demo
- * VIEWER and serves a
+ * Auto-login for the fixed demo organization (#127, viewer-scoped per #130,
+ * served at `GET /demo/guided` since #141): mints a normal 24 h access token
+ * for the seeded demo VIEWER and serves a
  * one-shot seat page whose nonce'd inline script stores the SPA's
  * `AuthSession` JSON in `localStorage` and replaces into the app — the
- * invoice/clear "open one URL, land signed in" experience, without the
- * disposable-org module (blocked on host-based tenant resolution, #118).
+ * invoice/clear "open one URL, land signed in" experience against the
+ * shared, nightly-reseeded showcase org. The disposable-org demo
+ * ({@see DemoSessionSeater}, `/demo/standard`) is the distribution link;
+ * this seat stays for guided walkthroughs and the README screenshots.
  *
- * No tenancy change is needed: in `single` mode every request already
- * resolves to the served org, so a token whose `org_id` is that org passes
- * the capability org-scope check.
+ * The token's `org_id` claim resolves the tenant (claim-based resolution,
+ * #141), and in `single` mode the host strategy resolves the same org for
+ * unauthenticated requests — either way the seat lands scoped correctly.
  *
  * Fail-close: 404 while `DEMO_MODE` is off, and 404 when the demo viewer
  * account is absent (not a demo deployment). The shared-org admin token this
- * page must NEVER mint again would make the URL a public upload endpoint
- * (#130) — the disposable-org adoption is the real fix. The page carries its own
+ * page must NEVER mint would make the URL a public upload endpoint (#130) —
+ * hands-on write access is exactly what the disposable-org demo is for.
+ * The page carries its own
  * per-response CSP — the app-wide policy would block the inline script (the
  * trap invoice hit; the security-headers middleware only fills absent
  * headers). Only server-generated values are embedded; nothing from the

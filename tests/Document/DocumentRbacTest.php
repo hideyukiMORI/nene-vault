@@ -20,7 +20,7 @@ use Nyholm\Psr7Server\ServerRequestCreator;
  *   viewer    ✗ 403   ✗ 403        ✗ 403  ✗ 403    ✅
  *
  * Tenant isolation:
- *   A token carrying a foreign org_id (≠ resolved org) is refused 403 by
+ *   A token whose org_id claim names a nonexistent org is refused 404 by
  *   CapabilityMiddleware — this is the enforcement boundary for cross-tenant access.
  */
 final class DocumentRbacTest extends ApiTestCase
@@ -28,7 +28,7 @@ final class DocumentRbacTest extends ApiTestCase
     private static string $adminToken  = '';
     private static string $memberToken = '';
     private static string $viewerToken = '';
-    private static string $foreignToken = '';  // wrong org_id → always 403
+    private static string $foreignToken = '';  // nonexistent org_id → 404 fail-close
     private static int    $orgId       = 0;
 
     public static function setUpBeforeClass(): void
@@ -40,7 +40,10 @@ final class DocumentRbacTest extends ApiTestCase
         self::$adminToken  = self::issueToken('admin', self::$orgId, userId: 30);
         self::$memberToken = self::issueToken('member', self::$orgId, userId: 31);
         self::$viewerToken = self::issueToken('viewer', self::$orgId, userId: 32);
-        // A token claiming a different org_id — simulates a user from another tenant.
+        // A token claiming an org that does not exist. Under claim-based tenant
+        // resolution (#141) the claim is looked up and fails closed with 404;
+        // a token for a REAL other org resolves that org and only ever sees its
+        // own data (covered below).
         self::$foreignToken = self::issueToken('admin', 999999, userId: 33);
     }
 
@@ -275,8 +278,10 @@ final class DocumentRbacTest extends ApiTestCase
     // ── tenant isolation: foreign org_id is refused ──────────────────────────
 
     /**
-     * A JWT carrying a different org_id is refused by CapabilityMiddleware (403).
-     * This is the system-level enforcement boundary for cross-tenant access.
+     * A JWT naming a nonexistent org fails closed in claim-based tenant
+     * resolution (#141). This is the system-level enforcement boundary for
+     * cross-tenant access: the claim decides the tenant, so "another org's
+     * data" is unreachable by construction.
      */
     public function test_foreign_token_cannot_search_documents(): void
     {
@@ -284,9 +289,31 @@ final class DocumentRbacTest extends ApiTestCase
             $this->request('GET', '/admin/vault/documents', self::$foreignToken),
         );
 
-        $this->assertSame(403, $response->getStatusCode());
+        $this->assertSame(404, $response->getStatusCode());
         $body = json_decode((string) $response->getBody(), true);
-        $this->assertSame('org-access-denied', basename($body['type']));
+        $this->assertSame('org-not-found', basename($body['type']));
+    }
+
+    /**
+     * A token for a REAL sibling org resolves that org (claim wins over the
+     * host) and sees only its own documents — tenant isolation under the
+     * claim-based model.
+     */
+    public function test_sibling_org_token_is_scoped_to_its_own_org(): void
+    {
+        $marker = 'RbacIsolation-' . uniqid();
+        $this->uploadDoc($this->handler(), self::$adminToken, $marker, '2026-05-01', '1');
+
+        $siblingOrgId = self::ensureOrg('rbac-sibling-org');
+        $siblingToken = self::issueToken('admin', $siblingOrgId, userId: 34);
+
+        $response = $this->handler()->handle(
+            $this->request('GET', "/admin/vault/documents?counterparty_name={$marker}", $siblingToken),
+        );
+
+        $this->assertSame(200, $response->getStatusCode());
+        $body = json_decode((string) $response->getBody(), true);
+        $this->assertCount(0, $body['items'], 'a sibling org must never see test-org documents');
     }
 
     public function test_foreign_token_cannot_get_document(): void
@@ -297,7 +324,7 @@ final class DocumentRbacTest extends ApiTestCase
             $this->request('GET', "/admin/vault/documents/{$id}", self::$foreignToken),
         );
 
-        $this->assertSame(403, $response->getStatusCode());
+        $this->assertSame(404, $response->getStatusCode());
     }
 
     public function test_foreign_token_cannot_upload(): void
@@ -317,7 +344,7 @@ final class DocumentRbacTest extends ApiTestCase
         $response = $this->handler()->handle($request);
         @unlink($tmp);
 
-        $this->assertSame(403, $response->getStatusCode());
+        $this->assertSame(404, $response->getStatusCode());
     }
 
     public function test_foreign_token_cannot_void_document(): void
@@ -328,7 +355,7 @@ final class DocumentRbacTest extends ApiTestCase
             $this->request('POST', "/admin/vault/documents/{$id}/void", self::$foreignToken, ['void_reason' => 'attack']),
         );
 
-        $this->assertSame(403, $response->getStatusCode());
+        $this->assertSame(404, $response->getStatusCode());
     }
 
     public function test_foreign_token_cannot_edit_metadata(): void
@@ -339,6 +366,6 @@ final class DocumentRbacTest extends ApiTestCase
             $this->request('PATCH', "/admin/vault/documents/{$id}/metadata", self::$foreignToken, ['counterparty_name' => 'Hacked']),
         );
 
-        $this->assertSame(403, $response->getStatusCode());
+        $this->assertSame(404, $response->getStatusCode());
     }
 }
