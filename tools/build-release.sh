@@ -61,6 +61,11 @@ find "$STAGING/vendor" -maxdepth 3 -type l | while read -r link; do
 done
 rsync -a \
     "$ROOT/locales/"   "$STAGING/locales/"
+# CLI tools ship with the release: the demo sweep/reseed crons (#141) and the
+# email-inbound entry point live here — a zip without tools/ leaves a Tier A
+# install with no cron targets at all (#145).
+rsync -a \
+    "$ROOT/tools/"     "$STAGING/tools/"
 rsync -a \
     "$ROOT/database/"  "$STAGING/database/"
 rsync -a \

@@ -9,13 +9,16 @@ use PHPUnit\Framework\TestCase;
 
 /**
  * Runs the real `tools/sweep-demo.php` as a subprocess with the host timezone
- * pinned to Asia/Tokyo — the production (HETEML) configuration where the
- * clear #280 / deal #72 bug bit live. `created_at` is written in UTC, so a
- * bare `DateTimeImmutable` parse reads every org as 9 hours older than it is
- * and the hourly cron reaps freshly provisioned demo orgs on the spot. The
- * script must parse UTC explicitly: fresh orgs survive, genuinely expired
- * ones are still reaped — and the reaped org's document storage tree goes
- * with it.
+ * pinned to Asia/Tokyo — the production (HETEML) configuration — and to UTC.
+ *
+ * Vault writes `organizations.created_at` with `date()` in the host's default
+ * timezone (unlike clear/deal, which write UTC), so the sweep must parse it
+ * with that same default timezone (#143): each scenario here writes
+ * `created_at` in the timezone the subprocess sweeps under and expects the
+ * same outcome — fresh orgs survive, genuinely expired ones are reaped, and
+ * the reaped org's document storage tree goes with it. (A UTC-forced parse on
+ * the JST host — the transplanted clear #280 / deal #72 shape — read every
+ * org as 9 h in the future and stretched the 3 h TTL to 12 h.)
  */
 final class SweepDemoScriptTest extends TestCase
 {
@@ -52,10 +55,11 @@ final class SweepDemoScriptTest extends TestCase
 
     public function test_fresh_org_survives_and_expired_org_is_reaped_on_a_jst_host(): void
     {
-        $nowUtc = time();
-        $this->insertOrg(1, 'demo-fresh', gmdate('Y-m-d H:i:s', $nowUtc - 60));          // 1 minute old
-        $this->insertOrg(2, 'demo-expired', gmdate('Y-m-d H:i:s', $nowUtc - 4 * 3600));  // past the 3h TTL
-        $this->insertOrg(3, 'ayane', gmdate('Y-m-d H:i:s', $nowUtc - 30 * 24 * 3600));   // fixed showcase org (no prefix)
+        // created_at written the way the app writes it on a JST host: date()
+        // in Asia/Tokyo — the sweep subprocess below runs under the same TZ.
+        $this->insertOrg(1, 'demo-fresh', $this->localStamp('Asia/Tokyo', 60));               // 1 minute old
+        $this->insertOrg(2, 'demo-expired', $this->localStamp('Asia/Tokyo', 4 * 3600));       // past the 3h TTL
+        $this->insertOrg(3, 'ayane', $this->localStamp('Asia/Tokyo', 30 * 24 * 3600));        // fixed showcase org (no prefix)
 
         // Child rows + a storage tree for the org that must be reaped.
         $this->pdo->exec('INSERT INTO users (organization_id) VALUES (2)');
@@ -74,9 +78,8 @@ final class SweepDemoScriptTest extends TestCase
 
     public function test_behaves_identically_on_a_utc_host_and_is_idempotent(): void
     {
-        $nowUtc = time();
-        $this->insertOrg(1, 'demo-fresh', gmdate('Y-m-d H:i:s', $nowUtc - 60));
-        $this->insertOrg(2, 'demo-expired', gmdate('Y-m-d H:i:s', $nowUtc - 4 * 3600));
+        $this->insertOrg(1, 'demo-fresh', $this->localStamp('UTC', 60));
+        $this->insertOrg(2, 'demo-expired', $this->localStamp('UTC', 4 * 3600));
 
         $output = $this->runSweep('UTC');
         self::assertStringContainsString('2 org(s) total, 1 expired, 0 overflow, 1 reaped', $output);
@@ -88,12 +91,20 @@ final class SweepDemoScriptTest extends TestCase
         self::assertSame(['demo-fresh'], $this->remainingSlugs());
     }
 
-    private function insertOrg(int $id, string $slug, string $createdAtUtc): void
+    /** A created_at string as the app's date() would write it in $timezone, $secondsAgo in the past. */
+    private function localStamp(string $timezone, int $secondsAgo): string
+    {
+        return (new \DateTimeImmutable('@' . (time() - $secondsAgo)))
+            ->setTimezone(new \DateTimeZone($timezone))
+            ->format('Y-m-d H:i:s');
+    }
+
+    private function insertOrg(int $id, string $slug, string $createdAt): void
     {
         $stmt = $this->pdo->prepare(
             "INSERT INTO organizations (id, slug, name, created_at, updated_at) VALUES (?, ?, 'Demo', ?, ?)",
         );
-        $stmt->execute([$id, $slug, $createdAtUtc, $createdAtUtc]);
+        $stmt->execute([$id, $slug, $createdAt, $createdAt]);
     }
 
     private function countRows(string $sql): int
