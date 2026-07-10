@@ -60,9 +60,11 @@ php tools/sweep-demo.php
 
 Reaps demo orgs (`demo-` slug prefix only) past `DEMO_TTL_HOURS`, enforces
 `DEMO_MAX_ORGS` overflow, deletes each org's DB rows **and storage tree**,
-and prunes stale throttle files. Idempotent. `created_at` is parsed as UTC
-explicitly — on a JST host a bare parse would reap fresh orgs on the spot
-(clear #280 / deal #72; regression-tested in `tests/Demo/SweepDemoScriptTest`).
+and prunes stale throttle files. Idempotent. `created_at` is parsed in the
+host's default timezone — the same timezone `date()` wrote it in (#143;
+Vault differs from clear/deal here, which write UTC and need the UTC-explicit
+parse of clear #280 / deal #72). Regression-tested for JST and UTC hosts in
+`tests/Demo/SweepDemoScriptTest`.
 
 Production wrapper: `~/bin/sweep-vault-demo.sh`, registered hourly in the
 HETEML panel (offset the minute from sibling crons; `:40` is free).

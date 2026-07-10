@@ -54,11 +54,15 @@ $records = [];
 foreach ($rows as $row) {
     $records[] = new DemoOrgRecord(
         orgId: (int) $row['id'],
-        // created_at is written in UTC (the app-wide UtcClock). Parse it as
-        // UTC explicitly: on a host whose default timezone is ahead of UTC
-        // (production runs Asia/Tokyo) a bare parse would read every fresh
-        // org as hours old and expire it on the spot (clear #280, deal #72).
-        createdAt: new DateTimeImmutable((string) $row['created_at'], new DateTimeZone('UTC')),
+        // Parse created_at in the timezone it was WRITTEN in (#143). Vault's
+        // PdoOrganizationRepository stamps it with date() — the host's default
+        // timezone — unlike clear/deal, which write UTC and therefore need the
+        // UTC-explicit parse (clear #280, deal #72). Web SAPI and this CLI
+        // share php.ini date.timezone on the target host, so the bare parse
+        // is the consistent one: forcing UTC on a JST host read every org as
+        // 9 h in the future and stretched the 3 h TTL to 12 h (caught in the
+        // #141 production acceptance).
+        createdAt: new DateTimeImmutable((string) $row['created_at']),
     );
 }
 
