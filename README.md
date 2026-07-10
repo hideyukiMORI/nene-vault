@@ -26,6 +26,36 @@ without becoming accounting software or expense workflow. Built on
 | **NeNe Profile** | `nene-profile` | Bank CSV column mapping & normalization |
 | **NeNe Vault** | `nene-vault` (this) | Received-document archive — 受取書類の保存・検索 |
 
+## Live demo
+
+Try it now — no sign-up. The link seats you as a **read-only viewer** in a **shared demo organization** pre-loaded with received invoices and receipts. Nothing you see can be changed from the demo seat, and the organization is reset nightly.
+
+- <https://vault.ayane.co.jp/demo/standard>
+
+### Screenshots
+
+From the shared demo organization. Japanese UI shown — the admin UI is bilingual (ja/en, one-click switch).
+
+**Received documents — every uploaded invoice and receipt tracked by date, counterparty, amount, and status, with 電帳法-style search filters (date range, amount range, counterparty, document type).**
+
+![Received-document list with date/amount/counterparty/type search filters and status badges](./docs/images/demo-01-documents.png)
+
+**Document detail — SHA-256 of the stored file, version number, full change history with before/after JSON, and a 10-year retention deadline computed per document.**
+
+![Document detail with metadata, SHA-256 hash, version, retention deadline, and change-history JSON](./docs/images/demo-02-document-detail.png)
+
+**Audit log — append-only record of every mutation; void → restore status transitions are shown as before/after diffs and can never be deleted.**
+
+![Audit log with document.voided and document.restored entries showing active/voided status transitions](./docs/images/demo-03-audit.png)
+
+**Export — download a date range of documents as a ZIP with a manifest CSV (or manifest-only CSV), voided documents optional.**
+
+![Export screen with date range, counterparty filter, and ZIP-plus-manifest-CSV output options](./docs/images/demo-04-export.png)
+
+**Upload — PDF/JPEG/PNG up to 20 MB, with required counterparty and document-type metadata captured at ingest.**
+
+![Upload modal with file picker (PDF/JPEG/PNG, max 20 MB) and required metadata fields](./docs/images/demo-05-upload.png)
+
 ## Goals
 
 - **Store received documents** — PDF/image upload, metadata, immutable audit trail
