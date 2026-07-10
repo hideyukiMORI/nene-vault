@@ -96,6 +96,17 @@ final class DemoSeedLifecycleTest extends ApiTestCase
         self::assertFileExists($absolute);
         self::assertSame((string) $version['file_sha256'], hash_file('sha256', $absolute));
 
+        // Amounts are whole yen (JPY has no minor unit — naming-conventions):
+        // the line generator yields ¥33,000–¥3,300,000 per document. A ×100
+        // regression (#136) would blow past the upper bound on every row.
+        $amounts = $this->query()->fetchOne(
+            'SELECT MIN(amount_cents) AS lo, MAX(amount_cents) AS hi FROM vault_documents WHERE organization_id = ?',
+            [$org->id],
+        );
+        self::assertIsArray($amounts);
+        self::assertGreaterThanOrEqual(33_000, (int) $amounts['lo']);
+        self::assertLessThanOrEqual(3_300_000, (int) $amounts['hi']);
+
         // Dates are spread — not a single bulk-upload day.
         $range = $this->query()->fetchOne(
             'SELECT MIN(transaction_date) AS lo, MAX(transaction_date) AS hi FROM vault_documents WHERE organization_id = ?',

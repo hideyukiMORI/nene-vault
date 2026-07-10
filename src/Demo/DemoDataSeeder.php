@@ -119,7 +119,9 @@ final readonly class DemoDataSeeder
                     counterpartyName: $vendor[0],
                     category: $category,
                     transactionDate: $txDate->format('Y-m-d'),
-                    amountCents: $total * 100,
+                    // JPY has no minor unit: amount_cents stores whole yen
+                    // (naming-conventions), matching the PDF total. Never x100.
+                    amountCents: $total,
                     tags: $i % 3 === 0 ? ['月次'] : [],
                     source: 'web_upload',
                     confirmDuplicate: true,

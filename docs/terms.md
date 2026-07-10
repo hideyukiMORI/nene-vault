@@ -468,6 +468,7 @@ Base URL: `https://nene-vault.dev/problems/`
 | `NENE_VAULT_PORT` | Optional | HTTP port (default 8080) | `PORT`, `VAULT_PORT`, `APP_PORT` |
 | `NENE_VAULT_APP_ENV` | Optional | `local` / `test` / `production` | `APP_ENV`, `ENV`, `ENVIRONMENT` |
 | `NENE_VAULT_MAX_FILE_SIZE_MB` | Optional | Max upload size in MB (default 20) | `MAX_FILE_SIZE`, `UPLOAD_LIMIT` |
+| `VITE_NENE_VAULT_MAX_FILE_SIZE_MB` | Optional | Frontend build-time mirror of `NENE_VAULT_MAX_FILE_SIZE_MB` for the upload hint (default 20; #137) | `VITE_MAX_FILE_SIZE` |
 | `NENE_VAULT_DEMO_ADMIN_PASSWORD` | Optional | Fixed hand-out demo admin password for `tools/seed-demo.php` (#118) | `DEMO_PASSWORD`, `DEMO_ADMIN_PASS` |
 | `DEMO_MODE` | Optional | Strict opt-in gate for the demo seat route (`Nene2\Config\ConfigLoader`-parsed; #127) | `DEMO`, `DEMO_ENABLED` |
 | `NENE_VAULT_DEMO_VIEWER_PASSWORD` | Optional | Fixed hand-out demo viewer password for `tools/seed-demo.php` (#118) | `DEMO_VIEWER_PASS` |
