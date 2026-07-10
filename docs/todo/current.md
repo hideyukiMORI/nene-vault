@@ -13,8 +13,15 @@ pre-production go-live gate (税理士 Review 3) and Tier A live testing.**
 > raw `getenv()` readers (org resolution 404'd on shared hosting), and the
 > HETEML `Authorization`-stripping fix (#118, `X-Authorization` mirror).
 > Owner cron step: register `~/bin/reseed-vault-demo.sh` (nightly) in the
-> HETEML panel. Disposable-org demo (`Nene2\Demo`) is blocked on host-based
-> tenant resolution — decision escalated to the coordinator (see #118).
+> HETEML panel.
+>
+> **2026-07-10 (late): disposable-org demo shipped (#141).** The #118 blocker
+> was resolved by claim-based tenant resolution: `AdminApiAuthMiddleware` now
+> runs before `OrgResolverMiddleware`, and a verified bearer's `org_id` claim
+> resolves the tenant ahead of the host/env strategy. `/demo/standard` is the
+> disposable-org distribution link (admin seat, upload showcase, TTL 3 h);
+> the fixed viewer seat moved to `/demo/guided`. Owner cron step: register
+> `~/bin/sweep-vault-demo.sh` (hourly, minute :40) in the HETEML panel.
 
 ## Done
 

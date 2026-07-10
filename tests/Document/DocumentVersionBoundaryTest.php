@@ -21,6 +21,8 @@ final class DocumentVersionBoundaryTest extends ApiTestCase
         self::bootContainer();
         self::$orgId        = self::ensureOrg('test-org');
         self::$adminToken   = self::issueToken('admin', self::$orgId, userId: 140);
+        // A token claiming an org that does not exist: under claim-based tenant
+        // resolution (#141) it fails closed with 404 org-not-found.
         self::$foreignToken = self::issueToken('admin', 999998, userId: 141);
     }
 
@@ -79,7 +81,7 @@ final class DocumentVersionBoundaryTest extends ApiTestCase
         $this->assertSame(404, $resp->getStatusCode());
     }
 
-    public function test_download_foreign_token_returns_403(): void
+    public function test_download_foreign_token_returns_404(): void
     {
         $handler = $this->handler();
         $id      = $this->uploadDoc($handler, self::$adminToken, 'DlForeign', '2026-01-01', '1000');
@@ -89,7 +91,7 @@ final class DocumentVersionBoundaryTest extends ApiTestCase
         $resp = $handler->handle(
             $this->request('GET', "/admin/vault/documents/{$docId}/versions/{$versionId}/download", self::$foreignToken),
         );
-        $this->assertSame(403, $resp->getStatusCode());
+        $this->assertSame(404, $resp->getStatusCode());
     }
 
     public function test_download_unauthenticated_returns_401(): void
@@ -144,13 +146,13 @@ final class DocumentVersionBoundaryTest extends ApiTestCase
         $this->assertSame(404, $resp->getStatusCode());
     }
 
-    public function test_history_foreign_token_returns_403(): void
+    public function test_history_foreign_token_returns_404(): void
     {
         $id   = $this->uploadDoc($this->handler(), self::$adminToken, 'HistForeign', '2026-01-01', '1000');
         $resp = $this->handler()->handle(
             $this->request('GET', "/admin/vault/documents/{$id}/history", self::$foreignToken),
         );
-        $this->assertSame(403, $resp->getStatusCode());
+        $this->assertSame(404, $resp->getStatusCode());
     }
 
     // ── Get by ID ─────────────────────────────────────────────────────────────
@@ -163,13 +165,13 @@ final class DocumentVersionBoundaryTest extends ApiTestCase
         $this->assertSame(404, $resp->getStatusCode());
     }
 
-    public function test_get_document_foreign_token_returns_403(): void
+    public function test_get_document_foreign_token_returns_404(): void
     {
         $id   = $this->uploadDoc($this->handler(), self::$adminToken, 'GetForeign', '2026-01-01', '1000');
         $resp = $this->handler()->handle(
             $this->request('GET', "/admin/vault/documents/{$id}", self::$foreignToken),
         );
-        $this->assertSame(403, $resp->getStatusCode());
+        $this->assertSame(404, $resp->getStatusCode());
     }
 
     // ── Helpers ───────────────────────────────────────────────────────────────

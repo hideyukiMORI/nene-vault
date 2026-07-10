@@ -136,12 +136,13 @@ final class ExportBoundaryTest extends ApiTestCase
     // ── tenant isolation ─────────────────────────────────────────────────────
 
     /**
-     * A JWT with a foreign org_id is refused by CapabilityMiddleware (403).
+     * A JWT claiming a nonexistent org fails closed in the claim-based org
+     * resolution with 404 (#141) — the export never runs.
      * No cross-tenant data can be exported.
      */
     public function test_foreign_token_cannot_export(): void
     {
-        $this->assertSame(403, $this->handler()->handle(
+        $this->assertSame(404, $this->handler()->handle(
             $this->request('POST', '/admin/vault/export', self::$foreignToken, []),
         )->getStatusCode());
     }

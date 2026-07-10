@@ -28,13 +28,15 @@ without becoming accounting software or expense workflow. Built on
 
 ## Live demo
 
-Try it now — no sign-up. The link seats you as a **read-only viewer** in a **shared demo organization** pre-loaded with received invoices and receipts. Nothing you see can be changed from the demo seat, and the organization is reset nightly.
+Try it now — no sign-up. The link provisions a **private, disposable demo organization** pre-loaded with a year of received invoices and receipts, and seats you as its **admin** — so you can upload, void/restore, and export for real. Nothing you do affects anyone else: the organization is destroyed automatically after a few hours, and opening the link again starts a brand-new one.
 
 - <https://vault.ayane.co.jp/demo/standard>
 
+A shared, read-only showcase organization (reset nightly) also exists at [`/demo/guided`](https://vault.ayane.co.jp/demo/guided) for guided walkthroughs — the screenshots below are from it.
+
 ### Screenshots
 
-From the shared demo organization. Japanese UI shown — the admin UI is bilingual (ja/en, one-click switch).
+Japanese UI shown — the admin UI is bilingual (ja/en, one-click switch).
 
 **Received documents — every uploaded invoice and receipt tracked by date, counterparty, amount, and status, with 電帳法-style search filters (date range, amount range, counterparty, document type).**
 

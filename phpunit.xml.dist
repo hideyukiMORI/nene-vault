@@ -36,6 +36,11 @@
         <env name="DB_NAME" value="var/nene_vault_test.sqlite" force="true"/>
         <env name="NENE_VAULT_STORAGE_PATH" value="/tmp/nene-vault-test" force="true"/>
         <env name="NENE_VAULT_MAX_FILE_SIZE_MB" value="20" force="true"/>
+        <!-- Demo mode ON so the disposable-demo flow (#141) is exercised end-to-end
+             through the real pipeline. It only gates the /demo/* routes. -->
+        <env name="DEMO_MODE" value="1" force="true"/>
+        <env name="DEMO_TTL_HOURS" value="3" force="true"/>
+        <env name="DEMO_MAX_ORGS" value="200" force="true"/>
         <!--
           Opt in to the framework's development JWT secret so any test that boots the
           runtime container (RuntimeServiceProvider -> GuardedJwtSecretResolver) can

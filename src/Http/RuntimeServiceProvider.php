@@ -320,9 +320,15 @@ final readonly class RuntimeServiceProvider implements ServiceProviderInterface
                         default => new EnvResolutionStrategy($orgSlug),
                     };
 
+                    // Order matters (#141): auth verifies the bearer FIRST so the
+                    // org resolver can trust the `org_id` claim (claim-based tenant
+                    // resolution — how a disposable demo org is reachable on a
+                    // single-domain host). Neither middleware consumes the other's
+                    // attributes in the opposite direction, and CapabilityMiddleware
+                    // (which needs both) stays last.
                     $authMiddleware = [
-                        new OrgResolverMiddleware($orgIdHolder, $orgRepo, $pd, $strategy),
                         new AdminApiAuthMiddleware($pd, $tokenVerifier),
+                        new OrgResolverMiddleware($orgIdHolder, $orgRepo, $pd, $strategy),
                         new CapabilityMiddleware($pd),
                     ];
 
