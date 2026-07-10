@@ -1,3 +1,4 @@
+import { env } from '@/shared/config/env';
 import { useTranslation } from '@/shared/i18n/use-translation';
 import { Button, Field, Input, Modal, Select } from '@/shared/ui';
 import { useDocumentUpload } from '../hooks/use-document-upload';
@@ -29,7 +30,7 @@ export function DocumentUploadModal({ onClose }: DocumentUploadModalProps) {
         <Field
           label={t('document.upload.file_label')}
           required
-          hint={t('document.upload.file_hint')}
+          hint={t('document.upload.file_hint', { max_size_mb: env.uploadMaxFileSizeMb })}
           error={errors.file !== undefined ? requiredMarker : undefined}
         >
           <input
