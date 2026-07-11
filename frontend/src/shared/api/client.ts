@@ -12,9 +12,11 @@ interface RequestOptions {
 
 /** Fail-closed handling for auth errors, shared by all requests. */
 function handleAuthError(response: Response, path: string): void {
+  // Session expired (not a wrong-credentials 401 from the login endpoint):
+  // clear the reactive store — the auth gate shows the login form in place at
+  // the current URL (#168), instead of a hard navigation that drops SPA state.
   if (response.status === 401 && !path.includes('/auth/login')) {
     authStore.clearSession();
-    window.location.href = '/login';
   }
   if (response.status === 403) {
     window.location.href = '/forbidden';

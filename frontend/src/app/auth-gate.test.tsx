@@ -1,8 +1,17 @@
-import { render, screen } from '@testing-library/react';
-import { MemoryRouter } from 'react-router-dom';
+import { screen } from '@testing-library/react';
+import { act } from 'react';
 import { afterEach, describe, expect, it } from 'vitest';
 import { authStore } from '@/entities/auth';
+import { renderWithProviders } from '@tests/render/render-with-providers';
 import { AuthGate } from './auth-gate';
+
+const SESSION = {
+  token: 'valid-jwt',
+  userId: 1,
+  email: 'admin@example.com',
+  role: 'admin',
+  orgId: 1,
+};
 
 afterEach(() => {
   sessionStorage.clear();
@@ -10,56 +19,60 @@ afterEach(() => {
 
 describe('AuthGate', () => {
   it('renders children when a session exists', () => {
-    authStore.setSession({
-      token: 'valid-jwt',
-      userId: 1,
-      email: 'admin@example.com',
-      role: 'admin',
-      orgId: 1,
-    });
+    authStore.setSession(SESSION);
 
-    render(
-      <MemoryRouter>
-        <AuthGate>
-          <div>Protected content</div>
-        </AuthGate>
-      </MemoryRouter>,
+    renderWithProviders(
+      <AuthGate>
+        <div>Protected content</div>
+      </AuthGate>,
     );
 
     expect(screen.getByText('Protected content')).toBeInTheDocument();
   });
 
-  it('redirects to /login when no session exists', () => {
-    render(
-      <MemoryRouter initialEntries={['/dashboard']}>
-        <AuthGate>
-          <div>Protected content</div>
-        </AuthGate>
-      </MemoryRouter>,
+  it('shows the login form in place when no session exists (#168)', () => {
+    renderWithProviders(
+      <AuthGate>
+        <div>Protected content</div>
+      </AuthGate>,
     );
 
-    // Protected content should NOT be rendered
     expect(screen.queryByText('Protected content')).toBeNull();
+    // The login form renders IN PLACE — no navigation away from the route.
+    expect(screen.getByRole('button', { name: 'Log In' })).toBeInTheDocument();
   });
 
-  it('does not render children when session was cleared', () => {
-    authStore.setSession({
-      token: 'valid-jwt',
-      userId: 1,
-      email: 'a@b.com',
-      role: 'admin',
-      orgId: 1,
-    });
-    authStore.clearSession();
+  it('swaps to the login form when the session is cleared reactively', () => {
+    authStore.setSession(SESSION);
 
-    render(
-      <MemoryRouter>
-        <AuthGate>
-          <div>Protected content</div>
-        </AuthGate>
-      </MemoryRouter>,
+    renderWithProviders(
+      <AuthGate>
+        <div>Protected content</div>
+      </AuthGate>,
     );
+    expect(screen.getByText('Protected content')).toBeInTheDocument();
+
+    // A 401 in the API client clears the session; the gate must react.
+    act(() => {
+      authStore.clearSession();
+    });
 
     expect(screen.queryByText('Protected content')).toBeNull();
+    expect(screen.getByRole('button', { name: 'Log In' })).toBeInTheDocument();
+  });
+
+  it('swaps back to children when a session appears (login in place)', () => {
+    renderWithProviders(
+      <AuthGate>
+        <div>Protected content</div>
+      </AuthGate>,
+    );
+    expect(screen.queryByText('Protected content')).toBeNull();
+
+    act(() => {
+      authStore.setSession(SESSION);
+    });
+
+    expect(screen.getByText('Protected content')).toBeInTheDocument();
   });
 });
