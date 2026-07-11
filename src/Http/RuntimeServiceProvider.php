@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace NeneVault\Http;
 
 use LogicException;
+use Nene2\Auth\BearerTokenMiddleware;
 use Nene2\Auth\GuardedJwtSecretResolver;
 use Nene2\Auth\LocalBearerTokenVerifier;
 use Nene2\Auth\TokenIssuerInterface;
@@ -28,7 +29,6 @@ use Nene2\Http\RuntimeApplicationFactory;
 use Nene2\Log\MonologLoggerFactory;
 use Nene2\Log\RequestIdHolder;
 use NeneVault\ApplicationServiceProvider;
-use NeneVault\Auth\AdminApiAuthMiddleware;
 use NeneVault\Auth\AuthServiceProvider;
 use NeneVault\Auth\CapabilityMiddleware;
 use NeneVault\Organization\OrganizationRepositoryInterface;
@@ -326,8 +326,18 @@ final readonly class RuntimeServiceProvider implements ServiceProviderInterface
                     // single-domain host). Neither middleware consumes the other's
                     // attributes in the opposite direction, and CapabilityMiddleware
                     // (which needs both) stays last.
+                    //
+                    // Blocklist shape (#157): every path requires a bearer token
+                    // EXCEPT the explicit public surface below. Adding a route
+                    // makes it protected by default; opening a route is a
+                    // deliberate edit here, pinned by PublicSurfaceBoundaryTest.
                     $authMiddleware = [
-                        new AdminApiAuthMiddleware($pd, $tokenVerifier),
+                        new BearerTokenMiddleware($pd, $tokenVerifier, excludedPaths: [
+                            '/health',
+                            '/admin/auth/login',
+                            '/demo/standard',
+                            '/demo/guided',
+                        ]),
                         new OrgResolverMiddleware($orgIdHolder, $orgRepo, $pd, $strategy),
                         new CapabilityMiddleware($pd),
                     ];

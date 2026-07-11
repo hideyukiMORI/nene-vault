@@ -21,7 +21,7 @@ use Psr\Http\Server\RequestHandlerInterface;
  * and pass through with org ID unset.
  *
  * Resolution order (#141):
- *  1. Verified bearer claims (`nene2.auth.claims`, set by AdminApiAuthMiddleware,
+ *  1. Verified bearer claims (`nene2.auth.claims`, set by the NENE2 BearerTokenMiddleware,
  *     which runs before this middleware): an integer `org` claim resolves the
  *     org by ID. The claim is signed, so the authenticated user's own tenant
  *     always wins over the host — this is what lets a disposable demo org work

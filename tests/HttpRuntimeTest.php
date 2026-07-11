@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace NeneVault\Tests;
 
+use Nene2\Auth\TokenIssuerInterface;
 use Nene2\Database\DatabaseConnectionFactoryInterface;
 use NeneVault\Http\RuntimeContainerFactory;
 use Nyholm\Psr7\Factory\Psr17Factory;
@@ -53,9 +54,22 @@ final class HttpRuntimeTest extends TestCase
         assert($container !== null);
 
         [$handler, $creator] = $this->makeHandlerAndCreator($container);
-        // /admin/auth/ bypasses org resolution and auth — router returns 404
+        // Blocklist auth (#157): unauthenticated unknown paths are 401 at the
+        // middleware (pinned by PublicSurfaceBoundaryTest), so the router's
+        // 404 for unknown routes is asserted behind a valid superadmin token.
+        $issuer = $container->get(TokenIssuerInterface::class);
+        assert($issuer instanceof TokenIssuerInterface);
+        $token = $issuer->issue([
+            'sub'  => 9999,
+            'role' => 'superadmin',
+            'org'  => null,
+            'iat'  => time(),
+            'exp'  => time() + 3600,
+        ]);
+
         $request = $creator->fromArrays(
             server: ['REQUEST_METHOD' => 'GET', 'REQUEST_URI' => '/admin/auth/no-such-endpoint'],
+            headers: ['Authorization' => "Bearer {$token}"],
         );
 
         $response = $handler->handle($request);

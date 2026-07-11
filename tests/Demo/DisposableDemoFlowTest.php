@@ -137,13 +137,13 @@ final class DisposableDemoFlowTest extends ApiTestCase
         $this->assertArrayNotHasKey('detail', $body);
     }
 
-    public function test_unknown_template_is_404(): void
+    public function test_unknown_template_is_401_unauthenticated(): void
     {
+        // Blocklist auth (#157): only /demo/standard and /demo/guided are on
+        // the public surface, so an unknown template never reaches the demo
+        // handler unauthenticated — it fails closed at the auth layer.
         $response = $this->handler()->handle($this->request('GET', '/demo/nonexistent'));
 
-        $this->assertSame(404, $response->getStatusCode());
-        $body = json_decode((string) $response->getBody(), true);
-        $this->assertIsArray($body);
-        $this->assertStringContainsString('Unknown demo template', (string) ($body['detail'] ?? ''));
+        $this->assertSame(401, $response->getStatusCode());
     }
 }
