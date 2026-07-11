@@ -54,15 +54,15 @@ $records = [];
 foreach ($rows as $row) {
     $records[] = new DemoOrgRecord(
         orgId: (int) $row['id'],
-        // Parse created_at in the timezone it was WRITTEN in (#143). Vault's
-        // PdoOrganizationRepository stamps it with date() — the host's default
-        // timezone — unlike clear/deal, which write UTC and therefore need the
-        // UTC-explicit parse (clear #280, deal #72). Web SAPI and this CLI
-        // share php.ini date.timezone on the target host, so the bare parse
-        // is the consistent one: forcing UTC on a JST host read every org as
-        // 9 h in the future and stretched the 3 h TTL to 12 h (caught in the
-        // #141 production acceptance).
-        createdAt: new DateTimeImmutable((string) $row['created_at']),
+        // Parse created_at as UTC — the timezone it is WRITTEN in since #161
+        // (PdoOrganizationRepository stamps via the injected UtcClock, matching
+        // clear #280 / deal #72). The #143 bare parse existed to pair with the
+        // old host-local date() write; both sides flipped together, and the
+        // one-shot migration 20260711000002 converts pre-#161 rows. A legacy
+        // local-TZ row that somehow escapes migration only looks NEWER on a
+        // UTC+ host (never reaped early); the DEMO_MAX_ORGS overflow ceiling
+        // still bounds it.
+        createdAt: new DateTimeImmutable((string) $row['created_at'], new DateTimeZone('UTC')),
     );
 }
 

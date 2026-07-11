@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace NeneVault\Organization;
 
 use Nene2\Database\DatabaseQueryExecutorInterface;
+use Nene2\Http\ClockInterface;
 use PDOException;
 
 final readonly class PdoOrganizationRepository implements OrganizationRepositoryInterface
@@ -13,6 +14,7 @@ final readonly class PdoOrganizationRepository implements OrganizationRepository
 
     public function __construct(
         private DatabaseQueryExecutorInterface $query,
+        private ClockInterface $clock,
     ) {
     }
 
@@ -66,7 +68,9 @@ final readonly class PdoOrganizationRepository implements OrganizationRepository
 
     public function save(Organization $organization): int
     {
-        $now = date('Y-m-d H:i:s');
+        // UTC via the injected clock (#161): the sweep parses created_at as
+        // UTC, and all fleet products write UTC (clear #280 / deal #72 shape).
+        $now = $this->clock->now()->format('Y-m-d H:i:s');
 
         try {
             $this->query->execute(
@@ -111,7 +115,7 @@ final readonly class PdoOrganizationRepository implements OrganizationRepository
                 $organization->customDomain,
                 $organization->plan,
                 $organization->isActive ? 1 : 0,
-                date('Y-m-d H:i:s'),
+                $this->clock->now()->format('Y-m-d H:i:s'),
                 $organization->id,
             ],
         );
