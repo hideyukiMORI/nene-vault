@@ -1,3 +1,4 @@
+import { dynamicMessageKey } from '@/shared/i18n/catalogs';
 import { useTranslation } from '@/shared/i18n/use-translation';
 import { formatDateTime } from '@/shared/lib/format';
 import type { AuditEvent } from '@/entities/audit';
@@ -29,7 +30,9 @@ export function DocumentHistoryTable({ events }: DocumentHistoryTableProps) {
           {events.map((event) => (
             <tr key={event.id}>
               <td>
-                <span className="pri">{t(`audit_event.action.${event.action}`)}</span>
+                <span className="pri">
+                  {t(dynamicMessageKey(`audit_event.action.${event.action}`))}
+                </span>
               </td>
               <td className="muted mono">
                 {event.actor_user_id !== null ? String(event.actor_user_id) : '—'}

@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { lookup, interpolate, translate } from './translate';
-import type { LocaleCatalog } from './catalogs';
+import { dynamicMessageKey, type LocaleCatalog } from './catalogs';
 
 const catalog = {
   common: {
@@ -22,11 +22,13 @@ describe('lookup', () => {
   });
 
   it('returns the key itself when not found', () => {
-    expect(lookup(catalog, 'no.such.key')).toBe('no.such.key');
+    expect(lookup(catalog, dynamicMessageKey('no.such.key'))).toBe('no.such.key');
   });
 
   it('returns the key when a node is not an object', () => {
-    expect(lookup(catalog, 'common.buttons.save.extra')).toBe('common.buttons.save.extra');
+    expect(lookup(catalog, dynamicMessageKey('common.buttons.save.extra'))).toBe(
+      'common.buttons.save.extra',
+    );
   });
 });
 
@@ -70,6 +72,6 @@ describe('translate', () => {
   });
 
   it('falls back to the key when the key is missing', () => {
-    expect(translate('ja', 'nonexistent.key')).toBe('nonexistent.key');
+    expect(translate('ja', dynamicMessageKey('nonexistent.key'))).toBe('nonexistent.key');
   });
 });

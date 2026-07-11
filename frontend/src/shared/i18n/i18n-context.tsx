@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useState, type ReactNode } from 'react';
+import type { MessageKey } from './catalogs';
 import { persistLocale, resolveInitialLocale, type SupportedLocale } from './locales';
 import { translate, type TranslateParams } from './translate';
 import { I18nContext } from './context';
@@ -19,7 +20,7 @@ export function I18nProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const t = useCallback(
-    (key: string, params?: TranslateParams) => translate(locale, key, params),
+    (key: MessageKey, params?: TranslateParams) => translate(locale, key, params),
     [locale],
   );
 

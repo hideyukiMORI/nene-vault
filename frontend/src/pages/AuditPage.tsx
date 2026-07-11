@@ -1,3 +1,4 @@
+import { dynamicMessageKey } from '@/shared/i18n/catalogs';
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuditEvents, diffAuditEvent, formatAuditValue } from '@/entities/audit';
@@ -150,7 +151,7 @@ function AuditDetailDrawer({ event, open, onClose }: DrawerProps) {
                 </div>
                 <h2>
                   <span className="tick" />
-                  <span>{t(`audit_event.action.${event.action}`)}</span>
+                  <span>{t(dynamicMessageKey(`audit_event.action.${event.action}`))}</span>
                 </h2>
               </div>
               <button
@@ -378,7 +379,9 @@ export function AuditPage() {
                         }
                       }}
                     >
-                      <td className="pri">{t(`audit_event.action.${event.action}`)}</td>
+                      <td className="pri">
+                        {t(dynamicMessageKey(`audit_event.action.${event.action}`))}
+                      </td>
                       <td className="muted mono label-xs">
                         {event.entity_type}/{event.entity_id}
                       </td>
