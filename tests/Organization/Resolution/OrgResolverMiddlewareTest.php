@@ -131,7 +131,7 @@ final class OrgResolverMiddlewareTest extends TestCase
             $this->repository(orgsById: [7 => $claimOrg], orgsBySlug: ['env-org' => $envOrg]),
             $holder,
         )->process(
-            $this->request('/admin/vault/documents', ['org_id' => 7, 'role' => 'admin']),
+            $this->request('/admin/vault/documents', ['org' => 7, 'role' => 'admin']),
             $handler,
         );
 
@@ -153,7 +153,7 @@ final class OrgResolverMiddlewareTest extends TestCase
             $this->repository(orgsBySlug: ['env-org' => $envOrg]),
             $holder,
         )->process(
-            $this->request('/admin/vault/documents', ['org_id' => 424242, 'role' => 'admin']),
+            $this->request('/admin/vault/documents', ['org' => 424242, 'role' => 'admin']),
             $handler,
         );
 
@@ -172,7 +172,7 @@ final class OrgResolverMiddlewareTest extends TestCase
         $handler = $this->spyHandler();
 
         $response = $this->middleware($this->repository(orgsById: [7 => $inactive]), $holder)->process(
-            $this->request('/admin/vault/documents', ['org_id' => 7, 'role' => 'admin']),
+            $this->request('/admin/vault/documents', ['org' => 7, 'role' => 'admin']),
             $handler,
         );
 
@@ -188,7 +188,7 @@ final class OrgResolverMiddlewareTest extends TestCase
         $handler = $this->spyHandler();
 
         $response = $this->middleware($this->repository(orgsBySlug: ['env-org' => $envOrg]), $holder)->process(
-            $this->request('/admin/vault/documents', ['org_id' => null, 'role' => 'superadmin']),
+            $this->request('/admin/vault/documents', ['org' => null, 'role' => 'superadmin']),
             $handler,
         );
 

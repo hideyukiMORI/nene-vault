@@ -20,7 +20,7 @@ use Psr\Http\Message\ServerRequestInterface;
  *
  * Mints a normal access token for the org's throwaway ADMIN — same claims
  * shape and secret as {@see \NeneVault\Auth\LoginUseCase}; the token's
- * `org_id` claim is what {@see \NeneVault\Organization\Resolution\OrgResolverMiddleware}
+ * `org` claim is what {@see \NeneVault\Organization\Resolution\OrgResolverMiddleware}
  * resolves the tenant from — and serves a one-shot seat page whose nonce'd
  * inline script stores the SPA's `AuthSession` JSON in `sessionStorage`
  * (key `nene_vault_token`, the exact shape `frontend/src/entities/auth/model.ts`
@@ -54,10 +54,9 @@ final readonly class DemoSessionSeater implements DemoSessionSeaterInterface
         $now = $this->clock->now()->getTimestamp();
 
         $token = $this->tokenIssuer->issue([
-            'sub' => $email,
-            'user_id' => $org->adminUserId,
+            'sub' => $org->adminUserId,
             'role' => 'admin',
-            'org_id' => $org->orgId,
+            'org' => $org->orgId,
             'iat' => $now,
             'exp' => $now + $this->config->ttlHours * 3600,
         ]);

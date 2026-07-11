@@ -321,7 +321,7 @@ final readonly class RuntimeServiceProvider implements ServiceProviderInterface
                     };
 
                     // Order matters (#141): auth verifies the bearer FIRST so the
-                    // org resolver can trust the `org_id` claim (claim-based tenant
+                    // org resolver can trust the `org` claim (claim-based tenant
                     // resolution — how a disposable demo org is reachable on a
                     // single-domain host). Neither middleware consumes the other's
                     // attributes in the opposite direction, and CapabilityMiddleware

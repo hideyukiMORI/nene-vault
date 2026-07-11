@@ -17,7 +17,7 @@ use Psr\Http\Server\RequestHandlerInterface;
  *
  * Organization scoping:
  *  - superadmin: no org check — operates across all organizations
- *  - admin/member/viewer: JWT org_id must match the resolved org ID (nene2.org.id attribute)
+ *  - admin/member/viewer: JWT `org` claim must match the resolved org ID (nene2.org.id attribute)
  */
 final readonly class CapabilityMiddleware implements MiddlewareInterface
 {
@@ -58,8 +58,8 @@ final readonly class CapabilityMiddleware implements MiddlewareInterface
             $resolvedOrgId = $request->getAttribute('nene2.org.id');
 
             if (is_int($resolvedOrgId)) {
-                $jwtOrgId = isset($claims['org_id']) && is_int($claims['org_id'])
-                    ? $claims['org_id']
+                $jwtOrgId = isset($claims['org']) && is_int($claims['org'])
+                    ? $claims['org']
                     : null;
 
                 if ($jwtOrgId !== $resolvedOrgId) {

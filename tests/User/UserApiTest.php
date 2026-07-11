@@ -38,10 +38,9 @@ final class UserApiTest extends TestCase
         $issuer = self::$container->get(TokenIssuerInterface::class);
         assert($issuer instanceof TokenIssuerInterface);
         self::$token = $issuer->issue([
-            'sub' => 'admin@example.com',
-            'user_id' => 1000,
+            'sub' => 1000,
             'role' => 'admin',
-            'org_id' => self::$orgId,
+            'org' => self::$orgId,
             'iat' => time(),
             'exp' => time() + 3600,
         ]);

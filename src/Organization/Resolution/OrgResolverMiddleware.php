@@ -22,12 +22,12 @@ use Psr\Http\Server\RequestHandlerInterface;
  *
  * Resolution order (#141):
  *  1. Verified bearer claims (`nene2.auth.claims`, set by AdminApiAuthMiddleware,
- *     which runs before this middleware): an integer `org_id` claim resolves the
+ *     which runs before this middleware): an integer `org` claim resolves the
  *     org by ID. The claim is signed, so the authenticated user's own tenant
  *     always wins over the host — this is what lets a disposable demo org work
  *     on a single-domain deployment where the host strategy would resolve the
  *     fixed ORG_SLUG org. A claim naming a missing org (e.g. a demo org already
- *     swept) fails closed with 404. Superadmin tokens carry `org_id: null` and
+ *     swept) fails closed with 404. Superadmin tokens carry `org: null` and
  *     fall through to the strategy, preserving cross-tenant behaviour.
  *  2. strategy->resolve() → slug or custom domain identifier
  *     (env / subdomain / custom_domain — unchanged, and still the only path
@@ -121,18 +121,19 @@ final readonly class OrgResolverMiddleware implements MiddlewareInterface
     }
 
     /**
-     * Integer `org_id` claim from the verified bearer token, or null when the
-     * request is unauthenticated or the token carries no tenant (superadmin).
+     * Integer `org` claim from the verified bearer token (fleet-standard
+     * schema, #150), or null when the request is unauthenticated or the token
+     * carries no tenant (superadmin).
      */
     private function claimOrgId(ServerRequestInterface $request): ?int
     {
         $claims = $request->getAttribute('nene2.auth.claims');
 
-        if (!is_array($claims) || !isset($claims['org_id']) || !is_int($claims['org_id'])) {
+        if (!is_array($claims) || !isset($claims['org']) || !is_int($claims['org'])) {
             return null;
         }
 
-        return $claims['org_id'];
+        return $claims['org'];
     }
 
     private function continueWith(

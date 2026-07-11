@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace NeneVault\Auth;
 
 use Nene2\Auth\TokenIssuerInterface;
+use Nene2\Http\ClockInterface;
 
 final readonly class LoginUseCase
 {
@@ -19,6 +20,7 @@ final readonly class LoginUseCase
     public function __construct(
         private UserRepositoryInterface $users,
         private TokenIssuerInterface $tokenIssuer,
+        private ClockInterface $clock,
     ) {
     }
 
@@ -44,19 +46,20 @@ final readonly class LoginUseCase
             throw new InvalidCredentialsException();
         }
 
-        $expiresAt = time() + self::TOKEN_TTL_SECONDS;
+        $now = $this->clock->now()->getTimestamp();
+        $expiresAt = $now + self::TOKEN_TTL_SECONDS;
 
-        // superadmin は組織に属さないため org_id は null。
+        // superadmin は組織に属さないため org は null。
         // admin / member / viewer は所属組織の ID を JWT に埋め込む。
+        // Claims follow the fleet-standard schema (#150): sub = user id, org.
         $orgId = $role === Role::Superadmin ? null : $user->organizationId;
 
         $token = $this->tokenIssuer->issue([
-            'sub'     => $user->email,
-            'user_id' => $user->id,
-            'role'    => $role->value,
-            'org_id'  => $orgId,
-            'iat'     => time(),
-            'exp'     => $expiresAt,
+            'sub'  => $user->id,
+            'role' => $role->value,
+            'org'  => $orgId,
+            'iat'  => $now,
+            'exp'  => $expiresAt,
         ]);
 
         return new LoginOutput(

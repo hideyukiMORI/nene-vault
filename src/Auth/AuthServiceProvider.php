@@ -36,6 +36,7 @@ final readonly class AuthServiceProvider implements ServiceProviderInterface
                 static function (ContainerInterface $c): LoginUseCase {
                     $users = $c->get(UserRepositoryInterface::class);
                     $tokenIssuer = $c->get('nene-vault.token_issuer');
+                    $clock = $c->get(ClockInterface::class);
 
                     if (!$users instanceof UserRepositoryInterface) {
                         throw new LogicException('UserRepositoryInterface service is invalid.');
@@ -45,7 +46,11 @@ final readonly class AuthServiceProvider implements ServiceProviderInterface
                         throw new LogicException('TokenIssuerInterface service is invalid.');
                     }
 
-                    return new LoginUseCase($users, $tokenIssuer);
+                    if (!$clock instanceof ClockInterface) {
+                        throw new LogicException('ClockInterface service is invalid.');
+                    }
+
+                    return new LoginUseCase($users, $tokenIssuer, $clock);
                 },
             )
             ->set(
