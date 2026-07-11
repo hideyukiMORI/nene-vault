@@ -20,7 +20,7 @@ export function ExportPage() {
 
   function handleLogout() {
     authStore.clearSession();
-    navigate('/login', { replace: true });
+    void navigate('/login', { replace: true });
   }
 
   async function handleExport() {

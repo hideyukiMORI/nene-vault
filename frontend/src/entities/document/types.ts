@@ -1,10 +1,6 @@
 export type DocumentStatus = 'active' | 'voided';
 export type DocumentCategory =
-  | 'invoice_received'
-  | 'contract'
-  | 'receipt'
-  | 'delivery_note'
-  | 'other';
+  'invoice_received' | 'contract' | 'receipt' | 'delivery_note' | 'other';
 export type DocumentSource = 'web_upload' | 'email_inbound' | 'api' | 'scan_upload';
 
 export interface VaultDocument {

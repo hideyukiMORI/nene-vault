@@ -6,7 +6,7 @@
  *
  * Does not: fetch data, know entity ids, or read router/query cache.
  */
-import type { Meta, StoryObj } from '@storybook/react';
+import type { Meta, StoryObj } from '@storybook/react-vite';
 import { Button } from './Button';
 
 const meta: Meta<typeof Button> = {

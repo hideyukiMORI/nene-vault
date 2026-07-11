@@ -85,7 +85,7 @@ export function HomePage() {
 
   function handleLogout() {
     authStore.clearSession();
-    navigate('/login', { replace: true });
+    void navigate('/login', { replace: true });
   }
 
   return (
@@ -108,7 +108,7 @@ export function HomePage() {
               type="button"
               className="qlink"
               onClick={() => {
-                navigate(link.to);
+                void navigate(link.to);
               }}
             >
               <span className="ic">{link.icon}</span>

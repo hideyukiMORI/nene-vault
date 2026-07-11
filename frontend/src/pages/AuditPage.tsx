@@ -102,10 +102,15 @@ function AuditDetailDrawer({ event, open, onClose }: DrawerProps) {
   const { t, locale } = useTranslation();
   const [view, setView] = useState<'diff' | 'json'>('diff');
 
-  // Reset to the diff view whenever a new record is opened.
-  useEffect(() => {
-    if (open) setView('diff');
-  }, [open, event?.id]);
+  // Reset to the diff view whenever a new record is opened — the
+  // adjust-state-during-render pattern (react-hooks v7 forbids the
+  // setState-in-effect shape this replaced).
+  const [openedEventId, setOpenedEventId] = useState<string | number | null>(null);
+  const currentKey = open ? (event?.id ?? null) : null;
+  if (currentKey !== openedEventId) {
+    setOpenedEventId(currentKey);
+    if (currentKey !== null) setView('diff');
+  }
 
   useEffect(() => {
     if (!open) return;
@@ -276,7 +281,7 @@ export function AuditPage() {
 
   function handleLogout() {
     authStore.clearSession();
-    navigate('/login', { replace: true });
+    void navigate('/login', { replace: true });
   }
 
   function handleReset() {

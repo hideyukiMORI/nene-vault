@@ -6,7 +6,7 @@
  *
  * Does not: register with a form, validate, or fetch.
  */
-import type { Meta, StoryObj } from '@storybook/react';
+import type { Meta, StoryObj } from '@storybook/react-vite';
 import { Field } from './Field';
 import { Input } from '../primitives/Input';
 import { I18nProvider } from '@/shared/i18n/i18n-context';

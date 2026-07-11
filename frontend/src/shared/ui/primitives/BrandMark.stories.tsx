@@ -6,7 +6,7 @@
  *
  * Does not: fetch data, read router/query cache, or hard-code its color.
  */
-import type { Meta, StoryObj } from '@storybook/react';
+import type { Meta, StoryObj } from '@storybook/react-vite';
 import { BrandMark } from './BrandMark';
 
 const meta: Meta<typeof BrandMark> = {
