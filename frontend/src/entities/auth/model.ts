@@ -12,7 +12,26 @@ export interface AuthSession {
 
 const STORAGE_KEY = 'nene_vault_token';
 
+// Reactive layer (#168): mutations notify subscribers so the auth gate can
+// re-render via useSyncExternalStore — a 401 clears the session and the login
+// form appears IN PLACE (current URL preserved), no hard navigation.
+const listeners = new Set<() => void>();
+
+function notify(): void {
+  for (const listener of listeners) {
+    listener();
+  }
+}
+
 export const authStore = {
+  /** Subscribe to session changes; returns the unsubscribe function. */
+  subscribe(listener: () => void): () => void {
+    listeners.add(listener);
+    return () => {
+      listeners.delete(listener);
+    };
+  },
+
   getSession(): AuthSession | null {
     try {
       const raw = sessionStorage.getItem(STORAGE_KEY);
@@ -31,6 +50,7 @@ export const authStore = {
     } catch {
       // ignore persistence failure
     }
+    notify();
   },
 
   clearSession(): void {
@@ -39,6 +59,7 @@ export const authStore = {
     } catch {
       // ignore
     }
+    notify();
   },
 
   getToken(): string | null {

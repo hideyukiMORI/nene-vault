@@ -57,6 +57,25 @@ describe('authStore.clearSession', () => {
   });
 });
 
+describe('authStore.subscribe', () => {
+  it('notifies on setSession and clearSession, and unsubscribes cleanly', () => {
+    let calls = 0;
+    const unsubscribe = authStore.subscribe(() => {
+      calls += 1;
+    });
+
+    authStore.setSession(SESSION);
+    expect(calls).toBe(1);
+
+    authStore.clearSession();
+    expect(calls).toBe(2);
+
+    unsubscribe();
+    authStore.setSession(SESSION);
+    expect(calls).toBe(2);
+  });
+});
+
 describe('authStore resilience', () => {
   it('returns null when sessionStorage contains malformed JSON', () => {
     sessionStorage.setItem('nene_vault_token', '{bad json');
