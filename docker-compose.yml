@@ -1,7 +1,7 @@
 ## NeNe Vault — development stack
 ##
 ## Prerequisites:
-##   composer install     (once, on the host — resolves ../NENE2 path dependency)
+##   composer install     (once, on the host — installs NENE2 from Packagist)
 ##   cp .env.example .env (and customise as needed)
 ##
 ## Usage:
@@ -28,11 +28,9 @@ services:
     ports:
       - "${NENE_VAULT_PORT:-8600}:8080"
     volumes:
-      # Source + vendor (read-only); vendor resolved by host composer install
+      # Source + vendor (read-only); vendor resolved by host composer install.
+      # NENE2 comes from Packagist (#159) — real files in vendor/, no sibling mount.
       - .:/var/www/html:ro
-      # vendor/hideyukimori/nene2 is a symlink pointing 3 levels up to NENE2/.
-      # Mount the sibling NENE2 directory at the resolved path inside the container.
-      - ../NENE2:/var/www/NENE2:ro
       # SQLite database and uploaded files need to be writable
       - sqlite_data:/var/www/html/var
       - vault_storage:/var/www/html/storage/vault

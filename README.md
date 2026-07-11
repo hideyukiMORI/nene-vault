@@ -90,7 +90,7 @@ Japanese UI shown — the admin UI is bilingual (ja/en, one-click switch).
 > [`docs/operator/installation.md`](./docs/operator/installation.md).
 
 ```sh
-composer install            # once, on the host — resolves the ../NENE2 path dependency
+composer install            # once, on the host — installs NENE2 ^1.10 from Packagist
 cp .env.example .env        # customise ADMIN_EMAIL / ADMIN_PASSWORD if desired
 docker compose up           # SQLite (default) + Vite dev server
 ```
