@@ -13,7 +13,7 @@ use Psr\Http\Server\RequestHandlerInterface;
 /**
  * Enforces role-based capabilities and organization scoping on authenticated requests.
  *
- * Runs after AdminApiAuthMiddleware. Unauthenticated requests pass through unchanged.
+ * Runs after the NENE2 BearerTokenMiddleware. Unauthenticated requests pass through unchanged.
  *
  * Organization scoping:
  *  - superadmin: no org check — operates across all organizations
