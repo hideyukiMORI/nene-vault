@@ -65,7 +65,7 @@ describe('useMetadataEditForm', () => {
     });
 
     await act(async () => {
-      await result.current.onSubmit(new Event('submit') as unknown as React.FormEvent);
+      await result.current.onSubmit(new Event('submit') as unknown as React.BaseSyntheticEvent);
     });
 
     await new Promise((r) => {
@@ -84,7 +84,7 @@ describe('useMetadataEditForm', () => {
     );
 
     await act(async () => {
-      await result.current.onSubmit(new Event('submit') as unknown as React.FormEvent);
+      await result.current.onSubmit(new Event('submit') as unknown as React.BaseSyntheticEvent);
     });
 
     await waitFor(() => {

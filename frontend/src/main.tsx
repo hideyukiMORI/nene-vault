@@ -14,7 +14,7 @@ createRoot(rootElement).render(
   <StrictMode>
     <RootErrorBoundary>
       <Providers>
-        <RouterProvider router={router} future={{ v7_startTransition: true }} />
+        <RouterProvider router={router} />
       </Providers>
     </RootErrorBoundary>
   </StrictMode>,

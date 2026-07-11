@@ -20,7 +20,7 @@ export function DocumentsPage() {
 
   function handleLogout() {
     authStore.clearSession();
-    navigate('/login', { replace: true });
+    void navigate('/login', { replace: true });
   }
 
   return (
@@ -62,7 +62,7 @@ export function DocumentsPage() {
           <DocumentTable
             documents={documents}
             onSelectDocument={(id) => {
-              navigate(`/documents/${id}`);
+              void navigate(`/documents/${id}`);
             }}
           />
           <Pagination

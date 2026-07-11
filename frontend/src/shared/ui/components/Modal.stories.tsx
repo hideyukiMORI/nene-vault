@@ -6,7 +6,7 @@
  *
  * Does not: manage focus-trap routing, fetch, or know entity shapes.
  */
-import type { Meta, StoryObj } from '@storybook/react';
+import type { Meta, StoryObj } from '@storybook/react-vite';
 import { Modal } from './Modal';
 import { Button } from '../primitives/Button';
 import { Stack } from '../primitives/Stack';

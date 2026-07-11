@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { useForm } from 'react-hook-form';
+import { useForm, useWatch } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { authStore } from '@/entities/auth';
@@ -37,11 +37,13 @@ export function SettingsPage() {
 
   const {
     register,
-    watch,
     reset,
+    control,
     formState: { errors },
   } = form;
-  const retentionYears = watch('retention_years');
+  // useWatch (not watch()): memoization-safe under the React Compiler /
+  // react-hooks v7 lint (watch() cannot be memoized without stale UI).
+  const retentionYears = useWatch({ control, name: 'retention_years' });
   const retentionWarn = typeof retentionYears === 'number' && retentionYears < 10;
 
   useEffect(() => {
@@ -63,7 +65,7 @@ export function SettingsPage() {
 
   function handleLogout() {
     authStore.clearSession();
-    navigate('/login', { replace: true });
+    void navigate('/login', { replace: true });
   }
 
   return (

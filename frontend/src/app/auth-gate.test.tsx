@@ -31,10 +31,7 @@ describe('AuthGate', () => {
 
   it('redirects to /login when no session exists', () => {
     render(
-      <MemoryRouter
-        initialEntries={['/dashboard']}
-        future={{ v7_startTransition: true, v7_relativeSplatPath: true }}
-      >
+      <MemoryRouter initialEntries={['/dashboard']}>
         <AuthGate>
           <div>Protected content</div>
         </AuthGate>

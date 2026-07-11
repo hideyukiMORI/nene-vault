@@ -6,7 +6,7 @@ export function LoginPage() {
   return (
     <LoginForm
       onLoggedIn={() => {
-        navigate('/', { replace: true });
+        void navigate('/', { replace: true });
       }}
     />
   );

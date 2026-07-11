@@ -32,7 +32,7 @@ export function DocumentDetailPage() {
 
   function handleLogout() {
     authStore.clearSession();
-    navigate('/login', { replace: true });
+    void navigate('/login', { replace: true });
   }
 
   async function handleOcrSuggest() {
@@ -67,7 +67,7 @@ export function DocumentDetailPage() {
         type="button"
         className="link"
         onClick={() => {
-          navigate('/documents');
+          void navigate('/documents');
         }}
       >
         ← {t('navigation.documents')}

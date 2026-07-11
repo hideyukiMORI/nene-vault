@@ -141,7 +141,7 @@ export function AppShell({
   const leafLabel = activeItem !== undefined ? t(activeItem.labelKey) : '';
 
   const go = (to: string): void => {
-    navigate(to);
+    void navigate(to);
   };
 
   const avatarLetter = userEmail !== undefined && userEmail !== '' ? userEmail.charAt(0) : '?';

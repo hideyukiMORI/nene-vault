@@ -34,7 +34,7 @@ describe('useVoidDocumentForm', () => {
 
     // Default void_reason is '' — onSubmit should not invoke the mutation
     await act(async () => {
-      await result.current.onSubmit(new Event('submit') as unknown as React.FormEvent);
+      await result.current.onSubmit(new Event('submit') as unknown as React.BaseSyntheticEvent);
     });
 
     // Wait a tick to ensure no pending mutations fire
@@ -58,7 +58,7 @@ describe('useVoidDocumentForm', () => {
     });
 
     await act(async () => {
-      await result.current.onSubmit(new Event('submit') as unknown as React.FormEvent);
+      await result.current.onSubmit(new Event('submit') as unknown as React.BaseSyntheticEvent);
     });
 
     await waitFor(() => {
@@ -76,7 +76,7 @@ describe('useVoidDocumentForm', () => {
     });
 
     await act(async () => {
-      await result.current.onSubmit(new Event('submit') as unknown as React.FormEvent);
+      await result.current.onSubmit(new Event('submit') as unknown as React.BaseSyntheticEvent);
     });
 
     await waitFor(() => {
@@ -103,7 +103,7 @@ describe('useVoidDocumentForm', () => {
     });
 
     await act(async () => {
-      await result.current.onSubmit(new Event('submit') as unknown as React.FormEvent);
+      await result.current.onSubmit(new Event('submit') as unknown as React.BaseSyntheticEvent);
     });
 
     await waitFor(() => {
@@ -126,7 +126,7 @@ describe('useVoidDocumentForm', () => {
     });
 
     await act(async () => {
-      await result.current.onSubmit(new Event('submit') as unknown as React.FormEvent);
+      await result.current.onSubmit(new Event('submit') as unknown as React.BaseSyntheticEvent);
     });
 
     await waitFor(() => {
