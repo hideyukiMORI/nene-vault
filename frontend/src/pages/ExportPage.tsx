@@ -1,14 +1,15 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { authStore } from '@/entities/auth';
+import { useExportDocuments } from '@/entities/document';
 import { useTranslation } from '@/shared/i18n/use-translation';
 import { AppShell, Button, Checkbox, Field, Input } from '@/shared/ui';
-import { env } from '@/shared/config/env';
 
 export function ExportPage() {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const session = authStore.getSession();
+  const exportMutation = useExportDocuments();
   const [dateFrom, setDateFrom] = useState('');
   const [dateTo, setDateTo] = useState('');
   const [counterparty, setCounterparty] = useState('');
@@ -29,35 +30,21 @@ export function ExportPage() {
     setExportSuccess(false);
 
     try {
-      const base = env.apiBaseUrl.replace(/\/$/, '');
-      const body: Record<string, unknown> = { include_voided: includeVoided, format };
-      if (dateFrom !== '') body['transaction_date_from'] = dateFrom;
-      if (dateTo !== '') body['transaction_date_to'] = dateTo;
-      if (counterparty !== '') body['counterparty_name'] = counterparty;
-
-      const token = authStore.getToken();
-      const headers: Record<string, string> = { 'Content-Type': 'application/json' };
-      if (token !== null) headers['Authorization'] = `Bearer ${token}`;
-
-      const response = await fetch(`${base}/admin/vault/export`, {
-        method: 'POST',
-        headers,
-        credentials: 'include',
-        body: JSON.stringify(body),
+      // Go through the shared API client (via the entity hook) so the request
+      // carries the X-Authorization mirror (#118); a raw fetch drops it and the
+      // export 401s behind the shared-hosting proxy that strips Authorization.
+      const { blob, filename } = await exportMutation.mutateAsync({
+        format,
+        include_voided: includeVoided,
+        transaction_date_from: dateFrom,
+        transaction_date_to: dateTo,
+        counterparty_name: counterparty,
       });
 
-      if (!response.ok) {
-        setExportError(t('common.status.error'));
-        return;
-      }
-
-      const blob = await response.blob();
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
-      const cd = response.headers.get('Content-Disposition') ?? '';
-      const match = /filename="?([^"]+)"?/.exec(cd);
-      a.download = match?.[1] ?? 'export.zip';
+      a.download = filename ?? (format === 'csv' ? 'export.csv' : 'export.zip');
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
