@@ -22,6 +22,11 @@ pre-production go-live gate (税理士 Review 3) and Tier A live testing.**
 > disposable-org distribution link (admin seat, upload showcase, TTL 3 h);
 > the fixed viewer seat moved to `/demo/guided`. Owner cron step: register
 > `~/bin/sweep-vault-demo.sh` (hourly, minute :40) in the HETEML panel.
+>
+> **2026-07-11: structural-alignment audit recorded** — fleet-wide audit
+> findings filed as #148 (session posture, security) / #149 (frontend
+> generation gap) / #150 (consolidated checklist); summary with strengths in
+> `docs/review/structural-alignment-audit-2026-07-11.md`.
 
 ## Done
 
@@ -83,4 +88,4 @@ production use by operators. Both come from Review 2's recorded conditions
 - [ ] **Standing P0 watch** — on any 電帳法 amendment / 国税庁 guidance, open a P0
       Issue and add a new review block to `signoff-record.md` (Review 2 condition 2).
 
-Last updated: 2026-06-01
+Last updated: 2026-07-11
