@@ -179,4 +179,8 @@ export const apiClient = {
   postBlob(path: string, body?: unknown): Promise<BlobDownload> {
     return requestBlob(path, { method: 'POST', body });
   },
+  async getBlob(path: string, signal?: AbortSignal): Promise<Blob> {
+    const { blob } = await requestBlob(path, { method: 'GET', signal });
+    return blob;
+  },
 };
