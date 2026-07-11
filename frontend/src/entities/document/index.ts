@@ -18,3 +18,4 @@ export { useOcrSuggest } from './ocr';
 export type { OcrPrefill } from './ocr';
 export { useExportDocuments } from './export';
 export type { ExportDocumentsInput, ExportFormat } from './export';
+export { fetchDocumentBlob } from './file';

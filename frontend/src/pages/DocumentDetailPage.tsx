@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { useDocumentById, useOcrSuggest } from '@/entities/document';
+import { useDocumentById, fetchDocumentBlob, useOcrSuggest } from '@/entities/document';
 import { useDocumentHistory } from '@/entities/audit';
 import { authStore } from '@/entities/auth';
 import {
@@ -13,7 +13,6 @@ import type { OcrPrefill } from '@/features/document-detail';
 import { useTranslation } from '@/shared/i18n/use-translation';
 import { formatJpy, formatDate, formatDateTime } from '@/shared/lib/format';
 import { AppShell, Button, Callout, EmptyState } from '@/shared/ui';
-import { env } from '@/shared/config/env';
 
 type Modal = 'void' | 'restore' | 'metadata-edit' | null;
 
@@ -30,6 +29,14 @@ export function DocumentDetailPage() {
   const { data: doc, isLoading, isError } = useDocumentById(docId);
   const { data: history } = useDocumentHistory(docId);
 
+  // The download endpoint is keyed by the version's ULID, which only the
+  // history response carries — the document detail exposes just the ordinal
+  // version_number (#179).
+  const currentVersion =
+    doc !== undefined
+      ? history?.versions.find((v) => v.version_number === doc.version_number)
+      : undefined;
+
   function handleLogout() {
     authStore.clearSession();
     void navigate('/login', { replace: true });
@@ -44,16 +51,20 @@ export function DocumentDetailPage() {
     setModal('metadata-edit');
   }
 
-  function handleDownload() {
-    if (doc === undefined) return;
-    const base = env.apiBaseUrl.replace(/\/$/, '');
-    const url = `${base}/admin/vault/documents/${doc.id}/versions/${String(doc.version_number)}/download`;
+  async function handleDownload() {
+    if (doc === undefined || currentVersion === undefined) return;
+    // Fetch through the authenticated client: a plain <a href> would drop the
+    // bearer token (the backend is JWT-only, no session cookie), and the route
+    // is keyed by the version ULID, not the ordinal version_number (#179).
+    const blob = await fetchDocumentBlob(doc.id, currentVersion.id);
+    const objectUrl = URL.createObjectURL(blob);
     const a = document.createElement('a');
-    a.href = url;
+    a.href = objectUrl;
     a.download = doc.original_filename ?? `document-${doc.id}`;
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
+    URL.revokeObjectURL(objectUrl);
   }
 
   return (
@@ -102,7 +113,13 @@ export function DocumentDetailPage() {
             </div>
 
             <div className="row gap-sm wrap">
-              <Button variant="secondary" onClick={handleDownload}>
+              <Button
+                variant="secondary"
+                onClick={() => {
+                  void handleDownload();
+                }}
+                disabled={currentVersion === undefined}
+              >
                 {t('document.detail.download_button')}
               </Button>
               <Button
