@@ -71,6 +71,27 @@ export default tseslint.config(
           selector: 'JSXAttribute[name.name="className"] Literal[value=/\\[.*\\]/]',
           message: 'Tailwind arbitrary values are forbidden outside shared/ui/theme.',
         },
+        {
+          // All network calls must go through the shared API client, which adds
+          // the Authorization + X-Authorization mirror (#118). A raw fetch drops
+          // the mirror and 401s behind the shared-hosting proxy (see #173).
+          selector: "CallExpression[callee.name='fetch']",
+          message:
+            'Do not call fetch() directly — use the shared apiClient (shared/api/client.ts) so the Authorization/X-Authorization headers are sent.',
+        },
+      ],
+    },
+  },
+  {
+    // The shared API client is the single sanctioned place that calls fetch().
+    files: ['src/shared/api/client.ts'],
+    rules: {
+      'no-restricted-syntax': [
+        'error',
+        {
+          selector: 'JSXAttribute[name.name="className"] Literal[value=/\\[.*\\]/]',
+          message: 'Tailwind arbitrary values are forbidden outside shared/ui/theme.',
+        },
       ],
     },
   },
