@@ -109,7 +109,10 @@ export function SettingsPage() {
               min={7}
               max={99}
               className={retentionWarn ? 'input-warn' : ''}
-              {...register('retention_years')}
+              // valueAsNumber so the watched value is numeric *while typing* — the
+              // under-10-years compliance warning must render live, not only after
+              // save → re-fetch coerces the value server-side.
+              {...register('retention_years', { valueAsNumber: true })}
             />
             {retentionWarn && (
               <Callout tone="warn">{t('vault_settings.fields.retention_warning')}</Callout>
