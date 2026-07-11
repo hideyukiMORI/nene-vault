@@ -46,6 +46,8 @@ final class HttpRuntimeTest extends TestCase
         $body = json_decode((string) $response->getBody(), true);
         $this->assertIsArray($body);
         $this->assertSame('ok', $body['status']);
+        // Framework-provided /health with the DatabaseHealthCheck wired (#163).
+        $this->assertSame('ok', $body['checks']['database'] ?? null);
     }
 
     public function test_unknown_route_returns_404(): void

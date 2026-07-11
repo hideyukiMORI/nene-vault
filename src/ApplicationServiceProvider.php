@@ -10,7 +10,6 @@ use Nene2\Config\AppConfig;
 use Nene2\Demo\DemoRouteRegistrar;
 use Nene2\DependencyInjection\ContainerBuilder;
 use Nene2\DependencyInjection\ServiceProviderInterface;
-use Nene2\Http\JsonResponseFactory;
 use Nene2\Http\RequestScopedHolder;
 use Nene2\Http\UtcClock;
 use NeneVault\Audit\AuditRouteRegistrar;
@@ -32,7 +31,6 @@ use NeneVault\Document\MimeTypeNotAllowedExceptionHandler;
 use NeneVault\Document\VaultDocumentNotFoundExceptionHandler;
 use NeneVault\Export\ExportRouteRegistrar;
 use NeneVault\Export\ExportServiceProvider;
-use NeneVault\Http\HealthHandler;
 use NeneVault\Ocr\OcrExceptionHandler;
 use NeneVault\Ocr\OcrRouteRegistrar;
 use NeneVault\Ocr\OcrServiceProvider;
@@ -81,20 +79,6 @@ final readonly class ApplicationServiceProvider implements ServiceProviderInterf
             ->addProvider(new OcrServiceProvider())
             ->addProvider(new DemoServiceProvider());
 
-        // Health handler
-        $builder->set(
-            HealthHandler::class,
-            static function (ContainerInterface $c): HealthHandler {
-                $json = $c->get(JsonResponseFactory::class);
-
-                if (!$json instanceof JsonResponseFactory) {
-                    throw new LogicException('JsonResponseFactory service is invalid.');
-                }
-
-                return new HealthHandler($json);
-            },
-        );
-
         // Fixed-demo seat (#127; served at /demo/guided since #141)
         $builder->set(
             SeatFixedDemoHandler::class,
@@ -140,7 +124,6 @@ final readonly class ApplicationServiceProvider implements ServiceProviderInterf
         $builder->set(
             self::ROUTE_REGISTRARS,
             static function (ContainerInterface $c): array {
-                $health = $c->get(HealthHandler::class);
                 $auth = $c->get('nene-vault.route_registrar.auth');
                 $org = $c->get(OrganizationRouteRegistrar::class);
                 $settings = $c->get(VaultSettingsRouteRegistrar::class);
@@ -151,10 +134,6 @@ final readonly class ApplicationServiceProvider implements ServiceProviderInterf
                 $ocr = $c->get(OcrRouteRegistrar::class);
                 $guidedDemo = $c->get(GuidedDemoRouteRegistrar::class);
                 $disposableDemo = $c->get(DemoRouteRegistrar::class);
-
-                if (!$health instanceof HealthHandler) {
-                    throw new LogicException('HealthHandler service is invalid.');
-                }
 
                 if (!$auth instanceof AuthRouteRegistrar) {
                     throw new LogicException('AuthRouteRegistrar service is invalid.');
@@ -196,8 +175,9 @@ final readonly class ApplicationServiceProvider implements ServiceProviderInterf
                     throw new LogicException('DemoRouteRegistrar service is invalid.');
                 }
 
+                // GET /health is provided by RuntimeApplicationFactory with the
+                // DatabaseHealthCheck wired in RuntimeServiceProvider (#163).
                 return [
-                    static fn ($router) => $router->get('/health', $health->handle(...)),
                     static fn ($router) => $auth->register($router),
                     static fn ($router) => $org->register($router),
                     static fn ($router) => $settings->register($router),

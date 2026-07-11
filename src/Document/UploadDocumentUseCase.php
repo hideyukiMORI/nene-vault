@@ -13,8 +13,8 @@ use NeneVault\Audit\AuditAction;
 use NeneVault\DocumentVersion\DocumentStorageInterface;
 use NeneVault\DocumentVersion\DocumentVersion;
 use NeneVault\DocumentVersion\DocumentVersionRepositoryInterface;
-use NeneVault\Support\Ulid;
 use NeneVault\VaultSettings\VaultSettingsRepositoryInterface;
+use Symfony\Component\Uid\Ulid;
 
 final readonly class UploadDocumentUseCase implements UploadDocumentUseCaseInterface
 {
@@ -74,7 +74,7 @@ final readonly class UploadDocumentUseCase implements UploadDocumentUseCaseInter
                 $retentionExpiresAt = date('Y-m-d', strtotime("{$anchorDate} +{$retentionYears} years") ?: time());
 
                 // 5. Store file (immutable — new path per version)
-                $documentId = Ulid::generate();
+                $documentId = (string) new Ulid();
                 $versionNumber = 1;
                 $relativePath = $this->storage->store(
                     $input->tmpPath,
@@ -85,7 +85,7 @@ final readonly class UploadDocumentUseCase implements UploadDocumentUseCaseInter
                 );
 
                 $now = date('Y-m-d H:i:s');
-                $versionId = Ulid::generate();
+                $versionId = (string) new Ulid();
 
                 $version = new DocumentVersion(
                     id: $versionId,
