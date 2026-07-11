@@ -163,8 +163,8 @@ final class SeatFixedDemoHandlerTest extends TestCase
         self::assertSame(2, $session['orgId']);
 
         $claims = (new LocalBearerTokenVerifier('seat-test-secret'))->verify((string) $session['token']);
-        self::assertSame(7, $claims['user_id']);
-        self::assertSame(2, $claims['org_id']);
+        self::assertSame(7, $claims['sub']);
+        self::assertSame(2, $claims['org']);
         self::assertSame('viewer', $claims['role']);
         self::assertEqualsWithDelta(3600, (int) $claims['exp'] - (int) $claims['iat'], 5);
     }

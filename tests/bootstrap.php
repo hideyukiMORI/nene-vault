@@ -137,3 +137,20 @@ $pdo->exec('CREATE TABLE IF NOT EXISTS document_versions (
     uploaded_by INTEGER,
     UNIQUE(vault_document_id, version_number)
 )');
+
+// Transient state cleanup (#155): the login throttle table and the file-backed
+// demo-start rate limits persist across local runs (the SQLite file and var/
+// survive), which would make repeated suite runs trip their own locks. Both
+// hold only rate-limit counters, never business data, so a fresh suite starts
+// clean — mirroring what CI gets for free.
+$pdo->exec('DELETE FROM login_attempts');
+
+$rateLimitDir = dirname(__DIR__) . '/var/rate-limits';
+
+if (is_dir($rateLimitDir)) {
+    foreach (glob($rateLimitDir . '/*') ?: [] as $rateLimitFile) {
+        if (is_file($rateLimitFile)) {
+            @unlink($rateLimitFile);
+        }
+    }
+}

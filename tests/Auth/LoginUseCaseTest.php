@@ -10,6 +10,7 @@ use NeneVault\Auth\LoginUseCase;
 use NeneVault\Auth\Role;
 use NeneVault\Auth\User;
 use NeneVault\Auth\UserRepositoryInterface;
+use NeneVault\Tests\Support\FixedClock;
 use PHPUnit\Framework\TestCase;
 
 final class LoginUseCaseTest extends TestCase
@@ -27,7 +28,7 @@ final class LoginUseCaseTest extends TestCase
 
         $repo = $this->createMockRepo(['admin@example.com' => $user]);
         $issuer = new InMemoryTokenIssuer();
-        $useCase = new LoginUseCase($repo, $issuer);
+        $useCase = new LoginUseCase($repo, $issuer, new FixedClock());
 
         $output = $useCase->execute(new LoginInput('admin@example.com', 'secret'));
 
@@ -50,7 +51,7 @@ final class LoginUseCaseTest extends TestCase
 
         $repo = $this->createMockRepo(['super@example.com' => $user]);
         $issuer = new InMemoryTokenIssuer();
-        $useCase = new LoginUseCase($repo, $issuer);
+        $useCase = new LoginUseCase($repo, $issuer, new FixedClock());
 
         $output = $useCase->execute(new LoginInput('super@example.com', 's3cr3t'));
 
@@ -69,7 +70,7 @@ final class LoginUseCaseTest extends TestCase
         );
 
         $repo = $this->createMockRepo(['admin@example.com' => $user]);
-        $useCase = new LoginUseCase($repo, new InMemoryTokenIssuer());
+        $useCase = new LoginUseCase($repo, new InMemoryTokenIssuer(), new FixedClock());
 
         $this->expectException(InvalidCredentialsException::class);
 
@@ -88,7 +89,7 @@ final class LoginUseCaseTest extends TestCase
         );
 
         $repo = $this->createMockRepo(['invited@example.com' => $user]);
-        $useCase = new LoginUseCase($repo, new InMemoryTokenIssuer());
+        $useCase = new LoginUseCase($repo, new InMemoryTokenIssuer(), new FixedClock());
 
         $this->expectException(InvalidCredentialsException::class);
 
@@ -106,7 +107,7 @@ final class LoginUseCaseTest extends TestCase
         );
 
         $repo = $this->createMockRepo(['ttl@example.com' => $user]);
-        $useCase = new LoginUseCase($repo, new InMemoryTokenIssuer());
+        $useCase = new LoginUseCase($repo, new InMemoryTokenIssuer(), new FixedClock());
 
         $output = $useCase->execute(new LoginInput('ttl@example.com', 'secret'));
 
@@ -118,7 +119,7 @@ final class LoginUseCaseTest extends TestCase
     public function test_throws_on_unknown_email(): void
     {
         $repo = $this->createMockRepo([]);
-        $useCase = new LoginUseCase($repo, new InMemoryTokenIssuer());
+        $useCase = new LoginUseCase($repo, new InMemoryTokenIssuer(), new FixedClock());
 
         $this->expectException(InvalidCredentialsException::class);
 

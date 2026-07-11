@@ -44,7 +44,7 @@ slug-namespaced email) through the real create-org/create-user use cases →
 seed → seat page stores the SPA's `AuthSession` in `sessionStorage` and lands
 in the app signed in.
 
-Tenancy: the minted token carries the disposable org in its `org_id` claim,
+Tenancy: the minted token carries the disposable org in its `org` claim,
 and `OrgResolverMiddleware` resolves **verified token claims first**, host/env
 strategy second — that is what makes per-visitor orgs reachable on a
 single-domain deployment. Superadmin (`org_id: null`) and unauthenticated

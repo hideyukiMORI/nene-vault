@@ -63,8 +63,8 @@ final class DemoSessionSeaterTest extends TestCase
         self::assertSame(42, $session['orgId']);
 
         $claims = (new LocalBearerTokenVerifier('seat-test-secret'))->verify((string) $session['token']);
-        self::assertSame(77, $claims['user_id']);
-        self::assertSame(42, $claims['org_id']);
+        self::assertSame(77, $claims['sub']);
+        self::assertSame(42, $claims['org']);
         self::assertSame('admin', $claims['role']);
         // Token TTL matches the demo org TTL (3 h), not the 1 h login TTL — the
         // disposable org lives 3 h and the seat must survive the whole session.

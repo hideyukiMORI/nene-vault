@@ -19,14 +19,15 @@ final class RequestContext
     private const ORG_ATTRIBUTE = 'nene2.org.id';
 
     /**
-     * Authenticated user id from the bearer-token claims, or null when the
-     * claim is absent (e.g. service-to-service calls without a user subject).
+     * Authenticated user id from the bearer-token claims (fleet-standard
+     * `sub` = user id, #150), or null when the subject is absent or not a
+     * user id (e.g. service tokens with a string subject).
      */
     public static function actorUserId(ServerRequestInterface $request): ?int
     {
         $claims = self::claims($request);
 
-        return isset($claims['user_id']) ? (int) $claims['user_id'] : null;
+        return isset($claims['sub']) && is_int($claims['sub']) ? $claims['sub'] : null;
     }
 
     /**

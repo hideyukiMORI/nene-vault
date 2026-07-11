@@ -55,10 +55,9 @@ abstract class ApiTestCase extends TestCase
         assert($issuer instanceof TokenIssuerInterface);
 
         return $issuer->issue(array_merge([
-            'sub'     => "{$role}@example.com",
-            'user_id' => $userId,
+            'sub'     => $userId,
             'role'    => $role,
-            'org_id'  => $orgId,
+            'org'     => $orgId,
             'iat'     => time(),
             'exp'     => time() + 3600,
         ], $extra));
@@ -72,10 +71,9 @@ abstract class ApiTestCase extends TestCase
         assert($issuer instanceof TokenIssuerInterface);
 
         return $issuer->issue([
-            'sub'     => 'superadmin@example.com',
-            'user_id' => $userId,
+            'sub'     => $userId,
             'role'    => 'superadmin',
-            'org_id'  => null,
+            'org'     => null,
             'iat'     => time(),
             'exp'     => time() + 3600,
         ]);

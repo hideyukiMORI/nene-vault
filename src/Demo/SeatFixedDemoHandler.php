@@ -25,7 +25,7 @@ use Psr\Http\Message\ServerRequestInterface;
  * ({@see DemoSessionSeater}, `/demo/standard`) is the distribution link;
  * this seat stays for guided walkthroughs and the README screenshots.
  *
- * The token's `org_id` claim resolves the tenant (claim-based resolution,
+ * The token's `org` claim resolves the tenant (claim-based resolution,
  * #141), and in `single` mode the host strategy resolves the same org for
  * unauthenticated requests — either way the seat lands scoped correctly.
  *
@@ -72,10 +72,9 @@ final readonly class SeatFixedDemoHandler
 
         $now = $this->clock->now()->getTimestamp();
         $token = $this->tokenIssuer->issue([
-            'sub' => $viewer->email,
-            'user_id' => $viewer->id,
+            'sub' => $viewer->id,
             'role' => $viewer->role,
-            'org_id' => $viewer->organizationId,
+            'org' => $viewer->organizationId,
             'iat' => $now,
             'exp' => $now + self::TOKEN_TTL_SECONDS,
         ]);

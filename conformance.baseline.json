@@ -4,12 +4,6 @@
     "ignore": [
         {
             "rule": "D4",
-            "file": "src/Auth/LoginUseCase.php",
-            "message": "Raw current-time read time(). Inject Nene2\\Http\\ClockInterface (Nene2\\Http\\UtcClock in production) instead of reading the wall clock directly.",
-            "count": 2
-        },
-        {
-            "rule": "D4",
             "file": "src/Auth/PdoUserRepository.php",
             "message": "Raw current-time read date() with no explicit timestamp. Inject Nene2\\Http\\ClockInterface (Nene2\\Http\\UtcClock in production) instead of reading the wall clock directly.",
             "count": 5
