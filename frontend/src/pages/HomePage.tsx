@@ -2,12 +2,13 @@ import type { ReactNode } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { authStore } from '@/entities/auth';
 import { useTranslation } from '@/shared/i18n/use-translation';
+import type { MessageKey } from '@/shared/i18n/catalogs';
 import { AppShell } from '@/shared/ui';
 
 interface QuickLink {
   to: string;
-  titleKey: string;
-  subKey: string;
+  titleKey: MessageKey;
+  subKey: MessageKey;
   icon: ReactNode;
 }
 

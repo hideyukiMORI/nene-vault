@@ -1,3 +1,4 @@
+import { dynamicMessageKey, type MessageKey } from '@/shared/i18n/catalogs';
 import type { ReactNode } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useTranslation } from '@/shared/i18n/use-translation';
@@ -6,10 +7,10 @@ import { LanguageSwitcher } from './LanguageSwitcher';
 
 interface NavItem {
   to: string;
-  labelKey: string;
+  labelKey: MessageKey;
   icon: ReactNode;
   /** Locale key for a group heading rendered above this item (new section). */
-  groupKey?: string;
+  groupKey?: MessageKey;
 }
 
 const HomeIcon = (
@@ -145,7 +146,10 @@ export function AppShell({
   };
 
   const avatarLetter = userEmail !== undefined && userEmail !== '' ? userEmail.charAt(0) : '?';
-  const roleLabel = userRole !== undefined && userRole !== '' ? t(`user.role.${userRole}`) : null;
+  const roleLabel =
+    userRole !== undefined && userRole !== ''
+      ? t(dynamicMessageKey(`user.role.${userRole}`))
+      : null;
 
   return (
     <div className="layout">

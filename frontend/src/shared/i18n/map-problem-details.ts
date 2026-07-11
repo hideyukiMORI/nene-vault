@@ -1,7 +1,8 @@
 import { AppError } from '@/shared/api/errors';
+import type { MessageKey } from './catalogs';
 
 // Map a Problem Details slug (or HTTP status fallback) to a locale key under `problem.*`.
-const SLUG_TO_KEY: Record<string, string> = {
+const SLUG_TO_KEY: Record<string, MessageKey> = {
   unauthorized: 'problem.unauthorized',
   forbidden: 'problem.forbidden',
   'org-access-denied': 'problem.org_access_denied',
@@ -23,10 +24,11 @@ const SLUG_TO_KEY: Record<string, string> = {
   'internal-server-error': 'problem.internal_server_error',
 };
 
-export function problemMessageKey(error: AppError): string {
+export function problemMessageKey(error: AppError): MessageKey {
   const slug = error.problemSlug;
-  if (slug !== null && slug in SLUG_TO_KEY) {
-    return SLUG_TO_KEY[slug] as string;
+  const mapped = slug !== null ? SLUG_TO_KEY[slug] : undefined;
+  if (mapped !== undefined) {
+    return mapped;
   }
   return error.status >= 500 ? 'problem.internal_server_error' : 'problem.validation_failed';
 }
@@ -36,6 +38,6 @@ export function problemMessageKey(error: AppError): string {
  * value is not an AppError. Lets feature hooks map errors without importing
  * shared/api directly (FSD boundary).
  */
-export function messageKeyForError(error: unknown): string | null {
+export function messageKeyForError(error: unknown): MessageKey | null {
   return error instanceof AppError ? problemMessageKey(error) : null;
 }

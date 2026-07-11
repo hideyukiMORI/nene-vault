@@ -1,10 +1,10 @@
-import { catalogs, type LocaleCatalog } from './catalogs';
+import { catalogs, type LocaleCatalog, type MessageKey } from './catalogs';
 import type { SupportedLocale } from './locales';
 
 export type TranslateParams = Record<string, string | number>;
 
 /** Look up a dot-notation key; returns the key itself when missing (visible, not blank). */
-export function lookup(catalog: LocaleCatalog, key: string): string {
+export function lookup(catalog: LocaleCatalog, key: MessageKey): string {
   const value = key.split('.').reduce<unknown>((node, part) => {
     if (node !== null && typeof node === 'object' && part in node) {
       return (node as Record<string, unknown>)[part];
@@ -24,6 +24,10 @@ export function interpolate(template: string, params?: TranslateParams): string 
   );
 }
 
-export function translate(locale: SupportedLocale, key: string, params?: TranslateParams): string {
+export function translate(
+  locale: SupportedLocale,
+  key: MessageKey,
+  params?: TranslateParams,
+): string {
   return interpolate(lookup(catalogs[locale], key), params);
 }
