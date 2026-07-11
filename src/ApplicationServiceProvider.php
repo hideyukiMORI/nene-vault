@@ -17,6 +17,7 @@ use NeneVault\Audit\AuditRouteRegistrar;
 use NeneVault\Audit\AuditServiceProvider;
 use NeneVault\Auth\AuthRouteRegistrar;
 use NeneVault\Auth\InvalidCredentialsExceptionHandler;
+use NeneVault\Auth\TooManyLoginAttemptsExceptionHandler;
 use NeneVault\Auth\UserRepositoryInterface;
 use NeneVault\Demo\DemoServiceProvider;
 use NeneVault\Demo\GuidedDemoRouteRegistrar;
@@ -217,6 +218,7 @@ final readonly class ApplicationServiceProvider implements ServiceProviderInterf
             static function (ContainerInterface $c): array {
                 return [
                     $c->get(InvalidCredentialsExceptionHandler::class),
+                    $c->get(TooManyLoginAttemptsExceptionHandler::class),
                     $c->get(OrganizationNotFoundExceptionHandler::class),
                     $c->get(OrganizationSlugConflictExceptionHandler::class),
                     $c->get(VaultDocumentNotFoundExceptionHandler::class),

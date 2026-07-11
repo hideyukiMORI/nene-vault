@@ -17,7 +17,7 @@ use Psr\Http\Message\ResponseInterface;
 /**
  * The disposable-org seat page (#141): mints an admin token whose `org_id`
  * claim drives the claim-based tenant resolution, parks the SPA's
- * `AuthSession` JSON in localStorage under the exact key/shape a login
+ * `AuthSession` JSON in sessionStorage under the exact key/shape a login
  * persists, and locks the page down with a nonce'd per-response CSP.
  */
 final class DemoSessionSeaterTest extends TestCase
@@ -50,7 +50,7 @@ final class DemoSessionSeaterTest extends TestCase
 
         self::assertSame(200, $response->getStatusCode());
         $html = (string) $response->getBody();
-        self::assertStringContainsString("localStorage.setItem('nene_vault_token', JSON.stringify(", $html);
+        self::assertStringContainsString("sessionStorage.setItem('nene_vault_token', JSON.stringify(", $html);
         self::assertStringContainsString("location.replace('/')", $html);
         self::assertSame('no-store', $response->getHeaderLine('Cache-Control'));
 
@@ -66,7 +66,8 @@ final class DemoSessionSeaterTest extends TestCase
         self::assertSame(77, $claims['user_id']);
         self::assertSame(42, $claims['org_id']);
         self::assertSame('admin', $claims['role']);
-        // Token TTL matches the demo org TTL (3 h), not the 24 h login TTL.
+        // Token TTL matches the demo org TTL (3 h), not the 1 h login TTL — the
+        // disposable org lives 3 h and the seat must survive the whole session.
         self::assertSame(3 * 3600, (int) $claims['exp'] - (int) $claims['iat']);
     }
 

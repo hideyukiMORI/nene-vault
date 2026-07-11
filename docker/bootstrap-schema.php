@@ -97,6 +97,16 @@ $pdo->exec('CREATE TABLE IF NOT EXISTS vault_documents (
     void_note TEXT
 )');
 
+$pdo->exec('CREATE TABLE IF NOT EXISTS login_attempts (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    identifier_hash VARCHAR(64) NOT NULL,
+    attempt_count INTEGER NOT NULL DEFAULT 0,
+    window_started_at DATETIME NOT NULL,
+    locked_until DATETIME,
+    created_at DATETIME,
+    UNIQUE(identifier_hash)
+)');
+
 $pdo->exec('CREATE TABLE IF NOT EXISTS document_versions (
     id CHAR(26) PRIMARY KEY,
     vault_document_id CHAR(26) NOT NULL,

@@ -74,6 +74,18 @@ pre-production go-live gate (税理士 Review 3) and Tier A live testing.**
 - [x] Optional email inbound (mailbox → auto-upload via IMAP/MIME parser) — `src/Email/` + `tools/email-inbound.php` (PR #74)
 - [x] OCR assist — suggest metadata from PDF/image, human confirm (PR #76)
 
+## Audit remediation 2026-07-11 — In progress
+
+Fleet structural-alignment audit remediation (#148 / #149 / #150).
+
+- [x] **#148 session posture** — access-token TTL 24 h → 1 h, token storage
+      localStorage → sessionStorage (SPA + both demo seat pages), login throttle
+      (`PdoLoginThrottle`, 5 attempts / 15 min per email+IP, 429 + `retry_after_seconds`),
+      `users.status = 'active'` login check + timing equalization (#150 item).
+- [ ] #150 backend standardization (JWT claims, BearerTokenMiddleware, Packagist
+      NENE2, UTC created_at, HealthCheck/Ulid, release checksum)
+- [ ] #149 frontend generation upgrade (+ typed i18n, auth-gate 401 handling)
+
 ## Go-live gate — Open 🔲
 
 These are the only items between the current (complete, all-green) codebase and

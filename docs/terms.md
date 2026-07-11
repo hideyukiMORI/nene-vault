@@ -116,6 +116,7 @@ These are patterns, not registered individual class names. Follow them exactly.
 | `document_links` | `DocumentLink` | 関連書類リンク | `links`, `sibling_links`, `doc_links` |
 | `audit_events` | `AuditEvent` | 監査ログ | `audit_logs`, `logs`, `events` |
 | `vault_settings` | `VaultSettings` | 保管設定 | `settings`, `configs`, `vault_config` |
+| `login_attempts` | — (throttle state, no entity) | ログイン試行 | `login_throttle`, `failed_logins`, `auth_attempts` |
 
 ---
 
@@ -200,6 +201,18 @@ These are patterns, not registered individual class names. Follow them exactly.
 | `clear_api_base_url` | VARCHAR nullable | Clear API ベースURL | `clear_url`, `clear_api_url` |
 | `clear_api_token` | VARCHAR nullable | Clear API トークン | `clear_token`, `clear_api_key` |
 | `updated_by` | UUID FK → users | 更新者 | `modified_by`, `changed_by` |
+
+### login_attempts columns
+
+Not tenant-scoped: transient brute-force counters keyed on a hashed
+email + client-IP identifier (raw identifiers are never stored).
+
+| Canonical form | Type | Japanese label | DO NOT use |
+| --- | --- | --- | --- |
+| `identifier_hash` | VARCHAR(64) UNIQUE | 識別子ハッシュ | `identifier`, `email_hash`, `key_hash` |
+| `attempt_count` | INT | 失敗回数 | `attempts`, `failures`, `count` |
+| `window_started_at` | TIMESTAMP | ウィンドウ開始 | `window_start`, `first_attempt_at` |
+| `locked_until` | TIMESTAMP nullable | ロック解除時刻 | `lock_expires_at`, `blocked_until` |
 
 ---
 
@@ -373,6 +386,7 @@ Standard fields used across multiple responses:
 | `tags` | array of strings | タグ | `labels`, `keywords` |
 | `file_sha256` | string (64-char hex) | SHA-256ハッシュ | `sha256`, `hash`, `checksum` |
 | `mime_type` | string | MIMEタイプ | `content_type`, `type` alone |
+| `retry_after_seconds` | integer | ロック解除までの秒数 | `retry_after`, `wait_seconds`, `lockout_seconds` |
 | `original_filename` | string | 元ファイル名 | `filename`, `file_name`, `name` |
 | `file_size_bytes` | integer | ファイルサイズ | `size`, `file_size` |
 | `source` | string enum | アップロード元 | `origin`, `channel` |
@@ -454,6 +468,8 @@ Base URL: `https://nene-vault.dev/problems/`
 | `file-too-large` | `…/file-too-large` | 413 | `payload-too-large`, `file-size-exceeded` |
 | `duplicate-file` | `…/duplicate-file` | 409 | `file-exists`, `duplicate-hash`, `file-duplicate` |
 | `organization-not-found` | `…/organization-not-found` | 404 | `tenant-not-found` |
+| `invalid-credentials` | `…/invalid-credentials` | 401 | `login-failed`, `bad-credentials`, `wrong-password` |
+| `too-many-login-attempts` | `…/too-many-login-attempts` | 429 | `rate-limited`, `login-locked`, `too-many-requests` |
 | `unauthorized` | `…/unauthorized` | 401 | `not-authenticated`, `authentication-required` |
 | `forbidden` | `…/forbidden` | 403 | `access-denied`, `not-authorized`, `permission-denied` |
 | `internal-server-error` | `…/internal-server-error` | 500 | `server-error`, `unexpected-error` |

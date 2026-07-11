@@ -83,6 +83,8 @@ paths:
           $ref: '#/components/responses/InvalidCredentials'
         '422':
           $ref: '#/components/responses/ValidationFailed'
+        '429':
+          $ref: '#/components/responses/TooManyLoginAttempts'
 
   /admin/organizations:
     get:
@@ -1486,6 +1488,17 @@ components:
             type: https://nene-vault.dev/problems/invalid-credentials
             title: Invalid Credentials
             status: 401
+    TooManyLoginAttempts:
+      description: Too many failed login attempts for this account/IP; retry after the indicated delay.
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/ProblemDetails'
+          example:
+            type: https://nene-vault.dev/problems/too-many-login-attempts
+            title: Too Many Login Attempts
+            status: 429
+            retry_after_seconds: 900
     ValidationFailed:
       description: Request body failed validation.
       content:

@@ -22,13 +22,15 @@ use Psr\Http\Message\ServerRequestInterface;
  * shape and secret as {@see \NeneVault\Auth\LoginUseCase}; the token's
  * `org_id` claim is what {@see \NeneVault\Organization\Resolution\OrgResolverMiddleware}
  * resolves the tenant from — and serves a one-shot seat page whose nonce'd
- * inline script stores the SPA's `AuthSession` JSON in `localStorage`
+ * inline script stores the SPA's `AuthSession` JSON in `sessionStorage`
  * (key `nene_vault_token`, the exact shape `frontend/src/entities/auth/model.ts`
  * persists after a login) and replaces into the app. Zero frontend change.
  *
- * The token TTL matches the demo org TTL ({@see DemoConfig::$ttlHours}) rather
- * than the 24 h login TTL: the org is swept by then, and a shorter token means
- * the stale session dies with its data instead of 404-ing for another day.
+ * The token TTL deliberately matches the demo org TTL ({@see DemoConfig::$ttlHours},
+ * 3 h) rather than the 1 h login TTL: the disposable org lives exactly that
+ * long, so the seat stays usable for the whole hands-on session and the stale
+ * token dies with its data when the org is swept (semantics pinned by
+ * {@see \NeneVault\Tests\Demo\DemoSessionSeaterTest}).
  *
  * The page carries its own per-response CSP — the app-wide policy would block
  * the inline script (the invoice #612 trap; the security-headers middleware
@@ -83,7 +85,7 @@ final readonly class DemoSessionSeater implements DemoSessionSeaterInterface
         <noscript><p>デモの開始には JavaScript が必要です。ブラウザの JavaScript を有効にして、もう一度お試しください。</p></noscript>
         <p>デモを準備しています…</p>
         <script nonce="{$nonce}">
-        localStorage.setItem('nene_vault_token', JSON.stringify({$session}));
+        sessionStorage.setItem('nene_vault_token', JSON.stringify({$session}));
         location.replace('/');
         </script>
         </body>
