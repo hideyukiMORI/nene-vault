@@ -1,9 +1,15 @@
-import { act, waitFor } from '@testing-library/react';
+import { act, renderHook, waitFor } from '@testing-library/react';
+import { QueryClientProvider } from '@tanstack/react-query';
+import { createElement, type ReactNode } from 'react';
 import { http, HttpResponse } from 'msw';
-import { describe, expect, it } from 'vitest';
-import { renderHookWithProviders } from '@tests/render/render-with-providers';
+import { describe, expect, it, vi } from 'vitest';
+import {
+  createTestQueryClient,
+  renderHookWithProviders,
+} from '@tests/render/render-with-providers';
 import { DOCUMENT_ID, mockDocument, mockVoidedDocument, problemDetails } from '@tests/msw/fixtures';
 import { server } from '@tests/msw/server';
+import { auditQueryKeys } from '@/entities/audit';
 import { useUpdateDocumentMetadata, useVoidDocument, useRestoreDocument } from './mutations';
 
 describe('useUpdateDocumentMetadata', () => {
@@ -103,5 +109,63 @@ describe('useRestoreDocument', () => {
     await waitFor(() => {
       expect(result.current.isError).toBe(true);
     });
+  });
+});
+
+// #172: the detail page's change-history table reads the audit history query,
+// which is keyed separately from the document detail/list. Every mutation that
+// records an audit event must invalidate it so new rows appear without a reload.
+describe('change-history invalidation', () => {
+  const HISTORY_KEY = auditQueryKeys.documentHistory(DOCUMENT_ID);
+
+  function renderWithSpyClient<T>(hook: () => T) {
+    const client = createTestQueryClient();
+    const spy = vi.spyOn(client, 'invalidateQueries');
+    const wrapper = ({ children }: { children: ReactNode }) =>
+      createElement(QueryClientProvider, { client }, children);
+    const view = renderHook(hook, { wrapper });
+    return { ...view, spy };
+  }
+
+  it('invalidates the document history after a metadata update', async () => {
+    const { result, spy } = renderWithSpyClient(() => useUpdateDocumentMetadata());
+
+    act(() => {
+      result.current.mutate({ id: DOCUMENT_ID, counterparty_name: 'Updated Inc.' });
+    });
+
+    await waitFor(() => {
+      expect(result.current.isSuccess).toBe(true);
+    });
+
+    expect(spy).toHaveBeenCalledWith({ queryKey: HISTORY_KEY });
+  });
+
+  it('invalidates the document history after voiding', async () => {
+    const { result, spy } = renderWithSpyClient(() => useVoidDocument());
+
+    act(() => {
+      result.current.mutate({ id: DOCUMENT_ID, void_reason: 'Duplicate entry' });
+    });
+
+    await waitFor(() => {
+      expect(result.current.isSuccess).toBe(true);
+    });
+
+    expect(spy).toHaveBeenCalledWith({ queryKey: HISTORY_KEY });
+  });
+
+  it('invalidates the document history after restoring', async () => {
+    const { result, spy } = renderWithSpyClient(() => useRestoreDocument());
+
+    act(() => {
+      result.current.mutate(DOCUMENT_ID);
+    });
+
+    await waitFor(() => {
+      expect(result.current.isSuccess).toBe(true);
+    });
+
+    expect(spy).toHaveBeenCalledWith({ queryKey: HISTORY_KEY });
   });
 });

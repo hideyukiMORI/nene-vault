@@ -1,4 +1,5 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { auditQueryKeys } from '@/entities/audit';
 import { apiClient } from '@/shared/api/client';
 import type { AppError } from '@/shared/api/errors';
 import type { DocumentCategory, VaultDocument } from './types';
@@ -58,6 +59,9 @@ export function useUpdateDocumentMetadata(onSuccess?: () => void) {
     onSuccess: (_, { id }) => {
       void queryClient.invalidateQueries({ queryKey: documentQueryKeys.detail(id) });
       void queryClient.invalidateQueries({ queryKey: documentQueryKeys.all });
+      // The detail page's change-history table reads the audit history query,
+      // which is keyed separately; refresh it so new events show without reload.
+      void queryClient.invalidateQueries({ queryKey: auditQueryKeys.documentHistory(id) });
       onSuccess?.();
     },
   });
@@ -78,6 +82,9 @@ export function useVoidDocument(onSuccess?: () => void) {
     onSuccess: (_, { id }) => {
       void queryClient.invalidateQueries({ queryKey: documentQueryKeys.detail(id) });
       void queryClient.invalidateQueries({ queryKey: documentQueryKeys.all });
+      // The detail page's change-history table reads the audit history query,
+      // which is keyed separately; refresh it so new events show without reload.
+      void queryClient.invalidateQueries({ queryKey: auditQueryKeys.documentHistory(id) });
       onSuccess?.();
     },
   });
@@ -91,6 +98,9 @@ export function useRestoreDocument(onSuccess?: () => void) {
     onSuccess: (_, id) => {
       void queryClient.invalidateQueries({ queryKey: documentQueryKeys.detail(id) });
       void queryClient.invalidateQueries({ queryKey: documentQueryKeys.all });
+      // The detail page's change-history table reads the audit history query,
+      // which is keyed separately; refresh it so new events show without reload.
+      void queryClient.invalidateQueries({ queryKey: auditQueryKeys.documentHistory(id) });
       onSuccess?.();
     },
   });
