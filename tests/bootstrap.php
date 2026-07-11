@@ -148,9 +148,8 @@ $pdo->exec('DELETE FROM login_attempts');
 // Disposable demo orgs from previous local runs (slug prefix `demo-`) count
 // against the DEMO_MAX_ORGS ceiling and would eventually 503 the disposable
 // demo tests. Sweep them and their tenant rows before the suite starts.
-$demoOrgIds = $pdo->query(
-    "SELECT id FROM organizations WHERE slug LIKE 'demo-%'",
-)->fetchAll(PDO::FETCH_COLUMN);
+$demoOrgStmt = $pdo->query("SELECT id FROM organizations WHERE slug LIKE 'demo-%'");
+$demoOrgIds = $demoOrgStmt !== false ? $demoOrgStmt->fetchAll(PDO::FETCH_COLUMN) : [];
 
 if ($demoOrgIds !== []) {
     $in = implode(',', array_map('intval', $demoOrgIds));
