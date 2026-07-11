@@ -74,17 +74,31 @@ pre-production go-live gate (税理士 Review 3) and Tier A live testing.**
 - [x] Optional email inbound (mailbox → auto-upload via IMAP/MIME parser) — `src/Email/` + `tools/email-inbound.php` (PR #74)
 - [x] OCR assist — suggest metadata from PDF/image, human confirm (PR #76)
 
-## Audit remediation 2026-07-11 — In progress
+## Audit remediation 2026-07-11 — Done (one stop-gated follow-up)
 
-Fleet structural-alignment audit remediation (#148 / #149 / #150).
+Fleet structural-alignment audit remediation (#148 / #149 / #150), all merged
+same day:
 
-- [x] **#148 session posture** — access-token TTL 24 h → 1 h, token storage
-      localStorage → sessionStorage (SPA + both demo seat pages), login throttle
-      (`PdoLoginThrottle`, 5 attempts / 15 min per email+IP, 429 + `retry_after_seconds`),
-      `users.status = 'active'` login check + timing equalization (#150 item).
-- [ ] #150 backend standardization (JWT claims, BearerTokenMiddleware, Packagist
-      NENE2, UTC created_at, HealthCheck/Ulid, release checksum)
-- [ ] #149 frontend generation upgrade (+ typed i18n, auth-gate 401 handling)
+- [x] **#148 session posture** (PR #154) — token TTL 24 h → 1 h, sessionStorage
+      (SPA + both demo seats), `PdoLoginThrottle` (5/15 min per email+IP, 429),
+      `users.status = 'active'` check + timing equalization. Refresh-session
+      upgrade (invoice ADR 0014 shape) filed as #153.
+- [x] **#150 backend standardization** — JWT claims fleet schema `sub`/`org` +
+      ClockInterface (#155/PR #156), NENE2 `BearerTokenMiddleware` blocklist +
+      `PublicSurfaceBoundaryTest` (#157/PR #158), NENE2 → Packagist `^1.10` +
+      release SHA-256 sidecar (#159/PR #160), UTC `created_at` write + UTC sweep
+      parse + conversion migration `20260711000002` with 2-TZ acceptance
+      (#161/PR #162), NENE2 health checks + symfony/uid (#163/PR #164).
+- [x] **#149 frontend generation** (PR #165) — React 19 / react-router 7 /
+      Vite 8 / TS 6 / Storybook 10 / Node >=22 (deal's version set); typed i18n
+      `MessageKey` keeping ADR 0005 JSON as source (#166/PR #167); 401 in-place
+      login via reactive auth gate (#168/PR #169).
+- [ ] **Base-path / subdirectory deployment** (invoice ADR 0015 port) —
+      stop-gated per the work order: Phase 0 estimate = 3 PRs; porting plan in
+      **#170** (includes the deferred 403 hard redirect).
+
+> Deploy note: apply migration `20260711000002` **together with** this code on
+> the live demo host, before the next hourly sweep tick (docblock has details).
 
 ## Go-live gate — Open 🔲
 
@@ -100,4 +114,4 @@ production use by operators. Both come from Review 2's recorded conditions
 - [ ] **Standing P0 watch** — on any 電帳法 amendment / 国税庁 guidance, open a P0
       Issue and add a new review block to `signoff-record.md` (Review 2 condition 2).
 
-Last updated: 2026-07-11
+Last updated: 2026-07-11 (audit remediation merged)
