@@ -11,14 +11,14 @@ use PHPUnit\Framework\TestCase;
  * Runs the real `tools/sweep-demo.php` as a subprocess with the host timezone
  * pinned to Asia/Tokyo — the production (HETEML) configuration — and to UTC.
  *
- * Vault writes `organizations.created_at` with `date()` in the host's default
- * timezone (unlike clear/deal, which write UTC), so the sweep must parse it
- * with that same default timezone (#143): each scenario here writes
- * `created_at` in the timezone the subprocess sweeps under and expects the
- * same outcome — fresh orgs survive, genuinely expired ones are reaped, and
- * the reaped org's document storage tree goes with it. (A UTC-forced parse on
- * the JST host — the transplanted clear #280 / deal #72 shape — read every
- * org as 9 h in the future and stretched the 3 h TTL to 12 h.)
+ * Since #161 the WRITE side stamps `organizations.created_at` in UTC
+ * (PdoOrganizationRepository via the injected UtcClock) and the sweep parses
+ * it as UTC — both sides of the #143 pairing flipped together, matching
+ * clear #280 / deal #72. Each scenario writes `created_at` through the REAL
+ * repository code path in a subprocess whose default timezone is pinned (so a
+ * regression back to host-local `date()` writes shows up on the JST run), then
+ * sweeps under the same pinned timezone: fresh orgs survive, genuinely expired
+ * ones are reaped, and the reaped org's document storage tree goes with it.
  */
 final class SweepDemoScriptTest extends TestCase
 {
@@ -55,11 +55,19 @@ final class SweepDemoScriptTest extends TestCase
 
     public function test_fresh_org_survives_and_expired_org_is_reaped_on_a_jst_host(): void
     {
-        // created_at written the way the app writes it on a JST host: date()
-        // in Asia/Tokyo — the sweep subprocess below runs under the same TZ.
-        $this->insertOrg(1, 'demo-fresh', $this->localStamp('Asia/Tokyo', 60));               // 1 minute old
-        $this->insertOrg(2, 'demo-expired', $this->localStamp('Asia/Tokyo', 4 * 3600));       // past the 3h TTL
-        $this->insertOrg(3, 'ayane', $this->localStamp('Asia/Tokyo', 30 * 24 * 3600));        // fixed showcase org (no prefix)
+        // Write side runs the real PdoOrganizationRepository inside a JST
+        // subprocess (#161): the stamp must come out UTC, not Asia/Tokyo.
+        $this->writeOrgViaRepository('Asia/Tokyo', 'demo-fresh');
+        $freshStamp = $this->createdAtOf('demo-fresh');
+        self::assertEqualsWithDelta(
+            time(),
+            strtotime($freshStamp . ' UTC'),
+            60,
+            "created_at must be stamped in UTC even on a JST host (got {$freshStamp})",
+        );
+
+        $this->insertOrg(2, 'demo-expired', $this->utcStamp(4 * 3600));       // past the 3h TTL
+        $this->insertOrg(3, 'ayane', $this->utcStamp(30 * 24 * 3600));        // fixed showcase org (no prefix)
 
         // Child rows + a storage tree for the org that must be reaped.
         $this->pdo->exec('INSERT INTO users (organization_id) VALUES (2)');
@@ -78,8 +86,8 @@ final class SweepDemoScriptTest extends TestCase
 
     public function test_behaves_identically_on_a_utc_host_and_is_idempotent(): void
     {
-        $this->insertOrg(1, 'demo-fresh', $this->localStamp('UTC', 60));
-        $this->insertOrg(2, 'demo-expired', $this->localStamp('UTC', 4 * 3600));
+        $this->writeOrgViaRepository('UTC', 'demo-fresh');
+        $this->insertOrg(2, 'demo-expired', $this->utcStamp(4 * 3600));
 
         $output = $this->runSweep('UTC');
         self::assertStringContainsString('2 org(s) total, 1 expired, 0 overflow, 1 reaped', $output);
@@ -91,12 +99,53 @@ final class SweepDemoScriptTest extends TestCase
         self::assertSame(['demo-fresh'], $this->remainingSlugs());
     }
 
-    /** A created_at string as the app's date() would write it in $timezone, $secondsAgo in the past. */
-    private function localStamp(string $timezone, int $secondsAgo): string
+    /** A UTC created_at string as the app writes it since #161, $secondsAgo in the past. */
+    private function utcStamp(int $secondsAgo): string
     {
         return (new \DateTimeImmutable('@' . (time() - $secondsAgo)))
-            ->setTimezone(new \DateTimeZone($timezone))
+            ->setTimezone(new \DateTimeZone('UTC'))
             ->format('Y-m-d H:i:s');
+    }
+
+    /**
+     * Saves an org through the REAL write path (PdoOrganizationRepository) in
+     * a subprocess whose default timezone is pinned to $timezone — proving the
+     * stamp is UTC regardless of the host timezone (#161).
+     */
+    private function writeOrgViaRepository(string $timezone, string $slug): void
+    {
+        $root = dirname(__DIR__, 2);
+        $code = <<<'PHP'
+        require $argv[1] . '/vendor/autoload.php';
+        $kit = Nene2\Testing\DatabaseTestKit::sqlite($argv[2]);
+        $repo = new NeneVault\Organization\PdoOrganizationRepository($kit->queryExecutor, new Nene2\Http\UtcClock());
+        $repo->save(new NeneVault\Organization\Organization(name: 'Demo', slug: $argv[3], plan: 'free', isActive: true));
+        PHP;
+
+        $command = [
+            PHP_BINARY,
+            '-d', 'date.timezone=' . $timezone,
+            '-r', $code,
+            '--',
+            $root,
+            $this->dbPath,
+            $slug,
+        ];
+
+        $process = proc_open($command, [1 => ['pipe', 'w'], 2 => ['pipe', 'w']], $pipes, $root);
+        self::assertIsResource($process);
+        $stderr = (string) stream_get_contents($pipes[2]);
+        fclose($pipes[1]);
+        fclose($pipes[2]);
+        self::assertSame(0, proc_close($process), 'repository write subprocess failed: ' . $stderr);
+    }
+
+    private function createdAtOf(string $slug): string
+    {
+        $stmt = $this->pdo->prepare('SELECT created_at FROM organizations WHERE slug = ?');
+        $stmt->execute([$slug]);
+
+        return (string) $stmt->fetchColumn();
     }
 
     private function insertOrg(int $id, string $slug, string $createdAt): void

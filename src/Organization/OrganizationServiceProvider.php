@@ -11,7 +11,9 @@ use Nene2\Database\DatabaseTransactionManagerInterface;
 use Nene2\DependencyInjection\ContainerBuilder;
 use Nene2\DependencyInjection\ServiceProviderInterface;
 use Nene2\Error\ProblemDetailsResponseFactory;
+use Nene2\Http\ClockInterface;
 use Nene2\Http\JsonResponseFactory;
+use Nene2\Http\UtcClock;
 use NeneVault\VaultSettings\PdoVaultSettingsRepository;
 use NeneVault\VaultSettings\VaultSettingsSeederInterface;
 use Psr\Container\ContainerInterface;
@@ -31,7 +33,13 @@ final readonly class OrganizationServiceProvider implements ServiceProviderInter
                         throw new LogicException('DatabaseQueryExecutorInterface service is invalid.');
                     }
 
-                    return new PdoOrganizationRepository($query);
+                    $clock = $c->get(ClockInterface::class);
+
+                    if (!$clock instanceof ClockInterface) {
+                        throw new LogicException('ClockInterface service is invalid.');
+                    }
+
+                    return new PdoOrganizationRepository($query, $clock);
                 },
             )
             // ── Use cases ──
@@ -46,7 +54,7 @@ final readonly class OrganizationServiceProvider implements ServiceProviderInter
 
                     return new CreateOrganizationUseCase(
                         $tx,
-                        static fn (DatabaseQueryExecutorInterface $e): OrganizationRepositoryInterface => new PdoOrganizationRepository($e),
+                        static fn (DatabaseQueryExecutorInterface $e): OrganizationRepositoryInterface => new PdoOrganizationRepository($e, new UtcClock()),
                         static fn (DatabaseQueryExecutorInterface $e): VaultSettingsSeederInterface => new PdoVaultSettingsRepository($e),
                         self::auditFactory($c),
                     );
@@ -87,7 +95,7 @@ final readonly class OrganizationServiceProvider implements ServiceProviderInter
 
                     return new UpdateOrganizationUseCase(
                         $tx,
-                        static fn (DatabaseQueryExecutorInterface $e): OrganizationRepositoryInterface => new PdoOrganizationRepository($e),
+                        static fn (DatabaseQueryExecutorInterface $e): OrganizationRepositoryInterface => new PdoOrganizationRepository($e, new UtcClock()),
                         self::auditFactory($c),
                     );
                 },
@@ -103,7 +111,7 @@ final readonly class OrganizationServiceProvider implements ServiceProviderInter
 
                     return new DeleteOrganizationUseCase(
                         $tx,
-                        static fn (DatabaseQueryExecutorInterface $e): OrganizationRepositoryInterface => new PdoOrganizationRepository($e),
+                        static fn (DatabaseQueryExecutorInterface $e): OrganizationRepositoryInterface => new PdoOrganizationRepository($e, new UtcClock()),
                         self::auditFactory($c),
                     );
                 },
