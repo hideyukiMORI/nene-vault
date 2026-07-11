@@ -5,7 +5,7 @@ import { authStore } from '@/entities/auth';
 import { AuthGate } from './auth-gate';
 
 afterEach(() => {
-  localStorage.clear();
+  sessionStorage.clear();
 });
 
 describe('AuthGate', () => {

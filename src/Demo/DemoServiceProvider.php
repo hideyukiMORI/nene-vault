@@ -28,7 +28,7 @@ use Psr\Container\ContainerInterface;
 /**
  * Wires the disposable-demo domain as a `Nene2\Demo` consumer (#141): the
  * product concretes (provisioner over the real create-org/create-user use
- * cases, the #118 seeder behind the framework contract, the localStorage
+ * cases, the #118 seeder behind the framework contract, the sessionStorage
  * seat page), the creation-time capacity guard (per-IP file-backed throttle +
  * instance-wide org ceiling), the branded browser error page, and the
  * framework handler + route registrar. No auth code is added — the seater

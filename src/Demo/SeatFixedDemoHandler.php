@@ -7,6 +7,7 @@ namespace NeneVault\Demo;
 use Nene2\Auth\TokenIssuerInterface;
 use Nene2\Demo\DemoConfig;
 use Nene2\Http\ClockInterface;
+use NeneVault\Auth\LoginUseCase;
 use NeneVault\Auth\Role;
 use NeneVault\Auth\UserRepositoryInterface;
 use Nyholm\Psr7\Factory\Psr17Factory;
@@ -15,10 +16,10 @@ use Psr\Http\Message\ServerRequestInterface;
 
 /**
  * Auto-login for the fixed demo organization (#127, viewer-scoped per #130,
- * served at `GET /demo/guided` since #141): mints a normal 24 h access token
- * for the seeded demo VIEWER and serves a
+ * served at `GET /demo/guided` since #141): mints a normal access token
+ * (same 1 h TTL as {@see LoginUseCase}) for the seeded demo VIEWER and serves a
  * one-shot seat page whose nonce'd inline script stores the SPA's
- * `AuthSession` JSON in `localStorage` and replaces into the app — the
+ * `AuthSession` JSON in `sessionStorage` and replaces into the app — the
  * invoice/clear "open one URL, land signed in" experience against the
  * shared, nightly-reseeded showcase org. The disposable-org demo
  * ({@see DemoSessionSeater}, `/demo/standard`) is the distribution link;
@@ -42,7 +43,7 @@ final readonly class SeatFixedDemoHandler
 {
     public const string DEMO_VIEWER_EMAIL = 'demo-viewer@nene-vault.dev';
 
-    private const int TOKEN_TTL_SECONDS = 86400; // mirror LoginUseCase
+    private const int TOKEN_TTL_SECONDS = LoginUseCase::TOKEN_TTL_SECONDS; // same TTL as a normal login (#148)
 
     public function __construct(
         private DemoConfig $config,
@@ -102,7 +103,7 @@ final readonly class SeatFixedDemoHandler
         <noscript><p>デモの開始には JavaScript が必要です。ブラウザの JavaScript を有効にして、もう一度お試しください。</p></noscript>
         <p>デモを準備しています…</p>
         <script nonce="{$nonce}">
-        localStorage.setItem('nene_vault_token', JSON.stringify({$session}));
+        sessionStorage.setItem('nene_vault_token', JSON.stringify({$session}));
         location.replace('/');
         </script>
         </body>

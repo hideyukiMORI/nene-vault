@@ -1,5 +1,6 @@
-// Auth session store. Same pattern as NeNe Records: the JWT session lives in
-// localStorage; the API client reads getToken() and sends it as a Bearer token.
+// Auth session store. The JWT session lives in sessionStorage (fleet-standard
+// XSS blast-radius mitigation, #148: the token does not persist across browser
+// restarts); the API client reads getToken() and sends it as a Bearer token.
 
 export interface AuthSession {
   token: string;
@@ -14,7 +15,7 @@ const STORAGE_KEY = 'nene_vault_token';
 export const authStore = {
   getSession(): AuthSession | null {
     try {
-      const raw = localStorage.getItem(STORAGE_KEY);
+      const raw = sessionStorage.getItem(STORAGE_KEY);
       if (raw === null) {
         return null;
       }
@@ -26,7 +27,7 @@ export const authStore = {
 
   setSession(session: AuthSession): void {
     try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(session));
+      sessionStorage.setItem(STORAGE_KEY, JSON.stringify(session));
     } catch {
       // ignore persistence failure
     }
@@ -34,7 +35,7 @@ export const authStore = {
 
   clearSession(): void {
     try {
-      localStorage.removeItem(STORAGE_KEY);
+      sessionStorage.removeItem(STORAGE_KEY);
     } catch {
       // ignore
     }

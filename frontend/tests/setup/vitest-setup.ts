@@ -9,6 +9,7 @@ beforeAll(() => {
 afterEach(() => {
   server.resetHandlers();
   localStorage.clear();
+  sessionStorage.clear();
 });
 
 afterAll(() => {

@@ -41,7 +41,7 @@ Schema: `php docker/bootstrap-schema.php` (sqlite) or phinx/installer (MySQL).
 has no cross-process memory) and org-ceiling check (`DEMO_MAX_ORGS`, 503
 when full) → provision org + throwaway admin (random undisclosed password,
 slug-namespaced email) through the real create-org/create-user use cases →
-seed → seat page stores the SPA's `AuthSession` in `localStorage` and lands
+seed → seat page stores the SPA's `AuthSession` in `sessionStorage` and lands
 in the app signed in.
 
 Tenancy: the minted token carries the disposable org in its `org_id` claim,
@@ -102,7 +102,7 @@ not seeded.
 
 - OCR / email-inbound stay disabled in the demo (external dependencies).
 - Disposable sessions last `DEMO_TTL_HOURS` (token TTL matches the org TTL);
-  fixed-org sessions last 24 h.
+  fixed-org sessions last 1 h (the login TTL, #148).
 - A swept org's leftover token fails closed with 404 `org-not-found` — the
   visitor just re-opens the link.
 

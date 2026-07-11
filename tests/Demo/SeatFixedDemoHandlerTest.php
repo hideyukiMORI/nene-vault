@@ -148,12 +148,12 @@ final class SeatFixedDemoHandlerTest extends TestCase
         self::assertSame(200, $response->getStatusCode());
         $html = (string) $response->getBody();
 
-        self::assertStringContainsString("localStorage.setItem('nene_vault_token', JSON.stringify(", $html);
+        self::assertStringContainsString("sessionStorage.setItem('nene_vault_token', JSON.stringify(", $html);
         self::assertStringContainsString("location.replace('/')", $html);
         self::assertSame('no-store', $response->getHeaderLine('Cache-Control'));
 
         // The embedded session carries the SPA's AuthSession shape and a
-        // verifiable 24 h token with LoginUseCase-identical claims.
+        // verifiable 1 h token with LoginUseCase-identical claims.
         self::assertSame(1, preg_match('/JSON\.stringify\((\{.*?\})\)/s', $html, $m));
         $session = json_decode($m[1] ?? '', true);
         self::assertIsArray($session);
@@ -166,7 +166,7 @@ final class SeatFixedDemoHandlerTest extends TestCase
         self::assertSame(7, $claims['user_id']);
         self::assertSame(2, $claims['org_id']);
         self::assertSame('viewer', $claims['role']);
-        self::assertEqualsWithDelta(86400, (int) $claims['exp'] - (int) $claims['iat'], 5);
+        self::assertEqualsWithDelta(3600, (int) $claims['exp'] - (int) $claims['iat'], 5);
     }
 
     public function test_page_specific_csp_matches_the_script_nonce(): void

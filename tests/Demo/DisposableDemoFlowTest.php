@@ -28,7 +28,7 @@ final class DisposableDemoFlowTest extends ApiTestCase
 
         $this->assertSame(200, $response->getStatusCode(), (string) $response->getBody());
         $html = (string) $response->getBody();
-        $this->assertStringContainsString("localStorage.setItem('nene_vault_token', JSON.stringify(", $html);
+        $this->assertStringContainsString("sessionStorage.setItem('nene_vault_token', JSON.stringify(", $html);
         $this->assertSame('no-store', $response->getHeaderLine('Cache-Control'));
 
         $this->assertSame(1, preg_match('/JSON\.stringify\((\{.*?\})\)/s', $html, $m));

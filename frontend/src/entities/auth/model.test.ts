@@ -10,7 +10,7 @@ const SESSION = {
 };
 
 afterEach(() => {
-  localStorage.clear();
+  sessionStorage.clear();
 });
 
 describe('authStore.setSession / getSession', () => {
@@ -58,8 +58,8 @@ describe('authStore.clearSession', () => {
 });
 
 describe('authStore resilience', () => {
-  it('returns null when localStorage contains malformed JSON', () => {
-    localStorage.setItem('nene_vault_token', '{bad json');
+  it('returns null when sessionStorage contains malformed JSON', () => {
+    sessionStorage.setItem('nene_vault_token', '{bad json');
     expect(authStore.getSession()).toBeNull();
   });
 });

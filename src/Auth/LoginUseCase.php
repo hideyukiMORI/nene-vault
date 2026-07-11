@@ -8,7 +8,13 @@ use Nene2\Auth\TokenIssuerInterface;
 
 final readonly class LoginUseCase
 {
-    private const TOKEN_TTL_SECONDS = 86400; // 24 hours
+    public const int TOKEN_TTL_SECONDS = 3600; // 1 hour — fleet standard (#148)
+
+    /**
+     * A valid bcrypt hash used to equalize timing when the email is unknown,
+     * so a failed login does not reveal whether the account exists (#150).
+     */
+    private const string TIMING_EQUALIZER_HASH = '$2y$12$zIm0IdtQKFLbeCP4lZhm7upwJ7hz/JAj4krfZ53eGCIVzLq82RwP6';
 
     public function __construct(
         private UserRepositoryInterface $users,
@@ -20,7 +26,15 @@ final readonly class LoginUseCase
     {
         $user = $this->users->findByEmail($input->email);
 
-        if ($user === null || !password_verify($input->password, $user->passwordHash)) {
+        // Always run password_verify — against a fixed dummy hash when the
+        // email is unknown — so the response time does not leak whether the
+        // account exists.
+        $hash = $user !== null ? $user->passwordHash : self::TIMING_EQUALIZER_HASH;
+        $passwordMatches = password_verify($input->password, $hash);
+
+        // Only `active` users may log in: `invited` users must accept the
+        // invite first, and any future deactivated state must not authenticate.
+        if ($user === null || $user->status !== 'active' || !$passwordMatches) {
             throw new InvalidCredentialsException();
         }
 

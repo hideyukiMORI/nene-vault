@@ -104,6 +104,83 @@ final class LoginBoundaryTest extends ApiTestCase
         $this->assertArrayNotHasKey('password', $body);
     }
 
+    // ── Throttle (#148) ────────────────────────────────────────────────────────
+
+    public function test_login_locks_after_five_failures_and_returns_429(): void
+    {
+        // Dedicated identifier so the lock cannot leak into other tests
+        // (the throttle keys on email + client IP).
+        $email = 'throttled-' . uniqid() . '@example.com';
+        $hash  = password_hash(self::PASSWORD, PASSWORD_BCRYPT);
+        $stmt  = self::pdo()->prepare(
+            "INSERT INTO users (email, password_hash, role, organization_id, status, created_at, updated_at)
+             VALUES (?, ?, 'admin', ?, 'active', datetime('now'), datetime('now'))",
+        );
+        $stmt->execute([$email, $hash, self::$orgId]);
+
+        for ($i = 0; $i < 5; $i++) {
+            $resp = $this->handler()->handle(
+                $this->request('POST', '/admin/auth/login', null, ['email' => $email, 'password' => 'wrong-password']),
+            );
+            $this->assertSame(401, $resp->getStatusCode(), 'attempt ' . ($i + 1) . ' must still be 401');
+        }
+
+        // 6th attempt — even with the CORRECT password — is locked out.
+        $resp = $this->handler()->handle(
+            $this->request('POST', '/admin/auth/login', null, ['email' => $email, 'password' => self::PASSWORD]),
+        );
+        $this->assertSame(429, $resp->getStatusCode());
+        $body = json_decode((string) $resp->getBody(), true);
+        $this->assertArrayHasKey('retry_after_seconds', $body);
+        $this->assertGreaterThan(0, $body['retry_after_seconds']);
+    }
+
+    public function test_successful_login_clears_failure_counter(): void
+    {
+        $email = 'clears-' . uniqid() . '@example.com';
+        $hash  = password_hash(self::PASSWORD, PASSWORD_BCRYPT);
+        $stmt  = self::pdo()->prepare(
+            "INSERT INTO users (email, password_hash, role, organization_id, status, created_at, updated_at)
+             VALUES (?, ?, 'admin', ?, 'active', datetime('now'), datetime('now'))",
+        );
+        $stmt->execute([$email, $hash, self::$orgId]);
+
+        for ($i = 0; $i < 4; $i++) {
+            $this->handler()->handle(
+                $this->request('POST', '/admin/auth/login', null, ['email' => $email, 'password' => 'wrong-password']),
+            );
+        }
+
+        $ok = $this->handler()->handle(
+            $this->request('POST', '/admin/auth/login', null, ['email' => $email, 'password' => self::PASSWORD]),
+        );
+        $this->assertSame(200, $ok->getStatusCode());
+
+        // Counter reset: four more failures still do not lock.
+        for ($i = 0; $i < 4; $i++) {
+            $resp = $this->handler()->handle(
+                $this->request('POST', '/admin/auth/login', null, ['email' => $email, 'password' => 'wrong-password']),
+            );
+            $this->assertSame(401, $resp->getStatusCode());
+        }
+    }
+
+    public function test_login_rejects_non_active_user(): void
+    {
+        $email = 'invited-' . uniqid() . '@example.com';
+        $hash  = password_hash(self::PASSWORD, PASSWORD_BCRYPT);
+        $stmt  = self::pdo()->prepare(
+            "INSERT INTO users (email, password_hash, role, organization_id, status, created_at, updated_at)
+             VALUES (?, ?, 'member', ?, 'invited', datetime('now'), datetime('now'))",
+        );
+        $stmt->execute([$email, $hash, self::$orgId]);
+
+        $resp = $this->handler()->handle(
+            $this->request('POST', '/admin/auth/login', null, ['email' => $email, 'password' => self::PASSWORD]),
+        );
+        $this->assertSame(401, $resp->getStatusCode(), 'A non-active user must not authenticate even with the right password (#150)');
+    }
+
     public function test_issued_token_is_accepted_by_protected_route(): void
     {
         $login = $this->handler()->handle(

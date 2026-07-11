@@ -76,6 +76,45 @@ final class LoginUseCaseTest extends TestCase
         $useCase->execute(new LoginInput('admin@example.com', 'wrong'));
     }
 
+    public function test_throws_when_user_is_not_active(): void
+    {
+        $user = new User(
+            id: 7,
+            email: 'invited@example.com',
+            passwordHash: password_hash('secret', PASSWORD_BCRYPT),
+            role: Role::Member->value,
+            organizationId: 1,
+            status: 'invited',
+        );
+
+        $repo = $this->createMockRepo(['invited@example.com' => $user]);
+        $useCase = new LoginUseCase($repo, new InMemoryTokenIssuer());
+
+        $this->expectException(InvalidCredentialsException::class);
+
+        $useCase->execute(new LoginInput('invited@example.com', 'secret'));
+    }
+
+    public function test_issued_token_ttl_is_one_hour(): void
+    {
+        $user = new User(
+            id: 1,
+            email: 'ttl@example.com',
+            passwordHash: password_hash('secret', PASSWORD_BCRYPT),
+            role: Role::Admin->value,
+            organizationId: 42,
+        );
+
+        $repo = $this->createMockRepo(['ttl@example.com' => $user]);
+        $useCase = new LoginUseCase($repo, new InMemoryTokenIssuer());
+
+        $output = $useCase->execute(new LoginInput('ttl@example.com', 'secret'));
+
+        $claims = json_decode((string) base64_decode($output->token, true), true, flags: JSON_THROW_ON_ERROR);
+
+        $this->assertSame(3600, (int) $claims['exp'] - (int) $claims['iat'], 'Access-token TTL must be the 1 h fleet standard (#148)');
+    }
+
     public function test_throws_on_unknown_email(): void
     {
         $repo = $this->createMockRepo([]);
