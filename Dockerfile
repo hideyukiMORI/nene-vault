@@ -50,22 +50,19 @@ ENV APACHE_RUN_USER=www-data \
 ENTRYPOINT ["/usr/local/bin/init.sh"]
 
 # ── Production target ─────────────────────────────────────────────────────────
-# Expects the entire monorepo context (../) including ../NENE2 so composer can
-# resolve the path dependency. Run:
-#   docker build --target prod -f nene-vault/Dockerfile ..
+# NENE2 is installed from Packagist (#159), so the build context is just this
+# repository. Run:
+#   docker build --target prod .
 FROM base AS prod
 
 WORKDIR /var/www/html
 
-# Copy the nene-vault project and NENE2 sibling (required by composer path repo)
-COPY nene-vault/ /var/www/html/
-COPY NENE2/ /NENE2/
+COPY . /var/www/html/
 
 RUN composer install --no-dev --optimize-autoloader --no-interaction \
-    && chown -R www-data:www-data /var/www/html \
-    && rm -rf /NENE2
+    && chown -R www-data:www-data /var/www/html
 
-COPY nene-vault/docker/init.sh /usr/local/bin/init.sh
+COPY docker/init.sh /usr/local/bin/init.sh
 RUN chmod +x /usr/local/bin/init.sh
 
 ENV APACHE_RUN_USER=www-data \

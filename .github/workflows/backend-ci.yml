@@ -34,12 +34,6 @@ jobs:
           key: ${{ runner.os }}-composer-${{ hashFiles('composer.lock') }}
           restore-keys: ${{ runner.os }}-composer-
 
-      # NENE2 is a Composer path repository (../NENE2, @dev) — see composer.json.
-      # Clone the framework next to this checkout so `composer install` can
-      # resolve it (same pattern as nene-records).
-      - name: Clone NENE2 (local path dependency)
-        run: git clone --depth=1 https://github.com/hideyukiMORI/NENE2.git ../NENE2
-
       - name: Install dependencies
         run: composer install --no-interaction --prefer-dist --optimize-autoloader
 

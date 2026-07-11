@@ -145,6 +145,22 @@ $pdo->exec('CREATE TABLE IF NOT EXISTS document_versions (
 // clean — mirroring what CI gets for free.
 $pdo->exec('DELETE FROM login_attempts');
 
+// Disposable demo orgs from previous local runs (slug prefix `demo-`) count
+// against the DEMO_MAX_ORGS ceiling and would eventually 503 the disposable
+// demo tests. Sweep them and their tenant rows before the suite starts.
+$demoOrgStmt = $pdo->query("SELECT id FROM organizations WHERE slug LIKE 'demo-%'");
+$demoOrgIds = $demoOrgStmt !== false ? $demoOrgStmt->fetchAll(PDO::FETCH_COLUMN) : [];
+
+if ($demoOrgIds !== []) {
+    $in = implode(',', array_map('intval', $demoOrgIds));
+    $pdo->exec("DELETE FROM vault_documents WHERE organization_id IN ({$in})");
+    $pdo->exec("DELETE FROM document_versions WHERE organization_id IN ({$in})");
+    $pdo->exec("DELETE FROM audit_events WHERE organization_id IN ({$in})");
+    $pdo->exec("DELETE FROM vault_settings WHERE organization_id IN ({$in})");
+    $pdo->exec("DELETE FROM users WHERE organization_id IN ({$in})");
+    $pdo->exec("DELETE FROM organizations WHERE id IN ({$in})");
+}
+
 $rateLimitDir = dirname(__DIR__) . '/var/rate-limits';
 
 if (is_dir($rateLimitDir)) {

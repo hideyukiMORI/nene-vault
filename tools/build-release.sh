@@ -7,6 +7,7 @@
 #
 # Output:
 #   dist/nene-vault-{version}.zip
+#   dist/nene-vault-{version}.zip.sha256   (integrity sidecar, #159)
 #
 # Requirements:
 #   - Composer installed globally
@@ -24,7 +25,7 @@ ZIP_FILE="$DIST/nene-vault-$VERSION.zip"
 echo "==> Building NeNe Vault $VERSION"
 
 # ── Cleanup ───────────────────────────────────────────────────────────────────
-rm -rf "$STAGING" "$ZIP_FILE"
+rm -rf "$STAGING" "$ZIP_FILE" "$ZIP_FILE.sha256"
 mkdir -p "$STAGING"
 
 # ── Frontend build ────────────────────────────────────────────────────────────
@@ -49,9 +50,10 @@ rsync -a --exclude='*.test.*' \
 rsync -a \
     "$ROOT/vendor/"    "$STAGING/vendor/"
 
-# Path-repository packages (hideyukimori/nene2) are SYMLINKS in vendor/;
-# rsync -a keeps them as links and zip silently drops them — the shipped zip
-# then contains no framework at all (#122). Dereference into real files.
+# Guard against symlinked vendor packages (the historic #122 trap): NENE2 now
+# comes from Packagist as real files (#159), so this loop is normally a no-op,
+# but a local path-repository override would reintroduce the empty-framework
+# zip without it. Dereference any remaining links into real files.
 find "$STAGING/vendor" -maxdepth 3 -type l | while read -r link; do
     # Relative link targets only resolve from the ORIGINAL vendor tree.
     src="$ROOT/vendor/${link#"$STAGING/vendor/"}"
@@ -102,8 +104,15 @@ cd "$DIST"
 # Tier A zip (#118) — without .htaccess Apache serves no routes at all.
 zip -r "nene-vault-$VERSION.zip" "nene-vault-$VERSION/" -x "*/.git/*" -x "*/.gitkeep" -q
 
+# ── SHA-256 sidecar (#159, invoice shape) ─────────────────────────────────────
+echo "--> Writing SHA-256 sidecar..."
+sha256sum "nene-vault-$VERSION.zip" > "nene-vault-$VERSION.zip.sha256"
+SHA256="$(cut -d' ' -f1 "nene-vault-$VERSION.zip.sha256")"
+
 echo ""
 echo "==> Release ZIP: $ZIP_FILE"
+echo "    sha256:  ${SHA256}"
+echo "    sidecar: $ZIP_FILE.sha256"
 echo "    Contents: $(du -sh "$STAGING" | cut -f1) uncompressed"
 echo ""
 echo "Tier A installation:"
