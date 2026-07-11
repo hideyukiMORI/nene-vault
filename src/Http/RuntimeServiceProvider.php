@@ -346,11 +346,18 @@ final readonly class RuntimeServiceProvider implements ServiceProviderInterface
                     $maxFileMb = (int) (getenv('NENE_VAULT_MAX_FILE_SIZE_MB') ?: 20);
                     $maxBodyBytes = ($maxFileMb + 5) * 1024 * 1024;
 
+                    $connForHealth = $c->get(DatabaseConnectionFactoryInterface::class);
+
+                    if (!$connForHealth instanceof DatabaseConnectionFactoryInterface) {
+                        throw new LogicException('DatabaseConnectionFactoryInterface service is invalid.');
+                    }
+
                     return new RuntimeApplicationFactory(
                         responseFactory: $rf,
                         streamFactory: $sf,
                         logger: $logger,
                         machineApiKey: $config->machineApiKey,
+                        healthChecks: [new DatabaseHealthCheck($connForHealth)],
                         domainExceptionHandlers: $exceptionHandlers,
                         requestIdHolder: $requestIdHolder,
                         routeRegistrars: $routeRegistrars,

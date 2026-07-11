@@ -45,6 +45,9 @@ paths:
                 ok:
                   value:
                     status: ok
+                    service: NENE2
+                    checks:
+                      database: ok
         '500':
           $ref: '#/components/responses/InternalServerError'
 
@@ -862,7 +865,17 @@ components:
       properties:
         status:
           type: string
+          description: '`ok`, or `degraded` when any dependency check fails.'
           examples: [ok]
+        service:
+          type: string
+          examples: [NENE2]
+        checks:
+          type: object
+          description: Dependency-level health checks (`ok` / `error`) per check name.
+          additionalProperties:
+            type: string
+          examples: [{ database: ok }]
 
     LoginRequest:
       type: object

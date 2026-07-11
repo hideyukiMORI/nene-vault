@@ -387,6 +387,7 @@ Standard fields used across multiple responses:
 | `file_sha256` | string (64-char hex) | SHA-256ハッシュ | `sha256`, `hash`, `checksum` |
 | `mime_type` | string | MIMEタイプ | `content_type`, `type` alone |
 | `retry_after_seconds` | integer | ロック解除までの秒数 | `retry_after`, `wait_seconds`, `lockout_seconds` |
+| `checks` | object (health checks) | ヘルスチェック結果 | `health_checks`, `dependencies`, `probes` |
 | `original_filename` | string | 元ファイル名 | `filename`, `file_name`, `name` |
 | `file_size_bytes` | integer | ファイルサイズ | `size`, `file_size` |
 | `source` | string enum | アップロード元 | `origin`, `channel` |
