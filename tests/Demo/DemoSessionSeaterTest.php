@@ -7,12 +7,14 @@ namespace NeneVault\Tests\Demo;
 use Nene2\Auth\LocalBearerTokenVerifier;
 use Nene2\Demo\DemoConfig;
 use Nene2\Demo\ProvisionedDemoOrg;
+use NeneVault\Demo\DemoEntryLog;
 use NeneVault\Demo\DemoProvisionRegistry;
 use NeneVault\Demo\DemoSessionSeater;
 use NeneVault\Tests\Support\FixedClock;
 use Nyholm\Psr7\Factory\Psr17Factory;
 use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\ServerRequestInterface;
 
 /**
  * The disposable-org seat page (#141): mints an admin token whose `org_id`
@@ -22,7 +24,10 @@ use Psr\Http\Message\ResponseInterface;
  */
 final class DemoSessionSeaterTest extends TestCase
 {
-    private function seat(?DemoProvisionRegistry $registry = null): ResponseInterface
+    /** @var list<string> */
+    private array $entryLines = [];
+
+    private function seat(?DemoProvisionRegistry $registry = null, ?ServerRequestInterface $request = null): ResponseInterface
     {
         $registry ??= new DemoProvisionRegistry();
 
@@ -33,12 +38,33 @@ final class DemoSessionSeaterTest extends TestCase
             new Psr17Factory(),
             // Real "now": the verifier checks exp against wall-clock time.
             new FixedClock(gmdate('c')),
+            new DemoEntryLog(function (string $line): void {
+                $this->entryLines[] = $line;
+            }),
         );
 
         return $seater->seatAndRedirect(
-            (new Psr17Factory())->createServerRequest('GET', '/demo/standard'),
+            $request ?? (new Psr17Factory())->createServerRequest('GET', '/demo/standard'),
             new ProvisionedDemoOrg(orgId: 42, slug: 'demo-abc123', adminUserId: 77),
         );
+    }
+
+    public function test_records_a_demo_entry_attribution_line_with_utm_and_referer(): void
+    {
+        $request = (new Psr17Factory())
+            ->createServerRequest('GET', '/demo/standard')
+            ->withQueryParams(['utm_source' => 'fb', 'utm_medium' => 'social', 'utm_campaign' => 'q3'])
+            ->withHeader('Referer', 'https://facebook.example.test/');
+
+        $this->seat(null, $request);
+
+        self::assertCount(1, $this->entryLines);
+        $line = $this->entryLines[0];
+        self::assertStringContainsString('slug=demo-abc123', $line);
+        self::assertStringContainsString('utm_source=fb', $line);
+        self::assertStringContainsString('utm_medium=social', $line);
+        self::assertStringContainsString('utm_campaign=q3', $line);
+        self::assertStringContainsString('referer=https://facebook.example.test/', $line);
     }
 
     public function test_seat_page_stores_an_admin_auth_session_for_the_disposable_org(): void

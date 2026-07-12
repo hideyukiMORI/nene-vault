@@ -45,13 +45,17 @@ final readonly class SeatFixedDemoHandler
 
     private const int TOKEN_TTL_SECONDS = LoginUseCase::TOKEN_TTL_SECONDS; // same TTL as a normal login (#148)
 
+    private DemoEntryLog $entryLog;
+
     public function __construct(
         private DemoConfig $config,
         private UserRepositoryInterface $users,
         private TokenIssuerInterface $tokenIssuer,
         private Psr17Factory $psr17,
         private ClockInterface $clock,
+        ?DemoEntryLog $entryLog = null,
     ) {
+        $this->entryLog = $entryLog ?? new DemoEntryLog();
     }
 
     public function handle(ServerRequestInterface $request): ResponseInterface
@@ -69,6 +73,13 @@ final readonly class SeatFixedDemoHandler
         if ($viewer === null || $viewer->organizationId === null || Role::tryFrom($viewer->role) !== Role::Viewer) {
             return $this->notFound();
         }
+
+        // Attribution layer 1 (#184): record channel/campaign before the seat
+        // page's `location.replace('/')` drops the query. Logged under the
+        // fixed `guided` label (no disposable slug here). No PII — Referer +
+        // utm_* only. Placed after the fail-close gates so a probe on a
+        // non-demo instance logs nothing.
+        $this->entryLog->record($request, 'guided');
 
         $now = $this->clock->now()->getTimestamp();
         $token = $this->tokenIssuer->issue([
