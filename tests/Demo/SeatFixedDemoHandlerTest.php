@@ -8,12 +8,16 @@ use Nene2\Auth\LocalBearerTokenVerifier;
 use Nene2\Demo\DemoConfig;
 use NeneVault\Auth\User;
 use NeneVault\Auth\UserRepositoryInterface;
+use NeneVault\Demo\DemoEntryLog;
 use NeneVault\Demo\SeatFixedDemoHandler;
 use Nyholm\Psr7\Factory\Psr17Factory;
 use PHPUnit\Framework\TestCase;
 
 final class SeatFixedDemoHandlerTest extends TestCase
 {
+    /** @var list<string> */
+    private array $entryLines = [];
+
     private function handler(bool $demoMode, ?User $user): SeatFixedDemoHandler
     {
         $users = new class ($user) implements UserRepositoryInterface {
@@ -99,12 +103,15 @@ final class SeatFixedDemoHandlerTest extends TestCase
             new LocalBearerTokenVerifier('seat-test-secret'),
             new Psr17Factory(),
             new \Nene2\Http\UtcClock(),
+            new DemoEntryLog(function (string $line): void {
+                $this->entryLines[] = $line;
+            }),
         );
     }
 
     private function request(): \Psr\Http\Message\ServerRequestInterface
     {
-        return (new Psr17Factory())->createServerRequest('GET', '/demo/standard');
+        return (new Psr17Factory())->createServerRequest('GET', '/demo/guided');
     }
 
     private function demoViewer(): User
@@ -179,5 +186,32 @@ final class SeatFixedDemoHandlerTest extends TestCase
         $nonce = $m[1] ?? '';
         self::assertNotSame('', $nonce);
         self::assertStringContainsString('<script nonce="' . $nonce . '">', (string) $response->getBody());
+    }
+
+    public function test_records_a_guided_demo_entry_attribution_line(): void
+    {
+        $request = (new Psr17Factory())
+            ->createServerRequest('GET', '/demo/guided')
+            ->withQueryParams(['utm_source' => 'li', 'utm_medium' => 'social', 'utm_campaign' => 'guided-tour'])
+            ->withHeader('Referer', 'https://linkedin.example.test/');
+
+        $this->handler(true, $this->demoViewer())->handle($request);
+
+        self::assertCount(1, $this->entryLines);
+        $line = $this->entryLines[0];
+        self::assertStringContainsString('slug=guided', $line);
+        self::assertStringContainsString('utm_source=li', $line);
+        self::assertStringContainsString('utm_campaign=guided-tour', $line);
+        self::assertStringContainsString('referer=https://linkedin.example.test/', $line);
+    }
+
+    public function test_fail_close_entries_record_nothing(): void
+    {
+        // A probe on a non-demo instance (or a forged viewer) must not log — the
+        // record() call sits after the fail-close gates.
+        $this->handler(false, $this->demoViewer())->handle($this->request());
+        $this->handler(true, null)->handle($this->request());
+
+        self::assertSame([], $this->entryLines);
     }
 }

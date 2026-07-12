@@ -11,10 +11,10 @@ RewriteRule .* - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization}]
 RewriteCond %{REQUEST_FILENAME} -f
 RewriteRule ^ - [L]
 
-# API, health and demo-seat routes → PHP front controller (#127)
-RewriteRule ^(admin|health|demo) index.php [QSA,L]
-
-# All other routes → SPA index.html (if present) or PHP front controller
-RewriteCond %{DOCUMENT_ROOT}/index.html -f
-RewriteRule ^ index.html [L]
+# Everything else → PHP front controller: the JSON API, the health/demo-seat
+# routes (#127), AND the SPA HTML shell. The shell is served *through* index.php
+# (it used to be the static index.html) so the disposable-demo host can inject
+# the env-gated cookieless analytics beacon (#184). index.php serves the shell
+# before the router, so with DEMO_ANALYTICS_ENDPOINT unset the shell body is
+# byte-identical and carries no CSP — exactly what the static file did.
 RewriteRule ^ index.php [QSA,L]

@@ -39,17 +39,28 @@ use Psr\Http\Message\ServerRequestInterface;
  */
 final readonly class DemoSessionSeater implements DemoSessionSeaterInterface
 {
+    private DemoEntryLog $entryLog;
+
     public function __construct(
         private DemoConfig $config,
         private DemoProvisionRegistry $registry,
         private TokenIssuerInterface $tokenIssuer,
         private Psr17Factory $psr17,
         private ClockInterface $clock,
+        ?DemoEntryLog $entryLog = null,
     ) {
+        $this->entryLog = $entryLog ?? new DemoEntryLog();
     }
 
     public function seatAndRedirect(ServerRequestInterface $request, ProvisionedDemoOrg $org): ResponseInterface
     {
+        // Attribution layer 1 (#184): record channel/campaign here — the last
+        // moment they exist — because the client-side `location.replace('/')`
+        // below drops the query and the browser's next request to `/` is
+        // same-origin (no UTM, a self Referer). No PII: only Referer + utm_* +
+        // the disposable slug are logged; never the client IP.
+        $this->entryLog->record($request, $org->slug);
+
         $email = $this->registry->adminEmail($org->orgId) ?? DemoOrgProvisioner::adminEmail($org->slug);
         $now = $this->clock->now()->getTimestamp();
 
