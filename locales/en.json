@@ -98,7 +98,8 @@
     "language": "Language",
     "group_admin": "Administration",
     "menu": "Menu",
-    "breadcrumb": "Breadcrumb"
+    "breadcrumb": "Breadcrumb",
+    "back_home": "Back to Home"
   },
   "home": {
     "eyebrow": "Overview",

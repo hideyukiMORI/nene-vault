@@ -101,7 +101,8 @@
     "language": "言語切替",
     "group_admin": "管理・運用",
     "menu": "メニュー",
-    "breadcrumb": "パンくずリスト"
+    "breadcrumb": "パンくずリスト",
+    "back_home": "ホームに戻る"
   },
 
   "home": {

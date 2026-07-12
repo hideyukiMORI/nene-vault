@@ -2,6 +2,7 @@ import { dynamicMessageKey, type MessageKey } from '@/shared/i18n/catalogs';
 import type { ReactNode } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useTranslation } from '@/shared/i18n/use-translation';
+import { roleHasCapability, type Capability } from '@/shared/auth/capabilities';
 import { BrandMark } from '@/shared/ui/primitives/BrandMark';
 import { LanguageSwitcher } from './LanguageSwitcher';
 
@@ -11,6 +12,13 @@ interface NavItem {
   icon: ReactNode;
   /** Locale key for a group heading rendered above this item (new section). */
   groupKey?: MessageKey;
+  /**
+   * Capability the current role must hold for this route (mirrors the backend
+   * CapabilityResolver). Omitted for routes open to every authenticated role
+   * (e.g. Home). Items the role cannot use are hidden so they never dead-end a
+   * viewer on the Forbidden page (#174).
+   */
+  requiredCapability?: Capability;
 }
 
 const HomeIcon = (
@@ -123,17 +131,39 @@ export function AppShell({
       labelKey: 'document.list.title',
       icon: DocIcon,
       groupKey: 'navigation.documents',
+      requiredCapability: 'ViewDocuments',
     },
     {
       to: '/audit',
       labelKey: 'navigation.audit_events',
       icon: AuditIcon,
       groupKey: 'navigation.group_admin',
+      requiredCapability: 'ManageVaultSettings',
     },
-    { to: '/settings', labelKey: 'navigation.settings', icon: SettingsIcon },
-    { to: '/users', labelKey: 'navigation.users', icon: UsersIcon },
-    { to: '/export', labelKey: 'navigation.export', icon: ExportIcon },
+    {
+      to: '/settings',
+      labelKey: 'navigation.settings',
+      icon: SettingsIcon,
+      requiredCapability: 'ManageVaultSettings',
+    },
+    {
+      to: '/users',
+      labelKey: 'navigation.users',
+      icon: UsersIcon,
+      requiredCapability: 'ManageUsers',
+    },
+    {
+      to: '/export',
+      labelKey: 'navigation.export',
+      icon: ExportIcon,
+      requiredCapability: 'ExportDocuments',
+    },
   ];
+
+  const visibleNav = nav.filter(
+    (item) =>
+      item.requiredCapability === undefined || roleHasCapability(userRole, item.requiredCapability),
+  );
 
   const isActive = (to: string): boolean =>
     to === '/' ? pathname === '/' : pathname.startsWith(to);
@@ -163,7 +193,7 @@ export function AppShell({
         </div>
 
         <nav className="rail-nav" aria-label={t('navigation.menu')}>
-          {nav.map((item) => (
+          {visibleNav.map((item) => (
             <div key={item.to} className="contents">
               {item.groupKey !== undefined && <div className="rail-group">{t(item.groupKey)}</div>}
               <button
