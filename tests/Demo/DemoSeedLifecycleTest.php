@@ -96,9 +96,13 @@ final class DemoSeedLifecycleTest extends ApiTestCase
         self::assertFileExists($absolute);
         self::assertSame((string) $version['file_sha256'], hash_file('sha256', $absolute));
 
-        // Amounts are whole yen (JPY has no minor unit — naming-conventions):
-        // the line generator yields ¥33,000–¥3,300,000 per document. A ×100
-        // regression (#136) would blow past the upper bound on every row.
+        // Weak oracle (kept, demoted): a plausibility band on the aggregate.
+        // Amounts are whole yen (JPY has no minor unit — naming-conventions) and
+        // the line generator yields ¥33,000–¥3,300,000 per document. This is only
+        // a "does the magnitude look sane" smoke test, NOT the real invariant: a
+        // ×100 on a small row (e.g. ¥33,000 → ¥3,300,000) lands on the upper bound
+        // and passes, and because it reads MIN/MAX only, any ×100 that does not
+        // move the aggregate is invisible. Cheap smoke, not a guarantee.
         $amounts = $this->query()->fetchOne(
             'SELECT MIN(amount_cents) AS lo, MAX(amount_cents) AS hi FROM vault_documents WHERE organization_id = ?',
             [$org->id],
@@ -106,6 +110,34 @@ final class DemoSeedLifecycleTest extends ApiTestCase
         self::assertIsArray($amounts);
         self::assertGreaterThanOrEqual(33_000, (int) $amounts['lo']);
         self::assertLessThanOrEqual(3_300_000, (int) $amounts['hi']);
+
+        // True invariant (the real oracle): every document's stored amount equals
+        // the total *printed in that document's own PDF*. The two values reach
+        // their sinks by independent paths — amount_cents via `amountCents:` (DB)
+        // and the printed total via `totalYen:` (PDF bytes) — so extracting the
+        // total from the actual stored PDF and comparing it to amount_cents is a
+        // non-circular cross-artifact check. A ×100 on amount_cents (#136) breaks
+        // it on that row at any magnitude, including the small-amount cases the
+        // band above cannot see.
+        $rows = $this->query()->fetchAll(
+            'SELECT d.amount_cents AS amount, v.file_path AS path
+               FROM vault_documents d
+               JOIN document_versions v ON v.vault_document_id = d.id
+              WHERE d.organization_id = ?',
+            [$org->id],
+        );
+        self::assertCount(20, $rows);
+        foreach ($rows as $row) {
+            $pdf = (string) file_get_contents($this->storageRoot() . '/' . (string) $row['path']);
+            if (preg_match('/TOTAL\s+JPY\s+([\d,]+)/', $pdf, $m) !== 1) {
+                self::fail('demo PDF is missing its printed TOTAL');
+            }
+            self::assertSame(
+                (int) $row['amount'],
+                (int) str_replace(',', '', $m[1]),
+                'amount_cents must equal the total printed in the document PDF (list == PDF)',
+            );
+        }
 
         // Dates are spread — not a single bulk-upload day.
         $range = $this->query()->fetchOne(
