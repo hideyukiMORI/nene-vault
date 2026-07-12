@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace NeneVault\Install;
 
+use Dotenv\Dotenv;
 use Nene2\Install\ProvisioningProbe;
 use PDO;
 use Throwable;
@@ -33,9 +34,27 @@ final class DatabaseProvisioningProbe implements ProvisioningProbe
 
     public static function fromEnvFile(string $envPath, string $projectRoot): self
     {
-        $env = is_file($envPath) ? (parse_ini_file($envPath) ?: []) : [];
+        // Parse with phpdotenv — the SAME dialect the runtime ConfigLoader uses.
+        // `parse_ini_file` speaks a different syntax (`#` comments and characters
+        // like `(` are errors) and emits warnings on mismatch; on a shared host
+        // with display_errors those warnings land before the guard's headers,
+        // turning the 403 blocked response into a 200 that leaks absolute paths
+        // (#144, deal #78). An unreadable `.env` degrades to an empty env — the
+        // marker layer of the guard still holds — and never produces output.
+        $env = [];
 
-        /** @var array<string, string> $env */
+        if (is_file($envPath)) {
+            try {
+                foreach (Dotenv::parse((string) @file_get_contents($envPath)) as $key => $value) {
+                    if (is_string($value)) {
+                        $env[$key] = $value;
+                    }
+                }
+            } catch (Throwable) {
+                $env = [];
+            }
+        }
+
         return new self($env, $projectRoot);
     }
 

@@ -84,6 +84,51 @@ final class DatabaseProvisioningProbeTest extends TestCase
         self::assertFalse($probe->isProvisioned());
     }
 
+    public function test_from_env_file_reads_the_runtime_dotenv_dialect(): void
+    {
+        // The live incident shape (#144, deal #78): `#` comments containing
+        // parentheses and double-quoted values — valid for the runtime's
+        // phpdotenv loader, a syntax error (with warnings) for parse_ini_file.
+        $this->makeSqlite(withUser: true);
+        file_put_contents($this->dir . '/.env', <<<'ENV'
+            APP_ENV=production
+            DB_ADAPTER=sqlite
+            DB_NAME=var/nene_vault.sqlite
+            DB_PASSWORD="p@ss (with parens) \$ and \" quote"
+
+            # --- Demo mode (Nene2\Demo) ---
+            DEMO_MODE=1
+            ENV);
+
+        $probe = DatabaseProvisioningProbe::fromEnvFile($this->dir . '/.env', $this->dir);
+
+        self::assertTrue($probe->isProvisioned());
+    }
+
+    public function test_from_env_file_with_malformed_env_is_silent_and_not_provisioned(): void
+    {
+        // A .env even phpdotenv rejects must degrade to an EMPTY env — not a
+        // partial one — WITHOUT emitting output: warnings before headers broke
+        // the guard's 403 on the live host (#144). The provisioned sqlite here
+        // proves the whole file is discarded, not parsed up to the bad line.
+        $this->makeSqlite(withUser: true);
+        file_put_contents($this->dir . '/.env', "DB_ADAPTER=sqlite\nDB_NAME=var/nene_vault.sqlite\nFOO BAR=1\n");
+
+        ob_start();
+        $probe = DatabaseProvisioningProbe::fromEnvFile($this->dir . '/.env', $this->dir);
+        $output = ob_get_clean();
+
+        self::assertSame('', $output);
+        self::assertFalse($probe->isProvisioned());
+    }
+
+    public function test_from_env_file_without_file_is_not_provisioned(): void
+    {
+        $probe = DatabaseProvisioningProbe::fromEnvFile($this->dir . '/.env', $this->dir);
+
+        self::assertFalse($probe->isProvisioned());
+    }
+
     public function test_guard_blocks_when_marker_present(): void
     {
         $marker = $this->dir . '/var/.installed';
