@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { authStore } from '@/entities/auth';
 import { useTranslation } from '@/shared/i18n/use-translation';
 import type { MessageKey } from '@/shared/i18n/catalogs';
+import { roleHasCapability, type Capability } from '@/shared/auth/capabilities';
 import { AppShell } from '@/shared/ui';
 
 interface QuickLink {
@@ -10,6 +11,13 @@ interface QuickLink {
   titleKey: MessageKey;
   subKey: MessageKey;
   icon: ReactNode;
+  /**
+   * Capability the current role must hold to reach this route (mirrors the rail
+   * gating in AppShell and the backend CapabilityResolver). Cards the role
+   * cannot use are hidden so a viewer's home never offers admin-only actions
+   * (#182, follow-up to #174).
+   */
+  requiredCapability: Capability;
 }
 
 const DocIcon = (
@@ -68,21 +76,39 @@ const LINKS: QuickLink[] = [
     titleKey: 'document.list.title',
     subKey: 'home.link_documents',
     icon: DocIcon,
+    requiredCapability: 'ViewDocuments',
   },
-  { to: '/audit', titleKey: 'navigation.audit_events', subKey: 'home.link_audit', icon: AuditIcon },
+  {
+    to: '/audit',
+    titleKey: 'navigation.audit_events',
+    subKey: 'home.link_audit',
+    icon: AuditIcon,
+    requiredCapability: 'ManageVaultSettings',
+  },
   {
     to: '/settings',
     titleKey: 'navigation.settings',
     subKey: 'home.link_settings',
     icon: SettingsIcon,
+    requiredCapability: 'ManageVaultSettings',
   },
-  { to: '/export', titleKey: 'navigation.export', subKey: 'home.link_export', icon: ExportIcon },
+  {
+    to: '/export',
+    titleKey: 'navigation.export',
+    subKey: 'home.link_export',
+    icon: ExportIcon,
+    requiredCapability: 'ExportDocuments',
+  },
 ];
 
 export function HomePage() {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const session = authStore.getSession();
+
+  const visibleLinks = LINKS.filter((link) =>
+    roleHasCapability(session?.role, link.requiredCapability),
+  );
 
   function handleLogout() {
     authStore.clearSession();
@@ -103,7 +129,7 @@ export function HomePage() {
           <h2 className="subtitle">{t('home.quick_access')}</h2>
         </div>
         <div className="grid-2">
-          {LINKS.map((link) => (
+          {visibleLinks.map((link) => (
             <button
               key={link.to}
               type="button"
