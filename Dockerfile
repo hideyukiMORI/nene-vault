@@ -30,6 +30,16 @@ RUN printf '<VirtualHost *:8080>\n\
 
 RUN sed -i 's/Listen 80/Listen 8080/' /etc/apache2/ports.conf
 
+# Harden the response surface (security assessment 2026-07-13, INFO-1):
+# suppress the Apache version/OS banner in the `Server` header and error pages,
+# and disable TRACE. Edit Debian's own conf-enabled/security.conf in place so
+# our values win (a separately named conf can load before it and be overridden).
+# Applies to the container we build for local + the disposable-org demo;
+# shared-hosting (HETEML) banners stay host-controlled.
+RUN sed -ri 's/^ServerTokens .*/ServerTokens Prod/; s/^ServerSignature .*/ServerSignature Off/; s/^TraceEnable .*/TraceEnable Off/' \
+        /etc/apache2/conf-available/security.conf \
+    && printf 'expose_php = Off\n' > /usr/local/etc/php/conf.d/zz-hardening.ini
+
 EXPOSE 8080
 
 # ── Development target ────────────────────────────────────────────────────────
