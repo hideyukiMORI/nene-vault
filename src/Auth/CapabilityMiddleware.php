@@ -34,26 +34,16 @@ final readonly class CapabilityMiddleware implements MiddlewareInterface
             return $handler->handle($request);
         }
 
-        $path = $request->getUri()->getPath() ?: '/';
-        $required = CapabilityResolver::resolve($path, $request->getMethod());
-
-        if ($required === null) {
-            return $handler->handle($request);
-        }
-
         $role = Role::tryFrom((string) ($claims['role'] ?? ''));
 
-        if ($role === null || !$role->hasCapability($required)) {
-            return $this->problemDetails->create(
-                $request,
-                'forbidden',
-                'Forbidden',
-                403,
-                'You do not have permission to perform this action.',
-            );
-        }
-
-        // Organization scope check: superadmin bypasses, others must match resolved org.
+        // Organization scope binding runs for EVERY authenticated, org-scoped
+        // request — independent of whether the route maps to a capability.
+        // Superadmin (cross-org by design) bypasses; org-agnostic bypass routes
+        // never set `nene2.org.id` so they are unaffected. Running this before
+        // (and regardless of) the capability lookup keeps an admin route with no
+        // capability mapping org-bound instead of skipping the check — the class
+        // of gap that let a JWT be replayed cross-tenant on unmapped routes in a
+        // sibling product (security assessment 2026-07-14, defense-in-depth).
         if ($role !== Role::Superadmin) {
             $resolvedOrgId = $request->getAttribute('nene2.org.id');
 
@@ -72,6 +62,23 @@ final readonly class CapabilityMiddleware implements MiddlewareInterface
                     );
                 }
             }
+        }
+
+        $path = $request->getUri()->getPath() ?: '/';
+        $required = CapabilityResolver::resolve($path, $request->getMethod());
+
+        if ($required === null) {
+            return $handler->handle($request);
+        }
+
+        if ($role === null || !$role->hasCapability($required)) {
+            return $this->problemDetails->create(
+                $request,
+                'forbidden',
+                'Forbidden',
+                403,
+                'You do not have permission to perform this action.',
+            );
         }
 
         return $handler->handle($request);

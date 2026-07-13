@@ -165,7 +165,8 @@ sec "I. Export CSV formula-injection neutralization"
 # upload a doc whose counterparty starts with a formula trigger
 printf '%%PDF-1.4\n%% csvinj\n%%%%EOF' > /tmp/vaultsec_csv.pdf
 code -X POST -H "Authorization: Bearer $A1" -F "file=@/tmp/vaultsec_csv.pdf;type=application/pdf" -F 'counterparty_name==2+5+cmd|calc' -F "category=other" -F "confirm_duplicate=1" "$BASE/admin/vault/documents" >/dev/null
-csv=$(body -H "Authorization: Bearer $A1" "$BASE/admin/vault/export?format=csv")
+# NB: /admin/vault/export is POST + JSON body (a GET yields no CSV — round-1 probe bug, fixed here).
+csv=$(body -X POST -H "Authorization: Bearer $A1" -H 'Content-Type: application/json' -d '{"format":"csv"}' "$BASE/admin/vault/export")
 verdict=$(printf '%s' "$csv" | python3 -c '
 import sys,csv,io
 data=sys.stdin.buffer.read().decode("utf-8-sig")
@@ -200,6 +201,37 @@ for i in 1 2 3 4 5 6 7; do
   last=$(code -X POST "$BASE/admin/auth/login" -H 'Content-Type: application/json' -d '{"email":"admin@example.com","password":"wrong"}')
 done
 [ "$last" = 429 ] && ok "brute force throttled → 429 after repeated failures" || bad "no throttle (last=$last)"
+
+# ── L. Unauthenticated admin-API sweep (nene-records F-01 Critical parity) ────
+sec "L. Unauthenticated admin-API GET sweep (every admin read must be 401)"
+UNAUTH_OK=1
+for p in \
+  "/admin/vault/documents" \
+  "/admin/vault/documents/$DOC1" \
+  "/admin/vault/documents/$DOC1/history" \
+  "/admin/vault/documents/$DOC1/versions/$VER1/download" \
+  "/admin/vault/documents/$DOC1/ocr-suggest" \
+  "/admin/vault/settings" \
+  "/admin/audit-events" \
+  "/admin/users" \
+  "/admin/users/1" \
+  "/admin/organizations" \
+  "/admin/organizations/1" ; do
+  c=$(code "$BASE$p")
+  if [ "$c" != 401 ]; then bad "UNAUTH GET $p → $c (EXPOSED: unauthenticated admin read)"; UNAUTH_OK=0; fi
+done
+[ "$UNAUTH_OK" = 1 ] && ok "all 11 admin GET endpoints require auth (401 unauthenticated)"
+# write/verb surfaces unauthenticated
+c=$(code -I "$BASE/admin/vault/documents"); [ "$c" = 401 ] && ok "unauth HEAD documents → 401" || bad "unauth HEAD → $c (EXPOSED)"
+c=$(code -X POST "$BASE/admin/vault/export" -H 'Content-Type: application/json' -d '{"format":"csv"}'); [ "$c" = 401 ] && ok "unauth POST export → 401" || bad "unauth export → $c (EXPOSED)"
+# public surface must STAY open (no over-correction)
+c=$(code "$BASE/health"); [ "$c" = 200 ] && ok "/health stays public → 200" || bad "/health → $c"
+c=$(code -X POST "$BASE/admin/auth/login" -H 'Content-Type: application/json' -d '{}'); { [ "$c" = 422 ] || [ "$c" = 400 ] || [ "$c" = 401 ]; } && ok "/admin/auth/login stays reachable (no bearer needed) → $c" || note "login → $c"
+
+# ── M. Verb/method confusion ─────────────────────────────────────────────────
+sec "M. Verb / method confusion"
+c=$(code -X GET -H "Authorization: Bearer $A1" "$BASE/admin/vault/export"); { [ "$c" = 404 ] || [ "$c" = 405 ] || [ "$c" = 403 ]; } && ok "GET on POST-only export → $c (not a data leak)" || bad "GET export → $c"
+c=$(code -X DELETE -H "Authorization: Bearer $A1" "$BASE/admin/vault/documents/$DOC1"); { [ "$c" = 404 ] || [ "$c" = 405 ]; } && ok "DELETE document (no such route) → $c" || note "DELETE document → $c"
 
 echo
 echo "================================================================"

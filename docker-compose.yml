@@ -42,6 +42,9 @@ services:
       PROBLEM_DETAILS_BASE_URL: "${PROBLEM_DETAILS_BASE_URL:-https://nene-vault.dev/problems/}"
       TENANT_RESOLUTION: "${TENANT_RESOLUTION:-single}"
       ORG_SLUG: "${ORG_SLUG:-default}"
+      # Base domain for TENANT_RESOLUTION=subdomain (<slug>.<BASE_DOMAIN>).
+      # Read by RuntimeServiceProvider; default localhost for single-tenant dev.
+      BASE_DOMAIN: "${BASE_DOMAIN:-localhost}"
       ORG_NAME: "${ORG_NAME:-NeNe Vault}"
       ADMIN_EMAIL: "${ADMIN_EMAIL:-admin@example.com}"
       ADMIN_PASSWORD: "${ADMIN_PASSWORD:-changeme123}"
