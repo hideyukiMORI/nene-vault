@@ -8,6 +8,7 @@ penetration tests. No production host is ever targeted.
 
 | Date | Report | Scope | Result |
 |---|---|---|---|
+| 2026-07-14 | [Red-team round 2](2026-07-14-redteam-assessment.md) | nene-records parity: unauthenticated admin GET (F-01), cross-tenant JWT-vs-host replay (F-02); org-binding defense-in-depth | **0 EXPOSED** — both sibling finding types absent (main 55 + tenant 4 assertions); unconditional org-scope binding hardening + regression |
 | 2026-07-13 | [Black-box live ATK](2026-07-13-assessment.md) | Auth/JWT, tenant isolation, RBAC, upload/download, export, storage-path disclosure, headers/CORS, compliance invariants | **0 Critical / 0 High / 0 Medium / 0 Low EXPOSED** (48 assertions); 2 low info-banner INFOs fixed + re-verified |
 
 Each report documents: the tested app/framework version and scope, methodology,

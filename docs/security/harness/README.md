@@ -15,7 +15,8 @@ received document each, and fires a black-box live attack (ATK) battery.
 |---|---|
 | `mint.php`  | Mints fleet-standard HS256 bearer tokens (`sub`/`role`/`org`/`iat`/`exp`) with the running app's own secret, so any tenant/role can be driven directly. Also emits attack tokens (`--forge-none`, `--tamper-role`, `--exp=-60`). |
 | `seed.sh`   | Creates org 2 (`acme`) beside the default org 1 and uploads one org-tagged PDF into each — the data cross-tenant/RBAC/export attacks target. |
-| `probe.sh`  | The live ATK runner. Sections A–K; prints `[PASS]`/`[VULN]`/`[INFO]` and a `SUMMARY: PASS/VULN/INFO` line. Exit non-zero if any `VULN`. |
+| `probe.sh`  | The main live ATK runner (assumes the stack is up). Sections A–M incl. the unauthenticated admin-GET sweep (L) and verb confusion (M); prints `[PASS]`/`[VULN]`/`[INFO]` and a `SUMMARY` line. Exit non-zero if any `VULN`. |
+| `probe-tenant.sh` | Self-contained cross-tenant JWT-vs-host replay test (boots subdomain-mode stack → seeds → asserts → tears down). Verifies a signed `org` claim binds a token to its own tenant regardless of `Host`. |
 | `.gitignore`| Keeps real secrets / minted tokens / run logs out of git. |
 
 The harness reuses the repository's own `docker-compose.yml` (SQLite, port 8600)
@@ -40,7 +41,13 @@ SEC_PROJECT=vaultsec BASE=http://localhost:8600 ./docs/security/harness/seed.sh
 SEC_PROJECT=vaultsec BASE=http://localhost:8600 ./docs/security/harness/probe.sh
 ```
 
-Expected tail on a clean tree: `SUMMARY: PASS=48  VULN=0  INFO=0`.
+Expected tail on a clean tree: `SUMMARY: PASS=55  VULN=0  INFO=0`.
+
+```bash
+# 4. Cross-tenant host-reuse test (self-contained; needs port 8600 free, so run
+#    it after `down -v` of the stack above). Boots + seeds + asserts + tears down.
+./docs/security/harness/probe-tenant.sh      # → "4 passed, 0 failed"
+```
 
 ## Teardown (destroys all data + volumes)
 
