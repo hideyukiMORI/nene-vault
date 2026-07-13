@@ -110,26 +110,15 @@ vault settings, and a superadmin user are seeded automatically.
 docker compose --profile mysql -f docker-compose.yml -f docker-compose.mysql.yml up
 ```
 
-### Local port allocation (binding)
+## Local ports
 
-NeNe Vault runs alongside sibling products on the same developer machine, so its
-host-published ports are **fixed in the "86 lane"** to never collide:
+NeNe Vault owns the **"86" port lane**; sibling products use their own lanes so several apps can run locally side by side (full policy: [`CLAUDE.md`](./CLAUDE.md#local-ports-fixed-86-lane)). Override via `NENE_VAULT_*` env vars in `.env`.
 
-| Service          | NeNe Vault host port | Env var                     |
-|------------------|----------------------|-----------------------------|
-| API (Apache/PHP) | **8600**             | `NENE_VAULT_PORT`           |
-| Frontend (Vite)  | **5186**             | `NENE_VAULT_FRONTEND_PORT`  |
-| MySQL            | **3386**             | `NENE_VAULT_MYSQL_PORT`     |
-
-Reserved by siblings — **do not reuse**:
-
-| Product       | API   | Frontend / DB |
-|---------------|-------|---------------|
-| NENE2         | 82**  | 3316          |
-| NeNe Clear    | 83**  | 5173          |
-| NeNe Profile  | 84**  | 3409          |
-| NeNe Invoice  | 85**  | 5185          |
-| NeNe Records  | 180** | —             |
+| Service          | Port  | Env var                     |
+|------------------|-------|------------------------------|
+| API (Apache/PHP) | 8600  | `NENE_VAULT_PORT`           |
+| Frontend (Vite)  | 5186  | `NENE_VAULT_FRONTEND_PORT`  |
+| MySQL            | 3386  | `NENE_VAULT_MYSQL_PORT`     |
 
 Container-internal ports (8080 / 5173 / 3306) are unchanged; only the host side
 differs. If you must temporarily override (e.g. running two Vault checkouts),
@@ -147,10 +136,10 @@ NENE_VAULT_PORT=8601 NENE_VAULT_FRONTEND_PORT=5187 docker compose up
 | Phase | Scope | Status |
 | --- | --- | --- |
 | 0 | Governance & foundation — ADRs, scope contract, NENE2 scaffold | ✅ Complete |
-| 1 | Document API — auth, multi-tenancy, upload/search/void/restore/history, SHA-256 download, audit logging, CSV export (PR #8–#26) | ✅ Complete |
-| 2 | Admin UI + Export — React/Vite pages, ja/en UI, frontend tests, Docker dev env, export ZIP (PR #39–#64) | ✅ Complete |
-| 3 | Tier A shared hosting — web installer + release ZIP, operator guide, 事務処理規程 template (PR #66, #68) | ✅ Complete |
-| 4 | Ecosystem — MCP read/write tools, S3-compatible storage, email inbound, OCR assist (PR #70–#80) | ✅ Complete |
+| 1 | Document API — auth, multi-tenancy, upload/search/void/restore/history, SHA-256 download, audit logging, CSV export | ✅ Complete |
+| 2 | Admin UI + Export — React/Vite pages, ja/en UI, frontend tests, Docker dev env, export ZIP | ✅ Complete |
+| 3 | Tier A shared hosting — web installer + release ZIP, operator guide, 事務処理規程 template | ✅ Complete |
+| 4 | Ecosystem — MCP read/write tools, S3-compatible storage, email inbound, OCR assist | ✅ Complete |
 
 **Compliance gate: 🟢 Approved** — licensed 税理士 sign-off recorded 2026-05-31
 (Review 2, [`docs/compliance-review/signoff-record.md`](./docs/compliance-review/signoff-record.md)).
