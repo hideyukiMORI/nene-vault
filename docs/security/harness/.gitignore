@@ -1,0 +1,8 @@
+# Never commit real secrets, minted tokens, or captured logs from a run.
+.env
+.env.app
+*.env
+tokens.env
+*.log
+*.out
+probe-output-*.txt
