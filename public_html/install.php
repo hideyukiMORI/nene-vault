@@ -17,7 +17,10 @@ declare(strict_types=1);
  * disable exec), `docker/seed-initial.php` with the admin password handed
  * over in memory only, and `ReInstallationGuard` (marker + DB probe).
  *
- * On success the installer deletes itself. CLI:
+ * The installer removes itself (install.php + installer.js) once the install is
+ * complete — both on the success path and whenever the re-installation guard
+ * fires, so a deploy/CLI-provisioned install (which never runs the web step)
+ * does not leave the installer in the docroot (#200). CLI:
  * `php public_html/install.php --export-patterns [dir]` renders every screen
  * state to static HTML (design-handoff source).
  */
@@ -57,9 +60,29 @@ function post_raw(string $key): string
     return is_string($_POST[$key] ?? null) ? (string) $_POST[$key] : '';
 }
 
+/**
+ * Remove the installer from the docroot so a completed install never leaves it
+ * reachable. Called on successful setup AND whenever the re-installation guard
+ * fires: a deploy/CLI provisions the app (writes `var/.installed`) without ever
+ * running the web step, so unlinking only on the success path would leave the
+ * files behind (#200). Best-effort — on hosting where the files are not
+ * writable they simply remain, which is no worse than before.
+ */
+function remove_installer_files(): void
+{
+    // installer.js first; install.php (this file) last — the running script
+    // keeps its already-open handle, so unlinking __FILE__ mid-request is safe.
+    @unlink(__DIR__ . '/installer.js');
+    @unlink(__FILE__);
+}
+
 /** 403 refusal shared by the entry guard and the pre-setup re-check. */
 function refuse_install(string $message): never
 {
+    // Already installed → the installer must not linger in the docroot, however
+    // the install was provisioned (web step, deploy, or CLI).
+    remove_installer_files();
+
     http_response_code(403);
     echo render_installer_page([
         'view' => 'blocked',
@@ -1117,8 +1140,9 @@ if ($method === 'POST' && $reqErrors === []) {
                     $success = true;
                     $summary = '組織「' . $orgName . '」と管理者 ' . $adminEmail . ' を作成しました。管理画面にログインして、最初の受取書類をアップロードしましょう。';
                     unset($_SESSION['db']);
-                    // Self-unlink: a completed install must not leave the installer behind.
-                    @unlink(__FILE__);
+                    // Self-unlink: a completed install must not leave the
+                    // installer (install.php + installer.js) behind.
+                    remove_installer_files();
                 }
             } catch (Throwable $e) {
                 $errors[] = 'セットアップに失敗しました: ' . $e->getMessage();
