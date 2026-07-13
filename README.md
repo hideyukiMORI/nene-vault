@@ -2,8 +2,6 @@
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](./LICENSE)
 [![PHP 8.4](https://img.shields.io/badge/PHP-8.4-777BB4?logo=php)](https://www.php.net/)
-[![Public](https://img.shields.io/badge/status-public-blue)]()
-[![Status: Phase 4 complete](https://img.shields.io/badge/status-Phase%204%20complete-brightgreen)]()
 
 **Received-document archive — self-hosted for Japan SMB.**
 
