@@ -2,6 +2,7 @@
 /dist/
 /var/*.sqlite
 /var/*.cache
+/var/*.log
 /var/rate-limits/
 /.env
 /.php-cs-fixer.cache

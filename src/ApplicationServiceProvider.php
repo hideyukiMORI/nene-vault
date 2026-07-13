@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace NeneVault;
 
+use Closure;
 use LogicException;
 use Nene2\Auth\TokenIssuerInterface;
 use Nene2\Config\AppConfig;
@@ -18,7 +19,9 @@ use NeneVault\Auth\AuthRouteRegistrar;
 use NeneVault\Auth\InvalidCredentialsExceptionHandler;
 use NeneVault\Auth\TooManyLoginAttemptsExceptionHandler;
 use NeneVault\Auth\UserRepositoryInterface;
+use NeneVault\Demo\DemoEntryLog;
 use NeneVault\Demo\DemoServiceProvider;
+use NeneVault\Demo\FileDemoEntryLogSink;
 use NeneVault\Demo\GuidedDemoRouteRegistrar;
 use NeneVault\Demo\SeatFixedDemoHandler;
 use NeneVault\Document\DocumentRouteRegistrar;
@@ -31,6 +34,7 @@ use NeneVault\Document\MimeTypeNotAllowedExceptionHandler;
 use NeneVault\Document\VaultDocumentNotFoundExceptionHandler;
 use NeneVault\Export\ExportRouteRegistrar;
 use NeneVault\Export\ExportServiceProvider;
+use NeneVault\Http\RuntimeServiceProvider;
 use NeneVault\Ocr\OcrExceptionHandler;
 use NeneVault\Ocr\OcrRouteRegistrar;
 use NeneVault\Ocr\OcrServiceProvider;
@@ -87,6 +91,7 @@ final readonly class ApplicationServiceProvider implements ServiceProviderInterf
                 $users = $c->get(UserRepositoryInterface::class);
                 $issuer = $c->get(TokenIssuerInterface::class);
                 $psr17 = $c->get(Psr17Factory::class);
+                $projectRoot = $c->get(RuntimeServiceProvider::PROJECT_ROOT);
 
                 if (!$config instanceof AppConfig) {
                     throw new LogicException('AppConfig service is invalid.');
@@ -104,7 +109,18 @@ final readonly class ApplicationServiceProvider implements ServiceProviderInterf
                     throw new LogicException('Psr17Factory service is invalid.');
                 }
 
-                return new SeatFixedDemoHandler($config->demo, $users, $issuer, $psr17, new UtcClock());
+                if (!is_string($projectRoot) || $projectRoot === '') {
+                    throw new LogicException('Project root service is invalid.');
+                }
+
+                // File sink (#192): demo-entry lines go to var/demo-entry.log
+                // (SSH-visible) instead of the default error_log (HETEML
+                // control-panel-only, invisible for UTM analysis).
+                $entryLog = new DemoEntryLog(Closure::fromCallable(
+                    new FileDemoEntryLogSink($projectRoot . '/var'),
+                ));
+
+                return new SeatFixedDemoHandler($config->demo, $users, $issuer, $psr17, new UtcClock(), $entryLog);
             },
         );
         $builder->set(

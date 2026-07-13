@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace NeneVault\Demo;
 
+use Closure;
 use LogicException;
 use Nene2\Auth\TokenIssuerInterface;
 use Nene2\Config\AppConfig;
@@ -122,6 +123,7 @@ final readonly class DemoServiceProvider implements ServiceProviderInterface
                         $tokenIssuer,
                         self::psr17($c),
                         new UtcClock(),
+                        self::entryLog($c),
                     );
                 },
             )
@@ -259,5 +261,23 @@ final readonly class DemoServiceProvider implements ServiceProviderInterface
         }
 
         return $config;
+    }
+
+    /**
+     * File sink (#192): demo-entry lines go to var/demo-entry.log
+     * (SSH-visible) instead of the default error_log (HETEML
+     * control-panel-only, invisible for UTM analysis). Same var/ path
+     * resolution as {@see FileRateLimitStorage}.
+     */
+    private static function entryLog(ContainerInterface $c): DemoEntryLog
+    {
+        $projectRoot = $c->get(RuntimeServiceProvider::PROJECT_ROOT);
+        if (!is_string($projectRoot) || $projectRoot === '') {
+            throw new LogicException('Project root service is invalid.');
+        }
+
+        return new DemoEntryLog(Closure::fromCallable(
+            new FileDemoEntryLogSink($projectRoot . '/var'),
+        ));
     }
 }
