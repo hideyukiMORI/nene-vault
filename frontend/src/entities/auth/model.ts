@@ -23,6 +23,7 @@ function notify(): void {
   }
 }
 
+// [nene2-exemplar:auth-store] — fleet frontend-standards AU-4 module-store exemplar (check:exemplars).
 export const authStore = {
   /** Subscribe to session changes; returns the unsubscribe function. */
   subscribe(listener: () => void): () => void {
