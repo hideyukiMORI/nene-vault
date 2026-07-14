@@ -21,9 +21,9 @@ export function LoginForm({ onLoggedIn }: LoginFormProps) {
       <form className="center-card" onSubmit={handleSubmit(onLoggedIn)} noValidate>
         <div className="head">
           <div className="brand-lock">
-            <BrandMark size={46} className="text-seal" title="NeNe Vault" />
+            <BrandMark size={46} className="text-x-seal" title="NeNe Vault" />
             <div className="brand-name">
-              NeNe <span className="text-brass">Vault</span>
+              NeNe <span className="text-x-brass">Vault</span>
             </div>
           </div>
         </div>

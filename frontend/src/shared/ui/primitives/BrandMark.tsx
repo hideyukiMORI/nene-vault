@@ -1,8 +1,8 @@
 /**
  * BrandMark — the NeNe Vault seal (二重円の印影 × 鍵穴 / double-ring impression
  * with a keyhole). The mark inherits its color from `currentColor`, so callers
- * set the seal color with a text-color utility (`text-seal` on light surfaces,
- * `text-seal-bright` on dark). Per brand spec the mark is vermilion (朱) only.
+ * set the seal color with a text-color utility (`text-x-seal` on light surfaces,
+ * `text-x-seal-bright` on dark). Per brand spec the mark is vermilion (朱) only.
  *
  * In:  size (px), simplified (drop the inner ring for ≤20px / favicon sizes),
  *      title (accessible name; omit for decorative use), className

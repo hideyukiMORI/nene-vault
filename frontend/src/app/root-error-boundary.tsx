@@ -21,7 +21,7 @@ export class RootErrorBoundary extends Component<{ children: ReactNode }, State>
   override render(): ReactNode {
     if (this.state.hasError) {
       return (
-        <div className="flex min-h-screen items-center justify-center bg-surface font-sans text-body text-text-primary">
+        <div className="flex min-h-screen items-center justify-center bg-surface-raised font-sans text-body text-text-primary">
           Something went wrong.
         </div>
       );
