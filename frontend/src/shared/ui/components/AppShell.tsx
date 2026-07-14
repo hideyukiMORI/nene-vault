@@ -185,7 +185,7 @@ export function AppShell({
     <div className="layout">
       <aside className="rail">
         <div className="rail-brand">
-          <BrandMark size={34} className="brand-mark text-seal-bright" title="NeNe Vault" />
+          <BrandMark size={34} className="brand-mark text-x-seal-bright" title="NeNe Vault" />
           <div>
             <div className="brand-name">NeNe Vault</div>
             <div className="brand-sub">Document Archive</div>

@@ -18,13 +18,13 @@ const meta: Meta<typeof BrandMark> = {
 export default meta;
 type Story = StoryObj<typeof BrandMark>;
 
-export const Default: Story = { args: { className: 'text-seal' } };
-export const Simplified: Story = { args: { simplified: true, size: 48, className: 'text-seal' } };
+export const Default: Story = { args: { className: 'text-x-seal' } };
+export const Simplified: Story = { args: { simplified: true, size: 48, className: 'text-x-seal' } };
 export const OnDark: Story = {
-  args: { className: 'text-seal-bright' },
+  args: { className: 'text-x-seal-bright' },
   decorators: [
     (Story) => (
-      <div className="bg-rail p-lg">
+      <div className="bg-x-rail p-lg">
         <Story />
       </div>
     ),
