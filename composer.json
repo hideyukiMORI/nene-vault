@@ -5,7 +5,7 @@
     "license": "MIT",
     "require": {
         "php": ">=8.4.1 <9.0",
-        "hideyukimori/nene2": "^1.10",
+        "hideyukimori/nene2": "^1.11",
         "robmorgan/phinx": "^0.16.11",
         "symfony/uid": "^8.1"
     },

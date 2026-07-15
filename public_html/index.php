@@ -3,7 +3,6 @@
 declare(strict_types=1);
 
 use Nene2\Http\ResponseEmitter;
-use NeneVault\Http\AuthorizationHeaderFallback;
 use NeneVault\Http\RuntimeContainerFactory;
 use NeneVault\Http\SpaShell;
 use NeneVault\Support\EnvFileLoader;
@@ -28,10 +27,6 @@ $serverRequestCreator = new ServerRequestCreator(
 );
 
 $request = $serverRequestCreator->fromGlobals();
-
-// Shared-hosting front proxies (HETEML) strip the Authorization header; adopt
-// the SPA's X-Authorization mirror when the standard header is absent (#118).
-$request = AuthorizationHeaderFallback::apply($request);
 
 // SPA shell — served *before* the router so it bypasses the security-headers
 // middleware and stays byte-identical to the static file it replaced. A non-API
