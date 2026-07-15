@@ -1,6 +1,7 @@
 /* ============================================================
    NeNe Vault — "Strongbox" theme — component classes
-   Paired with `default.css`; imported from it under layer(components).
+   Paired with `default.css`, which imports this file. The `@layer components`
+   wrapper below is this file's own — the import side must not restate it.
    All raw values resolve to the theme tokens in `default.css`.
 
    Sub-layer order (`main` then `responsive`) reproduces the pre-split

@@ -11,7 +11,14 @@
    single component.
    ============================================================ */
 
-@import './default.components.css' layer(components);
+/* NOTE: imported WITHOUT `layer(components)` — default.components.css already
+   wraps its rules in `@layer components { … }`, and layer membership must be
+   declared exactly once: either on the `@import` or inside the file, never
+   both. Stating it on both nests the rules as sub-layer `components.components`,
+   which loses to any rule sitting directly in `components` regardless of
+   specificity. Same trap, same reasoning, and same fix as the `layer(base)`
+   note in `../index.css`. */
+@import './default.components.css';
 
 @theme {
   /* ---- paper / surfaces — warm, never sterile white ---- */
