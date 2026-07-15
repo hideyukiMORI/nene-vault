@@ -362,13 +362,70 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/admin/vault/documents/{id}/ocr-suggest": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Resource ID. */
+                id: components["parameters"]["IdPath"];
+            };
+            cookie?: never;
+        };
+        /**
+         * OCR metadata suggestion
+         * @description Runs OCR on the current version of a document and returns suggested metadata (取引年月日, 取引金額, 取引先名). Suggestions are never applied automatically — the operator confirms via the metadata edit form. Requires `NENE_VAULT_OCR_ENABLED=true` and Tesseract installed on the server. Returns 422 if OCR fails (Tesseract not found, unreadable file, etc.).
+         */
+        get: operations["ocrSuggestDocument"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/admin/vault/export": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Export documents
+         * @description Exports matched documents as a manifest CSV (`format: csv`, default) or a ZIP archive containing `manifest.csv` plus every matched document file (`format: zip`). Requires `ExportDocuments` capability (admin / member). Every exported document is recorded in the audit log.
+         */
+        post: operations["exportDocuments"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
         HealthResponse: {
-            /** @example ok */
+            /**
+             * @description `ok`, or `degraded` when any dependency check fails.
+             * @example ok
+             */
             status: string;
+            /** @example NENE2 */
+            service?: string;
+            /**
+             * @description Dependency-level health checks (`ok` / `error`) per check name.
+             * @example {
+             *       "database": "ok"
+             *     }
+             */
+            checks?: {
+                [key: string]: string;
+            };
         };
         LoginRequest: {
             /** Format: email */
@@ -384,7 +441,7 @@ export interface components {
             email: string;
             role: components["schemas"]["Role"];
             /** @description Organization ID; null for superadmin. */
-            org_id?: number | null;
+            org_id: number | null;
         };
         /** @enum {string} */
         Role: "superadmin" | "admin" | "member" | "viewer";
@@ -430,13 +487,13 @@ export interface components {
             /** Format: email */
             email: string;
             role: components["schemas"]["Role"];
-            organization_id?: number | null;
+            organization_id: number | null;
             /** @enum {string} */
             status: "active" | "invited";
             /** Format: date-time */
-            created_at?: string;
+            created_at: string;
             /** Format: date-time */
-            updated_at?: string;
+            updated_at: string;
         };
         UserListResponse: {
             items: components["schemas"]["UserResponse"][];
@@ -460,11 +517,11 @@ export interface components {
         VaultSettingsResponse: {
             organization_id: number;
             retention_years: number;
-            storage_path_override?: string | null;
-            invoice_api_base_url?: string | null;
-            clear_api_base_url?: string | null;
+            storage_path_override: string | null;
+            invoice_api_base_url: string | null;
+            clear_api_base_url: string | null;
             /** Format: date-time */
-            updated_at?: string | null;
+            updated_at: string | null;
         };
         UpdateVaultSettingsRequest: {
             /** @description Years to retain (from transaction date). Default 10; below 10 warns. See ADR 0004. */
@@ -487,32 +544,32 @@ export interface components {
              * Format: date
              * @description 取引年月日.
              */
-            transaction_date?: string | null;
+            transaction_date: string | null;
             /** @description 取引金額 in integer JPY. Null when the document carries no amount. */
-            amount_cents?: number | null;
+            amount_cents: number | null;
             /** @description 取引先名. */
             counterparty_name: string;
             category: components["schemas"]["DocumentCategory"];
-            tags?: string[];
+            tags: string[];
             file_sha256: string;
             /** @enum {string} */
-            mime_type?: "application/pdf" | "image/jpeg" | "image/png";
-            original_filename?: string;
-            file_size_bytes?: number;
+            mime_type: "application/pdf" | "image/jpeg" | "image/png";
+            original_filename: string;
+            file_size_bytes: number;
             version_number: number;
             source: components["schemas"]["DocumentSource"];
             /** Format: date-time */
             uploaded_at: string;
-            uploaded_by?: number | null;
+            uploaded_by: number | null;
             /** Format: date-time */
-            voided_at?: string | null;
-            voided_by?: number | null;
-            void_reason?: string | null;
-            date_uncertain?: boolean;
-            is_metadata_confirmed?: boolean;
-            retention_years?: number;
+            voided_at: string | null;
+            voided_by: number | null;
+            void_reason: string | null;
+            date_uncertain: boolean;
+            is_metadata_confirmed: boolean;
+            retention_years: number;
             /** Format: date */
-            retention_expires_at?: string;
+            retention_expires_at: string;
         };
         VaultDocumentListResponse: {
             items: components["schemas"]["VaultDocumentResponse"][];
@@ -564,11 +621,11 @@ export interface components {
             file_sha256: string;
             mime_type: string;
             original_filename: string;
-            file_size_bytes?: number;
+            file_size_bytes: number;
             source: components["schemas"]["DocumentSource"];
             /** Format: date-time */
             uploaded_at: string;
-            uploaded_by?: number | null;
+            uploaded_by: number | null;
         };
         DocumentHistoryResponse: {
             versions: components["schemas"]["DocumentVersionResponse"][];
@@ -579,16 +636,16 @@ export interface components {
             action: string;
             entity_type: string;
             entity_id: string;
-            actor_user_id?: number | null;
-            organization_id?: number | null;
-            before_json?: {
+            actor_user_id: number | null;
+            organization_id: number | null;
+            before_json: {
                 [key: string]: unknown;
             } | null;
-            after_json?: {
+            after_json: {
                 [key: string]: unknown;
             } | null;
-            source?: string;
-            metadata_json?: {
+            source: string;
+            metadata_json: {
                 [key: string]: unknown;
             } | null;
             /** Format: date-time */
@@ -600,7 +657,22 @@ export interface components {
             limit: number;
             offset: number;
         };
+        OcrSuggestionResponse: {
+            document_id: string;
+            /** Format: date */
+            transaction_date: string | null;
+            amount_cents: number | null;
+            counterparty_name: string | null;
+            /** @description True if at least one field was extracted by OCR. */
+            has_suggestion: boolean;
+        };
         ExportDocumentsRequest: {
+            /**
+             * @description `csv` — manifest CSV only (default). `zip` — ZIP archive with `manifest.csv` + all matched document files.
+             * @default csv
+             * @enum {string}
+             */
+            format: "csv" | "zip";
             /** Format: date */
             transaction_date_from?: string;
             /** Format: date */
@@ -784,6 +856,23 @@ export interface components {
                 "application/problem+json": components["schemas"]["ProblemDetails"];
             };
         };
+        /** @description Too many failed login attempts for this account/IP; retry after the indicated delay. */
+        TooManyLoginAttempts: {
+            headers: {
+                [name: string]: unknown;
+            };
+            content: {
+                /**
+                 * @example {
+                 *       "type": "https://nene-vault.dev/problems/too-many-login-attempts",
+                 *       "title": "Too Many Login Attempts",
+                 *       "status": 429,
+                 *       "retry_after_seconds": 900
+                 *     }
+                 */
+                "application/problem+json": components["schemas"]["ProblemDetails"];
+            };
+        };
         /** @description Request body failed validation. */
         ValidationFailed: {
             headers: {
@@ -889,6 +978,7 @@ export interface operations {
             };
             401: components["responses"]["InvalidCredentials"];
             422: components["responses"]["ValidationFailed"];
+            429: components["responses"]["TooManyLoginAttempts"];
         };
     };
     listOrganizations: {
@@ -1391,6 +1481,15 @@ export interface operations {
             401: components["responses"]["Unauthorized"];
             403: components["responses"]["Forbidden"];
             404: components["responses"]["DocumentNotFound"];
+            /** @description Document is not active (already voided). */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
             422: components["responses"]["ValidationFailed"];
         };
     };
@@ -1418,6 +1517,15 @@ export interface operations {
             401: components["responses"]["Unauthorized"];
             403: components["responses"]["Forbidden"];
             404: components["responses"]["DocumentNotFound"];
+            /** @description Document is not voided (already active). */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
         };
     };
     getDocumentHistory: {
@@ -1501,6 +1609,68 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["AuditEventListResponse"];
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+        };
+    };
+    ocrSuggestDocument: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Resource ID. */
+                id: components["parameters"]["IdPath"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OCR suggestion (fields may be null if not detected). */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OcrSuggestionResponse"];
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["Forbidden"];
+            404: components["responses"]["DocumentNotFound"];
+            /** @description OCR failed (Tesseract error or unsupported file type). */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    };
+    exportDocuments: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["ExportDocumentsRequest"];
+            };
+        };
+        responses: {
+            /** @description Manifest CSV (`text/csv`) or ZIP archive (`application/zip`). `Content-Disposition: attachment` with a timestamped filename. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "text/csv": string;
+                    "application/zip": string;
                 };
             };
             401: components["responses"]["Unauthorized"];
