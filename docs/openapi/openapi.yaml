@@ -889,7 +889,7 @@ components:
 
     LoginResponse:
       type: object
-      required: [token, expires_at, user_id, email, role]
+      required: [token, expires_at, user_id, email, role, org_id]
       properties:
         token:
           type: string
@@ -991,7 +991,7 @@ components:
 
     UserResponse:
       type: object
-      required: [id, email, role, status]
+      required: [id, email, role, organization_id, status, created_at, updated_at]
       properties:
         id:
           type: integer
@@ -1054,7 +1054,7 @@ components:
 
     VaultSettingsResponse:
       type: object
-      required: [organization_id, retention_years]
+      required: [organization_id, retention_years, storage_path_override, invoice_api_base_url, clear_api_base_url, updated_at]
       properties:
         organization_id:
           type: integer
@@ -1105,12 +1105,26 @@ components:
         - id
         - organization_id
         - status
+        - transaction_date
+        - amount_cents
         - counterparty_name
         - category
+        - tags
         - file_sha256
+        - mime_type
+        - original_filename
+        - file_size_bytes
         - version_number
         - source
         - uploaded_at
+        - uploaded_by
+        - voided_at
+        - voided_by
+        - void_reason
+        - date_uncertain
+        - is_metadata_confirmed
+        - retention_years
+        - retention_expires_at
       properties:
         id:
           type: string
@@ -1243,7 +1257,7 @@ components:
 
     DocumentVersionResponse:
       type: object
-      required: [id, version_number, file_sha256, mime_type, original_filename, source, uploaded_at]
+      required: [id, version_number, file_sha256, mime_type, original_filename, file_size_bytes, source, uploaded_at, uploaded_by]
       properties:
         id:
           type: string
@@ -1281,7 +1295,7 @@ components:
 
     AuditEventResponse:
       type: object
-      required: [id, action, entity_type, entity_id, created_at]
+      required: [id, action, entity_type, entity_id, actor_user_id, organization_id, before_json, after_json, source, metadata_json, created_at]
       properties:
         id:
           type: integer
