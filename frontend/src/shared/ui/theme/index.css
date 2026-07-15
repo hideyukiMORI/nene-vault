@@ -1,2 +1,12 @@
+@layer theme, base, vendor, legacy, components, utilities;
 @import 'tailwindcss';
 @import './active.css';
+/* NOTE: intentionally imported WITHOUT `layer(base)`, deviating from the ST-06
+   reference form. base.css already wraps its rules in `@layer base { … }` — which
+   is what `[S:no-unlayered-css]` requires. Adding `layer(base)` on top of that
+   nests them as sub-layer `base.base`, and a sub-layer LOSES to rules sitting
+   directly in `base` — i.e. Tailwind's preflight. Measured in Chromium: with
+   `layer(base)` the preflight `h1..h6{font-weight:inherit}` beats vault's
+   `h1,h2,h3{font-weight:600}` and headings silently lose their weight.
+   See the PR body for the proposed ST-06 correction. */
+@import './base.css';
