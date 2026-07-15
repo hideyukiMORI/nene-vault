@@ -38,7 +38,11 @@ See [ADR 0009](docs/adr/0009-separate-from-billing-and-reconciliation.md).
 
 ## Operating Rules
 
-- Issue-driven; no direct commits to `main`
+> The two rules marked ⇄ are restated in `CLAUDE.md` § Workflow, because a session
+> reads that file first and rules it cannot see get broken. **Change both together.**
+
+- ⇄ Issue-driven; no direct commits to `main`. Branch `type/issue-number-summary`, then PR
+- ⇄ Journal: record each working day in `docs/journal/YYYY-MM-DD.md`, same Issue → PR flow
 - Do **not** add quote/invoice issuance — **`nene-invoice`**
 - Do **not** add bank reconciliation/dunning — **`nene-clear`**
 - Do **not** add bank CSV mapping engine — **`nene-profile`**
