@@ -26,7 +26,6 @@ const entityInternalFiles = [
 const importZones = [
   { target: './src/features', from: entityInternalFiles },
   { target: './src/features', from: './src/shared/api' },
-  { target: './src/features', from: './src/shared/api/generated' },
   { target: './src/pages', from: entityInternalFiles },
   { target: './src/pages', from: './src/shared/api' },
   { target: './src/shared/ui', from: './src/entities' },
@@ -36,7 +35,13 @@ const importZones = [
 
 export default tseslint.config(
   {
-    ignores: ['dist', 'storybook-static', 'node_modules', 'coverage', 'src/shared/api/generated'],
+    ignores: [
+      'dist',
+      'storybook-static',
+      'node_modules',
+      'coverage',
+      'src/shared/api/schema.gen.ts',
+    ],
   },
   {
     extends: [js.configs.recommended, ...tseslint.configs.strictTypeChecked],

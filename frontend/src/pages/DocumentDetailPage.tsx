@@ -60,7 +60,7 @@ export function DocumentDetailPage() {
     const objectUrl = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = objectUrl;
-    a.download = doc.original_filename ?? `document-${doc.id}`;
+    a.download = doc.original_filename;
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);

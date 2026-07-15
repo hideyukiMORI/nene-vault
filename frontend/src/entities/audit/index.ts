@@ -4,7 +4,7 @@ export type {
   DocumentVersion,
   DocumentHistoryResponse,
   ListAuditEventsParams,
-} from './types';
+} from './api-types';
 export { useAuditEvents, useDocumentHistory, auditQueryKeys } from './queries';
 export { diffAuditEvent, formatAuditValue } from './diff';
 export type { AuditDiffField } from './diff';

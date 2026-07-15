@@ -16,7 +16,7 @@
     "format:fix": "prettier --write .",
     "test": "vitest run",
     "test:watch": "vitest",
-    "codegen": "openapi-typescript ../docs/openapi/openapi.yaml -o src/shared/api/generated/schema.gen.ts",
+    "codegen": "openapi-typescript ../docs/openapi/openapi.yaml -o src/shared/api/schema.gen.ts",
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build",
     "knip": "knip",

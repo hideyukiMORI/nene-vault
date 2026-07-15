@@ -1,7 +1,7 @@
 import { useQuery, useMutation, useQueryClient, type UseQueryResult } from '@tanstack/react-query';
 import { apiClient } from '@/shared/api/client';
 import type { AppError } from '@/shared/api/errors';
-import type { UpdateVaultSettingsInput, VaultSettings } from './types';
+import type { UpdateVaultSettingsInput, VaultSettings } from './api-types';
 
 const QUERY_KEY = ['vault-settings'] as const;
 

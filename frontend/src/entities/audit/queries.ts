@@ -5,7 +5,7 @@ import type {
   AuditEventListResponse,
   DocumentHistoryResponse,
   ListAuditEventsParams,
-} from './types';
+} from './api-types';
 
 export const auditQueryKeys = {
   all: ['audit'] as const,

@@ -125,7 +125,7 @@ function UserRow({
         </span>
       </td>
       <td className="muted mono" data-label={t('user.list.table.created_at')}>
-        {user.created_at !== undefined ? user.created_at.slice(0, 10) : '—'}
+        {user.created_at.slice(0, 10)}
       </td>
       <td data-label={t('user.list.table.actions')}>
         {user.id !== currentUserId && (
