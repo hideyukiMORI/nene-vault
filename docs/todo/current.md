@@ -30,8 +30,9 @@ pre-production go-live gate (税理士 Review 3) and Tier A live testing.**
 >
 > **2026-07-13/14: first live-fire security reports — `EXPOSED 0` both rounds.**
 > Round 1 (#194) is a broad black-box ATK battery; round 2 (#198) verifies by
-> live fire that the two vulnerability types sibling **nene-records** actually
-> exploited are absent here. Both are authorized self / maintainer-run
+> live fire that the two vulnerability types sibling **nene-records** demonstrated
+> against itself — in its own self-assessment, and fixed there the same week — are
+> absent here. Both are authorized self / maintainer-run
 > assessments against a disposable local stack — **not** third-party penetration
 > tests, and no production host was targeted. See `docs/security/`.
 >
@@ -127,9 +128,10 @@ was targeted, and no destructive/DoS payloads were used.
       rules: **0 Critical / 0 High / 0 Medium / 0 Low `EXPOSED`**. Response-surface
       hardening merged with the report.
 - [x] **Round 2 — targeted red team** (#198 / PR #199) —
-      `docs/security/2026-07-14-redteam-assessment.md`. Sibling **nene-records**
-      found two *real, exploited* vulnerability types on 07-13; both were probed
-      live here and are **absent** (all 11 admin GET endpoints return 401
+      `docs/security/2026-07-14-redteam-assessment.md`. Two vulnerability types
+      that sibling **nene-records**' own 2026-07-13 self-assessment demonstrated
+      as exploitable *there* — and which nene-records fixed the same week — were
+      probed live here and are **absent** (all 11 admin GET endpoints return 401
       unauthenticated via fail-closed blocklist auth; no JWT cross-tenant read).
       Org binding hardened in depth against the sibling's root cause, and one
       round-1 probe gap corrected. **`EXPOSED 0`.**
