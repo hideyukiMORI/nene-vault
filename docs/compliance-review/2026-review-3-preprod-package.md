@@ -150,6 +150,22 @@ Then update the "Review status" table in `signoff-record.md` and check off the
 - Should `retention_expires_at` become an operator-editable master setting before
   go-live (§3), or is the ADR 0004 constant acceptable for the first release?
 - Any 電帳法 guidance updates since 2026-05-31 that change the posture?
+- **見読可能性 and in-browser display (proposed scope item D11, Issue #225).**
+  Today an operator reads a stored document by downloading it and opening it
+  locally; the Admin UI does not render the bytes. We have a candidate feature
+  that would display image/PDF bytes inline, re-computing SHA-256 in the browser
+  and **refusing to render on mismatch**. Three questions, in order:
+  1. Is the current download-and-open flow sufficient for 見読可能性の確保, or
+     would inline display materially help at an actual 税務調査?
+  2. Would adding it **widen the scope you approved at Review 2** — i.e. does it
+     need your re-confirmation rather than being an implementation detail of the
+     already-approved D9 (Admin UI)?
+  3. If it is in scope, should Review 3 verify it (a sample to inspect), or is it
+     out of Review 3's remit?
+
+  We have **not** implemented it and have **not** amended
+  [`scope-contract.md`](../explanation/scope-contract.md); both are deliberately
+  held until this question is answered.
 
 ---
 
@@ -161,4 +177,4 @@ Then update the "Review status" table in `signoff-record.md` and check off the
 - Integrity/download, void/restore, audit: `tests/Document/`
 - API contract: [`docs/openapi/openapi.yaml`](../openapi/openapi.yaml)
 
-Last updated: 2026-06-01
+Last updated: 2026-07-16 (§5: added the D11 / 見読可能性 question, #229)
