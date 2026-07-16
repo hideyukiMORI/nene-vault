@@ -37,6 +37,15 @@ docker compose up       # local stack — API :8600 · Frontend :5186 · MySQL :
 API **8600** · Frontend **5186** · MySQL **3386** — unique across the NeNe
 portfolio; never reuse sibling ports. See README "Local port allocation".
 
+## Workflow
+
+- **Issue-driven**: no Issue, no code or doc change. Branch `type/issue-number-summary`
+  from `main`; **never commit directly to `main`**. Then PR. (`AGENTS.md` is the source
+  of truth for the full operating rules.)
+- **Journal**: record each working day in `docs/journal/YYYY-MM-DD.md` — English
+  (ADR 0008), via the same Issue → branch → PR flow. Precedents: `docs/journal/2026-07-14.md`
+  (shape: headline title, lead paragraph, one `##` per topic, closing `## Carry-over`).
+
 ## Hard rules (never violate without an ADR)
 
 - **No hard-delete** of documents during the retention window
