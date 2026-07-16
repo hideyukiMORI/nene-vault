@@ -27,6 +27,18 @@ pre-production go-live gate (税理士 Review 3) and Tier A live testing.**
 > findings filed as #148 (session posture, security) / #149 (frontend
 > generation gap) / #150 (consolidated checklist); summary with strengths in
 > `docs/review/structural-alignment-audit-2026-07-11.md`.
+>
+> **2026-07-13/14: first live-fire security reports — `EXPOSED 0` both rounds.**
+> Round 1 (#194) is a broad black-box ATK battery; round 2 (#198) verifies by
+> live fire that the two vulnerability types sibling **nene-records** demonstrated
+> against itself — in its own self-assessment, and fixed there the same week — are
+> absent here. Both are authorized self / maintainer-run
+> assessments against a disposable local stack — **not** third-party penetration
+> tests, and no production host was targeted. See `docs/security/`.
+>
+> **2026-07-14 → 07-16: fleet frontend standards (W1) adopted** — NENE2 client
+> transport, Core Token Contract v1 vocabulary, theme file split, and generated
+> types wired through to the entities. No product behaviour change.
 
 ## Done
 
@@ -100,6 +112,77 @@ same day:
 > Deploy note: apply migration `20260711000002` **together with** this code on
 > the live demo host, before the next hourly sweep tick (docblock has details).
 
+## Security assessment 2026-07-13 / 07-14 — Done (two follow-ups open)
+
+The first live-fire security reports for this repository; prior security work
+was the `docs/review/middleware-security.md` self-review checklist only. Both
+rounds are **authorized self / maintainer-run** assessments run against a
+disposable local Docker stack (`docs/security/harness/`) — not third-party
+penetration tests. No production host (`vault.ayane.co.jp` or any live system)
+was targeted, and no destructive/DoS payloads were used.
+
+- [x] **Round 1 — black-box live ATK** (#194 / PR #195) —
+      `docs/security/2026-07-13-assessment.md`. 48 live attack assertions across
+      11 categories covering JWT verification, cross-org isolation, RBAC,
+      upload/download, export, storage-path disclosure and the compliance hard
+      rules: **0 Critical / 0 High / 0 Medium / 0 Low `EXPOSED`**. Response-surface
+      hardening merged with the report.
+- [x] **Round 2 — targeted red team** (#198 / PR #199) —
+      `docs/security/2026-07-14-redteam-assessment.md`. Two vulnerability types
+      that sibling **nene-records**' own 2026-07-13 self-assessment demonstrated
+      as exploitable *there* — and which nene-records fixed the same week — were
+      probed live here and are **absent** (all 11 admin GET endpoints return 401
+      unauthenticated via fail-closed blocklist auth; no JWT cross-tenant read).
+      Org binding hardened in depth against the sibling's root cause, and one
+      round-1 probe gap corrected. **`EXPOSED 0`.**
+- [ ] **#197 users repository org scope** — add `organization_id` at the
+      repository layer as well (defence in depth).
+- [ ] **#196 at-rest encryption of stored files** — application-layer
+      (`Encryptor` equivalent), under consideration.
+
+## Frontend standards alignment (fleet W1) 2026-07-14 → 07-16 — Done
+
+Adoption of the fleet-wide frontend conventions. No product behaviour change.
+
+- [x] **NENE2 client transport** (#204 / PR #205) — `shared/api/client.ts` runs on
+      `@hideyukimori/nene2-client`.
+- [x] **X-Authorization fallback retired** (#209 / PR #210) — the hand-rolled
+      HETEML `Authorization`-stripping workaround (#118) replaced by the NENE2
+      standard opt-in.
+- [x] **Core Token Contract v1** (#206 / PR #207) — colour-vocabulary codemod
+      (`nene2-tokens` VAULT_TABLE 1.0.0).
+- [x] **Theme split to the convention shape** (#211 / PR #212) — the single
+      2,005-line theme became token-only `default.css` (`@theme`) plus
+      `default.components.css` (all rules under `@layer components`); the layer
+      double-import was then removed (#213 / PR #214).
+- [x] **Generated types wired to the entities** (#217 / PR #218) — after the
+      response contract's `required` was corrected to match the runtime
+      (#215 / PR #216).
+
+## Demo operations, distribution and docs 2026-07-11 → 07-16 — Done
+
+- [x] **Frontend fixes surfaced by the live demo** — change history refreshes
+      after edit/void/restore (#172 / PR #176); export routed through the shared
+      API client with raw `fetch` banned by lint (#173 / PR #177); retention
+      warning shown live while typing (#175 / PR #178); authenticated download
+      keyed by the version ULID rather than the ordinal (#179 / PR #180);
+      role-gated rail nav with a Forbidden escape hatch (#174 / PR #181) and
+      role-gated HomePage cards (#182 / PR #183).
+- [x] **Demo analytics** (#184 / PR #185) — env-gated cookieless SPA-shell beacon
+      plus a server-side entry log, later moved to a `var/` file sink so it is
+      readable over SSH (#192 / PR #193).
+- [x] **Installer** — the probe's `.env` read unified on phpdotenv, since a
+      `parse_ini_file` warning turned a 403 into a 200 (#144); `install.php` and
+      `installer.js` now self-delete once installation is detected, permanently
+      preventing deploy-borne leftovers (#200 / PR #201).
+- [x] **README** — static status/phase badges removed (#188 / PR #189) and raw PR
+      ranges dropped with local ports centralized (#190 / PR #191). Maturity is
+      stated by the Status table, not by badges.
+- [x] **Workflow discipline made explicit** (#221 / PR #222) — the Issue-driven
+      flow and the journal rule are restated in `CLAUDE.md` (the file a session
+      reads first), with a drift-detection anchor in `AGENTS.md`. Journals:
+      `docs/journal/2026-07-14.md`, `docs/journal/2026-07-16.md`.
+
 ## Go-live gate — Open 🔲
 
 These are the only items between the current (complete, all-green) codebase and
@@ -114,4 +197,5 @@ production use by operators. Both come from Review 2's recorded conditions
 - [ ] **Standing P0 watch** — on any 電帳法 amendment / 国税庁 guidance, open a P0
       Issue and add a new review block to `signoff-record.md` (Review 2 condition 2).
 
-Last updated: 2026-07-11 (audit remediation merged)
+Last updated: 2026-07-16 (security rounds 1–2, fleet frontend W1, demo/installer
+fixes recorded; #223)
