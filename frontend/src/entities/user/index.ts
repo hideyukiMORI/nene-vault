@@ -5,5 +5,5 @@ export type {
   UpdateUserInput,
   UserRole,
   UserStatus,
-} from './types';
+} from './api-types';
 export { useUsers, useCreateUser, useUpdateUser, useDeleteUser, userQueryKeys } from './queries';

@@ -2,7 +2,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { auditQueryKeys } from '@/entities/audit';
 import { apiClient } from '@/shared/api/client';
 import type { AppError } from '@/shared/api/errors';
-import type { DocumentCategory, VaultDocument } from './types';
+import type { DocumentCategory, VaultDocument } from './api-types';
 import { documentQueryKeys } from './queries';
 
 export interface UploadDocumentInput {

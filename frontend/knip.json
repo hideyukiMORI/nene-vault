@@ -9,7 +9,9 @@
     "src/features/*/index.ts"
   ],
   "project": ["src/**/*.{ts,tsx}", "tests/**/*.{ts,tsx}"],
-  "ignore": ["src/shared/api/generated/**"],
+  "ignoreIssues": {
+    "src/shared/api/schema.gen.ts": ["types"]
+  },
   "ignoreDependencies": ["tailwindcss"],
   "ignoreExportsUsedInFile": true
 }

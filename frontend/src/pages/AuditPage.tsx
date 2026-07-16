@@ -274,9 +274,9 @@ export function AuditPage() {
     setCommitted({
       limit: PAGE_SIZE,
       offset: 0,
-      entity_type: filterEntityType !== '' ? filterEntityType : undefined,
-      entity_id: filterEntityId !== '' ? filterEntityId : undefined,
-      action: filterAction !== '' ? filterAction : undefined,
+      ...(filterEntityType !== '' && { entity_type: filterEntityType }),
+      ...(filterEntityId !== '' && { entity_id: filterEntityId }),
+      ...(filterAction !== '' && { action: filterAction }),
     });
   }
 

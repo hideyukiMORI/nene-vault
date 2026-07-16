@@ -19,6 +19,12 @@ const settingsSchema = z.object({
 
 type SettingsFormValues = z.infer<typeof settingsSchema>;
 
+// Blank or absent optional text clears the setting. The API has no "leave
+// unchanged" sentinel — the handler folds absent/null/'' into null alike.
+function toNullable(value: string | undefined): string | null {
+  return value === undefined || value === '' ? null : value;
+}
+
 export function SettingsPage() {
   const { t, locale } = useTranslation();
   const navigate = useNavigate();
@@ -89,12 +95,9 @@ export function SettingsPage() {
             void form.handleSubmit((values) => {
               mutation.mutate({
                 retention_years: values.retention_years,
-                storage_path_override:
-                  values.storage_path_override !== '' ? values.storage_path_override : null,
-                invoice_api_base_url:
-                  values.invoice_api_base_url !== '' ? values.invoice_api_base_url : null,
-                clear_api_base_url:
-                  values.clear_api_base_url !== '' ? values.clear_api_base_url : null,
+                storage_path_override: toNullable(values.storage_path_override),
+                invoice_api_base_url: toNullable(values.invoice_api_base_url),
+                clear_api_base_url: toNullable(values.clear_api_base_url),
               });
             })(e);
           }}

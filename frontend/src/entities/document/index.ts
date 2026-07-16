@@ -5,7 +5,7 @@ export type {
   DocumentCategory,
   DocumentStatus,
   DocumentSource,
-} from './types';
+} from './api-types';
 export { useDocuments, useDocumentById, documentQueryKeys } from './queries';
 export {
   useUploadDocument,

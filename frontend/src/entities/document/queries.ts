@@ -1,7 +1,7 @@
 import { useQuery, type UseQueryResult } from '@tanstack/react-query';
 import { apiClient } from '@/shared/api/client';
 import type { AppError } from '@/shared/api/errors';
-import type { DocumentListResponse, SearchDocumentsParams, VaultDocument } from './types';
+import type { DocumentListResponse, SearchDocumentsParams, VaultDocument } from './api-types';
 
 function buildSearchPath(params: SearchDocumentsParams): string {
   const q = new URLSearchParams();
