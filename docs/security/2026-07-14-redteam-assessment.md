@@ -15,6 +15,16 @@ by live fire, that **NeNe Vault does not have either type**, hardens the one
 latent-fragility that maps to the sibling's root cause, and corrects one round-1
 probe gap.
 
+> **Erratum 2026-07-16 (#226).** "*real, exploited*" above means **demonstrated
+> exploitable by nene-records' own self-assessment** on 2026-07-13, and **fixed
+> there the same week** — *not* exploited in the wild by an attacker. Both
+> repositories are public, so the distinction matters. nene-records' original
+> report uses no "exploit" wording at all: it records F-01 (Critical) and F-02
+> (Medium) as **"Fixed + regression-verified"**. The wording above is this
+> report's own summary, not a quotation. The sentence is **left unchanged** —
+> this document is a record of the assessment as it was written. The equivalent
+> summary in `docs/todo/current.md` was reworded instead (#224).
+
 **Scope / target.** Disposable local Docker stack (`docs/security/harness/`),
 project `vaultsec` / `vaultsec-tenant`, port 8600. **No production host**
 (`vault.ayane.co.jp` or any live system) was touched; no DoS/destructive payloads.
