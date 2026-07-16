@@ -2,7 +2,7 @@ import type { AuthSession } from '@/entities/auth';
 import { useTranslation } from '@/shared/i18n/use-translation';
 import { BrandMark, Button, Field, Input } from '@/shared/ui';
 import { LanguageSwitcher } from '@/shared/ui/components/LanguageSwitcher';
-import { useLoginPage } from '../hooks/use-login';
+import { useLoginPage } from '../model/use-login';
 
 export interface LoginFormProps {
   onLoggedIn: (session: AuthSession) => void;

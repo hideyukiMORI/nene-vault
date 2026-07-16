@@ -1,6 +1,6 @@
 import { useTranslation } from '@/shared/i18n/use-translation';
 import { Button, Callout, Field, Input, Modal, Textarea } from '@/shared/ui';
-import { useVoidDocumentForm } from '../hooks/use-void-document';
+import { useVoidDocumentForm } from '../model/use-void-document';
 
 interface VoidModalProps {
   documentId: string;

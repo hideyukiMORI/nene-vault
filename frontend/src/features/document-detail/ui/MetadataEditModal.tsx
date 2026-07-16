@@ -1,8 +1,8 @@
 import { useTranslation } from '@/shared/i18n/use-translation';
 import { Button, Field, Input, Modal, Select } from '@/shared/ui';
 import type { VaultDocument } from '@/entities/document';
-import { useMetadataEditForm } from '../hooks/use-metadata-edit';
-import type { OcrPrefill } from '../hooks/use-metadata-edit';
+import { useMetadataEditForm } from '../model/use-metadata-edit';
+import type { OcrPrefill } from '../model/use-metadata-edit';
 
 const CATEGORIES = ['invoice_received', 'contract', 'receipt', 'delivery_note', 'other'] as const;
 
