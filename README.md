@@ -86,6 +86,11 @@ Japanese UI shown — the admin UI is bilingual (ja/en, one-click switch).
 > build a release ZIP with `tools/build-release.sh` (or download one from GitHub
 > Releases), upload it, and open `install.php`. See
 > [`docs/operator/installation.md`](./docs/operator/installation.md).
+>
+> **Version:** the repo-root [`VERSION`](./VERSION) file is the single source of
+> the product version — `build-release.sh` reads it, and `frontend/package.json`
+> is pinned to `0.0.0` on purpose. To release, edit `VERSION` and commit; that is
+> the only place to bump (#231).
 
 ```sh
 composer install            # once, on the host — installs NENE2 ^1.10 from Packagist
