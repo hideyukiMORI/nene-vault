@@ -167,7 +167,7 @@
       height: 17px;
       flex: none;
       stroke: currentColor;
-      opacity: 0.78;
+      opacity: var(--rail-icon-op, 0.78);
     }
     .rail-link:hover {
       background: var(--color-x-rail-deep);
@@ -177,10 +177,10 @@
       background: var(--color-x-brass);
       color: var(--color-x-rail);
       font-weight: 600;
-    }
-    .rail-link.is-active svg {
-      opacity: 1;
-      stroke: var(--color-x-rail);
+      /* icon opacity lifted to a custom property so the active-state override
+         needs no descendant selector (was `.rail-link.is-active svg`, 0,2,1).
+         stroke follows `currentColor` from the color above. */
+      --rail-icon-op: 1;
     }
     .rail-foot {
       border-top: 1px solid var(--color-x-rail-line);
@@ -203,11 +203,11 @@
       font-size: 0.8rem;
       text-transform: uppercase;
     }
-    .rail-foot .who {
+    .who {
       min-width: 0;
       flex: 1;
     }
-    .rail-foot .who b {
+    .who b {
       display: block;
       font-size: var(--text-xs);
       color: var(--color-x-rail-ink);
@@ -216,11 +216,11 @@
       overflow: hidden;
       text-overflow: ellipsis;
     }
-    .rail-foot .who span {
+    .who span {
       font-size: var(--text-2xs);
       color: var(--color-x-rail-faint);
     }
-    .rail-foot .out {
+    .out {
       background: none;
       border: 0;
       color: var(--color-x-rail-faint);
@@ -229,11 +229,11 @@
       border-radius: var(--radius-sm);
       display: flex;
     }
-    .rail-foot .out:hover {
+    .out:hover {
       color: var(--color-x-rail-text);
       background: var(--color-x-rail-deep);
     }
-    .rail-foot .out svg {
+    .out svg {
       width: 16px;
       height: 16px;
       stroke: currentColor;
@@ -1400,8 +1400,8 @@
         justify-content: center;
         padding: 14px 0;
       }
-      .rail-foot .who,
-      .rail-foot .out {
+      .who,
+      .out {
         display: none;
       }
       .content {
@@ -1477,10 +1477,10 @@
         z-index: 70;
       }
       .rail-foot .avatar,
-      .rail-foot .who {
+      .who {
         display: none;
       }
-      .rail-foot .out {
+      .out {
         display: flex;
         width: 38px;
         height: 38px;
@@ -1491,11 +1491,11 @@
         border: 1px solid var(--color-x-line-mid);
         border-radius: var(--radius-sm);
       }
-      .rail-foot .out:hover {
+      .out:hover {
         background: var(--color-surface-sunken);
         color: var(--color-x-ink-deep);
       }
-      .rail-foot .out svg {
+      .out svg {
         width: 17px;
         height: 17px;
       }
@@ -1528,7 +1528,7 @@
       .rail-link svg {
         width: 21px;
         height: 21px;
-        opacity: 0.9;
+        opacity: var(--rail-icon-op, 0.9);
       }
       .rail-link:hover {
         background: transparent;
@@ -1538,10 +1538,7 @@
         background: transparent;
         color: oklch(76% 0.1 77);
         font-weight: 700;
-      }
-      .rail-link.is-active svg {
-        stroke: oklch(76% 0.1 77);
-        opacity: 1;
+        --rail-icon-op: 1;
       }
 
       /* top app bar */
