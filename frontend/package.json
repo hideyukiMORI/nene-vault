@@ -1,7 +1,8 @@
 {
   "name": "nene-vault-frontend",
   "private": true,
-  "version": "0.1.0",
+  "version": "0.0.0",
+  "//": "version is intentionally pinned to 0.0.0 — the single source of the product version is the repo-root VERSION file (#231)",
   "type": "module",
   "engines": {
     "node": ">=22"

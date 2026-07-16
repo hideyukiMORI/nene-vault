@@ -16,8 +16,14 @@
 
 set -euo pipefail
 
-VERSION="${1:-$(git describe --tags --always 2>/dev/null || echo 'dev')}"
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
+
+# The single source of the product version is the repo-root VERSION file (#231).
+# Explicit argument wins, then VERSION, then 'dev'. Do not fall back to
+# `git describe --tags --always`: this repo carries no tags, so `--always`
+# silently degraded to a commit SHA and shipped `nene-vault-<sha>.zip`.
+VERSION="${1:-$(cat "$ROOT/VERSION" 2>/dev/null || echo 'dev')}"
+
 DIST="$ROOT/dist"
 STAGING="$DIST/nene-vault-$VERSION"
 ZIP_FILE="$DIST/nene-vault-$VERSION.zip"
@@ -82,6 +88,9 @@ rsync -a \
 # Config files
 cp "$ROOT/phinx.php"        "$STAGING/phinx.php"
 cp "$ROOT/.env.example"     "$STAGING/.env.example"
+# Ship VERSION inside the zip too, so an installed site can state its own version
+# without relying on the zip's filename surviving the download (#231).
+cp "$ROOT/VERSION"          "$STAGING/VERSION"
 cp "$ROOT/phpstan.neon.dist" "$STAGING/phpstan.neon.dist" 2>/dev/null || true
 
 # Installer
