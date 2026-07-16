@@ -7,10 +7,11 @@
    Sub-layer order (`main` then `responsive`) reproduces the pre-split
    cascade: the responsive overrides used to sit OUTSIDE any layer and so
    beat the base component rules regardless of specificity. Inside one flat
-   layer they would instead lose on specificity — e.g. `.tbl.tbl-cards td`
-   (0,2,1) vs `table.tbl td.right` (0,2,2) — silently right-aligning the
-   mobile card cells. Sub-layers restore "responsive always wins" without
-   touching a single selector.
+   layer a lower-specificity responsive rule could instead lose to a
+   higher-specificity base rule — silently dropping a mobile override.
+   Sub-layers restore "responsive always wins" without touching a single
+   selector, which also lets the base selectors below stay low-specificity
+   (`:where(...)` scoping, per selector-max-specificity) without risk.
    ============================================================ */
 @layer components {
   @layer main, responsive;
@@ -499,7 +500,7 @@
       cursor: not-allowed;
       box-shadow: none;
     }
-    .btn[disabled]:active {
+    :where(.btn)[disabled]:active {
       transform: none;
     }
 
@@ -605,7 +606,7 @@
       padding: 7px 13px;
       cursor: pointer;
     }
-    .file-input::file-selector-button:hover {
+    :where(.file-input)::file-selector-button:hover {
       background: var(--color-accent-hover);
     }
 
@@ -630,7 +631,7 @@
       border-bottom: 1px solid var(--color-x-line-mid);
       white-space: nowrap;
     }
-    table.tbl thead th.right {
+    :where(.tbl) thead th.right {
       text-align: right;
     }
     table.tbl tbody td {
@@ -639,16 +640,16 @@
       vertical-align: top;
       color: var(--color-text-primary);
     }
-    table.tbl tbody tr:last-child td {
+    :where(.tbl) tbody tr:last-child td {
       border-bottom: 0;
     }
-    table.tbl tbody tr:hover {
+    :where(.tbl) tbody tr:hover {
       background: var(--color-surface-overlay);
     }
-    table.tbl td.right {
+    :where(.tbl) td.right {
       text-align: right;
     }
-    table.tbl td .pri {
+    :where(.tbl) td .pri {
       font-weight: 600;
       color: var(--color-x-ink-deep);
     }
@@ -692,7 +693,7 @@
       border-radius: 50%;
       background: currentColor;
     }
-    .badge.no-dot::before {
+    :where(.badge).no-dot::before {
       display: none;
     }
     .badge-success {
@@ -830,7 +831,7 @@
       line-height: 1;
       font-variant-numeric: tabular-nums;
     }
-    .stat .v small {
+    :where(.stat) .v small {
       font-family: var(--font-sans);
       font-size: 0.85rem;
       font-weight: 500;
@@ -877,7 +878,7 @@
       align-items: center;
       justify-content: center;
     }
-    .qlink .ic svg {
+    :where(.qlink) .ic svg {
       width: 19px;
       height: 19px;
       stroke: currentColor;
@@ -927,7 +928,7 @@
       padding: 30px 30px 4px;
       text-align: center;
     }
-    .center-card .head .brand-name {
+    :where(.center-card) .head .brand-name {
       color: var(--color-x-ink-deep);
       font-size: 1.5rem;
     }
@@ -1010,7 +1011,7 @@
     .audit-row {
       cursor: pointer;
     }
-    .audit-row:hover .row-chev {
+    :where(.audit-row):hover .row-chev {
       color: var(--color-accent);
       transform: translateX(2px);
     }
@@ -1054,23 +1055,23 @@
     table.audit-table {
       table-layout: fixed;
     }
-    .audit-table thead th:nth-child(1) {
+    :where(.audit-table) thead th:nth-child(1) {
       width: 13%;
     }
-    .audit-table thead th:nth-child(2) {
+    :where(.audit-table) thead th:nth-child(2) {
       width: 17%;
     }
-    .audit-table thead th:nth-child(3) {
+    :where(.audit-table) thead th:nth-child(3) {
       width: 9%;
     }
-    .audit-table thead th:nth-child(4) {
+    :where(.audit-table) thead th:nth-child(4) {
       width: 14%;
     }
-    .audit-table thead th:nth-child(6) {
+    :where(.audit-table) thead th:nth-child(6) {
       width: 34px;
     }
-    .audit-row td.pri,
-    .audit-row td:nth-child(2) {
+    :where(.audit-row) td.pri,
+    :where(.audit-row) td:nth-child(2) {
       overflow-wrap: anywhere;
       word-break: break-word;
     }
@@ -1097,12 +1098,13 @@
       display: block;
     }
     /* keep the chevron vertically centered even when 対象/変更内容 wrap and the
-         row grows tall; the base `table.tbl tbody td { vertical-align: top }` rule
-         would otherwise win on specificity, so !important guarantees we override it */
-    td.chev-cell {
+         row grows tall; scoping to `.audit-table .chev-cell` (0,2,0) outranks the
+         base `table.tbl tbody td { vertical-align: top }` (0,1,3) on specificity,
+         so no !important is needed to override it */
+    .audit-table .chev-cell {
       width: 34px;
       text-align: center;
-      vertical-align: middle !important;
+      vertical-align: middle;
       line-height: 0;
     }
 
@@ -1235,7 +1237,7 @@
     .seg button + button {
       border-left: 1px solid var(--color-x-line-mid);
     }
-    .seg button.is-on {
+    :where(.seg) button.is-on {
       background: var(--color-accent);
       color: var(--color-on-accent);
     }
@@ -1605,12 +1607,12 @@
       }
 
       /* a form's action row spans full width, primary on its own line & reachable */
-      form .row.end {
+      :where(form) .row.end {
         flex-direction: column-reverse;
         align-items: stretch;
         gap: 10px;
       }
-      form .row.end .btn {
+      :where(form .row.end) .btn {
         width: 100%;
       }
 
@@ -1666,26 +1668,26 @@
       .tbl-wrap:has(.tbl-cards) {
         overflow-x: visible;
       }
-      table.tbl.tbl-cards,
-      .tbl.tbl-cards tbody {
+      .tbl.tbl-cards,
+      :where(.tbl.tbl-cards) tbody {
         display: block;
         width: 100%;
       }
-      .tbl.tbl-cards thead {
+      :where(.tbl.tbl-cards) thead {
         display: none;
       }
-      .tbl.tbl-cards tr {
+      :where(.tbl.tbl-cards) tr {
         display: block;
         padding: 14px 16px;
         border-bottom: 1px solid var(--color-border);
       }
-      .tbl.tbl-cards tr:last-child {
+      :where(.tbl.tbl-cards) tr:last-child {
         border-bottom: 0;
       }
-      .tbl.tbl-cards tr:hover {
+      :where(.tbl.tbl-cards) tr:hover {
         background: transparent;
       }
-      .tbl.tbl-cards td {
+      :where(.tbl.tbl-cards) td {
         display: flex;
         align-items: baseline;
         gap: 12px;
@@ -1693,7 +1695,7 @@
         border: 0;
         text-align: left;
       }
-      .tbl.tbl-cards td::before {
+      :where(.tbl.tbl-cards) td::before {
         content: attr(data-label);
         flex: none;
         width: 6.5rem;
@@ -1705,7 +1707,7 @@
         letter-spacing: 0.04em;
       }
       /* title cell (.cell-title): full-width heading, no label */
-      .tbl.tbl-cards td.cell-title {
+      :where(.tbl.tbl-cards) td.cell-title {
         display: block;
         text-align: left;
         font-size: var(--text-body);
@@ -1715,10 +1717,10 @@
         margin-bottom: 6px;
         border-bottom: 1px solid var(--color-border);
       }
-      .tbl.tbl-cards td.cell-title::before {
+      :where(.tbl.tbl-cards) td.cell-title::before {
         display: none;
       }
-      .tbl.tbl-cards td.cell-title .pri {
+      :where(.tbl.tbl-cards td.cell-title) .pri {
         font-weight: 600;
       }
 
@@ -1812,30 +1814,30 @@
         padding: 0;
         border: 0;
       }
-      .audit-row td.pri {
+      :where(.audit-row) td.pri {
         font-size: var(--text-body);
         order: 1;
       }
-      .audit-row td:nth-child(2) {
+      :where(.audit-row) td:nth-child(2) {
         order: 2;
         font-size: var(--text-2xs);
         color: var(--color-text-muted);
         margin-top: 3px;
       }
-      .audit-row td:nth-child(3) {
+      :where(.audit-row) td:nth-child(3) {
         display: none; /* actor — secondary, hidden on mobile */
       }
-      .audit-row td:nth-child(4) {
+      :where(.audit-row) td:nth-child(4) {
         order: 4;
         font-size: var(--text-2xs);
         color: var(--color-text-faint);
         margin-top: 9px;
       }
-      .audit-row td:nth-child(5) {
+      :where(.audit-row) td:nth-child(5) {
         order: 3;
         margin-top: 10px;
       }
-      .audit-row td.chev-cell {
+      :where(.audit-row) td.chev-cell {
         position: absolute;
         right: 14px;
         top: 0;
@@ -1845,7 +1847,7 @@
         align-items: center;
         padding: 0;
       }
-      .audit-row td.chev-cell .row-chev svg {
+      :where(.audit-row td.chev-cell) .row-chev svg {
         width: 18px;
         height: 18px;
       }
