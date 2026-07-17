@@ -159,6 +159,34 @@ Adoption of the fleet-wide frontend conventions. No product behaviour change.
       response contract's `required` was corrected to match the runtime
       (#215 / PR #216).
 
+## Frontend CSS standards, structure and gate (W-Spec / A1 / Lane1) 2026-07-16 → 07-17
+
+Continuation of the fleet frontend sweep. No product behaviour change.
+
+- [x] **W-Spec #236 — selector specificity rewrite** (PR #237) — the 48
+      `selector-max-specificity` violations plus the 1 `!important` in
+      `default.components.css` rewritten to the standard (ancestor-selector
+      removal, variable lift, element-tag drop). Fleet core CSS rule violations
+      are now **0** (`selector-max-specificity` 0 / `declaration-no-important` 0),
+      so the gate can be wired green without a grandfather baseline.
+- [x] **A1 — `hooks/` → `model/` relocation** (#240 / PR #241) — the feature
+      `hooks/` directories moved to `model/` (codemod, directory move only).
+- [ ] **Lane1 — stylelint gate wiring** (#238) — 🅿️ **parked** on the fleet
+      central registry. The wiring (`.stylelintrc.json` extending
+      `@hideyukimori/nene2-standards/stylelint` + the `check` chain) is prepared
+      on branch `chore/238-stylelint-gate` (not merged, no PR). Real-wiring
+      measurement: core rules 0/0 green, but `nene2/layer-components-allowlist`
+      is red — **156** distinct component classes (409 instances) not yet in the
+      central registry. That count matches the fleet's expected seed
+      (`vault156`); resolving it is fleet#65's central-registry work, not a
+      vault-side change (no rule-disable / exclude-glob workaround was applied).
+      Restart when fleet#65 lands: re-measure → if green, prove red-on-mutation →
+      revert → PR. Seed report:
+      `_work/reports/2026-07-17-vault-components-allowlist-seed.md`.
+
+Journals recording this burst: `docs/journal/2026-07-16.md`,
+`docs/journal/2026-07-17.md` (#242 / PR #243).
+
 ## Demo operations, distribution and docs 2026-07-11 → 07-16 — Done
 
 - [x] **Frontend fixes surfaced by the live demo** — change history refreshes
@@ -197,5 +225,5 @@ production use by operators. Both come from Review 2's recorded conditions
 - [ ] **Standing P0 watch** — on any 電帳法 amendment / 国税庁 guidance, open a P0
       Issue and add a new review block to `signoff-record.md` (Review 2 condition 2).
 
-Last updated: 2026-07-16 (security rounds 1–2, fleet frontend W1, demo/installer
-fixes recorded; #223)
+Last updated: 2026-07-17 (W-Spec #236 done via #237, A1 hooks→model #240, Lane1
+#238 stylelint gate parked on fleet#65, 07-17 journal #242 recorded; #244)
