@@ -21,7 +21,8 @@
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build",
     "knip": "knip",
-    "check": "npm run type-check && npm run lint && npm run format && npm run test && npm run knip && npm run build-storybook"
+    "stylelint": "stylelint \"src/**/*.css\"",
+    "check": "npm run type-check && npm run lint && npm run format && npm run test && npm run knip && npm run stylelint && npm run build-storybook"
   },
   "dependencies": {
     "@hideyukimori/nene2-client": "^1.1.0",
@@ -35,6 +36,7 @@
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
+    "@hideyukimori/nene2-standards": "^1.1.0",
     "@storybook/addon-a11y": "^10.1.4",
     "@storybook/addon-docs": "^10.1.4",
     "@storybook/react-vite": "^10.1.4",
@@ -61,6 +63,7 @@
     "openapi-typescript": "^7.13.0",
     "prettier": "^3.6.2",
     "storybook": "^10.1.4",
+    "stylelint": "^16.26.1",
     "tailwindcss": "^4.1.17",
     "typescript": "~6.0.2",
     "typescript-eslint": "^8.59.2",
