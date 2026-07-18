@@ -12,6 +12,6 @@
   "ignoreIssues": {
     "src/shared/api/schema.gen.ts": ["types"]
   },
-  "ignoreDependencies": ["tailwindcss"],
+  "ignoreDependencies": ["tailwindcss", "@hideyukimori/nene2-tokens"],
   "ignoreExportsUsedInFile": true
 }
