@@ -136,7 +136,8 @@ NENE_VAULT_PORT=8601 NENE_VAULT_FRONTEND_PORT=5187 docker compose up
 ## Status
 
 **All roadmap phases (0–4) complete; compliance gate approved.** See
-[`docs/roadmap.md`](./docs/roadmap.md) and [`docs/todo/current.md`](./docs/todo/current.md).
+[`docs/roadmap.md`](./docs/roadmap.md); operational status and handoff are tracked in
+the private `nene-origin/internal-docs/vault/`.
 
 | Phase | Scope | Status |
 | --- | --- | --- |
@@ -150,8 +151,8 @@ NENE_VAULT_PORT=8601 NENE_VAULT_FRONTEND_PORT=5187 docker compose up
 (Review 2, [`docs/compliance-review/signoff-record.md`](./docs/compliance-review/signoff-record.md)).
 
 **Remaining before production go-live:** pre-production 税理士 Review 3 and
-Tier A live testing on real shared hosting — see
-[`docs/todo/current.md`](./docs/todo/current.md).
+Tier A live testing on real shared hosting — tracked in the private
+`nene-origin/internal-docs/vault/todo/current.md`.
 
 ## Ecosystem
 

@@ -138,7 +138,7 @@ Append a **Review 3** block to
 - **Changes required** ⇒ production stays blocked.
 
 Then update the "Review status" table in `signoff-record.md` and check off the
-**税理士 Review 3** item in [`../todo/current.md`](../todo/current.md).
+**税理士 Review 3** item in the private `nene-origin/internal-docs/vault/todo/current.md`.
 
 ---
 
