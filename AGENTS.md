@@ -33,7 +33,7 @@ See [ADR 0009](docs/adr/0009-separate-from-billing-and-reconciliation.md).
 - **Scope boundary:** `docs/explanation/scope-boundary.md`
 - **NENE2 inheritance map:** `docs/inheritance-from-nene2.md`
 - **Sibling integration:** `docs/integrations/sibling-products.md`
-- **Current work:** `docs/todo/current.md`
+- **Current work:** private `nene-origin/internal-docs/vault/todo/current.md` (operational logs moved to the private receptacle — P3)
 - **Roadmap:** `docs/roadmap.md`
 
 ## Operating Rules
@@ -42,7 +42,7 @@ See [ADR 0009](docs/adr/0009-separate-from-billing-and-reconciliation.md).
 > reads that file first and rules it cannot see get broken. **Change both together.**
 
 - ⇄ Issue-driven; no direct commits to `main`. Branch `type/issue-number-summary`, then PR
-- ⇄ Journal: record each working day in `docs/journal/YYYY-MM-DD.md`, same Issue → PR flow
+- ⇄ Journal: record each working day in the private `nene-origin/internal-docs/vault/daily/YYYY-MM-DD.md` (operational logs moved to the private receptacle — P3; see `_work/daily-report-convention.md`)
 - Do **not** add quote/invoice issuance — **`nene-invoice`**
 - Do **not** add bank reconciliation/dunning — **`nene-clear`**
 - Do **not** add bank CSV mapping engine — **`nene-profile`**
