@@ -6,6 +6,7 @@ namespace NeneVault\Tests\Document;
 
 use Nene2\Database\DatabaseQueryExecutorInterface;
 use NeneVault\Document\DuplicateFileException;
+use NeneVault\Document\EmptyFileException;
 use NeneVault\Document\FileTooLargeException;
 use NeneVault\Document\MimeTypeNotAllowedException;
 use NeneVault\Document\UploadDocumentInput;
@@ -129,6 +130,17 @@ final class UploadDocumentUseCaseTest extends TestCase
         $output = $useCase->execute($this->input(mimeType: 'image/png'));
 
         $this->assertSame('active', $output->document->status);
+    }
+
+    public function test_rejects_empty_file(): void
+    {
+        // QA VLT-B7-02: a 0-byte upload is a meaningless record and is rejected
+        // with a clear reason before the MIME/sniff gates.
+        $useCase = $this->makeUseCase();
+
+        $this->expectException(EmptyFileException::class);
+
+        $useCase->execute($this->input(fileSizeBytes: 0, content: ''));
     }
 
     public function test_rejects_oversized_file(): void

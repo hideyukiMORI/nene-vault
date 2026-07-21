@@ -41,6 +41,13 @@ final readonly class UploadDocumentUseCase implements UploadDocumentUseCaseInter
 
     public function execute(UploadDocumentInput $input): UploadDocumentOutput
     {
+        // 0. Empty file (QA VLT-B7-02): a 0-byte upload is a meaningless record
+        // for a 電子帳簿保存法 archive. Reject it with a clear reason before the
+        // MIME/sniff gates (which would otherwise report it as a content mismatch).
+        if ($input->fileSizeBytes <= 0) {
+            throw new EmptyFileException();
+        }
+
         // 1. MIME allowlist (compliance §2.1, backend-standards §5) — the
         // client-declared media type is a cheap first gate.
         if (!in_array($input->mimeType, self::ALLOWED_MIME_TYPES, true)) {

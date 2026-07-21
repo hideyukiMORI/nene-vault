@@ -27,6 +27,7 @@ use NeneVault\Demo\SeatFixedDemoHandler;
 use NeneVault\Document\DocumentRouteRegistrar;
 use NeneVault\Document\DocumentServiceProvider;
 use NeneVault\Document\DuplicateFileExceptionHandler;
+use NeneVault\Document\EmptyFileExceptionHandler;
 use NeneVault\Document\FileIntegrityExceptionHandler;
 use NeneVault\Document\FileTooLargeExceptionHandler;
 use NeneVault\Document\InvalidDocumentStateExceptionHandler;
@@ -221,6 +222,7 @@ final readonly class ApplicationServiceProvider implements ServiceProviderInterf
                     $c->get(DuplicateFileExceptionHandler::class),
                     $c->get(MimeTypeNotAllowedExceptionHandler::class),
                     $c->get(FileTooLargeExceptionHandler::class),
+                    $c->get(EmptyFileExceptionHandler::class),
                     $c->get(FileIntegrityExceptionHandler::class),
                     $c->get(InvalidDocumentStateExceptionHandler::class),
                     $c->get(UserNotFoundExceptionHandler::class),
