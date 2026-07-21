@@ -26,8 +26,9 @@
     "build-storybook": "storybook build",
     "knip": "knip",
     "stylelint": "stylelint \"src/**/*.css\"",
-    "check": "npm run type-check && npm run lint && npm run format && npm run coverage:check && npm run knip && npm run stylelint && npm run build-storybook",
-    "e2e:live": "NODE_PATH=./node_modules playwright test --config playwright.live.config.ts"
+    "check": "npm run type-check && npm run lint && npm run format && npm run coverage:check && npm run knip && npm run stylelint && npm run registries:check && npm run build-storybook",
+    "e2e:live": "NODE_PATH=./node_modules playwright test --config playwright.live.config.ts",
+    "registries:check": "nene2-check init --check"
   },
   "//overrides": "js-yaml is pulled transitively by @redocly/openapi-core and trips the CI npm audit high gate (GHSA-52cp-r559-cp3m). Bump it here rather than via `npm audit fix` (platform-binary risk) or a redocly bump (churn). (#273)",
   "overrides": {
@@ -44,7 +45,7 @@
     "zod": "^3.24.1"
   },
   "devDependencies": {
-    "@hideyukimori/nene2-standards": "^1.2.0",
+    "@hideyukimori/nene2-standards": "^2.1.0",
     "@hideyukimori/nene2-tokens": "1.1.0",
     "@playwright/test": "^1.61.1",
     "@storybook/addon-a11y": "^10.1.4",

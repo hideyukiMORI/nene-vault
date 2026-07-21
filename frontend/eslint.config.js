@@ -12,6 +12,10 @@ export default tseslint.config(
       'storybook-static',
       'node_modules',
       'coverage',
+      // Playwright artifacts (hermetic @smoke + live QA reports/traces).
+      'playwright-report',
+      'playwright-report-live',
+      'test-results',
       'src/shared/api/schema.gen.ts',
       // Config/tooling files live outside the typed project; base enables the
       // typed projectService, which errors on files it can't find in a project.
