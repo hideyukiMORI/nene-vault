@@ -1,5 +1,9 @@
 import { useTranslation } from '@/shared/i18n/use-translation';
-import { Button, Field, Input, Modal, Select } from '@/shared/ui';
+import { Button } from '@/shared/ui/primitives/Button';
+import { Field } from '@/shared/ui/components/Field';
+import { Input } from '@/shared/ui/primitives/Input';
+import { Modal } from '@/shared/ui/components/Modal';
+import { Select } from '@/shared/ui/primitives/Select';
 import type { VaultDocument } from '@/entities/document';
 import { useMetadataEditForm } from '../model/use-metadata-edit';
 import type { OcrPrefill } from '../model/use-metadata-edit';

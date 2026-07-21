@@ -1,5 +1,10 @@
 import { useTranslation } from '@/shared/i18n/use-translation';
-import { Button, Callout, Field, Input, Modal, Textarea } from '@/shared/ui';
+import { Button } from '@/shared/ui/primitives/Button';
+import { Callout } from '@/shared/ui/components/Callout';
+import { Field } from '@/shared/ui/components/Field';
+import { Input } from '@/shared/ui/primitives/Input';
+import { Modal } from '@/shared/ui/components/Modal';
+import { Textarea } from '@/shared/ui/primitives/Textarea';
 import { useVoidDocumentForm } from '../model/use-void-document';
 
 interface VoidModalProps {

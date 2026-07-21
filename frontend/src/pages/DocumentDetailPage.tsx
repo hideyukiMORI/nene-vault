@@ -12,7 +12,10 @@ import {
 import type { OcrPrefill } from '@/features/document-detail';
 import { useTranslation } from '@/shared/i18n/use-translation';
 import { formatJpy, formatDate, formatDateTime } from '@/shared/lib/format';
-import { AppShell, Button, Callout, EmptyState } from '@/shared/ui';
+import { AppShell } from '@/shared/ui/components/AppShell';
+import { Button } from '@/shared/ui/primitives/Button';
+import { Callout } from '@/shared/ui/components/Callout';
+import { EmptyState } from '@/shared/ui/components/EmptyState';
 
 type Modal = 'void' | 'restore' | 'metadata-edit' | null;
 

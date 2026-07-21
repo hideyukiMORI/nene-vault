@@ -1,6 +1,10 @@
 import { env } from '@/shared/config/env';
 import { useTranslation } from '@/shared/i18n/use-translation';
-import { Button, Field, Input, Modal, Select } from '@/shared/ui';
+import { Button } from '@/shared/ui/primitives/Button';
+import { Field } from '@/shared/ui/components/Field';
+import { Input } from '@/shared/ui/primitives/Input';
+import { Modal } from '@/shared/ui/components/Modal';
+import { Select } from '@/shared/ui/primitives/Select';
 import { useDocumentUpload } from '../model/use-document-upload';
 
 const CATEGORIES = ['invoice_received', 'contract', 'receipt', 'delivery_note', 'other'] as const;

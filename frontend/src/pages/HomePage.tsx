@@ -4,7 +4,7 @@ import { authStore } from '@/entities/auth';
 import { useTranslation } from '@/shared/i18n/use-translation';
 import type { MessageKey } from '@/shared/i18n/catalogs';
 import { roleHasCapability, type Capability } from '@/shared/auth/capabilities';
-import { AppShell } from '@/shared/ui';
+import { AppShell } from '@/shared/ui/components/AppShell';
 
 interface QuickLink {
   to: string;

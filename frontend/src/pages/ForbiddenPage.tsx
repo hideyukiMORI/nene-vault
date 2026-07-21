@@ -1,6 +1,7 @@
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from '@/shared/i18n/use-translation';
-import { BrandMark, Button } from '@/shared/ui';
+import { BrandMark } from '@/shared/ui/primitives/BrandMark';
+import { Button } from '@/shared/ui/primitives/Button';
 
 export function ForbiddenPage() {
   const { t } = useTranslation();

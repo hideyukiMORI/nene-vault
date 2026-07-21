@@ -3,7 +3,11 @@ import { useNavigate } from 'react-router-dom';
 import { authStore } from '@/entities/auth';
 import { useExportDocuments } from '@/entities/document';
 import { useTranslation } from '@/shared/i18n/use-translation';
-import { AppShell, Button, Checkbox, Field, Input } from '@/shared/ui';
+import { AppShell } from '@/shared/ui/components/AppShell';
+import { Button } from '@/shared/ui/primitives/Button';
+import { Checkbox } from '@/shared/ui/primitives/Checkbox';
+import { Field } from '@/shared/ui/components/Field';
+import { Input } from '@/shared/ui/primitives/Input';
 
 export function ExportPage() {
   const { t } = useTranslation();

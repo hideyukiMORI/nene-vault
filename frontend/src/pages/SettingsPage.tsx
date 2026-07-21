@@ -7,7 +7,12 @@ import { useVaultSettings, useUpdateVaultSettings } from '@/entities/vault-setti
 import { messageKeyForError } from '@/shared/i18n/map-problem-details';
 import { useTranslation } from '@/shared/i18n/use-translation';
 import { formatDateTime } from '@/shared/lib/format';
-import { AppShell, Button, Callout, EmptyState, Field, Input } from '@/shared/ui';
+import { AppShell } from '@/shared/ui/components/AppShell';
+import { Button } from '@/shared/ui/primitives/Button';
+import { Callout } from '@/shared/ui/components/Callout';
+import { EmptyState } from '@/shared/ui/components/EmptyState';
+import { Field } from '@/shared/ui/components/Field';
+import { Input } from '@/shared/ui/primitives/Input';
 import { useNavigate } from 'react-router-dom';
 
 const settingsSchema = z.object({

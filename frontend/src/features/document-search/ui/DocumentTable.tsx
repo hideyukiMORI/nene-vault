@@ -1,6 +1,6 @@
 import { useTranslation } from '@/shared/i18n/use-translation';
 import { formatJpy, formatDate } from '@/shared/lib/format';
-import { EmptyState } from '@/shared/ui';
+import { EmptyState } from '@/shared/ui/components/EmptyState';
 import type { VaultDocument } from '@/entities/document';
 
 interface DocumentTableProps {
