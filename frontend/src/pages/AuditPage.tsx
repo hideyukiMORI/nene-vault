@@ -191,7 +191,7 @@ function AuditDetailDrawer({ event, open, onClose }: DrawerProps) {
             </div>
 
             <div className="overflow-auto flex-1 pt-5 px-5.5 pb-7">
-              <dl className="drawer-meta">
+              <dl className="grid grid-cols-2 gap-x-5.5 gap-y-3.25 pb-4.5 border-b border-border mb-4.5 max-md:grid-cols-1 max-md:gap-3 [&_dt]:text-2xs [&_dt]:text-text-muted [&_dt]:uppercase [&_dt]:tracking-meta [&_dt]:font-semibold [&_dt]:mb-0.75 [&_dd]:text-sm [&_dd]:text-x-ink-deep">
                 <div>
                   <dt>{t('audit_event.list.table.actor')}</dt>
                   <dd className="font-mono zero-slash">
@@ -204,7 +204,7 @@ function AuditDetailDrawer({ event, open, onClose }: DrawerProps) {
                     {formatDateTime(event.created_at, locale)}
                   </dd>
                 </div>
-                <div className="col2">
+                <div className="col-span-2 max-md:col-auto">
                   <dt>{t('audit_event.detail.entity')}</dt>
                   <dd className="font-mono zero-slash label-xs break-all">
                     {event.entity_type}/{event.entity_id}

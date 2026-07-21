@@ -609,29 +609,6 @@
     }
 
     /* ---- audit detail drawer ---- */
-    .drawer-meta {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 13px 22px;
-      padding-bottom: 18px;
-      border-bottom: 1px solid var(--color-border);
-      margin-bottom: 18px;
-    }
-    .drawer-meta .col2 {
-      grid-column: span 2;
-    }
-    .drawer-meta dt {
-      font-size: var(--text-2xs);
-      color: var(--color-text-muted);
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-      font-weight: 600;
-      margin-bottom: 3px;
-    }
-    .drawer-meta dd {
-      font-size: var(--text-sm);
-      color: var(--color-x-ink-deep);
-    }
     .params-head {
       display: flex;
       align-items: center;
@@ -1000,13 +977,6 @@
       }
 
       /* audit detail drawer becomes a bottom sheet with a grab handle */
-      .drawer-meta {
-        grid-template-columns: 1fr;
-        gap: 12px;
-      }
-      .drawer-meta .col2 {
-        grid-column: auto;
-      }
       /* diff stacks vertically: before above, arrow turns down, after below */
       .diff-pair {
         grid-template-columns: 1fr;
