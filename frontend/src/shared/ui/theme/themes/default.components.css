@@ -317,13 +317,6 @@
     .card.flush {
       box-shadow: none;
     }
-    .card-head {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      padding: 15px 18px;
-      border-bottom: 1px solid var(--color-border);
-    }
 
     /* ---- buttons ---- */
     .btn {
@@ -606,10 +599,6 @@
       background: var(--color-x-sunk-deep);
       color: var(--color-text-muted);
     }
-    .badge-brass {
-      background: var(--color-x-brass-soft);
-      color: var(--color-x-brass-deep);
-    }
     .tag {
       display: inline-flex;
       border-radius: var(--radius-sm);
@@ -662,21 +651,6 @@
       flex: none;
       margin-top: 1px;
       stroke: currentColor;
-    }
-    .callout-warn {
-      background: var(--color-warn-soft);
-      border-color: var(--color-warn);
-      color: var(--color-on-warn);
-    }
-    .callout-info {
-      background: var(--color-accent-soft);
-      border-color: var(--color-x-navy-line);
-      color: var(--color-x-navy-deep);
-    }
-    .callout-danger {
-      background: var(--color-danger-soft);
-      border-color: var(--color-danger);
-      color: var(--color-x-danger-hover);
     }
 
     /* ---- pagination ---- */
