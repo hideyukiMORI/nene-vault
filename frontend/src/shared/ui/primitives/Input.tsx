@@ -9,5 +9,14 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(function Input(
   { className, ...rest },
   ref,
 ) {
-  return <input ref={ref} className={`input ${className ?? ''}`} {...rest} />;
+  // Invalid state (regenerated from the retired `.input-warn` class, C5 W3 波W3):
+  // the styling hangs off the `aria-invalid` attribute so accessibility and paint
+  // come from the same source (FC-1.8). Callers just set `aria-invalid`.
+  return (
+    <input
+      ref={ref}
+      className={`input aria-invalid:border-warn aria-invalid:ring-3 aria-invalid:ring-warn-soft ${className ?? ''}`}
+      {...rest}
+    />
+  );
 });

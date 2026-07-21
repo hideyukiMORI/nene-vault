@@ -310,10 +310,6 @@
       background-position: right 11px center;
       padding-right: 30px;
     }
-    .input-warn {
-      border-color: var(--color-warn);
-      box-shadow: 0 0 0 3px var(--color-warn-soft);
-    }
     .checkbox,
     .radio {
       display: inline-flex;
