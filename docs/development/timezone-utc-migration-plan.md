@@ -1,5 +1,15 @@
 # Timezone-to-UTC Migration Plan (#228)
 
+> ## ✅ 施主裁定 2026-07-21（hide）: **案A — 現状維持**（この移行は保留）
+> #228 は **案A（現状維持＋注記のみ）** で確定。**文書タイムスタンプは host-local naive のまま（意図的）**とし、本移行計画（案C＝UTC 保存への正規化）は **W3 再生成時の再検討候補**として保留する。
+>
+> **根拠（live 実証・表示実害なし）**: guided 固定org で**同一文書**を UTC/JST の両ブラウザで開き、`uploaded_at` が両 TZ とも同一表示（`07/13/2026, 11:22 AM`）＝**ブラウザ TZ で動かない**ことを確認。host-local naive（`Z` なし）は `new Date()` が browser-local で parse → `Intl` が browser-local で format するため wall-clock 数字が round-trip 不変。表示上の実害は無い。
+> - 実証: `docs/qa/2026-07-21-e4-228-decision-package.md`（施主即断1枚）／`tests/e2e/live/batch4-e4-fixedorg.spec.ts`（PASS）／`docs/qa/2026-07-21-demo-keystroke-qa.md` §3 バッチ4。
+> - 唯一の設計差は監査証跡（UTC・`Z` 付き）が browser TZ で動く点。文書時刻（host-local）と並ぶ画面で見かけ上ずれるが、監査は admin 権限のみ閲覧・記録の法的原本は UTC のまま。案A では正規化しない。
+> - conformance: `conformance.baseline.json` の D4×15 は本裁定に基づき **理由付き `allow`（公認差異登録）**へ格上げ済み（bare `ignore` から）。→ 負債台帳 0・C1 green。
+>
+> 以下の移行設計（案C）は **post-launch 実行 GO が出た場合にのみ**着手する参照資料。案A 確定により当面は不要。
+
 **Status: DESIGN ONLY. Nothing here has been executed.** The migration described
 below is **not** committed as a runnable Phinx file, on purpose: a file under
 `database/migrations/` runs on the next `phinx migrate` (CI, a laptop, a deploy),
