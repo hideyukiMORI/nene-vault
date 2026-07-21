@@ -5,3 +5,6 @@ coverage
 *.local
 *.tsbuildinfo
 .vite
+test-results
+playwright-report
+blob-report
