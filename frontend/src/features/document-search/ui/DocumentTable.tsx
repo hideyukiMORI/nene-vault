@@ -55,7 +55,8 @@ export function DocumentTable({ documents, onSelectDocument }: DocumentTableProp
               <td data-label={labels.category}>{t(`document.category.${doc.category}`)}</td>
               <td data-label={labels.status}>
                 <span
-                  className={doc.status === 'voided' ? 'badge badge-danger' : 'badge badge-success'}
+                  className="badge data-[tone=danger]:bg-danger-soft data-[tone=danger]:text-danger data-[tone=success]:bg-success-soft data-[tone=success]:text-success"
+                  data-tone={doc.status === 'voided' ? 'danger' : 'success'}
                 >
                   {t(`document.status.${doc.status}`)}
                 </span>
