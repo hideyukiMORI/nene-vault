@@ -4,7 +4,7 @@ import { authStore } from '@/entities/auth';
 import { useTranslation } from '@/shared/i18n/use-translation';
 import type { MessageKey } from '@/shared/i18n/catalogs';
 import { roleHasCapability, type Capability } from '@/shared/auth/capabilities';
-import { AppShell } from '@/shared/ui/components/AppShell';
+import { AppChrome } from '@/features/app-chrome';
 
 interface QuickLink {
   to: string;
@@ -116,7 +116,7 @@ export function HomePage() {
   }
 
   return (
-    <AppShell onLogout={handleLogout} userEmail={session?.email} userRole={session?.role}>
+    <AppChrome onLogout={handleLogout} userEmail={session?.email} userRole={session?.role}>
       <div className="titlebar">
         <span className="eyebrow">{t('home.eyebrow')}</span>
         <h1 className="page-title">{t('home.title')}</h1>
@@ -148,6 +148,6 @@ export function HomePage() {
           ))}
         </div>
       </div>
-    </AppShell>
+    </AppChrome>
   );
 }

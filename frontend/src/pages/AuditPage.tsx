@@ -6,7 +6,7 @@ import type { ListAuditEventsParams, AuditEvent, AuditDiffField } from '@/entiti
 import { authStore } from '@/entities/auth';
 import { useTranslation } from '@/shared/i18n/use-translation';
 import { formatDateTime } from '@/shared/lib/format';
-import { AppShell } from '@/shared/ui/components/AppShell';
+import { AppChrome } from '@/features/app-chrome';
 import { Button } from '@/shared/ui/primitives/Button';
 import { Callout } from '@/shared/ui/components/Callout';
 import { EmptyState } from '@/shared/ui/components/EmptyState';
@@ -300,7 +300,7 @@ export function AuditPage() {
   }
 
   return (
-    <AppShell onLogout={handleLogout} userEmail={session?.email} userRole={session?.role}>
+    <AppChrome onLogout={handleLogout} userEmail={session?.email} userRole={session?.role}>
       <div className="titlebar">
         <span className="eyebrow">{t('navigation.group_admin')}</span>
         <h1 className="page-title">{t('audit_event.list.title')}</h1>
@@ -408,8 +408,6 @@ export function AuditPage() {
             </div>
           )}
           <Pagination
-            offset={offset}
-            limit={PAGE_SIZE}
             total={total}
             canPrev={offset > 0}
             canNext={offset + PAGE_SIZE < total}
@@ -419,6 +417,13 @@ export function AuditPage() {
             onNext={() => {
               setOffset((o) => o + PAGE_SIZE);
             }}
+            showingLabel={t('common.pagination.showing', {
+              from: String(offset + 1),
+              to: String(Math.min(offset + PAGE_SIZE, total)),
+              total: String(total),
+            })}
+            previousLabel={t('common.buttons.previous')}
+            nextLabel={t('common.buttons.next')}
           />
         </div>
       )}
@@ -430,6 +435,6 @@ export function AuditPage() {
           setDrawerOpen(false);
         }}
       />
-    </AppShell>
+    </AppChrome>
   );
 }

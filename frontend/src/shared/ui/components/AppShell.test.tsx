@@ -14,6 +14,19 @@ function LocationProbe() {
   return <div>{`path:${pathname}`}</div>;
 }
 
+// AppShell is presentation-only (fleet 会議R1②): the consumer resolves every
+// string. These mirror the English catalog the previous i18n-backed shell used,
+// so the gating/interaction assertions below stay unchanged.
+const NAV_LABELS = {
+  home: 'Home',
+  documents: 'Received Documents',
+  audit: 'Audit Log',
+  settings: 'Vault Settings',
+  users: 'Users',
+  export: 'Export',
+};
+const GROUP_LABELS = { documents: 'Received Documents', admin: 'Administration' };
+
 function renderShell(props: {
   role?: string;
   email?: string;
@@ -26,6 +39,16 @@ function renderShell(props: {
         onLogout={props.onLogout ?? (() => undefined)}
         userEmail={props.email}
         userRole={props.role}
+        navLabels={NAV_LABELS}
+        groupLabels={GROUP_LABELS}
+        menuLabel="Menu"
+        logoutLabel="Log Out"
+        breadcrumbLabel="Breadcrumb"
+        roleLabel={props.role}
+        languageLabel="Language"
+        locale="en"
+        onLocaleChange={() => undefined}
+        locales={['ja', 'en']}
       >
         <LocationProbe />
       </AppShell>

@@ -8,7 +8,7 @@ import { useUsers, useCreateUser, useDeleteUser } from '@/entities/user';
 import type { User } from '@/entities/user';
 import { messageKeyForError } from '@/shared/i18n/map-problem-details';
 import { useTranslation } from '@/shared/i18n/use-translation';
-import { AppShell } from '@/shared/ui/components/AppShell';
+import { AppChrome } from '@/features/app-chrome';
 import { Button } from '@/shared/ui/primitives/Button';
 import { Callout } from '@/shared/ui/components/Callout';
 import { EmptyState } from '@/shared/ui/components/EmptyState';
@@ -49,7 +49,11 @@ function UserFormModal({ onClose }: { onClose: () => void }) {
   const requiredMarker = t('common.required_marker');
 
   return (
-    <Modal title={t('user.form.create_title')} onClose={onClose}>
+    <Modal
+      title={t('user.form.create_title')}
+      onClose={onClose}
+      closeLabel={t('common.buttons.close')}
+    >
       <form
         onSubmit={(e) => {
           void form.handleSubmit((values) => {
@@ -167,7 +171,7 @@ export function UsersPage() {
   }
 
   return (
-    <AppShell onLogout={handleLogout} userEmail={session?.email} userRole={session?.role}>
+    <AppChrome onLogout={handleLogout} userEmail={session?.email} userRole={session?.role}>
       <div className="page-head">
         <div className="titlebar">
           <span className="eyebrow">{t('navigation.group_admin')}</span>
@@ -217,8 +221,6 @@ export function UsersPage() {
             </div>
           )}
           <Pagination
-            offset={offset}
-            limit={PAGE_SIZE}
             total={total}
             canPrev={offset > 0}
             canNext={offset + PAGE_SIZE < total}
@@ -228,6 +230,13 @@ export function UsersPage() {
             onNext={() => {
               setOffset((o) => o + PAGE_SIZE);
             }}
+            showingLabel={t('common.pagination.showing', {
+              from: String(offset + 1),
+              to: String(Math.min(offset + PAGE_SIZE, total)),
+              total: String(total),
+            })}
+            previousLabel={t('common.buttons.previous')}
+            nextLabel={t('common.buttons.next')}
           />
         </div>
       )}
@@ -239,6 +248,6 @@ export function UsersPage() {
           }}
         />
       )}
-    </AppShell>
+    </AppChrome>
   );
 }

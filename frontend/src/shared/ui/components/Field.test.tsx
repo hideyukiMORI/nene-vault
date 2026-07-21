@@ -1,15 +1,10 @@
 import { describe, expect, it } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import { Field } from './Field';
-import { I18nProvider } from '@/shared/i18n/i18n-context';
-
-function renderField(ui: React.ReactNode) {
-  return render(<I18nProvider>{ui}</I18nProvider>);
-}
 
 describe('Field', () => {
   it('renders the label and the control', () => {
-    renderField(
+    render(
       <Field label="Counterparty">
         <input aria-label="cp" />
       </Field>,
@@ -18,18 +13,27 @@ describe('Field', () => {
     expect(screen.getByLabelText('cp')).toBeInTheDocument();
   });
 
-  it('shows a required marker when required', () => {
-    const { container } = renderField(
+  it('shows the required marker when required and a marker is supplied', () => {
+    const { container } = render(
+      <Field label="Counterparty" required requiredMarker="Required">
+        <input />
+      </Field>,
+    );
+    expect(container.querySelector('.req')).not.toBeNull();
+    expect(screen.getByText('Required')).toBeInTheDocument();
+  });
+
+  it('omits the required marker when required but no marker is supplied', () => {
+    const { container } = render(
       <Field label="Counterparty" required>
         <input />
       </Field>,
     );
-    // required marker resolves the common.required_marker locale key
-    expect(container.querySelector('.req')).not.toBeNull();
+    expect(container.querySelector('.req')).toBeNull();
   });
 
   it('renders hint text when provided', () => {
-    renderField(
+    render(
       <Field label="Amount" hint="Leave blank if not stated">
         <input />
       </Field>,
@@ -38,7 +42,7 @@ describe('Field', () => {
   });
 
   it('renders error text when provided', () => {
-    renderField(
+    render(
       <Field label="Amount" error="This field is required.">
         <input />
       </Field>,
@@ -47,7 +51,7 @@ describe('Field', () => {
   });
 
   it('omits hint and error nodes when not provided', () => {
-    const { container } = renderField(
+    const { container } = render(
       <Field label="Amount">
         <input />
       </Field>,

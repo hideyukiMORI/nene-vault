@@ -1,49 +1,45 @@
-import { useTranslation } from '@/shared/i18n/use-translation';
 import { Button } from '@/shared/ui/primitives/Button';
 
 interface PaginationProps {
-  offset: number;
-  limit: number;
   total: number;
   canPrev: boolean;
   canNext: boolean;
   onPrev: () => void;
   onNext: () => void;
+  /**
+   * Resolved "showing {from}–{to} of {total}" range text, formatted by the
+   * consumer (this component holds no i18n — fleet 会議R1②).
+   */
+  showingLabel: string;
+  /** Resolved label for the previous-page button. */
+  previousLabel: string;
+  /** Resolved label for the next-page button. */
+  nextLabel: string;
 }
 
 export function Pagination({
-  offset,
-  limit,
   total,
   canPrev,
   canNext,
   onPrev,
   onNext,
+  showingLabel,
+  previousLabel,
+  nextLabel,
 }: PaginationProps) {
-  const { t } = useTranslation();
-
   if (total === 0) {
     return null;
   }
 
-  const from = offset + 1;
-  const to = Math.min(offset + limit, total);
-
   return (
     <div className="pagination">
-      <span>
-        {t('common.pagination.showing', {
-          from: String(from),
-          to: String(to),
-          total: String(total),
-        })}
-      </span>
+      <span>{showingLabel}</span>
       <div className="row gap-sm">
         <Button variant="secondary" size="sm" onClick={onPrev} disabled={!canPrev}>
-          {t('common.buttons.previous')}
+          {previousLabel}
         </Button>
         <Button variant="secondary" size="sm" onClick={onNext} disabled={!canNext}>
-          {t('common.buttons.next')}
+          {nextLabel}
         </Button>
       </div>
     </div>

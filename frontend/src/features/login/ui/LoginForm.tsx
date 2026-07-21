@@ -1,4 +1,5 @@
 import type { AuthSession } from '@/entities/auth';
+import { SUPPORTED_LOCALES, type SupportedLocale } from '@/shared/i18n/locales';
 import { useTranslation } from '@/shared/i18n/use-translation';
 import { BrandMark } from '@/shared/ui/primitives/BrandMark';
 import { Button } from '@/shared/ui/primitives/Button';
@@ -12,14 +13,21 @@ export interface LoginFormProps {
 }
 
 export function LoginForm({ onLoggedIn }: LoginFormProps) {
-  const { t } = useTranslation();
+  const { t, locale, setLocale } = useTranslation();
   const { register, handleSubmit, emailError, passwordError, submitError, isSubmitting } =
     useLoginPage();
 
   return (
     <div className="center">
       <div className="center-top">
-        <LanguageSwitcher />
+        <LanguageSwitcher
+          label={t('navigation.language')}
+          locale={locale}
+          onLocaleChange={(next) => {
+            setLocale(next as SupportedLocale);
+          }}
+          locales={SUPPORTED_LOCALES}
+        />
       </div>
       <form className="center-card" onSubmit={handleSubmit(onLoggedIn)} noValidate>
         <div className="head">
