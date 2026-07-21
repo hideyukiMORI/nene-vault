@@ -149,6 +149,20 @@ final class DocumentMetadataBoundaryTest extends ApiTestCase
         $this->assertSame(422, $resp->getStatusCode());
     }
 
+    public function test_metadata_edit_amount_above_int32_max_returns_422(): void
+    {
+        // QA VLT-B1-02: app-layer range guard on the metadata edit path too.
+        $id   = $this->uploadDoc($this->handler(), self::$adminToken, 'AmountRange', '2026-01-01', '1');
+        $resp = $this->handler()->handle(
+            $this->request('PATCH', "/admin/vault/documents/{$id}/metadata", self::$adminToken, [
+                'counterparty_name' => 'AmountRange',
+                'category'          => 'invoice_received',
+                'amount_cents'      => 2147483648,
+            ]),
+        );
+        $this->assertSame(422, $resp->getStatusCode());
+    }
+
     public function test_metadata_edit_nonexistent_document_returns_404(): void
     {
         $resp = $this->handler()->handle(

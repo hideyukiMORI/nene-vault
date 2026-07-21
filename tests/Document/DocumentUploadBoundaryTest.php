@@ -171,6 +171,37 @@ final class DocumentUploadBoundaryTest extends ApiTestCase
         @unlink($tmp);
     }
 
+    // ── amount_cents range (QA VLT-B1-02) ─────────────────────────────────────
+
+    public function test_upload_amount_at_int32_max_accepted(): void
+    {
+        $tmp = $this->makeTempPdf('amount-max');
+        $req = $this->buildUploadRequest(self::$adminToken, $tmp, 'invoice.pdf', 'application/pdf', 'Max Amount Co', '2026-01-01', '2147483647');
+        $resp = $this->handler()->handle($req);
+        $this->assertSame(201, $resp->getStatusCode(), (string) $resp->getBody());
+        @unlink($tmp);
+    }
+
+    public function test_upload_amount_above_int32_max_returns_422(): void
+    {
+        // App-layer range guard returns a friendly 422 instead of overflowing the
+        // signed-32-bit DB column and surfacing as a raw server error.
+        $tmp = $this->makeTempPdf('amount-over');
+        $req = $this->buildUploadRequest(self::$adminToken, $tmp, 'invoice.pdf', 'application/pdf', 'Over Amount Co', '2026-01-01', '2147483648');
+        $resp = $this->handler()->handle($req);
+        $this->assertSame(422, $resp->getStatusCode());
+        @unlink($tmp);
+    }
+
+    public function test_upload_negative_amount_returns_422(): void
+    {
+        $tmp = $this->makeTempPdf('amount-neg');
+        $req = $this->buildUploadRequest(self::$adminToken, $tmp, 'invoice.pdf', 'application/pdf', 'Negative Amount Co', '2026-01-01', '-1');
+        $resp = $this->handler()->handle($req);
+        $this->assertSame(422, $resp->getStatusCode());
+        @unlink($tmp);
+    }
+
     // ── Duplicate detection ───────────────────────────────────────────────────
 
     public function test_duplicate_sha256_rejected_unless_confirmed(): void
