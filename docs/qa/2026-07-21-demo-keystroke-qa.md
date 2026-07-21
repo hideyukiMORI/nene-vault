@@ -194,7 +194,7 @@
 - 前提: 未ログイン・クリーンなブラウザ
 - 手順: 1. `https://vault.ayane.co.jp/demo/standard` を開く 2. 「デモを準備しています…」表示後に disposable-org が払い出され admin seat で `/` に着地 3. アップロード等の書き込み showcase を試す 4. **TTL 3h の残り時間/期限が画面のどこかに示されるかを確認**
 - 期待: 使い捨て org に admin として着地し、アップロード導線が動く。既存 org のデータには触れない。**TTL 3h は UI に一切表示されない見込み**（実装上、期限は JWT `exp` とサーバ側 sweep のみで、SPA・PHP 入口とも残り時間を出さない）。表示されないことを確認し、「使い捨て org が予告なく 3h で消える」ことが営業品質上許容かを**発見候補**として記録。
-- 結果: —／証拠: —／発見: —（→ 営業品質: TTL 無告知の是非を hub 仕分けへ）
+- 結果: ✅ PASS（§3 バッチ1）／証拠: trace（playwright-report-live）／発見: TTL 3h は UI 無告知（silent）＝営業品質は施主判断枠
 
 #### VLT-A6-03: TTL 3h org の期限切れ瞬間（作業中に org 消滅）
 - 分類: A-6 / 異常（デモ固有・C4 とは別ケース）
@@ -222,7 +222,7 @@
 - 前提: 未ログイン
 - 手順: 1. `https://vault.ayane.co.jp/demo/guided` を開く
 - 期待: 固定 viewer seat で閲覧デモに着地。ViewDocuments のみのナビ（viewer）で「売り」を閲覧できる。
-- 結果: —／証拠: —／発見: —
+- 結果: ✅ PASS（§3 バッチ1）／証拠: trace／発見: —（viewer authz 正）
 
 ### B. 異常系 — 入力
 
@@ -338,7 +338,7 @@
 - 前提: 未ログイン（token null）
 - 手順: /documents /audit /users /settings /export /documents/{id} を直接 URL で開く
 - 期待: **リダイレクトせず現在 URL のまま** AuthGate が LoginForm を in-place 表示。ログイン成功で元ページが reactively 復帰。保護データは一切先読み表示されない。
-- 結果: —／証拠: —／発見: —
+- 結果: ✅ PASS（§3 バッチ1）／証拠: trace／発見: —（in-place LoginForm・URL 維持）
 
 #### VLT-C2-01〜03: ID 直叩き（不在・他org・不正形式）
 - 分類: C-2 / 異常（情報漏えい確認）
@@ -429,7 +429,7 @@
 - 前提: 文書詳細（uploaded_at・transaction_date・retention_expires_at を持つ文書）
 - 手順: 1. 詳細で uploaded_at（`formatDateTime`）・transaction_date/retention_expires_at（`formatDate`）を確認 2. 一覧 DocumentTable で同文書の uploaded_at（`.slice(0,10)`）を確認 3. UTC 日境界付近の時刻（例 UTC 23:30 = JST 翌 08:30）の文書で日付ズレを観察
 - 期待（現状把握）: `formatDateTime` はブラウザローカル TZ、`formatDate`/`.slice` は生 UTC 日付。**UTC 日境界で「詳細の uploaded_at 日付」と「一覧の uploaded_at 日付」が 1 日ズレる**可能性。ズレたら #228 の実データ証拠として記録。
-- 結果: —／証拠: —／発見: —（→ **#228 実データ最終GOへ必ず連携**）
+- 結果: ⚠️（§3 バッチ1）／証拠: E4 UTC/JST テキスト捕捉／発見: uploaded_at=formatDateTime(ブラウザTZ) と transaction_date=生ISO の書式混在を live 確認 → **#228 連携**。同一文書の日境界ズレ直接実証は固定org 再現待ち
 
 #### VLT-E4-02: audit 時刻（ローカルTZ）× 文書日付（UTC）の混在
 - 分類: E-4 / 異常（#228）
@@ -483,21 +483,41 @@
 
 ---
 
-## 3. 実行記録（hub 承認後に追記）
+## 3. 実行記録
+
+### バッチ1（機械レーン・read/authz/timezone）2026-07-21
 
 | 項目 | 値 |
 |---|---|
-| 実行日時（TZ 明記） | — |
-| 実行者 | Vault リナ |
-| ブラウザ/バージョン | — |
-| 画面幅 | — |
-| デモ URL | https://vault.ayane.co.jp |
-| フロント ビルド SHA | — |
+| 実行日時 | 2026-07-21（JST）※ブラウザ TZ は E-4 で UTC/Asia-Tokyo を明示切替 |
+| 実行者 | Vault リナ（live-target Playwright・`tests/e2e/live/`） |
+| ブラウザ/バージョン | Playwright Chromium（Desktop Chrome・headless）・言語 en-US |
+| 画面幅 | Desktop Chrome 既定（1280×720） |
+| デモ URL | https://vault.ayane.co.jp（disposable admin org / fixed viewer seat） |
+| フロント ビルド SHA | 凍結中のデプロイ版（リポ最新 main = eslint 合成形完了時点 `283cb8b`・デプロイ SHA は未確認） |
 
-**サマリ**: 総数 — ／ ✅ — ／ 🔴 — ／ ⚠️ — ／ 未実行 —（理由）
+**バッチ1 サマリ**: 総数 5 ／ ✅ 5 ／ 🔴 0 ／ ⚠️ 1（E-4 = #228 の既知不整合を実描画で確認） ／ 未実行 0
 
-- 🔴 と ⚠️ は**その場で再現手順を確定**してから次へ進む（後から再現できない報告を作らない）。
-- E-4 系の発見は #228 実データ最終GOへ必ず連携する。
+| シナリオ | 結果 | 実測 |
+|---|---|---|
+| VLT-A6-01 /demo/standard = admin | ✅ | 全6ナビ（Home/Received Documents/Audit Log/Vault Settings/Users/Export）・**console error 0** |
+| VLT-A6-02 /demo/guided = viewer | ✅ | ナビは Home + Received Documents のみ・Users/Settings/Audit/Export **不可視**（authz 正）・console error 0 |
+| VLT-A5-01 / A2-01 一覧 | ✅ | Received Documents に着地・**seed 19 行**表示 |
+| VLT-C1-01 未ログイン直叩き | ✅ | fresh context で `/documents` 直叩き→**リダイレクトせず** LoginForm in-place（URL 維持） |
+| VLT-E4-01/02 タイムゾーン（#228） | ⚠️ | 下記「発見」参照 |
+
+**⚠️ VLT-E4（#228 連携）**: 文書詳細で日時書式が**混在**することを live で確認。
+- `uploaded_at`・監査行 = `formatDateTime`（**ブラウザ TZ**・Intl en-US 形 `07/18/2026, 01:55 PM`）
+- `transaction_date`・`retention_expires_at` = 生 ISO（`2026-07-16` / `2036-07-16`・TZ 非依存）
+- つまり同一画面で「TZ で動く時刻」と「動かない日付」が併存。**#228 バンドルへ連携**。
+- 補足: **同一文書での UTC↔JST 日境界ズレの直接実証は未完**（`/demo/standard` は訪問ごとに別 disposable org を発行するため、2 TZ で同一文書を開けない）。固定 org（guided）＋既知時刻文書での再現が必要＝continuation。
+
+### 継続（未実行・machine/human レーン）
+
+- **書込系（demo org 内）**: A1 ライフサイクル（upload→edit→void→restore）・A3 SHA 整合（DL ハッシュ照合）・B1-B5/B7 入力/ファイル異常・B8 CSV 式中和・C2 他org/不在 ID・C3-02 member の「見えるが 403」・C4/C5 セッション。
+- **E-4 固定org 再現**: guided seat で同一文書を UTC/JST。
+- **目視・営業レーン（別）**: F1-F4・E1（OSダーク）・E2（375/768）・D4（低速）→ headed スクショ収集→施主/hub 判定。
+- 🔴 と ⚠️ は**その場で再現手順を確定**してから次へ進む。E-4 系の発見は #228 へ必ず連携。
 
 ---
 
