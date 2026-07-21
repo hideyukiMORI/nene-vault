@@ -18,14 +18,17 @@ describe('SettingsPage retention warning', () => {
     await waitFor(() => {
       expect(input).toHaveValue(10);
     });
-    expect(input).not.toHaveClass('input-warn');
+    // The under-10 warning now hangs off `aria-invalid` (C5 W3 波W3, FC-1.8) —
+    // the styling regenerated from `.input-warn` follows this attribute, so
+    // assert the attribute (a11y + paint source) rather than the retired class.
+    expect(input).not.toHaveAttribute('aria-invalid');
 
     // Typing a value below 10 must flag the field immediately — no save required.
     await userEvent.clear(input);
     await userEvent.type(input, '8');
 
     await waitFor(() => {
-      expect(input).toHaveClass('input-warn');
+      expect(input).toHaveAttribute('aria-invalid', 'true');
     });
   });
 });

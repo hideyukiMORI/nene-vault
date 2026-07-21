@@ -120,7 +120,7 @@ export function SettingsPage() {
               type="number"
               min={7}
               max={99}
-              className={retentionWarn ? 'input-warn' : ''}
+              aria-invalid={retentionWarn || undefined}
               // valueAsNumber so the watched value is numeric *while typing* — the
               // under-10-years compliance warning must render live, not only after
               // save → re-fetch coerces the value server-side.
