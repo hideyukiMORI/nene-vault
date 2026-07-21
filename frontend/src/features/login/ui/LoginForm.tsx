@@ -19,7 +19,7 @@ export function LoginForm({ onLoggedIn }: LoginFormProps) {
 
   return (
     <div className="center">
-      <div className="center-top">
+      <div className="flex justify-end px-6 py-4.5">
         <LanguageSwitcher
           label={t('navigation.language')}
           locale={locale}

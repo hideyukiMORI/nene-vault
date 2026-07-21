@@ -177,7 +177,7 @@ export function DocumentDetailPage() {
               </div>
               <div>
                 <dt>{t('document.metadata.amount_cents')}</dt>
-                <dd className="mono tabular">{formatJpy(doc.amount_cents, locale)}</dd>
+                <dd className="mono tabular-nums">{formatJpy(doc.amount_cents, locale)}</dd>
               </div>
               <div>
                 <dt>{t('document.metadata.category')}</dt>

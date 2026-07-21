@@ -126,7 +126,7 @@ function UserRow({
           {t(`user.status.${user.status}`)}
         </span>
       </td>
-      <td className="muted mono" data-label={t('user.list.table.created_at')}>
+      <td className="text-text-muted mono" data-label={t('user.list.table.created_at')}>
         {user.created_at.slice(0, 10)}
       </td>
       <td data-label={t('user.list.table.actions')}>

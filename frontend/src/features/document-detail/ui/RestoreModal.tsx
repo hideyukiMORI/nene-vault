@@ -24,7 +24,7 @@ export function RestoreModal({ documentId, onClose }: RestoreModalProps) {
       closeLabel={t('common.buttons.close')}
     >
       <div className="modal-body space-y-4">
-        <p className="muted body-sm">{t('document.restore.description')}</p>
+        <p className="text-text-muted body-sm">{t('document.restore.description')}</p>
         {submitError !== null && <p className="field-error">{t(submitError)}</p>}
         <div className="flex items-center justify-end gap-2 max-md:flex-col-reverse max-md:items-stretch max-md:gap-2.5">
           <Button type="button" variant="secondary" onClick={onClose} disabled={mutation.isPending}>

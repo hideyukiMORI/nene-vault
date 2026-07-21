@@ -38,7 +38,7 @@ export function MetadataEditModal({ doc, onClose, ocrPrefill }: MetadataEditModa
         }}
         className="modal-body space-y-4"
       >
-        <p className="muted body-sm">{t('document.metadata_edit.description')}</p>
+        <p className="text-text-muted body-sm">{t('document.metadata_edit.description')}</p>
 
         <Field
           label={t('document.metadata.counterparty_name')}
