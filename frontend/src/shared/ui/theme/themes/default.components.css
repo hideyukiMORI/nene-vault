@@ -535,22 +535,6 @@
     }
 
     /* ---- callouts ---- */
-    .callout {
-      display: flex;
-      gap: 11px;
-      border-radius: var(--radius-md);
-      padding: 13px 15px;
-      font-size: var(--text-sm);
-      line-height: 1.55;
-      border: 1px solid;
-    }
-    .callout svg {
-      width: 18px;
-      height: 18px;
-      flex: none;
-      margin-top: 1px;
-      stroke: currentColor;
-    }
 
     /* ---- pagination ---- */
     .pagination {
