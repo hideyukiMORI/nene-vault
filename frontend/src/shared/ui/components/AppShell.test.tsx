@@ -49,6 +49,36 @@ describe('AppShell navigation gating', () => {
     }
   });
 
+  it('shows every route to a superadmin', () => {
+    renderShell({ role: 'superadmin', email: 'root@example.com' });
+
+    for (const name of [
+      'Home',
+      'Received Documents',
+      'Audit Log',
+      'Vault Settings',
+      'Users',
+      'Export',
+    ]) {
+      expect(screen.getByRole('button', { name })).toBeInTheDocument();
+    }
+  });
+
+  it('shows a member only Home and Received Documents (member capabilities)', () => {
+    renderShell({ role: 'member', email: 'member@example.com' });
+
+    // A member has ViewDocuments (plus Upload/Edit, which have no nav route),
+    // so the visible nav matches a viewer's even though the backing capability
+    // differs — Home stays ungated and Received Documents is ViewDocuments.
+    expect(screen.getByRole('button', { name: 'Home' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Received Documents' })).toBeInTheDocument();
+    // The admin routes gate on ManageVaultSettings/ManageUsers/ExportDocuments,
+    // none of which a member holds.
+    for (const name of ['Audit Log', 'Vault Settings', 'Users', 'Export']) {
+      expect(screen.queryByRole('button', { name })).not.toBeInTheDocument();
+    }
+  });
+
   it('hides admin-only routes from a viewer (capability gating)', () => {
     renderShell({ role: 'viewer', email: 'viewer@example.com' });
 
