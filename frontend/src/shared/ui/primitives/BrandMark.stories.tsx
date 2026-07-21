@@ -24,7 +24,7 @@ export const OnDark: Story = {
   args: { className: 'text-x-seal-bright' },
   decorators: [
     (Story) => (
-      <div className="bg-x-rail p-lg">
+      <div className="bg-x-rail p-6">
         <Story />
       </div>
     ),

@@ -307,8 +307,8 @@ export function AuditPage() {
         <p className="lede">{t('audit_event.list.lede')}</p>
       </div>
 
-      <div className="card p-md stack-md">
-        <div className="grid-3">
+      <div className="card p-4.5 space-y-4">
+        <div className="grid grid-cols-3 gap-4">
           <Field label={t('audit_event.list.filter.entity_type_label')}>
             <Input
               type="text"
@@ -337,7 +337,7 @@ export function AuditPage() {
             />
           </Field>
         </div>
-        <div className="row gap-sm end">
+        <div className="flex items-center gap-2 justify-end">
           <Button variant="secondary" onClick={handleReset}>
             {t('document.search.reset_button')}
           </Button>

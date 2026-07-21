@@ -14,7 +14,7 @@ export function ForbiddenPage() {
             <BrandMark size={40} className="text-x-seal" title="NeNe Vault" />
           </div>
         </div>
-        <div className="body text-center stack-md">
+        <div className="body text-center space-y-4">
           <p className="danger">{t('problem.forbidden')}</p>
           {/* Escape hatch so a forbidden route is never a dead-end (#174). */}
           <Button

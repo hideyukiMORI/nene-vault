@@ -124,11 +124,11 @@ export function HomePage() {
       </div>
 
       <div>
-        <div className="row gap-sm mb-stack-sm">
+        <div className="flex items-center gap-2 mb-stack-sm">
           <span className="tick" />
           <h2 className="subtitle">{t('home.quick_access')}</h2>
         </div>
-        <div className="grid-2">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           {visibleLinks.map((link) => (
             <button
               key={link.to}
@@ -139,7 +139,7 @@ export function HomePage() {
               }}
             >
               <span className="ic">{link.icon}</span>
-              <span className="flex1">
+              <span className="flex-1 min-w-0">
                 <b>{t(link.titleKey)}</b>
                 <span>{t(link.subKey)}</span>
               </span>

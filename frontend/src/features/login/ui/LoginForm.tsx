@@ -38,7 +38,7 @@ export function LoginForm({ onLoggedIn }: LoginFormProps) {
             </div>
           </div>
         </div>
-        <div className="body stack-md">
+        <div className="body space-y-4">
           <Field label={t('auth.login.email_label')}>
             <Input
               type="email"

@@ -30,7 +30,7 @@ export function VoidModal({ documentId, onClose }: VoidModalProps) {
         onSubmit={(e) => {
           void onSubmit(e);
         }}
-        className="modal-body stack-md"
+        className="modal-body space-y-4"
       >
         <p className="muted body-sm">{t('document.void.description')}</p>
 
@@ -55,7 +55,7 @@ export function VoidModal({ documentId, onClose }: VoidModalProps) {
 
         {submitError !== null && <p className="field-error">{t(submitError)}</p>}
 
-        <div className="row end gap-sm">
+        <div className="flex items-center justify-end gap-2 max-md:flex-col-reverse max-md:items-stretch max-md:gap-2.5">
           <Button type="button" variant="secondary" onClick={onClose} disabled={isSubmitting}>
             {t('common.buttons.cancel')}
           </Button>
