@@ -32,7 +32,7 @@ export function Pagination({
   }
 
   return (
-    <div className="pagination">
+    <div className="flex items-center justify-between px-4 py-3 border-t border-border text-xs text-text-muted max-md:flex-col max-md:gap-3 max-md:items-stretch max-md:text-center">
       <span>{showingLabel}</span>
       <div className="flex items-center gap-2 max-md:justify-center">
         {/* max-md:flex-1 preserves the retired `.pagination .btn { flex: 1 }`
