@@ -31,7 +31,9 @@ export function DocumentsPage() {
     <AppChrome onLogout={handleLogout} userEmail={session?.email} userRole={session?.role}>
       <div className="page-head">
         <div className="titlebar">
-          <span className="eyebrow">{t('navigation.documents')}</span>
+          <span className="text-2xs tracking-eyebrow uppercase text-x-brass-deep font-semibold">
+            {t('navigation.documents')}
+          </span>
           <h1 className="page-title">{t('document.list.title')}</h1>
         </div>
         <Button

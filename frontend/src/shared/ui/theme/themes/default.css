@@ -126,4 +126,11 @@
   --z-scrim: 60;
   --z-drawer: 70;
   --z-modal: 100;
+
+  /* ---- letter-spacing (tracking) ---- */
+  --tracking-eyebrow: 0.16em;
+  --tracking-tight: -0.005em;
+
+  /* ---- prose width ---- */
+  --container-lede: 60ch;
 }

@@ -34,10 +34,12 @@ export function DocumentHistoryTable({ events }: DocumentHistoryTableProps) {
                   {t(dynamicMessageKey(`audit_event.action.${event.action}`))}
                 </span>
               </td>
-              <td className="text-text-muted mono">
+              <td className="text-text-muted font-mono zero-slash">
                 {event.actor_user_id !== null ? String(event.actor_user_id) : '—'}
               </td>
-              <td className="text-text-muted mono">{formatDateTime(event.created_at, locale)}</td>
+              <td className="text-text-muted font-mono zero-slash">
+                {formatDateTime(event.created_at, locale)}
+              </td>
               <td>
                 {event.before_json !== null ? (
                   <pre className="tbl-diff">{JSON.stringify(event.before_json, null, 2)}</pre>

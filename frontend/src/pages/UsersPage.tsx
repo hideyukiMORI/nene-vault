@@ -126,7 +126,10 @@ function UserRow({
           {t(`user.status.${user.status}`)}
         </span>
       </td>
-      <td className="text-text-muted mono" data-label={t('user.list.table.created_at')}>
+      <td
+        className="text-text-muted font-mono zero-slash"
+        data-label={t('user.list.table.created_at')}
+      >
         {user.created_at.slice(0, 10)}
       </td>
       <td data-label={t('user.list.table.actions')}>
@@ -174,7 +177,9 @@ export function UsersPage() {
     <AppChrome onLogout={handleLogout} userEmail={session?.email} userRole={session?.role}>
       <div className="page-head">
         <div className="titlebar">
-          <span className="eyebrow">{t('navigation.group_admin')}</span>
+          <span className="text-2xs tracking-eyebrow uppercase text-x-brass-deep font-semibold">
+            {t('navigation.group_admin')}
+          </span>
           <h1 className="page-title">{t('user.list.title')}</h1>
         </div>
         <Button

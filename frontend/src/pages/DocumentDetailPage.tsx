@@ -94,7 +94,9 @@ export function DocumentDetailPage() {
         <>
           <div className="page-head">
             <div className="titlebar">
-              <span className="eyebrow">{t('document.detail.title')}</span>
+              <span className="text-2xs tracking-eyebrow uppercase text-x-brass-deep font-semibold">
+                {t('document.detail.title')}
+              </span>
               <h1 className="page-title">{doc.counterparty_name}</h1>
               <div className="flex items-center gap-2 flex-wrap">
                 <span
@@ -168,16 +170,20 @@ export function DocumentDetailPage() {
           <section className="card p-4.5">
             <div className="flex items-center gap-2 mb-stack-md">
               <span className="tick" />
-              <h2 className="subtitle">{t('document.detail.metadata_section')}</h2>
+              <h2 className="text-h2 font-semibold tracking-tight text-x-ink-deep flex items-center gap-2.25">
+                {t('document.detail.metadata_section')}
+              </h2>
             </div>
             <dl className="dl">
               <div>
                 <dt>{t('document.metadata.transaction_date')}</dt>
-                <dd className="mono">{formatDate(doc.transaction_date)}</dd>
+                <dd className="font-mono zero-slash">{formatDate(doc.transaction_date)}</dd>
               </div>
               <div>
                 <dt>{t('document.metadata.amount_cents')}</dt>
-                <dd className="mono tabular-nums">{formatJpy(doc.amount_cents, locale)}</dd>
+                <dd className="font-mono zero-slash tabular-nums">
+                  {formatJpy(doc.amount_cents, locale)}
+                </dd>
               </div>
               <div>
                 <dt>{t('document.metadata.category')}</dt>
@@ -189,11 +195,11 @@ export function DocumentDetailPage() {
               </div>
               <div>
                 <dt>{t('document.metadata.uploaded_at')}</dt>
-                <dd className="mono">{formatDateTime(doc.uploaded_at, locale)}</dd>
+                <dd className="font-mono zero-slash">{formatDateTime(doc.uploaded_at, locale)}</dd>
               </div>
               <div>
                 <dt>{t('document.metadata.retention_expires_at')}</dt>
-                <dd className="mono">{formatDate(doc.retention_expires_at)}</dd>
+                <dd className="font-mono zero-slash">{formatDate(doc.retention_expires_at)}</dd>
               </div>
               {doc.tags.length > 0 && (
                 <div className="col2">
@@ -213,16 +219,18 @@ export function DocumentDetailPage() {
           <section className="card p-4.5">
             <div className="flex items-center gap-2 mb-stack-md">
               <span className="tick" />
-              <h2 className="subtitle">{t('document.detail.file_section')}</h2>
+              <h2 className="text-h2 font-semibold tracking-tight text-x-ink-deep flex items-center gap-2.25">
+                {t('document.detail.file_section')}
+              </h2>
             </div>
             <dl className="dl">
               <div>
                 <dt>{t('document.metadata.version_number')}</dt>
-                <dd className="mono">{doc.version_number}</dd>
+                <dd className="font-mono zero-slash">{doc.version_number}</dd>
               </div>
               <div className="col2">
                 <dt>{t('document.metadata.file_sha256')}</dt>
-                <dd className="mono break-all">{doc.file_sha256}</dd>
+                <dd className="font-mono zero-slash break-all">{doc.file_sha256}</dd>
               </div>
             </dl>
           </section>
@@ -230,7 +238,9 @@ export function DocumentDetailPage() {
           <section className="card p-4.5">
             <div className="flex items-center gap-2 mb-stack-md">
               <span className="tick" />
-              <h2 className="subtitle">{t('document.history.title')}</h2>
+              <h2 className="text-h2 font-semibold tracking-tight text-x-ink-deep flex items-center gap-2.25">
+                {t('document.history.title')}
+              </h2>
             </div>
             <DocumentHistoryTable events={history?.audit_events ?? []} />
           </section>
