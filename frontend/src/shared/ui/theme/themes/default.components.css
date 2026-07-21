@@ -263,9 +263,6 @@
       border-radius: var(--radius-md);
       box-shadow: var(--shadow-sm);
     }
-    .card.flush {
-      box-shadow: none;
-    }
 
     /* ---- buttons ---- */
 

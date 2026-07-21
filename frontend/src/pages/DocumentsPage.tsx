@@ -66,7 +66,7 @@ export function DocumentsPage() {
       {isLoading ? (
         <EmptyState>{t('common.status.loading')}</EmptyState>
       ) : (
-        <div className="card flush">
+        <div className="card shadow-none">
           <DocumentTable
             documents={documents}
             onSelectDocument={(id) => {

@@ -202,7 +202,7 @@ export function UsersPage() {
       {isLoading ? (
         <EmptyState>{t('common.status.loading')}</EmptyState>
       ) : (
-        <div className="card flush">
+        <div className="card shadow-none">
           {users.length === 0 ? (
             <EmptyState>{t('user.list.empty')}</EmptyState>
           ) : (

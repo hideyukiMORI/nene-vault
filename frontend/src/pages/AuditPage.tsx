@@ -384,7 +384,7 @@ export function AuditPage() {
       {isLoading ? (
         <EmptyState>{t('common.status.loading')}</EmptyState>
       ) : (
-        <div className="card flush">
+        <div className="card shadow-none">
           {events.length === 0 ? (
             <EmptyState>{t('audit_event.list.empty')}</EmptyState>
           ) : (
