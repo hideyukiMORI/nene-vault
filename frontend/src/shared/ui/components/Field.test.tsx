@@ -19,8 +19,9 @@ describe('Field', () => {
         <input />
       </Field>,
     );
-    // The visible marker renders as the `.req` span carrying the supplied text.
-    expect(screen.getByText('Required')).toHaveClass('req');
+    // The required marker (formerly the `.req` span) was regenerated into
+    // Tailwind utilities (C5 W3 波(a)) — assert the danger-toned marker survives.
+    expect(screen.getByText('Required')).toHaveClass('text-danger');
     expect(screen.getByText('Required')).toBeInTheDocument();
   });
 
