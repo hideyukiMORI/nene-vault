@@ -91,7 +91,7 @@ function UserFormModal({ onClose }: { onClose: () => void }) {
             ))}
           </Select>
         </Field>
-        {submitError !== null && <p className="field-error">{t(submitError)}</p>}
+        {submitError !== null && <p className="text-2xs text-danger">{t(submitError)}</p>}
         <div className="flex items-center justify-end gap-2 max-md:flex-col-reverse max-md:items-stretch max-md:gap-2.5">
           <Button type="button" variant="secondary" onClick={onClose} disabled={mutation.isPending}>
             {t('common.buttons.cancel')}

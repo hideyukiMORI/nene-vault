@@ -137,7 +137,7 @@ export function ExportPage() {
           }}
         />
 
-        {exportError !== null && <p className="field-error">{exportError}</p>}
+        {exportError !== null && <p className="text-2xs text-danger">{exportError}</p>}
         {exportSuccess && <p className="success body-sm">{t('export.messages.downloaded')}</p>}
 
         <div>

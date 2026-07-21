@@ -32,7 +32,7 @@ export function Field({
   error,
 }: FieldProps) {
   return (
-    <div className="field">
+    <div className="flex flex-col gap-1.5">
       <label className="field-label">
         {label}
         {required && requiredMarker !== undefined && requiredMarker !== null && (
@@ -40,8 +40,12 @@ export function Field({
         )}
       </label>
       {children}
-      {hint !== undefined && hint !== null && <span className="field-hint">{hint}</span>}
-      {error !== undefined && error !== null && <span className="field-error">{error}</span>}
+      {hint !== undefined && hint !== null && (
+        <span className="text-2xs text-text-faint leading-normal">{hint}</span>
+      )}
+      {error !== undefined && error !== null && (
+        <span className="text-2xs text-danger">{error}</span>
+      )}
     </div>
   );
 }

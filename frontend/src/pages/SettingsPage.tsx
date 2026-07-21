@@ -168,7 +168,7 @@ export function SettingsPage() {
           {mutation.isSuccess && (
             <p className="success body-sm">{t('vault_settings.messages.saved')}</p>
           )}
-          {submitError !== null && <p className="field-error">{t(submitError)}</p>}
+          {submitError !== null && <p className="text-2xs text-danger">{t(submitError)}</p>}
 
           <div>
             <Button type="submit" variant="primary" disabled={mutation.isPending}>
