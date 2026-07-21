@@ -3,3 +3,7 @@ storybook-static
 node_modules
 coverage
 src/shared/api/schema.gen.ts
+test-results
+playwright-report
+playwright-report-live
+blob-report
