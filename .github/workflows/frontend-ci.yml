@@ -29,9 +29,10 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      # npm run check = type-check + lint + format + test (vitest) + knip
+      # npm run check = type-check + lint + format + coverage:check
+      # (vitest --coverage + shrink-only ratchet) + knip + stylelint
       # + build-storybook.
-      - name: Check (type-check, lint, format, test, knip, storybook build)
+      - name: Check (type-check, lint, format, coverage:check, knip, storybook build)
         run: npm run check
 
       - name: Audit (fail on high/critical)
