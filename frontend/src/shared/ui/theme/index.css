@@ -52,6 +52,14 @@
   transition-property: opacity, visibility;
 }
 
+/* button の複合 transition（プロパティ別 duration＝単一 utility 不可・page-glow precedent）。 */
+@utility btn-transition {
+  transition:
+    background 0.12s,
+    border-color 0.12s,
+    transform 0.04s;
+}
+
 @import './active.css';
 /* NOTE: imported WITHOUT `layer(base)` — this is the canonical form, not a
    deviation. base.css already wraps its rules in `@layer base { … }`, and layer

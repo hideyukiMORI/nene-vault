@@ -35,10 +35,24 @@ export function Pagination({
     <div className="pagination">
       <span>{showingLabel}</span>
       <div className="flex items-center gap-2 max-md:justify-center">
-        <Button variant="secondary" size="sm" onClick={onPrev} disabled={!canPrev}>
+        {/* max-md:flex-1 preserves the retired `.pagination .btn { flex: 1 }`
+            mobile rule now that `.btn` is utility-based (C5 W3 波B). */}
+        <Button
+          variant="secondary"
+          size="sm"
+          className="max-md:flex-1"
+          onClick={onPrev}
+          disabled={!canPrev}
+        >
           {previousLabel}
         </Button>
-        <Button variant="secondary" size="sm" onClick={onNext} disabled={!canNext}>
+        <Button
+          variant="secondary"
+          size="sm"
+          className="max-md:flex-1"
+          onClick={onNext}
+          disabled={!canNext}
+        >
           {nextLabel}
         </Button>
       </div>
