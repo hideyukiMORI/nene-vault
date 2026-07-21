@@ -9,7 +9,6 @@
       "repo": "nene-vault",
       "classes": [
         ".a",
-        ".add",
         ".ar",
         ".arr",
         ".audit-row",
@@ -53,7 +52,6 @@
         ".lang",
         ".layout",
         ".link",
-        ".mod",
         ".no-dot",
         ".out",
         ".pagination",
@@ -71,7 +69,6 @@
         ".row-chev",
         ".seg",
         ".select",
-        ".tag-chg",
         ".tbl",
         ".tbl-cards",
         ".tbl-wrap",

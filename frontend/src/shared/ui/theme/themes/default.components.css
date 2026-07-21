@@ -682,23 +682,6 @@
     .diff-field + .diff-field {
       margin-top: 13px;
     }
-    .tag-chg {
-      font-family: var(--font-sans);
-      font-size: 9px;
-      letter-spacing: 0.06em;
-      font-weight: 700;
-      text-transform: uppercase;
-      padding: 1px 6px;
-      border-radius: var(--radius-full);
-    }
-    .tag-chg.add {
-      background: var(--color-success-soft);
-      color: var(--color-success);
-    }
-    .tag-chg.mod {
-      background: var(--color-x-brass-soft);
-      color: var(--color-x-brass-deep);
-    }
     .diff-pair {
       display: grid;
       grid-template-columns: 1fr 22px 1fr;
