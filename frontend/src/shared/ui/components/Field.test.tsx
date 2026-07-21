@@ -14,22 +14,25 @@ describe('Field', () => {
   });
 
   it('shows the required marker when required and a marker is supplied', () => {
-    const { container } = render(
+    render(
       <Field label="Counterparty" required requiredMarker="Required">
         <input />
       </Field>,
     );
-    expect(container.querySelector('.req')).not.toBeNull();
+    // The visible marker renders as the `.req` span carrying the supplied text.
+    expect(screen.getByText('Required')).toHaveClass('req');
     expect(screen.getByText('Required')).toBeInTheDocument();
   });
 
   it('omits the required marker when required but no marker is supplied', () => {
-    const { container } = render(
+    render(
       <Field label="Counterparty" required>
         <input />
       </Field>,
     );
-    expect(container.querySelector('.req')).toBeNull();
+    // required, but no marker supplied → the label renders with no marker text.
+    expect(screen.getByText('Counterparty')).toBeInTheDocument();
+    expect(screen.queryByText('Required')).not.toBeInTheDocument();
   });
 
   it('renders hint text when provided', () => {
@@ -51,12 +54,14 @@ describe('Field', () => {
   });
 
   it('omits hint and error nodes when not provided', () => {
-    const { container } = render(
+    render(
       <Field label="Amount">
         <input />
       </Field>,
     );
-    // Only the label text node; no extra hint/error Text elements
-    expect(container.querySelectorAll('p, span').length).toBeLessThanOrEqual(1);
+    // Neither the hint nor the error text (used in the tests above) is rendered.
+    expect(screen.getByText('Amount')).toBeInTheDocument();
+    expect(screen.queryByText('Leave blank if not stated')).not.toBeInTheDocument();
+    expect(screen.queryByText('This field is required.')).not.toBeInTheDocument();
   });
 });

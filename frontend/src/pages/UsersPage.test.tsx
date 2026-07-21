@@ -5,7 +5,7 @@ import { MemoryRouter } from 'react-router-dom';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { renderWithProviders } from '@tests/render/render-with-providers';
 import { server } from '@tests/msw/server';
-import { authStore } from '@/entities/auth';
+import { authStore } from '@/shared/api/auth-session';
 import { UsersPage } from './UsersPage';
 
 // jsdom resolves to the 'en' catalog (navigator.language = 'en-US').

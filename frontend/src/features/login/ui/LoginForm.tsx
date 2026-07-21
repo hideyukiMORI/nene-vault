@@ -1,4 +1,4 @@
-import type { AuthSession } from '@/entities/auth';
+import type { AuthSession } from '@/shared/api/auth-session';
 import { SUPPORTED_LOCALES, type SupportedLocale } from '@/shared/i18n/locales';
 import { useTranslation } from '@/shared/i18n/use-translation';
 import { BrandMark } from '@/shared/ui/primitives/BrandMark';

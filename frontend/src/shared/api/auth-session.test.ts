@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it } from 'vitest';
-import { authStore } from './model';
+import { authStore } from './auth-session';
 
 const SESSION = {
   token: 'test-jwt',

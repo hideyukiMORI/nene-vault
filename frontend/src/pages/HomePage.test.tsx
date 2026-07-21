@@ -1,7 +1,7 @@
 import { screen } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import { afterEach, describe, expect, it } from 'vitest';
-import { authStore } from '@/entities/auth';
+import { authStore } from '@/shared/api/auth-session';
 import { renderWithProviders } from '@tests/render/render-with-providers';
 import { HomePage } from './HomePage';
 
@@ -27,10 +27,12 @@ function renderHome() {
 describe('HomePage quick-access cards (#182 — role-gated like the rail)', () => {
   it('shows a viewer only the documents card, not admin-only actions', () => {
     authStore.setSession({ ...baseSession, role: 'viewer' });
-    const { container } = renderHome();
+    renderHome();
 
-    // Quick-access cards use the `.qlink` class (distinct from `.rail-link`).
-    expect(container.querySelectorAll('.qlink')).toHaveLength(1);
+    // Quick-access cards are buttons carrying the `.qlink` class (distinct from
+    // the rail's `.rail-link`); count them among the rendered buttons.
+    const cards = screen.getAllByRole('button').filter((b) => b.classList.contains('qlink'));
+    expect(cards).toHaveLength(1);
     // Admin-only card labels appear nowhere on a viewer's home (rail is gated too).
     expect(screen.queryByText('監査ログ')).toBeNull();
     expect(screen.queryByText('保管設定')).toBeNull();
@@ -39,8 +41,9 @@ describe('HomePage quick-access cards (#182 — role-gated like the rail)', () =
 
   it('shows an admin all four quick-access cards', () => {
     authStore.setSession({ ...baseSession, role: 'admin' });
-    const { container } = renderHome();
+    renderHome();
 
-    expect(container.querySelectorAll('.qlink')).toHaveLength(4);
+    const cards = screen.getAllByRole('button').filter((b) => b.classList.contains('qlink'));
+    expect(cards).toHaveLength(4);
   });
 });

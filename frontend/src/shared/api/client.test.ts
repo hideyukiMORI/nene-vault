@@ -2,7 +2,7 @@ import { http, HttpResponse } from 'msw';
 import { describe, expect, it } from 'vitest';
 import { server } from '@tests/msw/server';
 import { problemDetails } from '@tests/msw/fixtures';
-import { authStore } from '@/entities/auth';
+import { authStore } from '@/shared/api/auth-session';
 import { apiClient } from './client';
 import { AppError } from './errors';
 

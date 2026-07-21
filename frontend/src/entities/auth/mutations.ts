@@ -2,7 +2,7 @@ import { useMutation, type UseMutationResult } from '@tanstack/react-query';
 import { apiClient } from '@/shared/api/client';
 import type { AppError } from '@/shared/api/errors';
 import type { LoginRequest, LoginResponse } from './api-types';
-import { authStore, type AuthSession } from './model';
+import { authStore, type AuthSession } from '@/shared/api/auth-session';
 
 function toSession(response: LoginResponse): AuthSession {
   return {

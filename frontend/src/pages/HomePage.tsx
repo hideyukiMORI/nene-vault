@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { authStore } from '@/entities/auth';
+import { authStore } from '@/shared/api/auth-session';
 import { useTranslation } from '@/shared/i18n/use-translation';
 import type { MessageKey } from '@/shared/i18n/catalogs';
 import { roleHasCapability, type Capability } from '@/shared/auth/capabilities';

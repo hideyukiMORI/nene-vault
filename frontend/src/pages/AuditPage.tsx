@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuditEvents, diffAuditEvent, formatAuditValue } from '@/entities/audit';
 import type { ListAuditEventsParams, AuditEvent, AuditDiffField } from '@/entities/audit';
-import { authStore } from '@/entities/auth';
+import { authStore } from '@/shared/api/auth-session';
 import { useTranslation } from '@/shared/i18n/use-translation';
 import { formatDateTime } from '@/shared/lib/format';
 import { AppChrome } from '@/features/app-chrome';

@@ -6,7 +6,7 @@ import { beforeEach, describe, expect, it } from 'vitest';
 import { renderWithProviders } from '@tests/render/render-with-providers';
 import { DOCUMENT_ID, mockAuditEventList } from '@tests/msw/fixtures';
 import { server } from '@tests/msw/server';
-import { authStore } from '@/entities/auth';
+import { authStore } from '@/shared/api/auth-session';
 import { AuditPage } from './AuditPage';
 
 // Default locale in jsdom resolves to 'en' (navigator.language = 'en-US'),
@@ -50,11 +50,13 @@ describe('AuditPage', () => {
   it('opens the detail dialog with the created values when a row is activated', async () => {
     renderPage();
 
-    const idCell = await screen.findByText(entityCell);
-    const row = idCell.closest('[role="button"]');
-    expect(row).not.toBeNull();
+    // The row is a role=button whose accessible name is built from its cell
+    // text, so it includes the entity type/id (ignoring incidental whitespace).
+    const row = await screen.findByRole('button', {
+      name: (name) => name.replace(/\s/g, '').includes(ENTITY_TEXT),
+    });
 
-    await userEvent.click(row as HTMLElement);
+    await userEvent.click(row);
 
     const dialog = await screen.findByRole('dialog');
     // before_json is null → a creation event → the after snapshot is shown.

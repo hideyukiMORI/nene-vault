@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useDocumentById, fetchDocumentBlob, useOcrSuggest } from '@/entities/document';
 import { useDocumentHistory } from '@/entities/audit';
-import { authStore } from '@/entities/auth';
+import { authStore } from '@/shared/api/auth-session';
 import {
   VoidModal,
   RestoreModal,
