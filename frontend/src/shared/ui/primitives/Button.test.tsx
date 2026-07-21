@@ -37,10 +37,32 @@ describe('Button', () => {
     expect(screen.getByRole('button')).toHaveAttribute('type', 'submit');
   });
 
-  it.each(['primary', 'secondary', 'danger'] as const)(
+  it.each(['primary', 'secondary', 'danger', 'ghost'] as const)(
     'renders variant "%s" without throwing',
     (variant) => {
       expect(() => render(<Button variant={variant}>X</Button>)).not.toThrow();
     },
   );
+
+  // Regression guard for the VARIANT_UTILS map form (判例#35): the variant
+  // resolves to colour utilities (not a `.btn-*` component class), so assert the
+  // utilities are present — a className-only check on the retired class could not
+  // guard the paint.
+  it.each([
+    ['primary', 'bg-accent'],
+    ['secondary', 'bg-surface-raised'],
+    ['danger', 'bg-danger'],
+    ['ghost', 'bg-transparent'],
+  ] as const)('maps variant "%s" to its colour utility', (variant, util) => {
+    render(<Button variant={variant}>X</Button>);
+    expect(screen.getByRole('button')).toHaveClass(util);
+  });
+
+  it.each([
+    ['md', 'py-2'],
+    ['sm', 'py-1.25'],
+  ] as const)('maps size "%s" to its padding utility', (size, util) => {
+    render(<Button size={size}>X</Button>);
+    expect(screen.getByRole('button')).toHaveClass(util);
+  });
 });
