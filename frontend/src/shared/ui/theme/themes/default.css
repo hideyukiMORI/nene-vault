@@ -93,6 +93,7 @@
   --text-2xs: 0.6875rem;
 
   /* ---- geometry ---- */
+  --radius-px: 1px;
   --radius-sm: 4px;
   --radius-md: 6px;
   --radius-lg: 8px;
@@ -130,6 +131,7 @@
   /* ---- letter-spacing (tracking) ---- */
   --tracking-eyebrow: 0.16em;
   --tracking-tight: -0.005em;
+  --tracking-title: -0.01em;
 
   /* ---- prose width ---- */
   --container-lede: 60ch;

@@ -68,11 +68,13 @@ export function ExportPage() {
       userRole={session?.role}
       width="narrow"
     >
-      <div className="titlebar">
+      <div className="flex flex-col gap-1.5">
         <span className="text-2xs tracking-eyebrow uppercase text-x-brass-deep font-semibold">
           {t('navigation.export')}
         </span>
-        <h1 className="page-title">{t('export.title')}</h1>
+        <h1 className="text-h1 font-semibold tracking-title text-x-ink-deep">
+          {t('export.title')}
+        </h1>
         <p className="text-text-muted text-sm max-w-lede">{t('export.description')}</p>
       </div>
 

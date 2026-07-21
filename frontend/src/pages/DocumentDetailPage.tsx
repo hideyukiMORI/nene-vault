@@ -92,12 +92,14 @@ export function DocumentDetailPage() {
 
       {doc !== undefined && (
         <>
-          <div className="page-head">
-            <div className="titlebar">
+          <div className="flex items-end justify-between gap-4 max-md:flex-col max-md:items-start max-md:gap-3.5">
+            <div className="flex flex-col gap-1.5">
               <span className="text-2xs tracking-eyebrow uppercase text-x-brass-deep font-semibold">
                 {t('document.detail.title')}
               </span>
-              <h1 className="page-title">{doc.counterparty_name}</h1>
+              <h1 className="text-h1 font-semibold tracking-title text-x-ink-deep">
+                {doc.counterparty_name}
+              </h1>
               <div className="flex items-center gap-2 flex-wrap">
                 <span
                   className={doc.status === 'voided' ? 'badge badge-danger' : 'badge badge-success'}
@@ -169,7 +171,7 @@ export function DocumentDetailPage() {
 
           <section className="card p-4.5">
             <div className="flex items-center gap-2 mb-stack-md">
-              <span className="tick" />
+              <span className="inline-block w-0.75 h-3.75 bg-x-brass rounded-px flex-none" />
               <h2 className="text-h2 font-semibold tracking-tight text-x-ink-deep flex items-center gap-2.25">
                 {t('document.detail.metadata_section')}
               </h2>
@@ -218,7 +220,7 @@ export function DocumentDetailPage() {
 
           <section className="card p-4.5">
             <div className="flex items-center gap-2 mb-stack-md">
-              <span className="tick" />
+              <span className="inline-block w-0.75 h-3.75 bg-x-brass rounded-px flex-none" />
               <h2 className="text-h2 font-semibold tracking-tight text-x-ink-deep flex items-center gap-2.25">
                 {t('document.detail.file_section')}
               </h2>
@@ -237,7 +239,7 @@ export function DocumentDetailPage() {
 
           <section className="card p-4.5">
             <div className="flex items-center gap-2 mb-stack-md">
-              <span className="tick" />
+              <span className="inline-block w-0.75 h-3.75 bg-x-brass rounded-px flex-none" />
               <h2 className="text-h2 font-semibold tracking-tight text-x-ink-deep flex items-center gap-2.25">
                 {t('document.history.title')}
               </h2>

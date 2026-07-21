@@ -175,12 +175,14 @@ export function UsersPage() {
 
   return (
     <AppChrome onLogout={handleLogout} userEmail={session?.email} userRole={session?.role}>
-      <div className="page-head">
-        <div className="titlebar">
+      <div className="flex items-end justify-between gap-4 max-md:flex-col max-md:items-start max-md:gap-3.5">
+        <div className="flex flex-col gap-1.5">
           <span className="text-2xs tracking-eyebrow uppercase text-x-brass-deep font-semibold">
             {t('navigation.group_admin')}
           </span>
-          <h1 className="page-title">{t('user.list.title')}</h1>
+          <h1 className="text-h1 font-semibold tracking-title text-x-ink-deep">
+            {t('user.list.title')}
+          </h1>
         </div>
         <Button
           variant="primary"

@@ -117,17 +117,17 @@ export function HomePage() {
 
   return (
     <AppChrome onLogout={handleLogout} userEmail={session?.email} userRole={session?.role}>
-      <div className="titlebar">
+      <div className="flex flex-col gap-1.5">
         <span className="text-2xs tracking-eyebrow uppercase text-x-brass-deep font-semibold">
           {t('home.eyebrow')}
         </span>
-        <h1 className="page-title">{t('home.title')}</h1>
+        <h1 className="text-h1 font-semibold tracking-title text-x-ink-deep">{t('home.title')}</h1>
         <p className="text-text-muted text-sm max-w-lede">{t('home.lede')}</p>
       </div>
 
       <div>
         <div className="flex items-center gap-2 mb-stack-sm">
-          <span className="tick" />
+          <span className="inline-block w-0.75 h-3.75 bg-x-brass rounded-px flex-none" />
           <h2 className="text-h2 font-semibold tracking-tight text-x-ink-deep flex items-center gap-2.25">
             {t('home.quick_access')}
           </h2>
