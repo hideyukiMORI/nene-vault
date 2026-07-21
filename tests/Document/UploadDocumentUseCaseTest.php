@@ -82,6 +82,55 @@ final class UploadDocumentUseCaseTest extends TestCase
         $useCase->execute($this->input(mimeType: 'application/zip'));
     }
 
+    public function test_rejects_executable_spoofed_as_pdf(): void
+    {
+        // QA VLT-B7-01: an .exe whose client-declared media type is
+        // application/pdf must be rejected by magic-byte content sniffing, even
+        // though the declaration alone passes the allowlist.
+        $useCase = $this->makeUseCase();
+
+        $this->expectException(MimeTypeNotAllowedException::class);
+        $this->expectExceptionMessage('does not match the file content');
+
+        $useCase->execute($this->input(
+            mimeType: 'application/pdf',
+            content: "MZ\x90\x00\x03fake-exe-bytes",
+        ));
+    }
+
+    public function test_rejects_svg_spoofed_as_png(): void
+    {
+        // An SVG (an XSS vector) declared image/png is rejected: its bytes do not
+        // match the PNG signature.
+        $useCase = $this->makeUseCase();
+
+        $this->expectException(MimeTypeNotAllowedException::class);
+
+        $useCase->execute($this->input(
+            mimeType: 'image/png',
+            content: '<svg xmlns="http://www.w3.org/2000/svg"><script>alert(1)</script></svg>',
+        ));
+    }
+
+    public function test_accepts_genuine_jpeg(): void
+    {
+        // Regression: real JPEG/PNG (matching magic bytes) still upload.
+        $useCase = $this->makeUseCase();
+
+        $output = $useCase->execute($this->input(mimeType: 'image/jpeg'));
+
+        $this->assertSame('active', $output->document->status);
+    }
+
+    public function test_accepts_genuine_png(): void
+    {
+        $useCase = $this->makeUseCase();
+
+        $output = $useCase->execute($this->input(mimeType: 'image/png'));
+
+        $this->assertSame('active', $output->document->status);
+    }
+
     public function test_rejects_oversized_file(): void
     {
         $useCase = $this->makeUseCase();
@@ -160,7 +209,31 @@ final class UploadDocumentUseCaseTest extends TestCase
         );
     }
 
-    /** @param list<string> $tags */
+    /** Magic-byte headers for the accepted formats. */
+    private const PDF_BYTES = "%PDF-1.4\n%%EOF\n";
+    private const JPEG_BYTES = "\xFF\xD8\xFF\xE0hello";
+    private const PNG_BYTES = "\x89PNG\r\n\x1A\nhello";
+
+    /** @var list<string> temp files to unlink after each test */
+    private array $tmpFiles = [];
+
+    protected function tearDown(): void
+    {
+        foreach ($this->tmpFiles as $path) {
+            if (is_file($path)) {
+                unlink($path);
+            }
+        }
+        $this->tmpFiles = [];
+        parent::tearDown();
+    }
+
+    /**
+     * @param list<string> $tags
+     * @param string|null  $content the actual file bytes written to the tmp path.
+     *                              Defaults to a valid header for $mimeType; pass
+     *                              spoofed bytes to exercise content sniffing.
+     */
     private function input(
         string $mimeType = 'application/pdf',
         int $fileSizeBytes = 1024,
@@ -168,10 +241,20 @@ final class UploadDocumentUseCaseTest extends TestCase
         ?int $amountCents = null,
         bool $confirmDuplicate = false,
         array $tags = [],
+        ?string $content = null,
     ): UploadDocumentInput {
+        $bytes = $content ?? match ($mimeType) {
+            'image/jpeg' => self::JPEG_BYTES,
+            'image/png' => self::PNG_BYTES,
+            default => self::PDF_BYTES,
+        };
+        $tmpPath = (string) tempnam(sys_get_temp_dir(), 'vault-upload-test');
+        file_put_contents($tmpPath, $bytes);
+        $this->tmpFiles[] = $tmpPath;
+
         return new UploadDocumentInput(
             organizationId: 1,
-            tmpPath: '/tmp/fake-upload',
+            tmpPath: $tmpPath,
             originalFilename: 'invoice.pdf',
             mimeType: $mimeType,
             fileSizeBytes: $fileSizeBytes,

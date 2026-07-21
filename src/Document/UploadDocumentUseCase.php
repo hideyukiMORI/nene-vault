@@ -41,9 +41,20 @@ final readonly class UploadDocumentUseCase implements UploadDocumentUseCaseInter
 
     public function execute(UploadDocumentInput $input): UploadDocumentOutput
     {
-        // 1. MIME allowlist (compliance §2.1, backend-standards §5)
+        // 1. MIME allowlist (compliance §2.1, backend-standards §5) — the
+        // client-declared media type is a cheap first gate.
         if (!in_array($input->mimeType, self::ALLOWED_MIME_TYPES, true)) {
             throw new MimeTypeNotAllowedException($input->mimeType);
+        }
+
+        // 1b. Content sniffing (QA VLT-B7-01): the declared media type is
+        // client-controlled — an .exe can claim `application/pdf` and slip
+        // through the allowlist above. Verify the actual magic bytes match an
+        // allowed type; reject the declaration/content mismatch at intake rather
+        // than relying only on the download-side nosniff+attachment mitigation.
+        $sniffed = $this->sniffMimeType($input->tmpPath);
+        if ($sniffed === null || !in_array($sniffed, self::ALLOWED_MIME_TYPES, true)) {
+            throw new MimeTypeNotAllowedException($input->mimeType, $sniffed ?? 'unknown');
         }
 
         // 2. Size limit
@@ -166,5 +177,38 @@ final readonly class UploadDocumentUseCase implements UploadDocumentUseCaseInter
             'date_uncertain'    => $doc->dateUncertain,
             'retention_expires_at' => $doc->retentionExpiresAt,
         ];
+    }
+
+    /**
+     * Detect the media type from a file's leading magic bytes, restricted to the
+     * three accepted formats. Returns the detected type, or null when the header
+     * matches none of them (e.g. an executable, SVG, or truncated file). This is
+     * content-based, so it cannot be spoofed by a client-declared media type.
+     */
+    private function sniffMimeType(string $tmpPath): ?string
+    {
+        $handle = @fopen($tmpPath, 'rb');
+        if ($handle === false) {
+            return null;
+        }
+
+        $header = fread($handle, 8);
+        fclose($handle);
+
+        if ($header === false || $header === '') {
+            return null;
+        }
+
+        if (str_starts_with($header, '%PDF-')) {
+            return 'application/pdf';
+        }
+        if (str_starts_with($header, "\xFF\xD8\xFF")) {
+            return 'image/jpeg';
+        }
+        if (str_starts_with($header, "\x89PNG\r\n\x1A\n")) {
+            return 'image/png';
+        }
+
+        return null;
     }
 }
