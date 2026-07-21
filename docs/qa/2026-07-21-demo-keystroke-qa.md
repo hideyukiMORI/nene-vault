@@ -539,6 +539,19 @@ demo org（disposable admin）内で実行。`tests/e2e/live/batch2-write-sha-cs
 
 **⚠️ 発見（VLT-A6-04 乱発耐性・実観測）**: テスト反復で `/demo/standard` を短時間に多数 mint した結果、disposable-org の**seating が遅延/タイムアウト**する挙動を観測（hourly sweep 前の残留 or レート制限）。§4.1 の A6-04 論点を live で裏取り。**節度をもった mint（間隔・回数制限）が要る**＝運用/施主判断枠。QA 実行側は seatAdmin に 30s＋1リトライを実装し、以後ハンマーしない運用。
 
+### バッチ5（目視レーン・guided）2026-07-21
+
+`tests/e2e/live/batch5-visual.spec.ts`。guided 固定org（mint 不要）で観測＋スクショ（`docs/qa/screenshots/`・png は gitignore）。施主/hub 判定用の台帳。
+
+| シナリオ | 結果 | 実測（プログラム観測） |
+|---|---|---|
+| VLT-E2-01 @375px | ✅ | body 横 overflow なし（scrollW 375 = innerW 375）。スクショ e2-375-*.png |
+| VLT-E2-01 @768px | ✅ | body 横 overflow なし（768 = 768）。スクショ e2-768-*.png |
+| VLT-E1-01 OSダーク | ✅ | `prefers-color-scheme: dark` 下でも **light 固定で健全描画**（body 背景 `oklch(0.972 0.007 83)`＝明色・黒つぶれ/未スタイルなし）。トグル不在は仕様（P-2）。スクショ e1-dark-home.png |
+| VLT-F1-01 初見導線 | ✅ | guided 着地→Received Documents で **19件＋検索 affordance** 即到達（売りに迷わず到達）。スクショ f1-documents.png |
+
+**目視レーン所見**: 横スクロール破綻・ダーク OS 崩れ・初見の売り到達性いずれも**営業品質 OK**（プログラム観測）。細部の意匠判定（余白・折返しの美観）はスクショ台帳で施主/hub が最終判断。D4（低速回線の体感）は standard 回復後の admin レーンに回す（loading 状態の目視）。
+
 ### 継続（未実行・machine/human レーン）
 
 - **書込系（demo org 内）**: A1 ライフサイクル（upload→edit→void→restore）・A3 SHA 整合（DL ハッシュ照合）・B1-B5/B7 入力/ファイル異常・B8 CSV 式中和・C2 他org/不在 ID・C3-02 member の「見えるが 403」・C4/C5 セッション。

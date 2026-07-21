@@ -9,3 +9,4 @@
 /.phpstan.cache/
 .phpunit.result.cache
 /storage/vault/
+docs/qa/screenshots/*.png
