@@ -1,5 +1,5 @@
 import { describe, expect, it, beforeEach, afterEach } from 'vitest';
-import { render, screen, act } from '@testing-library/react';
+import { render, screen, fireEvent } from '@testing-library/react';
 import { useContext } from 'react';
 import { I18nProvider } from './i18n-context';
 import { I18nContext } from './context';
@@ -61,9 +61,7 @@ describe('I18nProvider <html lang> sync', () => {
     );
     expect(document.documentElement.lang).toBe('ja');
 
-    act(() => {
-      screen.getByRole('button').click();
-    });
+    fireEvent.click(screen.getByRole('button'));
 
     expect(document.documentElement.lang).toBe('en');
     expect(localStorage.getItem(STORAGE_KEY)).toBe('en');

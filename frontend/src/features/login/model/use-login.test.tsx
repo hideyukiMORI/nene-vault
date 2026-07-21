@@ -1,6 +1,6 @@
 import { act, waitFor } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
-import { authStore } from '@/entities/auth';
+import { authStore } from '@/shared/api/auth-session';
 import { renderHookWithProviders } from '@tests/render/render-with-providers';
 import { useLoginPage } from './use-login';
 

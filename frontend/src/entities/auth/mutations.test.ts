@@ -1,7 +1,7 @@
 import { act, waitFor } from '@testing-library/react';
 import { afterEach, describe, expect, it } from 'vitest';
 import { renderHookWithProviders } from '@tests/render/render-with-providers';
-import { authStore } from './model';
+import { authStore } from '@/shared/api/auth-session';
 import { useLogin } from './mutations';
 
 const VALID = { email: 'admin@example.com', password: 'secret' };

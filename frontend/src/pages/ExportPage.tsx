@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { authStore } from '@/entities/auth';
+import { authStore } from '@/shared/api/auth-session';
 import { useExportDocuments } from '@/entities/document';
 import { useTranslation } from '@/shared/i18n/use-translation';
 import { AppChrome } from '@/features/app-chrome';

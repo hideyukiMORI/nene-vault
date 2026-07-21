@@ -1,7 +1,7 @@
 import { screen } from '@testing-library/react';
 import { act } from 'react';
 import { afterEach, describe, expect, it } from 'vitest';
-import { authStore } from '@/entities/auth';
+import { authStore } from '@/shared/api/auth-session';
 import { renderWithProviders } from '@tests/render/render-with-providers';
 import { AuthGate } from './auth-gate';
 

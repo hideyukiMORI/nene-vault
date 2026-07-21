@@ -1,37 +1,9 @@
-import js from '@eslint/js';
+import nene2 from '@hideyukimori/nene2-standards';
 import eslintConfigPrettier from 'eslint-config-prettier';
-import importPlugin from 'eslint-plugin-import';
-import jsxA11y from 'eslint-plugin-jsx-a11y';
 import reactHooks from 'eslint-plugin-react-hooks';
 import reactRefresh from 'eslint-plugin-react-refresh';
 import globals from 'globals';
-import path from 'node:path';
-import { fileURLToPath } from 'node:url';
 import tseslint from 'typescript-eslint';
-
-const dirname = path.dirname(fileURLToPath(import.meta.url));
-
-// Entity internals that upper layers must reach only through index.ts.
-const entityInternalFiles = [
-  './src/entities/*/api-types.ts',
-  './src/entities/*/mapper.ts',
-  './src/entities/*/queries.ts',
-  './src/entities/*/mutations.ts',
-  './src/entities/*/query-keys.ts',
-  './src/entities/*/ids.ts',
-  './src/entities/*/model.ts',
-  './src/entities/*/enum.ts',
-];
-
-const importZones = [
-  { target: './src/features', from: entityInternalFiles },
-  { target: './src/features', from: './src/shared/api' },
-  { target: './src/pages', from: entityInternalFiles },
-  { target: './src/pages', from: './src/shared/api' },
-  { target: './src/shared/ui', from: './src/entities' },
-  { target: './src/shared/ui', from: './src/features' },
-  { target: './src/shared/ui', from: './src/shared/api' },
-];
 
 export default tseslint.config(
   {
@@ -41,83 +13,100 @@ export default tseslint.config(
       'node_modules',
       'coverage',
       'src/shared/api/schema.gen.ts',
+      // Config/tooling files live outside the typed project; base enables the
+      // typed projectService, which errors on files it can't find in a project.
+      '*.config.ts',
+      'stylelint.config.js',
+      'eslint.config.js',
+      '.storybook/**',
+      '**/*.mjs',
     ],
   },
+  // base enables the typed projectService (auto-discovers tsconfig), so we only
+  // supply browser globals here — no explicit parserOptions.project.
   {
-    extends: [js.configs.recommended, ...tseslint.configs.strictTypeChecked],
     files: ['src/**/*.{ts,tsx}', 'tests/**/*.{ts,tsx}'],
     languageOptions: {
       ecmaVersion: 2023,
       globals: globals.browser,
-      parserOptions: {
-        project: ['./tsconfig.app.json'],
-        tsconfigRootDir: dirname,
-      },
     },
-    plugins: {
-      'react-hooks': reactHooks,
-      'react-refresh': reactRefresh,
-      'jsx-a11y': jsxA11y,
-      import: importPlugin,
-    },
-    settings: {
-      'import/resolver': {
-        typescript: { project: './tsconfig.app.json' },
-      },
-    },
+  },
+  // Shared synthesized form (README canonical order). fsd/api/i18n/testing carry
+  // the FSD boundaries, transport bans, a11y, and testing-library rules that were
+  // previously hand-rolled here. styling uses the no-arg FSD-canonical entry
+  // (src/shared/ui/theme/index.css).
+  ...nene2.base,
+  ...nene2.fsd,
+  ...nene2.api,
+  ...nene2.stylingWith(),
+  ...nene2.i18n,
+  ...nene2.testing,
+  // React hygiene is not part of the fleet form; keep it as a repo-local addition.
+  {
+    files: ['src/**/*.{ts,tsx}'],
+    plugins: { 'react-hooks': reactHooks, 'react-refresh': reactRefresh },
     rules: {
       ...reactHooks.configs.recommended.rules,
       'react-refresh/only-export-components': ['warn', { allowConstantExport: true }],
-      ...jsxA11y.configs.recommended.rules,
-      'import/no-restricted-paths': ['error', { zones: importZones }],
-      'no-restricted-syntax': [
-        'error',
-        {
-          selector: 'JSXAttribute[name.name="className"] Literal[value=/\\[.*\\]/]',
-          message: 'Tailwind arbitrary values are forbidden outside shared/ui/theme.',
-        },
-        {
-          // All network calls must go through the shared API client, which adds
-          // the Authorization + X-Authorization mirror (#118). A raw fetch drops
-          // the mirror and 401s behind the shared-hosting proxy (see #173).
-          selector: "CallExpression[callee.name='fetch']",
-          message:
-            'Do not call fetch() directly — use the shared apiClient (shared/api/client.ts) so the Authorization/X-Authorization headers are sent.',
-        },
-      ],
     },
   },
+
+  // ── Registered exceptions (files×rule off + reason + removal condition) ──
+  // These are the ONLY sanctioned deviations from the synthesized form. Each is
+  // scoped to the exact files, keeps `--max-warnings 0` intact, and names the
+  // condition under which the override is removed.
+
+  // fork A — better-tailwindcss/no-unknown-classes (#281, 判例15型 / 判例21 訂正).
+  // These are true unhomed utility classes, not false positives (the entryPoint
+  // resolves correctly). Per the P2 per-repo shift they are classified by vault's
+  // Lane D `init --scan`: classes the scan admits move to the components allowlist,
+  // the rest are the true remainder that C5 drains (判例7). Until Lane D runs the
+  // rule is scoped off here (kept visible in the Lane D seed report), NOT weakened
+  // globally. Removal: when Lane D scan lands and wires the generated severity
+  // manifest. Phase-B ledger: docs (private) todo/current.md Lane1 note.
   {
-    // The shared API client is the single sanctioned place that calls fetch().
-    files: ['src/shared/api/client.ts'],
-    rules: {
-      'no-restricted-syntax': [
-        'error',
-        {
-          selector: 'JSXAttribute[name.name="className"] Literal[value=/\\[.*\\]/]',
-          message: 'Tailwind arbitrary values are forbidden outside shared/ui/theme.',
-        },
-      ],
-    },
+    files: [
+      'src/features/document-detail/ui/DocumentHistoryTable.tsx',
+      'src/features/document-detail/ui/MetadataEditModal.tsx',
+      'src/features/document-detail/ui/RestoreModal.tsx',
+      'src/features/document-detail/ui/VoidModal.tsx',
+      'src/pages/AuditPage.tsx',
+      'src/pages/ExportPage.tsx',
+      'src/pages/ForbiddenPage.tsx',
+      'src/pages/SettingsPage.tsx',
+      'src/shared/ui/components/Callout.tsx',
+      'src/shared/ui/components/Modal.stories.tsx',
+      'src/shared/ui/primitives/Text.test.tsx',
+    ],
+    rules: { 'better-tailwindcss/no-unknown-classes': 'off' },
   },
+
+  // format.ts — direct Intl usage (判例15, supply-coupled). The api form bans raw
+  // Intl calls outside nene2-i18n's format implementation; vault's format util
+  // predates that supply. Removal: when @hideyukimori/nene2-i18n's format ships
+  // and vault adopts it (I18N-13). Scoped to the one util file.
   {
-    files: ['**/*.test.ts', '**/*.test.tsx', 'tests/**/*.{ts,tsx}'],
-    rules: {
-      '@typescript-eslint/no-unsafe-call': 'off',
-      '@typescript-eslint/no-unsafe-member-access': 'off',
-      '@typescript-eslint/no-unsafe-argument': 'off',
-      '@typescript-eslint/no-unsafe-assignment': 'off',
-      // Test render helpers intentionally export utilities alongside components.
-      'react-refresh/only-export-components': 'off',
-    },
+    files: ['src/shared/lib/format.ts'],
+    rules: { 'no-restricted-syntax': 'off' },
   },
+
+  // i18n-context.tsx — sets documentElement.lang (判例16). The rule allows the
+  // lang attribute only inside the fleet i18n provider; vault's provider IS that
+  // sanctioned place, but the check keys on the fleet package. Removal: fleet#118
+  // (payout-raised) which teaches the rule about product-side providers.
   {
-    files: ['.storybook/**/*.{ts,tsx}', 'vite.config.ts', 'vitest.config.ts'],
-    extends: [js.configs.recommended, ...tseslint.configs.recommended],
-    languageOptions: {
-      ecmaVersion: 2023,
-      globals: { ...globals.browser, ...globals.node },
-    },
+    files: ['src/shared/i18n/i18n-context.tsx'],
+    rules: { 'no-restricted-syntax': 'off' },
   },
+
+  // LanguageSwitcher.tsx — the endonym map (日本語/English) is a hardcoded string
+  // by design (判例19): a language's own name is identical in every UI locale and
+  // is never routed through t(). The user-facing "Language" label is already a
+  // prop (#284). No removal condition — endonyms are a permanent exemption.
+  {
+    files: ['src/shared/ui/components/LanguageSwitcher.tsx'],
+    rules: { 'no-restricted-syntax': 'off' },
+  },
+
   eslintConfigPrettier,
 );

@@ -2,7 +2,8 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import type { BaseSyntheticEvent } from 'react';
 import { useForm, type UseFormRegister } from 'react-hook-form';
 import { z } from 'zod';
-import { useLogin as useLoginMutation, type AuthSession } from '@/entities/auth';
+import { useLogin as useLoginMutation } from '@/entities/auth';
+import type { AuthSession } from '@/shared/api/auth-session';
 import { messageKeyForError } from '@/shared/i18n/map-problem-details';
 import { useTranslation } from '@/shared/i18n/use-translation';
 

@@ -2,7 +2,7 @@ import { screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
 import { renderWithProviders } from '@tests/render/render-with-providers';
-import { authStore } from '@/entities/auth';
+import { authStore } from '@/shared/api/auth-session';
 import { LoginForm } from './LoginForm';
 
 /**
@@ -24,9 +24,8 @@ describe('LoginForm (rendered)', () => {
     await userEvent.type(emailInput as HTMLElement, 'admin@example.com');
 
     // Password field — query by placeholder since type=password has no textbox role
-    const passwordInput = document.querySelector('input[type="password"]');
-    expect(passwordInput).not.toBeNull();
-    await userEvent.type(passwordInput as HTMLElement, 'secret');
+    const passwordInput = screen.getByPlaceholderText(/password|パスワード/i);
+    await userEvent.type(passwordInput, 'secret');
 
     const submit = screen.getByRole('button', { name: /log|ログイン/i });
     await userEvent.click(submit);
@@ -42,10 +41,7 @@ describe('LoginForm (rendered)', () => {
     renderWithProviders(<LoginForm onLoggedIn={onLoggedIn} />);
 
     await userEvent.type(screen.getAllByRole('textbox')[0] as HTMLElement, 'admin@example.com');
-    await userEvent.type(
-      document.querySelector('input[type="password"]') as HTMLElement,
-      'wrong-password',
-    );
+    await userEvent.type(screen.getByPlaceholderText(/password|パスワード/i), 'wrong-password');
     await userEvent.click(screen.getByRole('button', { name: /log|ログイン/i }));
 
     await waitFor(() => {

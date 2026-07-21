@@ -43,7 +43,6 @@
     "zod": "^3.24.1"
   },
   "devDependencies": {
-    "@eslint/js": "^10.0.1",
     "@hideyukimori/nene2-standards": "^1.2.0",
     "@hideyukimori/nene2-tokens": "1.1.0",
     "@playwright/test": "^1.61.1",
@@ -64,7 +63,6 @@
     "eslint-config-prettier": "^10.1.8",
     "eslint-import-resolver-typescript": "^4.4.4",
     "eslint-plugin-import": "^2.32.0",
-    "eslint-plugin-jsx-a11y": "^6.10.2",
     "eslint-plugin-react-hooks": "^7.1.1",
     "eslint-plugin-react-refresh": "^0.5.2",
     "globals": "^17.6.0",

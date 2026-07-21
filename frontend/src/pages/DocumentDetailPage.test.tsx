@@ -6,7 +6,7 @@ import { describe, expect, it, vi } from 'vitest';
 import { renderWithProviders } from '@tests/render/render-with-providers';
 import { DOCUMENT_ID } from '@tests/msw/fixtures';
 import { server } from '@tests/msw/server';
-import { authStore } from '@/entities/auth';
+import { authStore } from '@/shared/api/auth-session';
 import { DocumentDetailPage } from './DocumentDetailPage';
 
 // jsdom does not implement object URLs; the download handler needs them.

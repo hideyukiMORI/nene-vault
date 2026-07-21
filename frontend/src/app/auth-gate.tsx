@@ -1,5 +1,5 @@
 import { useSyncExternalStore, type ReactNode } from 'react';
-import { authStore } from '@/entities/auth';
+import { authStore } from '@/shared/api/auth-session';
 import { LoginForm } from '@/features/login';
 
 const subscribe = (listener: () => void) => authStore.subscribe(listener);

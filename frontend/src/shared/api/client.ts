@@ -5,7 +5,7 @@ import {
   type Nene2ClientError,
   type TokenStore,
 } from '@hideyukimori/nene2-client';
-import { authStore } from '@/entities/auth';
+import { authStore } from '@/shared/api/auth-session';
 import { env } from '@/shared/config/env';
 import { AppError, type ProblemDetails } from '@/shared/api/errors';
 

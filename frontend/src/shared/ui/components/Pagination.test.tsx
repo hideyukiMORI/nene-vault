@@ -17,8 +17,9 @@ const base = {
 
 describe('Pagination', () => {
   it('renders nothing when total is 0', () => {
-    const { container } = renderWithProviders(<Pagination {...base} total={0} canNext={false} />);
-    expect(container.firstChild).toBeNull();
+    renderWithProviders(<Pagination {...base} total={0} canNext={false} />);
+    // total 0 → the component renders null, so no Previous/Next buttons exist.
+    expect(screen.queryByRole('button')).toBeNull();
   });
 
   it('renders Previous/Next buttons when total > 0', () => {

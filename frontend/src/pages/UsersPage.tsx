@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { authStore } from '@/entities/auth';
+import { authStore } from '@/shared/api/auth-session';
 import { useUsers, useCreateUser, useDeleteUser } from '@/entities/user';
 import type { User } from '@/entities/user';
 import { messageKeyForError } from '@/shared/i18n/map-problem-details';
