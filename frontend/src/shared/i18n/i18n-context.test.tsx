@@ -1,27 +1,28 @@
-import { describe, expect, it, beforeEach, afterEach } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
-import { useContext } from 'react';
+import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { I18nProvider } from './i18n-context';
-import { I18nContext } from './context';
+import { useTranslation } from './use-translation';
 
 const STORAGE_KEY = 'nene-vault.locale';
 
+// Probes the shared runtime through vault's public hook: the vault-specific
+// side effects (<html lang> sync + localStorage persist) must survive the
+// nene2-i18n runtime 昇格 (behaviour unchanged).
 function LocaleProbe() {
-  const ctx = useContext(I18nContext);
-  if (ctx === null) throw new Error('no context');
+  const { locale, setLocale } = useTranslation();
   return (
     <button
       type="button"
       onClick={() => {
-        ctx.setLocale(ctx.locale === 'ja' ? 'en' : 'ja');
+        setLocale(locale === 'ja' ? 'en' : 'ja');
       }}
     >
-      {ctx.locale}
+      {locale}
     </button>
   );
 }
 
-describe('I18nProvider <html lang> sync', () => {
+describe('I18nProvider <html lang> sync + persistence', () => {
   beforeEach(() => {
     localStorage.clear();
     document.documentElement.lang = 'ja';
@@ -52,7 +53,7 @@ describe('I18nProvider <html lang> sync', () => {
     expect(document.documentElement.lang).toBe('ja');
   });
 
-  it('updates <html lang> when the locale changes', () => {
+  it('updates <html lang> and persists to localStorage when the locale changes', () => {
     localStorage.setItem(STORAGE_KEY, 'ja');
     render(
       <I18nProvider>
@@ -65,5 +66,6 @@ describe('I18nProvider <html lang> sync', () => {
 
     expect(document.documentElement.lang).toBe('en');
     expect(localStorage.getItem(STORAGE_KEY)).toBe('en');
+    expect(screen.getByRole('button')).toHaveTextContent('en');
   });
 });
