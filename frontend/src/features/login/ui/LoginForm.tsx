@@ -59,7 +59,7 @@ export function LoginForm({ onLoggedIn }: LoginFormProps) {
             />
           </Field>
 
-          {submitError !== null && <p className="field-error">{submitError}</p>}
+          {submitError !== null && <p className="text-2xs text-danger">{submitError}</p>}
 
           <Button type="submit" disabled={isSubmitting} className="w-full">
             {isSubmitting ? t('auth.login.logging_in') : t('auth.login.submit')}
