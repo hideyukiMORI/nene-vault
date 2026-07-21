@@ -87,7 +87,9 @@ export function SettingsPage() {
       width="narrow"
     >
       <div className="titlebar">
-        <span className="eyebrow">{t('navigation.settings')}</span>
+        <span className="text-2xs tracking-eyebrow uppercase text-x-brass-deep font-semibold">
+          {t('navigation.settings')}
+        </span>
         <h1 className="page-title">{t('vault_settings.title')}</h1>
       </div>
 

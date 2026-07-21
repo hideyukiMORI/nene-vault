@@ -42,14 +42,14 @@ export function DocumentTable({ documents, onSelectDocument }: DocumentTableProp
         <tbody>
           {documents.map((doc) => (
             <tr key={doc.id}>
-              <td className="mono" data-label={labels.date}>
+              <td className="font-mono zero-slash" data-label={labels.date}>
                 {formatDate(doc.transaction_date)}
                 {doc.date_uncertain && <span className="text-text-faint"> *</span>}
               </td>
               <td className="cell-title">
                 <span className="pri">{doc.counterparty_name}</span>
               </td>
-              <td className="right tabular-nums mono" data-label={labels.amount}>
+              <td className="right tabular-nums font-mono zero-slash" data-label={labels.amount}>
                 {formatJpy(doc.amount_cents, locale)}
               </td>
               <td data-label={labels.category}>{t(`document.category.${doc.category}`)}</td>
@@ -60,7 +60,7 @@ export function DocumentTable({ documents, onSelectDocument }: DocumentTableProp
                   {t(`document.status.${doc.status}`)}
                 </span>
               </td>
-              <td className="text-text-muted mono" data-label={labels.uploaded}>
+              <td className="text-text-muted font-mono zero-slash" data-label={labels.uploaded}>
                 {doc.uploaded_at.slice(0, 10)}
               </td>
               <td className="right" data-label={labels.actions}>

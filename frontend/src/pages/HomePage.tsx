@@ -118,15 +118,19 @@ export function HomePage() {
   return (
     <AppChrome onLogout={handleLogout} userEmail={session?.email} userRole={session?.role}>
       <div className="titlebar">
-        <span className="eyebrow">{t('home.eyebrow')}</span>
+        <span className="text-2xs tracking-eyebrow uppercase text-x-brass-deep font-semibold">
+          {t('home.eyebrow')}
+        </span>
         <h1 className="page-title">{t('home.title')}</h1>
-        <p className="lede">{t('home.lede')}</p>
+        <p className="text-text-muted text-sm max-w-lede">{t('home.lede')}</p>
       </div>
 
       <div>
         <div className="flex items-center gap-2 mb-stack-sm">
           <span className="tick" />
-          <h2 className="subtitle">{t('home.quick_access')}</h2>
+          <h2 className="text-h2 font-semibold tracking-tight text-x-ink-deep flex items-center gap-2.25">
+            {t('home.quick_access')}
+          </h2>
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           {visibleLinks.map((link) => (

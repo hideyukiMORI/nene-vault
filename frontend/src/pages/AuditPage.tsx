@@ -152,7 +152,7 @@ function AuditDetailDrawer({ event, open, onClose }: DrawerProps) {
           <>
             <div className="drawer-head">
               <div>
-                <div className="eyebrow">
+                <div className="text-2xs tracking-eyebrow uppercase text-x-brass-deep font-semibold mb-1.25">
                   {t('audit_event.detail.record')} #{event.id}
                 </div>
                 <h2>
@@ -174,24 +174,26 @@ function AuditDetailDrawer({ event, open, onClose }: DrawerProps) {
               <dl className="drawer-meta">
                 <div>
                   <dt>{t('audit_event.list.table.actor')}</dt>
-                  <dd className="mono">
+                  <dd className="font-mono zero-slash">
                     {event.actor_user_id !== null ? String(event.actor_user_id) : '—'}
                   </dd>
                 </div>
                 <div>
                   <dt>{t('audit_event.list.table.timestamp')}</dt>
-                  <dd className="mono">{formatDateTime(event.created_at, locale)}</dd>
+                  <dd className="font-mono zero-slash">
+                    {formatDateTime(event.created_at, locale)}
+                  </dd>
                 </div>
                 <div className="col2">
                   <dt>{t('audit_event.detail.entity')}</dt>
-                  <dd className="mono label-xs break-all">
+                  <dd className="font-mono zero-slash label-xs break-all">
                     {event.entity_type}/{event.entity_id}
                   </dd>
                 </div>
               </dl>
 
               <div className="params-head">
-                <span className="subtitle">
+                <span className="text-body font-semibold tracking-tight text-x-ink-deep flex items-center gap-2.25">
                   <span className="tick" />
                   {t('audit_event.detail.params')}{' '}
                   <span className="count">
@@ -302,9 +304,11 @@ export function AuditPage() {
   return (
     <AppChrome onLogout={handleLogout} userEmail={session?.email} userRole={session?.role}>
       <div className="titlebar">
-        <span className="eyebrow">{t('navigation.group_admin')}</span>
+        <span className="text-2xs tracking-eyebrow uppercase text-x-brass-deep font-semibold">
+          {t('navigation.group_admin')}
+        </span>
         <h1 className="page-title">{t('audit_event.list.title')}</h1>
-        <p className="lede">{t('audit_event.list.lede')}</p>
+        <p className="text-text-muted text-sm max-w-lede">{t('audit_event.list.lede')}</p>
       </div>
 
       <div className="card p-4.5 space-y-4">
@@ -388,13 +392,13 @@ export function AuditPage() {
                       <td className="pri">
                         {t(dynamicMessageKey(`audit_event.action.${event.action}`))}
                       </td>
-                      <td className="text-text-muted mono label-xs">
+                      <td className="text-text-muted font-mono zero-slash label-xs">
                         {event.entity_type}/{event.entity_id}
                       </td>
                       <td className="text-text-muted">
                         {event.actor_user_id !== null ? String(event.actor_user_id) : '—'}
                       </td>
-                      <td className="text-text-muted mono">
+                      <td className="text-text-muted font-mono zero-slash">
                         {formatDateTime(event.created_at, locale)}
                       </td>
                       <td>

@@ -69,9 +69,11 @@ export function ExportPage() {
       width="narrow"
     >
       <div className="titlebar">
-        <span className="eyebrow">{t('navigation.export')}</span>
+        <span className="text-2xs tracking-eyebrow uppercase text-x-brass-deep font-semibold">
+          {t('navigation.export')}
+        </span>
         <h1 className="page-title">{t('export.title')}</h1>
-        <p className="lede">{t('export.description')}</p>
+        <p className="text-text-muted text-sm max-w-lede">{t('export.description')}</p>
       </div>
 
       <div className="card p-4.5 space-y-4">

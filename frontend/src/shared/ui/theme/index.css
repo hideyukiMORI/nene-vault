@@ -1,5 +1,12 @@
 @layer theme, base, vendor, legacy, components, utilities;
 @import 'tailwindcss';
+
+/* Custom utility: slashed zero via the low-level OpenType feature (exact parity
+   with the retired `.mono` component class, whose numerals used `'zero' 1`). */
+@utility zero-slash {
+  font-feature-settings: 'zero' 1;
+}
+
 @import './active.css';
 /* NOTE: imported WITHOUT `layer(base)` — this is the canonical form, not a
    deviation. base.css already wraps its rules in `@layer base { … }`, and layer
