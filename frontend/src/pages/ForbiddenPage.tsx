@@ -7,7 +7,7 @@ export function ForbiddenPage() {
   const { t } = useTranslation();
   const navigate = useNavigate();
   return (
-    <div className="center">
+    <div className="min-h-screen flex flex-col page-glow">
       <div className="center-card">
         <div className="head">
           <div className="inline-flex flex-col items-center gap-3">

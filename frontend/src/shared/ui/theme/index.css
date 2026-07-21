@@ -7,6 +7,17 @@
   font-feature-settings: 'zero' 1;
 }
 
+/* Custom utility: the app's page-background glow (exact parity with the retired
+   `.center` block — a radial glow over the base surface). arbitrary gradient は
+   規約⑤で components 禁止 → @utility 化が正道。 */
+@utility page-glow {
+  background: radial-gradient(
+    120% 80% at 50% -10%,
+    var(--color-x-page-glow) 0%,
+    var(--color-surface) 60%
+  );
+}
+
 @import './active.css';
 /* NOTE: imported WITHOUT `layer(base)` — this is the canonical form, not a
    deviation. base.css already wraps its rules in `@layer base { … }`, and layer
