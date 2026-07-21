@@ -156,7 +156,7 @@ function AuditDetailDrawer({ event, open, onClose }: DrawerProps) {
                   {t('audit_event.detail.record')} #{event.id}
                 </div>
                 <h2>
-                  <span className="tick" />
+                  <span className="inline-block w-0.75 h-3.75 bg-x-brass rounded-px flex-none" />
                   <span>{t(dynamicMessageKey(`audit_event.action.${event.action}`))}</span>
                 </h2>
               </div>
@@ -194,7 +194,7 @@ function AuditDetailDrawer({ event, open, onClose }: DrawerProps) {
 
               <div className="params-head">
                 <span className="text-body font-semibold tracking-tight text-x-ink-deep flex items-center gap-2.25">
-                  <span className="tick" />
+                  <span className="inline-block w-0.75 h-3.75 bg-x-brass rounded-px flex-none" />
                   {t('audit_event.detail.params')}{' '}
                   <span className="count">
                     · {t('audit_event.summary.fields', { count: String(fields.length) })}
@@ -303,11 +303,13 @@ export function AuditPage() {
 
   return (
     <AppChrome onLogout={handleLogout} userEmail={session?.email} userRole={session?.role}>
-      <div className="titlebar">
+      <div className="flex flex-col gap-1.5">
         <span className="text-2xs tracking-eyebrow uppercase text-x-brass-deep font-semibold">
           {t('navigation.group_admin')}
         </span>
-        <h1 className="page-title">{t('audit_event.list.title')}</h1>
+        <h1 className="text-h1 font-semibold tracking-title text-x-ink-deep">
+          {t('audit_event.list.title')}
+        </h1>
         <p className="text-text-muted text-sm max-w-lede">{t('audit_event.list.lede')}</p>
       </div>
 
