@@ -27,7 +27,5 @@ export default defineConfig({
     screenshot: 'on',
     // Real network to the live demo; no webServer.
   },
-  projects: [
-    { name: 'chromium', use: { ...devices['Desktop Chrome'] } },
-  ],
+  projects: [{ name: 'chromium', use: { ...devices['Desktop Chrome'] } }],
 });
