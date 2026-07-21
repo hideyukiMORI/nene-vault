@@ -220,7 +220,9 @@ export function AppShell({
           />
           <div>
             <div className="brand-name">NeNe Vault</div>
-            <div className="brand-sub">Document Archive</div>
+            <div className="text-3xs tracking-brand text-x-brass uppercase mt-0.5 font-medium">
+              Document Archive
+            </div>
           </div>
         </div>
 
@@ -276,7 +278,7 @@ export function AppShell({
             ) : (
               <>
                 <span>{navLabels.home}</span>
-                <span className="sep">/</span>
+                <span className="text-text-faint">/</span>
                 <b>{leafLabel}</b>
               </>
             )}

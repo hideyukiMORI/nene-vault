@@ -70,14 +70,6 @@
       letter-spacing: 0.01em;
       white-space: nowrap;
     }
-    .brand-sub {
-      font-size: 9px;
-      letter-spacing: 0.22em;
-      color: var(--color-x-brass);
-      text-transform: uppercase;
-      margin-top: 2px;
-      font-weight: 500;
-    }
     .rail-nav {
       padding: 14px 12px;
       display: flex;
@@ -208,9 +200,6 @@
       font-size: var(--text-sm);
       color: var(--color-text-muted);
       min-width: 0;
-    }
-    .crumbs .sep {
-      color: var(--color-text-faint);
     }
     .crumbs b {
       color: var(--color-x-ink-deep);
@@ -365,12 +354,6 @@
       font-size: var(--text-xs);
       color: var(--color-text-muted);
       font-weight: 500;
-    }
-    .field-label .req {
-      color: var(--color-danger);
-      margin-left: 6px;
-      font-size: var(--text-2xs);
-      font-weight: 600;
     }
     .input,
     .select,
@@ -920,10 +903,6 @@
       justify-content: space-between;
       gap: 12px;
       margin-bottom: 14px;
-    }
-    .params-head .count {
-      font-size: var(--text-2xs);
-      color: var(--color-text-faint);
     }
     .seg {
       display: inline-flex;

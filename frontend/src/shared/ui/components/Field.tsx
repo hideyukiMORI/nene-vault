@@ -36,7 +36,7 @@ export function Field({
       <label className="field-label">
         {label}
         {required && requiredMarker !== undefined && requiredMarker !== null && (
-          <span className="req">{requiredMarker}</span>
+          <span className="text-danger ml-1.5 text-2xs font-semibold">{requiredMarker}</span>
         )}
       </label>
       {children}

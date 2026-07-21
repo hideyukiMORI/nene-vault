@@ -204,7 +204,7 @@ function AuditDetailDrawer({ event, open, onClose }: DrawerProps) {
                 <span className="text-body font-semibold tracking-tight text-x-ink-deep flex items-center gap-2.25">
                   <span className="inline-block w-0.75 h-3.75 bg-x-brass rounded-px flex-none" />
                   {t('audit_event.detail.params')}{' '}
-                  <span className="count">
+                  <span className="text-2xs text-text-faint">
                     · {t('audit_event.summary.fields', { count: String(fields.length) })}
                   </span>
                 </span>

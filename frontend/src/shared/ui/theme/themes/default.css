@@ -90,6 +90,7 @@
   --text-body: 0.875rem;
   --text-sm: 0.8125rem;
   --text-xs: 0.75rem;
+  --text-3xs: 0.5625rem;
   --text-2xs: 0.6875rem;
 
   /* ---- geometry ---- */
@@ -133,6 +134,7 @@
   --tracking-tight: -0.005em;
   --tracking-title: -0.01em;
   --tracking-label: 0.06em;
+  --tracking-brand: 0.22em;
 
   /* ---- line-height (leading) ---- */
   --leading-diff: 1.55;
