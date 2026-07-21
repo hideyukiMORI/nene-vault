@@ -1,0 +1,9 @@
+{
+  "_comment": "Frozen coverage floor (fleet T1 ratchet, Issue #277; payout #241 型). Shrink-only: coverage-ratchet.mjs fails CI if any metric drops below these values. Raise these numbers when coverage improves; never lower them. Regenerate the measurement with `npm run coverage`.",
+  "metrics": {
+    "statements": 74.93,
+    "branches": 68.47,
+    "functions": 67.3,
+    "lines": 75.6
+  }
+}
