@@ -29,4 +29,13 @@ describe('Text', () => {
     render(<Text className="text-heading-md">Title</Text>);
     expect(screen.getByText('Title')).toHaveClass('text-heading-md');
   });
+
+  // Regression (#313): the muted tone mapped to the drained `.muted` component
+  // class (removed in drain #2) — assert it now carries the utility form.
+  it('maps the muted tone to the text-text-muted utility, not the drained .muted', () => {
+    render(<Text tone="muted">Quiet</Text>);
+    const el = screen.getByText('Quiet');
+    expect(el).toHaveClass('text-text-muted');
+    expect(el).not.toHaveClass('muted');
+  });
 });

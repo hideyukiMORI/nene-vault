@@ -9,7 +9,7 @@ export interface TextProps {
 
 const TONE_CLASS: Record<NonNullable<TextProps['tone']>, string> = {
   primary: '',
-  muted: 'muted',
+  muted: 'text-text-muted',
   danger: 'danger',
   success: 'success',
 };
