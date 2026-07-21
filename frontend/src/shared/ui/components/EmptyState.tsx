@@ -9,5 +9,9 @@ export interface EmptyStateProps {
  * styled by the design-system `.empty-state` block.
  */
 export function EmptyState({ children }: EmptyStateProps) {
-  return <div className="empty-state">{children}</div>;
+  return (
+    <div className="flex items-center justify-center py-12 px-6 text-text-muted text-sm">
+      {children}
+    </div>
+  );
 }

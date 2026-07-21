@@ -208,7 +208,10 @@ export function DocumentDetailPage() {
                   <dt>{t('document.metadata.tags')}</dt>
                   <dd className="flex items-center gap-2 flex-wrap">
                     {doc.tags.map((tag) => (
-                      <span key={tag} className="tag">
+                      <span
+                        key={tag}
+                        className="inline-flex rounded-sm bg-surface-overlay border border-x-line-mid px-2.25 py-0.75 text-2xs text-text-muted"
+                      >
                         {tag}
                       </span>
                     ))}

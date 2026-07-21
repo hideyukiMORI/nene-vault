@@ -178,7 +178,7 @@ function AuditDetailDrawer({ event, open, onClose }: DrawerProps) {
               </button>
             </div>
 
-            <div className="drawer-body">
+            <div className="overflow-auto flex-1 pt-5 px-5.5 pb-7">
               <dl className="drawer-meta">
                 <div>
                   <dt>{t('audit_event.list.table.actor')}</dt>

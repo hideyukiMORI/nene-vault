@@ -23,7 +23,7 @@ export function RestoreModal({ documentId, onClose }: RestoreModalProps) {
       onClose={onClose}
       closeLabel={t('common.buttons.close')}
     >
-      <div className="modal-body space-y-4">
+      <div className="p-5.5 space-y-4">
         <p className="text-text-muted body-sm">{t('document.restore.description')}</p>
         {submitError !== null && <p className="text-2xs text-danger">{t(submitError)}</p>}
         <div className="flex items-center justify-end gap-2 max-md:flex-col-reverse max-md:items-stretch max-md:gap-2.5">
