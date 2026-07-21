@@ -84,21 +84,27 @@ test('VLT-B4-01: a <script> counterparty is escaped, not executed (XSS)', async 
   expect(alertFired, 'no script executed').toBe(false);
 });
 
-test('VLT-B7-01: a non-PDF disguised with an application/pdf client MIME (finding)', async () => {
-  await gotoDocuments(page);
+test('VLT-B7-01: a non-PDF disguised with an application/pdf client MIME (finding)', async ({ browser }) => {
+  // Own context (not the shared serial page) so a stuck modal from a prior test
+  // cannot block this upload — this test drives its own gentle admin org.
+  const ctx = await browser.newContext({ locale: 'en-US' });
+  const p = await ctx.newPage();
+  await seatAdmin(p);
+  await gotoDocuments(p);
   // .exe bytes, but the browser reports application/pdf (client-trusted MIME).
   const exeBytes = Buffer.from('MZ\x90\x00\x03fake-exe-bytes');
-  await uploadDoc(page, {
+  await uploadDoc(p, {
     bytes: exeBytes,
     filename: 'payload.exe',
     mimeType: 'application/pdf',
     counterparty: 'MimeSpoof KK',
   });
-  await page.waitForTimeout(1500);
-  const listed = await page.getByText('MimeSpoof KK').count();
-  const modalText = (await page.locator('.modal').innerText().catch(() => '')).toLowerCase();
+  await p.waitForTimeout(1500);
+  const listed = await p.getByText('MimeSpoof KK').count();
+  const modalText = (await p.locator('.modal').innerText().catch(() => '')).toLowerCase();
   // Record the observed outcome: server MIME is client-reported (no content
   // sniffing) → a spoofed application/pdf is expected to be accepted (finding).
   console.log('B7-01 spoofed listed?', listed > 0, 'modal error?', modalText.slice(0, 120));
   expect(listed > 0 || modalText.length > 0, 'upload resolved (accepted or errored)').toBeTruthy();
+  await ctx.close();
 });
