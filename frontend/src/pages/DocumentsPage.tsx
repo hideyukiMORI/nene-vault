@@ -4,7 +4,7 @@ import { useDocumentSearch, DocumentSearchForm, DocumentTable } from '@/features
 import { DocumentUploadModal } from '@/features/document-upload';
 import { authStore } from '@/entities/auth';
 import { useTranslation } from '@/shared/i18n/use-translation';
-import { AppChrome } from '@/widgets/app-chrome/AppChrome';
+import { AppChrome } from '@/features/app-chrome';
 import { Button } from '@/shared/ui/primitives/Button';
 import { Callout } from '@/shared/ui/components/Callout';
 import { EmptyState } from '@/shared/ui/components/EmptyState';

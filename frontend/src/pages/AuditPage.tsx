@@ -6,7 +6,7 @@ import type { ListAuditEventsParams, AuditEvent, AuditDiffField } from '@/entiti
 import { authStore } from '@/entities/auth';
 import { useTranslation } from '@/shared/i18n/use-translation';
 import { formatDateTime } from '@/shared/lib/format';
-import { AppChrome } from '@/widgets/app-chrome/AppChrome';
+import { AppChrome } from '@/features/app-chrome';
 import { Button } from '@/shared/ui/primitives/Button';
 import { Callout } from '@/shared/ui/components/Callout';
 import { EmptyState } from '@/shared/ui/components/EmptyState';

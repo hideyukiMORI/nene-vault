@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { authStore } from '@/entities/auth';
 import { useExportDocuments } from '@/entities/document';
 import { useTranslation } from '@/shared/i18n/use-translation';
-import { AppChrome } from '@/widgets/app-chrome/AppChrome';
+import { AppChrome } from '@/features/app-chrome';
 import { Button } from '@/shared/ui/primitives/Button';
 import { Checkbox } from '@/shared/ui/primitives/Checkbox';
 import { Field } from '@/shared/ui/components/Field';

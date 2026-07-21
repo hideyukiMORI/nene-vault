@@ -4,7 +4,7 @@ import { authStore } from '@/entities/auth';
 import { useTranslation } from '@/shared/i18n/use-translation';
 import type { MessageKey } from '@/shared/i18n/catalogs';
 import { roleHasCapability, type Capability } from '@/shared/auth/capabilities';
-import { AppChrome } from '@/widgets/app-chrome/AppChrome';
+import { AppChrome } from '@/features/app-chrome';
 
 interface QuickLink {
   to: string;
