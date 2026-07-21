@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace NeneVault\Tests\Document;
 
 use NeneVault\Tests\Support\ApiTestCase;
+use Nyholm\Psr7Server\ServerRequestCreator;
 
 /**
  * Version download and history boundary tests: wrong IDs, tenant isolation,
@@ -55,6 +56,54 @@ final class DocumentVersionBoundaryTest extends ApiTestCase
         );
 
         $this->assertStringContainsString('attachment', $resp->getHeaderLine('Content-Disposition'));
+    }
+
+    public function test_download_content_disposition_rfc5987_for_japanese_filename(): void
+    {
+        // QA VLT-B7-03: a Japanese filename must be carried via RFC 5987
+        // `filename*=UTF-8''…` (percent-encoded), with an ASCII `filename=`
+        // fallback — not emitted as raw bytes that garble in the header.
+        $handler = $this->handler();
+        $psr17   = $this->psr17();
+        $tmp     = $this->makeTempPdf('jp-name');
+
+        $file = $psr17->createUploadedFile(
+            $psr17->createStreamFromFile($tmp),
+            (int) filesize($tmp),
+            UPLOAD_ERR_OK,
+            '請求書_4月.pdf',
+            'application/pdf',
+        );
+        $creator = new ServerRequestCreator($psr17, $psr17, $psr17, $psr17);
+        $up = $handler->handle(
+            $creator->fromArrays(
+                server: ['REQUEST_METHOD' => 'POST', 'REQUEST_URI' => '/admin/vault/documents'],
+                headers: ['Host' => 'localhost', 'Authorization' => 'Bearer ' . self::$adminToken],
+            )
+                ->withUploadedFiles(['file' => $file])
+                ->withParsedBody([
+                    'counterparty_name' => 'JpName',
+                    'category'          => 'invoice_received',
+                    'transaction_date'  => '2026-01-01',
+                ]),
+        );
+        $this->assertSame(201, $up->getStatusCode(), (string) $up->getBody());
+        @unlink($tmp);
+        $docId = (string) json_decode((string) $up->getBody(), true)['id'];
+
+        [$docId, $versionId] = $this->getVersionId($handler, $docId);
+        $resp = $handler->handle(
+            $this->request('GET', "/admin/vault/documents/{$docId}/versions/{$versionId}/download", self::$adminToken),
+        );
+
+        $cd = $resp->getHeaderLine('Content-Disposition');
+        // RFC 5987 percent-encoding of the UTF-8 name (請 = %E8%AB%8B).
+        $this->assertStringContainsString("filename*=UTF-8''", $cd);
+        $this->assertStringContainsString('%E8%AB%8B', $cd);
+        // ASCII fallback present (non-ASCII replaced with '_').
+        $this->assertMatchesRegularExpression('/filename="[^"]*_[^"]*"/', $cd);
+        // Header-injection safety: no raw CR/LF/quote leakage.
+        $this->assertStringNotContainsString("\n", $cd);
     }
 
     public function test_download_unknown_version_returns_404(): void
