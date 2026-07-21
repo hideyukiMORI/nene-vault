@@ -219,7 +219,9 @@ export function AppShell({
             title="NeNe Vault"
           />
           <div>
-            <div className="brand-name">NeNe Vault</div>
+            <div className="font-serif text-brand font-semibold text-x-rail-ink leading-brand tracking-wordmark whitespace-nowrap">
+              NeNe Vault
+            </div>
             <div className="text-3xs tracking-brand text-x-brass uppercase mt-0.5 font-medium">
               Document Archive
             </div>

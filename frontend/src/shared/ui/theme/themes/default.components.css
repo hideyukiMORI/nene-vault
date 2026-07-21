@@ -61,15 +61,6 @@
       padding: 20px 18px 18px;
       border-bottom: 1px solid var(--color-x-rail-line);
     }
-    .brand-name {
-      font-family: var(--font-serif);
-      font-size: 1.18rem;
-      font-weight: 600;
-      color: var(--color-x-rail-ink);
-      line-height: 1.05;
-      letter-spacing: 0.01em;
-      white-space: nowrap;
-    }
     .rail-nav {
       padding: 14px 12px;
       display: flex;
@@ -640,10 +631,6 @@
     .center-card .head {
       padding: 30px 30px 4px;
       text-align: center;
-    }
-    :where(.center-card) .head .brand-name {
-      color: var(--color-x-ink-deep);
-      font-size: 1.5rem;
     }
     .center-card .body {
       padding: 24px 30px 30px;

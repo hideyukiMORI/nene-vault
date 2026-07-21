@@ -33,7 +33,7 @@ export function LoginForm({ onLoggedIn }: LoginFormProps) {
         <div className="head">
           <div className="inline-flex flex-col items-center gap-3">
             <BrandMark size={46} className="text-x-seal" title="NeNe Vault" />
-            <div className="brand-name">
+            <div className="font-serif text-2xl font-semibold text-x-ink-deep leading-brand tracking-wordmark whitespace-nowrap">
               NeNe <span className="text-x-brass">Vault</span>
             </div>
           </div>
