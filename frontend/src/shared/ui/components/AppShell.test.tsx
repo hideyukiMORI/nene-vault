@@ -146,4 +146,16 @@ describe('AppShell interactions', () => {
 
     expect(screen.getByText('admin@example.com')).toBeInTheDocument();
   });
+
+  // Regression (#313): the content wrapper's vertical rhythm lived in the map
+  // string, which the drain codemod (className literals only) never rewrote —
+  // so `.stack-lg` was dropped from CSS while the reference lingered. Assert the
+  // wrapper now carries the utility form and no drained component class survives.
+  it('wraps content in the space-y utility, not the drained .stack-lg', () => {
+    renderShell({ role: 'admin' });
+
+    const content = screen.getByRole('main');
+    expect(content).toHaveClass('content', 'space-y-5.5');
+    expect(content).not.toHaveClass('stack-lg');
+  });
 });

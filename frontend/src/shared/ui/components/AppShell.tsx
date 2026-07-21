@@ -131,9 +131,9 @@ interface AppShellProps {
 }
 
 const WIDTH_CLASS: Record<NonNullable<AppShellProps['width']>, string> = {
-  default: 'content stack-lg',
-  mid: 'content is-mid stack-lg',
-  narrow: 'content is-narrow stack-lg',
+  default: 'content space-y-5.5 max-md:space-y-4.5',
+  mid: 'content is-mid space-y-5.5 max-md:space-y-4.5',
+  narrow: 'content is-narrow space-y-5.5 max-md:space-y-4.5',
 };
 
 export function AppShell({
