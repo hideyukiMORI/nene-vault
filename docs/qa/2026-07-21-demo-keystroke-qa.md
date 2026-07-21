@@ -506,11 +506,21 @@
 | VLT-C1-01 未ログイン直叩き | ✅ | fresh context で `/documents` 直叩き→**リダイレクトせず** LoginForm in-place（URL 維持） |
 | VLT-E4-01/02 タイムゾーン（#228） | ⚠️ | 下記「発見」参照 |
 
-**⚠️ VLT-E4（#228 連携）**: 文書詳細で日時書式が**混在**することを live で確認。
-- `uploaded_at`・監査行 = `formatDateTime`（**ブラウザ TZ**・Intl en-US 形 `07/18/2026, 01:55 PM`）
-- `transaction_date`・`retention_expires_at` = 生 ISO（`2026-07-16` / `2036-07-16`・TZ 非依存）
-- つまり同一画面で「TZ で動く時刻」と「動かない日付」が併存。**#228 バンドルへ連携**。
-- 補足: **同一文書での UTC↔JST 日境界ズレの直接実証は未完**（`/demo/standard` は訪問ごとに別 disposable org を発行するため、2 TZ で同一文書を開けない）。固定 org（guided）＋既知時刻文書での再現が必要＝continuation。
+**⚠️ VLT-E4（#228 連携・バッチ1 の暫定所見／バッチ4 で訂正）**: バッチ1 では別 org の別文書を比較し「uploaded_at がブラウザ TZ で動く」と暫定観測したが、**バッチ4（guided 固定org・同一文書の直接実証）で訂正**（下記バッチ4 参照）。
+
+### バッチ4（機械レーン・E-4 固定org 直接実証）2026-07-21
+
+`tests/e2e/live/batch4-e4-fixedorg.spec.ts`。guided（fixed viewer seat・mint 不要）で**同一文書**を UTC / Asia-Tokyo の `timezoneId` で開き比較。
+
+| シナリオ | 結果 | 実測 |
+|---|---|---|
+| VLT-E4-fixed 同一文書 UTC↔JST | ✅（**訂正発見**） | doc `01KY0G3FFCYRJVJ7KRVE9NER2F`: uploaded_at が UTC/JST とも **`07/13/2026, 11:22 AM` で完全一致**・transaction_date/retention も `2026-07-12`/`2036-07-12` で一致 |
+
+**🟢 #228 訂正発見（直接実証）**:
+- **文書タイムスタンプ（uploaded_at）はブラウザ TZ で動かない**。host-local **naive**（`Z` なし）で送られ、`new Date()` が browser-local として parse → `Intl` が browser-local として format するため wall-clock 数字が round-trip 不変。**同一文書なら UTC でも JST でも同じ表示**。
+- **バッチ1 の「TZ で動く」は誤読**（別 disposable org の別文書同士を比較していた）。固定org 直接実証で否定。
+- **真の混在懸念は監査証跡（audit created_at・UTC・`Z` 付き）**: これは browser TZ で動くため、host-local の文書時刻と並ぶと見かけ上ズレる。ただし audit は `ManageVaultSettings` 権限で viewer/guided からは不可視 → admin レーンで別途実証が要る（standard mint 回復後）。
+- **施主即断パッケージ**: `docs/qa/2026-07-21-e4-228-decision-package.md`（#228 の1枚要約）。
 
 ### バッチ2（機械レーン・書込系）2026-07-21
 
