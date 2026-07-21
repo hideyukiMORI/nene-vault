@@ -1,17 +1,26 @@
+import { expectCatalogParity } from '@hideyukimori/nene2-i18n/testing';
 import { describe, expect, it } from 'vitest';
 import { catalogs, dynamicMessageKey } from './catalogs';
 
-/** Collects every dot-notation path to a non-object leaf. */
-function leafPaths(value: unknown, prefix = ''): string[] {
+// Flatten a nested catalog to `{ 'a.b.c': value }`. nene2-i18n 0.2.0's
+// `expectCatalogParity` operates on a FLAT `Record<string, string>` catalog
+// (the skeleton MessageCatalog); the nested "vault JSON form" (DotPaths) is a
+// 0.3.0 / W0b feature (see catalog.d.ts) and is not yet natively accepted. This
+// thin adapter feeds the shared parity logic the real leaf keys so shape and
+// lazy-copy checks run on the actual message keys, not just the top-level groups.
+function flatten(
+  value: unknown,
+  prefix = '',
+  out: Record<string, string> = {},
+): Record<string, string> {
   if (value === null || typeof value !== 'object') {
-    return [prefix];
+    out[prefix] = String(value);
+    return out;
   }
-  const paths: string[] = [];
   for (const [key, child] of Object.entries(value)) {
-    const path = prefix ? `${prefix}.${key}` : key;
-    paths.push(...leafPaths(child, path));
+    flatten(child, prefix ? `${prefix}.${key}` : key, out);
   }
-  return paths;
+  return out;
 }
 
 describe('catalogs', () => {
@@ -19,12 +28,17 @@ describe('catalogs', () => {
     expect(Object.keys(catalogs).sort()).toEqual(['en', 'ja']);
   });
 
-  it('ja and en share an identical key structure (#137 / #166 parity guard)', () => {
-    const ja = leafPaths(catalogs.ja).sort();
-    const en = leafPaths(catalogs.en).sort();
-
-    expect(ja.length).toBeGreaterThan(0);
-    expect(en).toEqual(ja);
+  it('ja/en share an identical key shape and en is not a lazy copy of ja (#137/#166)', () => {
+    // Fleet-shared parity guard (nene2-i18n `./testing`, AM-17): shape 100% vs the
+    // authority (ja) plus a lazy-copy ratio check. ja is the authority (ADR 0008).
+    // `_meta` carries locale self-description (label/direction/note) that is
+    // legitimately identical or per-locale; allowlist the keys that are the same
+    // in every locale by design (direction; the shared English note).
+    const flat = { ja: flatten(catalogs.ja), en: flatten(catalogs.en) };
+    expectCatalogParity(flat, {
+      authority: 'ja',
+      identicalAllowlist: ['_meta.direction', '_meta.note'],
+    });
   });
 });
 
