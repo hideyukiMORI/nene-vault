@@ -102,17 +102,18 @@ export function DocumentDetailPage() {
               </h1>
               <div className="flex items-center gap-2 flex-wrap">
                 <span
-                  className={doc.status === 'voided' ? 'badge badge-danger' : 'badge badge-success'}
+                  className="badge data-[tone=danger]:bg-danger-soft data-[tone=danger]:text-danger data-[tone=success]:bg-success-soft data-[tone=success]:text-success"
+                  data-tone={doc.status === 'voided' ? 'danger' : 'success'}
                 >
                   {t(`document.status.${doc.status}`)}
                 </span>
                 {doc.date_uncertain && (
-                  <span className="badge badge-warning">
+                  <span className="badge bg-warn-soft text-warn">
                     {t('document.detail.date_uncertain_badge')}
                   </span>
                 )}
                 {!doc.is_metadata_confirmed && (
-                  <span className="badge badge-muted">
+                  <span className="badge bg-x-sunk-deep text-text-muted">
                     {t('document.detail.metadata_unconfirmed_badge')}
                   </span>
                 )}
