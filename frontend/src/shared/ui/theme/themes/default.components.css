@@ -515,19 +515,6 @@
       font-weight: 600;
       color: var(--color-x-ink-deep);
     }
-    .tbl-diff {
-      font-family: var(--font-mono);
-      font-size: var(--text-2xs);
-      color: var(--color-text-muted);
-      background: var(--color-surface-sunken);
-      border: 1px solid var(--color-border);
-      border-radius: var(--radius-sm);
-      padding: 7px 9px;
-      white-space: pre-wrap;
-      max-width: 14rem;
-      line-height: 1.5;
-      overflow: hidden;
-    }
     .empty-state {
       display: flex;
       align-items: center;
@@ -805,13 +792,6 @@
       color: var(--color-accent);
       transform: translateX(2px);
     }
-    .chg-sum {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      flex-wrap: wrap;
-      min-width: 0;
-    }
     .chg-kv {
       display: inline-flex;
       align-items: center;
@@ -867,11 +847,6 @@
     }
     .chg-kv .ar {
       color: var(--color-text-faint);
-    }
-    .chg-more {
-      font-size: var(--text-2xs);
-      color: var(--color-text-faint);
-      white-space: nowrap;
     }
     .row-chev {
       color: var(--color-text-faint);
@@ -1028,16 +1003,6 @@
     .diff-field + .diff-field {
       margin-top: 13px;
     }
-    .diff-key {
-      font-family: var(--font-mono);
-      font-size: var(--text-xs);
-      color: var(--color-x-ink-deep);
-      font-weight: 500;
-      margin-bottom: 7px;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
     .tag-chg {
       font-family: var(--font-sans);
       font-size: 9px;
@@ -1061,25 +1026,6 @@
       align-items: stretch;
       gap: 8px;
     }
-    .diff-val {
-      font-family: var(--font-mono);
-      font-size: var(--text-2xs);
-      line-height: 1.55;
-      border-radius: var(--radius-sm);
-      padding: 8px 10px;
-      word-break: break-all;
-      white-space: pre-wrap;
-    }
-    .diff-before {
-      background: var(--color-surface-sunken);
-      border: 1px solid var(--color-border);
-      color: var(--color-text-muted);
-    }
-    .diff-after {
-      background: var(--color-x-brass-soft);
-      border: 1px solid var(--color-x-brass-line);
-      color: var(--color-x-brass-deep);
-    }
     .diff-arrow {
       display: flex;
       align-items: center;
@@ -1094,37 +1040,8 @@
     .diff-single .diff-pair {
       grid-template-columns: 1fr;
     }
-    .diff-empty {
-      font-size: var(--text-sm);
-      color: var(--color-text-muted);
-      background: var(--color-surface-overlay);
-      border: 1px dashed var(--color-x-line-mid);
-      border-radius: var(--radius-md);
-      padding: 16px;
-      text-align: center;
-    }
     .json-block + .json-block {
       margin-top: 14px;
-    }
-    .json-label {
-      font-size: var(--text-2xs);
-      color: var(--color-text-muted);
-      text-transform: uppercase;
-      letter-spacing: 0.06em;
-      font-weight: 600;
-      margin-bottom: 6px;
-    }
-    .json-pre {
-      font-family: var(--font-mono);
-      font-size: var(--text-2xs);
-      line-height: 1.6;
-      background: var(--color-surface-sunken);
-      border: 1px solid var(--color-border);
-      border-radius: var(--radius-sm);
-      padding: 12px 13px;
-      white-space: pre;
-      overflow-x: auto;
-      color: var(--color-text-primary);
     }
   }
 
