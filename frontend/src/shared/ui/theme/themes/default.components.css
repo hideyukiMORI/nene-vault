@@ -796,54 +796,6 @@
       color: var(--color-text-muted);
     }
 
-    /* ---- stat tiles (home) ---- */
-    .stat {
-      background: var(--color-surface-raised);
-      border: 1px solid var(--color-border);
-      border-radius: var(--radius-md);
-      padding: 18px 18px 16px;
-      box-shadow: var(--shadow-sm);
-      position: relative;
-      overflow: hidden;
-    }
-    .stat::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 2px;
-      background: var(--color-x-brass);
-    }
-    .stat .k {
-      font-size: var(--text-2xs);
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
-      color: var(--color-text-muted);
-      font-weight: 600;
-    }
-    .stat .v {
-      font-family: var(--font-serif);
-      font-size: 1.85rem;
-      font-weight: 600;
-      color: var(--color-x-ink-deep);
-      margin-top: 8px;
-      line-height: 1;
-      font-variant-numeric: tabular-nums;
-    }
-    :where(.stat) .v small {
-      font-family: var(--font-sans);
-      font-size: 0.85rem;
-      font-weight: 500;
-      color: var(--color-text-muted);
-      margin-left: 3px;
-    }
-    .stat .meta {
-      margin-top: 9px;
-      font-size: var(--text-2xs);
-      color: var(--color-text-faint);
-    }
-
     /* ---- quick links (home) ---- */
     .qlink {
       display: flex;
@@ -1653,15 +1605,6 @@
       table.tbl thead th,
       table.tbl tbody td {
         padding: 11px 13px;
-      }
-
-      /* stat tiles: keep big numbers from overflowing their tile */
-      .stat {
-        padding: 15px 15px 13px;
-      }
-      .stat .v {
-        font-size: 1.55rem;
-        word-break: break-word;
       }
 
       /* opt-in card tables (.tbl.tbl-cards): label/value rows, no horizontal scroll */
