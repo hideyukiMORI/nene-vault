@@ -1,17 +1,20 @@
-import { dynamicMessageKey, type MessageKey } from '@/shared/i18n/catalogs';
 import type { ReactNode } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { useTranslation } from '@/shared/i18n/use-translation';
 import { roleHasCapability, type Capability } from '@/shared/auth/capabilities';
 import { BrandMark } from '@/shared/ui/primitives/BrandMark';
-import { LanguageSwitcher } from './LanguageSwitcher';
+import { LanguageSwitcher, type LocaleCode } from './LanguageSwitcher';
+
+/** Stable identifier for a rail nav item — the key into the resolved-label maps. */
+type NavId = 'home' | 'documents' | 'audit' | 'settings' | 'users' | 'export';
+/** Stable identifier for a rail group heading. */
+type GroupId = 'documents' | 'admin';
 
 interface NavItem {
+  id: NavId;
   to: string;
-  labelKey: MessageKey;
   icon: ReactNode;
-  /** Locale key for a group heading rendered above this item (new section). */
-  groupKey?: MessageKey;
+  /** Group heading rendered above this item (new section), by stable id. */
+  groupId?: GroupId;
   /**
    * Capability the current role must hold for this route (mirrors the backend
    * CapabilityResolver). Omitted for routes open to every authenticated role
@@ -101,10 +104,30 @@ interface AppShellProps {
   onLogout: () => void;
   /** Signed-in user's email (rail footer). */
   userEmail?: string | undefined;
-  /** Raw role key (e.g. 'admin'); translated via `user.role.*`. */
+  /** Raw role key (e.g. 'admin'); drives capability gating. */
   userRole?: string | undefined;
   /** Content column width: full (default), 'mid', or 'narrow' (forms). */
-  width?: 'default' | 'mid' | 'narrow';
+  width?: 'default' | 'mid' | 'narrow' | undefined;
+  /** Resolved nav item labels, keyed by route id (consumer holds the i18n). */
+  navLabels: Record<NavId, string>;
+  /** Resolved group headings, keyed by group id. */
+  groupLabels: Record<GroupId, string>;
+  /** Resolved aria-label for the rail nav. */
+  menuLabel: string;
+  /** Resolved aria-label for the log-out control. */
+  logoutLabel: string;
+  /** Resolved aria-label for the breadcrumb nav. */
+  breadcrumbLabel: string;
+  /** Resolved role label for the footer, or null/undefined when there is none. */
+  roleLabel?: ReactNode;
+  /** Resolved label for the language switcher. */
+  languageLabel: string;
+  /** Currently selected locale (forwarded to the language switcher). */
+  locale: LocaleCode;
+  /** Called with the chosen locale when the language switcher changes. */
+  onLocaleChange: (locale: LocaleCode) => void;
+  /** Selectable locales, in display order (forwarded to the language switcher). */
+  locales: readonly LocaleCode[];
 }
 
 const WIDTH_CLASS: Record<NonNullable<AppShellProps['width']>, string> = {
@@ -119,42 +142,51 @@ export function AppShell({
   userEmail,
   userRole,
   width = 'default',
+  navLabels,
+  groupLabels,
+  menuLabel,
+  logoutLabel,
+  breadcrumbLabel,
+  roleLabel,
+  languageLabel,
+  locale,
+  onLocaleChange,
+  locales,
 }: AppShellProps) {
-  const { t } = useTranslation();
   const navigate = useNavigate();
   const { pathname } = useLocation();
 
   const nav: NavItem[] = [
-    { to: '/', labelKey: 'navigation.home', icon: HomeIcon },
+    { id: 'home', to: '/', icon: HomeIcon },
     {
+      id: 'documents',
       to: '/documents',
-      labelKey: 'document.list.title',
       icon: DocIcon,
-      groupKey: 'navigation.documents',
+      groupId: 'documents',
       requiredCapability: 'ViewDocuments',
     },
     {
+      id: 'audit',
       to: '/audit',
-      labelKey: 'navigation.audit_events',
       icon: AuditIcon,
-      groupKey: 'navigation.group_admin',
+      groupId: 'admin',
       requiredCapability: 'ManageVaultSettings',
     },
     {
+      id: 'settings',
       to: '/settings',
-      labelKey: 'navigation.settings',
       icon: SettingsIcon,
       requiredCapability: 'ManageVaultSettings',
     },
     {
+      id: 'users',
       to: '/users',
-      labelKey: 'navigation.users',
       icon: UsersIcon,
       requiredCapability: 'ManageUsers',
     },
     {
+      id: 'export',
       to: '/export',
-      labelKey: 'navigation.export',
       icon: ExportIcon,
       requiredCapability: 'ExportDocuments',
     },
@@ -169,17 +201,13 @@ export function AppShell({
     to === '/' ? pathname === '/' : pathname.startsWith(to);
 
   const activeItem = [...nav].reverse().find((n) => isActive(n.to));
-  const leafLabel = activeItem !== undefined ? t(activeItem.labelKey) : '';
+  const leafLabel = activeItem !== undefined ? navLabels[activeItem.id] : '';
 
   const go = (to: string): void => {
     void navigate(to);
   };
 
   const avatarLetter = userEmail !== undefined && userEmail !== '' ? userEmail.charAt(0) : '?';
-  const roleLabel =
-    userRole !== undefined && userRole !== ''
-      ? t(dynamicMessageKey(`user.role.${userRole}`))
-      : null;
 
   return (
     <div className="layout">
@@ -192,10 +220,12 @@ export function AppShell({
           </div>
         </div>
 
-        <nav className="rail-nav" aria-label={t('navigation.menu')}>
+        <nav className="rail-nav" aria-label={menuLabel}>
           {visibleNav.map((item) => (
             <div key={item.to} className="contents">
-              {item.groupKey !== undefined && <div className="rail-group">{t(item.groupKey)}</div>}
+              {item.groupId !== undefined && (
+                <div className="rail-group">{groupLabels[item.groupId]}</div>
+              )}
               <button
                 type="button"
                 className={isActive(item.to) ? 'rail-link is-active' : 'rail-link'}
@@ -205,7 +235,7 @@ export function AppShell({
                 }}
               >
                 {item.icon}
-                {t(item.labelKey)}
+                {navLabels[item.id]}
               </button>
             </div>
           ))}
@@ -217,14 +247,9 @@ export function AppShell({
           </div>
           <div className="who">
             <b>{userEmail ?? '—'}</b>
-            {roleLabel !== null && <span>{roleLabel}</span>}
+            {roleLabel !== null && roleLabel !== undefined && <span>{roleLabel}</span>}
           </div>
-          <button
-            type="button"
-            className="out"
-            onClick={onLogout}
-            aria-label={t('navigation.logout')}
-          >
+          <button type="button" className="out" onClick={onLogout} aria-label={logoutLabel}>
             <svg
               viewBox="0 0 24 24"
               fill="none"
@@ -241,19 +266,24 @@ export function AppShell({
 
       <div className="main">
         <header className="topbar">
-          <nav className="crumbs" aria-label={t('navigation.breadcrumb')}>
+          <nav className="crumbs" aria-label={breadcrumbLabel}>
             {pathname === '/' || leafLabel === '' ? (
-              <b>{t('navigation.home')}</b>
+              <b>{navLabels.home}</b>
             ) : (
               <>
-                <span>{t('navigation.home')}</span>
+                <span>{navLabels.home}</span>
                 <span className="sep">/</span>
                 <b>{leafLabel}</b>
               </>
             )}
           </nav>
           <div className="right">
-            <LanguageSwitcher />
+            <LanguageSwitcher
+              label={languageLabel}
+              locale={locale}
+              onLocaleChange={onLocaleChange}
+              locales={locales}
+            />
           </div>
         </header>
 

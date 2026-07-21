@@ -5,13 +5,14 @@ import { renderWithProviders } from '@tests/render/render-with-providers';
 import { Pagination } from './Pagination';
 
 const base = {
-  offset: 0,
-  limit: 20,
   total: 50,
   canPrev: false,
   canNext: true,
   onPrev: vi.fn(),
   onNext: vi.fn(),
+  showingLabel: 'Showing 1–20 of 50',
+  previousLabel: 'Previous',
+  nextLabel: 'Next',
 };
 
 describe('Pagination', () => {
@@ -32,7 +33,7 @@ describe('Pagination', () => {
   });
 
   it('enables Previous when canPrev is true', () => {
-    renderWithProviders(<Pagination {...base} canPrev={true} offset={20} />);
+    renderWithProviders(<Pagination {...base} canPrev={true} />);
     expect(screen.getByRole('button', { name: 'Previous' })).not.toBeDisabled();
   });
 
@@ -50,25 +51,14 @@ describe('Pagination', () => {
 
   it('calls onPrev when Previous is clicked', async () => {
     const onPrev = vi.fn();
-    renderWithProviders(<Pagination {...base} canPrev={true} offset={20} onPrev={onPrev} />);
+    renderWithProviders(<Pagination {...base} canPrev={true} onPrev={onPrev} />);
     await userEvent.click(screen.getByRole('button', { name: 'Previous' }));
     expect(onPrev).toHaveBeenCalledOnce();
   });
 
-  it('shows the clamped "to" value on the last partial page', () => {
-    // offset=40, limit=20, total=45 → to=45 (not 60)
-    renderWithProviders(
-      <Pagination
-        offset={40}
-        limit={20}
-        total={45}
-        canPrev={true}
-        canNext={false}
-        onPrev={vi.fn()}
-        onNext={vi.fn()}
-      />,
-    );
-    // Range text contains "45"
+  it('renders the supplied showing-range label', () => {
+    // The consumer formats the range; the component just renders the string.
+    renderWithProviders(<Pagination {...base} showingLabel="Showing 41–45 of 45" />);
     expect(screen.getByText(/45/)).toBeInTheDocument();
   });
 });

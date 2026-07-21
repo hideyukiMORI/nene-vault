@@ -15,7 +15,7 @@ import { Text } from '../primitives/Text';
 const meta: Meta<typeof Modal> = {
   title: 'Components/Modal',
   component: Modal,
-  args: { title: 'Confirm action', size: 'sm' },
+  args: { title: 'Confirm action', size: 'sm', closeLabel: 'Close' },
   argTypes: { onClose: { action: 'close' } },
   render: (args) => (
     <Modal {...args}>

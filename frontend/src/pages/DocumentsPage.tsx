@@ -4,7 +4,7 @@ import { useDocumentSearch, DocumentSearchForm, DocumentTable } from '@/features
 import { DocumentUploadModal } from '@/features/document-upload';
 import { authStore } from '@/entities/auth';
 import { useTranslation } from '@/shared/i18n/use-translation';
-import { AppShell } from '@/shared/ui/components/AppShell';
+import { AppChrome } from '@/widgets/app-chrome/AppChrome';
 import { Button } from '@/shared/ui/primitives/Button';
 import { Callout } from '@/shared/ui/components/Callout';
 import { EmptyState } from '@/shared/ui/components/EmptyState';
@@ -28,7 +28,7 @@ export function DocumentsPage() {
   }
 
   return (
-    <AppShell onLogout={handleLogout} userEmail={session?.email} userRole={session?.role}>
+    <AppChrome onLogout={handleLogout} userEmail={session?.email} userRole={session?.role}>
       <div className="page-head">
         <div className="titlebar">
           <span className="eyebrow">{t('navigation.documents')}</span>
@@ -70,13 +70,18 @@ export function DocumentsPage() {
             }}
           />
           <Pagination
-            offset={pagination.offset}
-            limit={pagination.limit}
             total={pagination.total}
             canPrev={pagination.canPrev}
             canNext={pagination.canNext}
             onPrev={pagination.goPrev}
             onNext={pagination.goNext}
+            showingLabel={t('common.pagination.showing', {
+              from: String(pagination.offset + 1),
+              to: String(Math.min(pagination.offset + pagination.limit, pagination.total)),
+              total: String(pagination.total),
+            })}
+            previousLabel={t('common.buttons.previous')}
+            nextLabel={t('common.buttons.next')}
           />
         </div>
       )}
@@ -88,6 +93,6 @@ export function DocumentsPage() {
           }}
         />
       )}
-    </AppShell>
+    </AppChrome>
   );
 }

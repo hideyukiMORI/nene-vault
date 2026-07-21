@@ -12,7 +12,7 @@ import {
 import type { OcrPrefill } from '@/features/document-detail';
 import { useTranslation } from '@/shared/i18n/use-translation';
 import { formatJpy, formatDate, formatDateTime } from '@/shared/lib/format';
-import { AppShell } from '@/shared/ui/components/AppShell';
+import { AppChrome } from '@/widgets/app-chrome/AppChrome';
 import { Button } from '@/shared/ui/primitives/Button';
 import { Callout } from '@/shared/ui/components/Callout';
 import { EmptyState } from '@/shared/ui/components/EmptyState';
@@ -71,7 +71,7 @@ export function DocumentDetailPage() {
   }
 
   return (
-    <AppShell
+    <AppChrome
       onLogout={handleLogout}
       userEmail={session?.email}
       userRole={session?.role}
@@ -263,6 +263,6 @@ export function DocumentDetailPage() {
           }}
         />
       )}
-    </AppShell>
+    </AppChrome>
   );
 }

@@ -9,18 +9,15 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { Field } from './Field';
 import { Input } from '../primitives/Input';
-import { I18nProvider } from '@/shared/i18n/i18n-context';
 
 const meta: Meta<typeof Field> = {
   title: 'Components/Field',
   component: Field,
   decorators: [
     (Story) => (
-      <I18nProvider>
-        <div className="w-80">
-          <Story />
-        </div>
-      </I18nProvider>
+      <div className="w-80">
+        <Story />
+      </div>
     ),
   ],
   render: (args) => (
@@ -34,7 +31,9 @@ export default meta;
 type Story = StoryObj<typeof Field>;
 
 export const Default: Story = { args: { label: 'Counterparty' } };
-export const Required: Story = { args: { label: 'Counterparty', required: true } };
+export const Required: Story = {
+  args: { label: 'Counterparty', required: true, requiredMarker: 'Required' },
+};
 export const WithHint: Story = {
   args: { label: 'Counterparty', hint: 'As printed on the document' },
 };

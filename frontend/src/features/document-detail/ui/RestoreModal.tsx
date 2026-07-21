@@ -18,7 +18,11 @@ export function RestoreModal({ documentId, onClose }: RestoreModalProps) {
       : null;
 
   return (
-    <Modal title={t('document.restore.title')} onClose={onClose}>
+    <Modal
+      title={t('document.restore.title')}
+      onClose={onClose}
+      closeLabel={t('common.buttons.close')}
+    >
       <div className="modal-body stack-md">
         <p className="muted body-sm">{t('document.restore.description')}</p>
         {submitError !== null && <p className="field-error">{t(submitError)}</p>}

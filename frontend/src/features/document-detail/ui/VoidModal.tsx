@@ -21,7 +21,11 @@ export function VoidModal({ documentId, onClose }: VoidModalProps) {
   } = form;
 
   return (
-    <Modal title={t('document.void.title')} onClose={onClose}>
+    <Modal
+      title={t('document.void.title')}
+      onClose={onClose}
+      closeLabel={t('common.buttons.close')}
+    >
       <form
         onSubmit={(e) => {
           void onSubmit(e);
@@ -35,6 +39,7 @@ export function VoidModal({ documentId, onClose }: VoidModalProps) {
         <Field
           label={t('document.void.reason_label')}
           required
+          requiredMarker={t('common.required_marker')}
           error={errors.void_reason !== undefined ? t('common.required_marker') : undefined}
         >
           <Input

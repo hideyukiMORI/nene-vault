@@ -7,7 +7,7 @@ import { useVaultSettings, useUpdateVaultSettings } from '@/entities/vault-setti
 import { messageKeyForError } from '@/shared/i18n/map-problem-details';
 import { useTranslation } from '@/shared/i18n/use-translation';
 import { formatDateTime } from '@/shared/lib/format';
-import { AppShell } from '@/shared/ui/components/AppShell';
+import { AppChrome } from '@/widgets/app-chrome/AppChrome';
 import { Button } from '@/shared/ui/primitives/Button';
 import { Callout } from '@/shared/ui/components/Callout';
 import { EmptyState } from '@/shared/ui/components/EmptyState';
@@ -80,7 +80,7 @@ export function SettingsPage() {
   }
 
   return (
-    <AppShell
+    <AppChrome
       onLogout={handleLogout}
       userEmail={session?.email}
       userRole={session?.role}
@@ -173,6 +173,6 @@ export function SettingsPage() {
           </div>
         </form>
       )}
-    </AppShell>
+    </AppChrome>
   );
 }

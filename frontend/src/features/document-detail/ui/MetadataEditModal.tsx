@@ -26,7 +26,12 @@ export function MetadataEditModal({ doc, onClose, ocrPrefill }: MetadataEditModa
   const { register } = form;
 
   return (
-    <Modal title={t('document.metadata_edit.title')} onClose={onClose} size="md">
+    <Modal
+      title={t('document.metadata_edit.title')}
+      onClose={onClose}
+      size="md"
+      closeLabel={t('common.buttons.close')}
+    >
       <form
         onSubmit={(e) => {
           void onSubmit(e);
@@ -35,7 +40,11 @@ export function MetadataEditModal({ doc, onClose, ocrPrefill }: MetadataEditModa
       >
         <p className="muted body-sm">{t('document.metadata_edit.description')}</p>
 
-        <Field label={t('document.metadata.counterparty_name')} required>
+        <Field
+          label={t('document.metadata.counterparty_name')}
+          required
+          requiredMarker={t('common.required_marker')}
+        >
           <Input type="text" {...register('counterparty_name')} />
         </Field>
 

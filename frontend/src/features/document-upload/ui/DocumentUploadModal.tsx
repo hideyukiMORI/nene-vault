@@ -24,7 +24,12 @@ export function DocumentUploadModal({ onClose }: DocumentUploadModalProps) {
   const requiredMarker = t('common.required_marker');
 
   return (
-    <Modal title={t('document.upload.title')} onClose={onClose} size="md">
+    <Modal
+      title={t('document.upload.title')}
+      onClose={onClose}
+      size="md"
+      closeLabel={t('common.buttons.close')}
+    >
       <form
         onSubmit={(e) => {
           void onSubmit(e);
@@ -34,6 +39,7 @@ export function DocumentUploadModal({ onClose }: DocumentUploadModalProps) {
         <Field
           label={t('document.upload.file_label')}
           required
+          requiredMarker={requiredMarker}
           hint={t('document.upload.file_hint', { max_size_mb: env.uploadMaxFileSizeMb })}
           error={errors.file !== undefined ? requiredMarker : undefined}
         >
@@ -48,6 +54,7 @@ export function DocumentUploadModal({ onClose }: DocumentUploadModalProps) {
         <Field
           label={t('document.upload.counterparty_label')}
           required
+          requiredMarker={requiredMarker}
           error={errors.counterparty_name !== undefined ? requiredMarker : undefined}
         >
           <Input
@@ -57,7 +64,7 @@ export function DocumentUploadModal({ onClose }: DocumentUploadModalProps) {
           />
         </Field>
 
-        <Field label={t('document.upload.category_label')} required>
+        <Field label={t('document.upload.category_label')} required requiredMarker={requiredMarker}>
           <Select {...register('category')}>
             {CATEGORIES.map((cat) => (
               <option key={cat} value={cat}>
