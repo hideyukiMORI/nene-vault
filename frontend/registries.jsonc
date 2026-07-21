@@ -39,7 +39,6 @@
         ".head",
         ".ic",
         ".input",
-        ".is-active",
         ".is-danger",
         ".is-mid",
         ".is-narrow",

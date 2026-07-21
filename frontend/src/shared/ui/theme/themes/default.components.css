@@ -104,12 +104,12 @@
       background: var(--color-x-rail-deep);
       color: var(--color-x-rail-ink);
     }
-    .rail-link.is-active {
+    .rail-link[aria-current='page'] {
       background: var(--color-x-brass);
       color: var(--color-x-rail);
       font-weight: 600;
       /* icon opacity lifted to a custom property so the active-state override
-         needs no descendant selector (was `.rail-link.is-active svg`, 0,2,1).
+         needs no descendant selector (was `.rail-link[aria-current='page'] svg`, 0,3,1).
          stroke follows `currentColor` from the color above. */
       --rail-icon-op: 1;
     }
@@ -873,7 +873,7 @@
         background: transparent;
         color: var(--color-x-rail-text);
       }
-      .rail-link.is-active {
+      .rail-link[aria-current='page'] {
         background: transparent;
         color: oklch(76% 0.1 77);
         font-weight: 700;

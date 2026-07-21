@@ -236,7 +236,7 @@ export function AppShell({
               )}
               <button
                 type="button"
-                className={isActive(item.to) ? 'rail-link is-active' : 'rail-link'}
+                className="rail-link"
                 aria-current={isActive(item.to) ? 'page' : undefined}
                 onClick={() => {
                   go(item.to);
