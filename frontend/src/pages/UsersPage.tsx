@@ -122,7 +122,10 @@ function UserRow({
       </td>
       <td data-label={t('user.list.table.role')}>{t(`user.role.${user.role}`)}</td>
       <td data-label={t('user.list.table.status')}>
-        <span className={user.status === 'active' ? 'badge badge-success' : 'badge badge-muted'}>
+        <span
+          className="badge data-[tone=success]:bg-success-soft data-[tone=success]:text-success data-[tone=muted]:bg-x-sunk-deep data-[tone=muted]:text-text-muted"
+          data-tone={user.status === 'active' ? 'success' : 'muted'}
+        >
           {t(`user.status.${user.status}`)}
         </span>
       </td>

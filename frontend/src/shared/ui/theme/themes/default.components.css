@@ -491,22 +491,6 @@
     :where(.badge).no-dot::before {
       display: none;
     }
-    .badge-success {
-      background: var(--color-success-soft);
-      color: var(--color-success);
-    }
-    .badge-danger {
-      background: var(--color-danger-soft);
-      color: var(--color-danger);
-    }
-    .badge-warning {
-      background: var(--color-warn-soft);
-      color: var(--color-warn);
-    }
-    .badge-muted {
-      background: var(--color-x-sunk-deep);
-      color: var(--color-text-muted);
-    }
 
     /* ---- definition lists ---- */
     .dl {

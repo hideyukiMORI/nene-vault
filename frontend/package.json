@@ -46,7 +46,7 @@
   },
   "devDependencies": {
     "@hideyukimori/nene2-i18n": "^0.3.0",
-    "@hideyukimori/nene2-standards": "^2.1.0",
+    "@hideyukimori/nene2-standards": "^2.1.1",
     "@hideyukimori/nene2-tokens": "1.1.0",
     "@playwright/test": "^1.61.1",
     "@storybook/addon-a11y": "^10.1.4",
