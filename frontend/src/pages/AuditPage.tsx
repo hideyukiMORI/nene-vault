@@ -86,9 +86,13 @@ function DiffView({ fields, isCreate }: { fields: AuditDiffField[]; isCreate: bo
       {fields.map((f) => {
         const tag =
           f.kind === 'add' ? (
-            <span className="tag-chg add">{t('audit_event.detail.tag_added')}</span>
+            <span className="font-sans text-3xs tracking-label font-bold uppercase px-1.5 py-px rounded-full bg-success-soft text-success">
+              {t('audit_event.detail.tag_added')}
+            </span>
           ) : (
-            <span className="tag-chg mod">{t('audit_event.detail.tag_changed')}</span>
+            <span className="font-sans text-3xs tracking-label font-bold uppercase px-1.5 py-px rounded-full bg-x-brass-soft text-x-brass-deep">
+              {t('audit_event.detail.tag_changed')}
+            </span>
           );
         return (
           <div key={f.key} className={isCreate ? 'diff-field diff-single' : 'diff-field'}>
