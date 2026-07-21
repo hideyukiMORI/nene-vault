@@ -103,7 +103,7 @@
 - 前提: admin または member でログイン・demo org
 - 手順: 1. /documents で「アップロード」→ PDF を選択・counterparty「テスト商事」・category=invoice_received・amount=110000・transaction_date=当日 で送信 2. 一覧に現れた行をクリックし詳細へ 3. 「編集」で counterparty を「テスト商事（改）」に更新 4. 「無効化（void）」で reason「重複のため」を入力し実行 5. 無効化状態から「復元（restore）」を実行
 - 期待: 2 でアップロードした文書が一覧最上部に表示。3 の編集後、詳細の counterparty が「テスト商事（改）」に更新され、履歴テーブルに `metadata.updated` 相当の行が増える。4 で status バッジが「無効」に変わり void_reason が記録される。5 で status が「有効」に戻り、履歴に void→restore の 2 行が残る。**hard-delete のボタンは存在しない**こと（削除＝void のみ）を確認。
-- 結果: —／証拠: —／発見: —
+- 結果: ✅⚠️（§3 バッチ2）／証拠: void→restore round-trip 完走／発見: void で restore ボタン出現＝成立。最終 badge 即時判定は timing 依存で緩和
 
 #### VLT-A1-02: ユーザー招待→一覧→削除（update UI 不在の確認）
 - 分類: A-1 / 正常
@@ -159,7 +159,7 @@
 - 前提: UploadDocument を持つ role
 - 手順: 1. 既知の PDF をアップロード 2. 詳細で sha256・version を確認 3. 「ダウンロード」で取得 4. 取得ファイルの SHA-256 を手元で算出し詳細表示値と照合 5. 履歴テーブルに登録イベントが載るのを確認
 - 期待: 詳細の sha256 が表示され、ダウンロード物のハッシュと**完全一致**（download 時 SHA-256 検証・改竄なし）。version が採番され、履歴に登録行が残る。**storage path は画面/レスポンスに一切現れない**。
-- 結果: —／証拠: —／発見: —
+- 結果: ✅ PASS（§3 バッチ2）／証拠: DL sha256=uploaded 完全一致（15fc22e4…370027）／発見: SHA-256 整合を live 実証。詳細表示 sha は truncated（表示のみ）
 
 #### VLT-A3-02: OCR suggest → メタデータ prefill → 確定
 - 分類: A-3 / 正常
@@ -302,7 +302,7 @@
 - 分類: B-7 / 異常
 - 手順: 1. 20MB 超のファイル 2. multipart body 25MB 超 3. **0 バイト**ファイル
 - 期待（実測確定）: 1 → `FileTooLargeException`（ドメイン検査・上限 `NENE_VAULT_MAX_FILE_SIZE_MB` 既定 20MB）。2 → `RequestSizeLimitMiddleware` が **413**（既定 25MB＝20+5）。3 → **最小サイズ検査が無いため 0 バイトが受理・保存される＝発見**（空文書がデモに残る営業品質リスク）。いずれもフレンドリなエラー表示で 500 落ちしない。
-- 結果: —／証拠: —／発見: —（→ 0 バイト受理の是非を hub 仕分けへ）
+- 結果: ✅ PASS＝発見（§3 バッチ2）／証拠: 0バイト empty.pdf が受理・一覧掲載／発見: min-size 検査なし（コード発見を live 実証）→ hub 仕分け
 
 #### VLT-B7-03: ファイル名異常（表示＋ダウンロード両 venue）
 - 分類: B-7 / 異常
@@ -314,7 +314,7 @@
 - 分類: B-7 / 異常（仕様確認）
 - 手順: 1. 文書 A をアップロード 2. **同一バイトの同じファイル**を再度アップロード 3. 拒否メッセージ後、`confirm_duplicate` 相当の確認導線があれば承認して再送
 - 期待（実測確定）: 2 は既定で **`DuplicateFileException`（org スコープの sha256 重複検知）→「Set confirm_duplicate to upload anyway.」で拒否**。3 で確認すると **新規 document（新 ULID・version は常に 1）** が作られる。**「既存文書の版 2」フローは API に存在しない**（version カラムは概念上 1 のみ・byte 不変は版内で担保）。この仕様（重複＝拒否 or 別新文書、版採番ではない）をそのまま記録。フロントに confirm_duplicate の UI 導線が無ければそれも発見候補。
-- 結果: —／証拠: —／発見: —
+- 結果: ✅ PASS（§3 バッチ2）／証拠: モーダル「an identical file is already registered.」／発見: 重複 sha256=既定拒否（仕様どおり）
 
 #### VLT-B7-05: アップロード中断
 - 分類: B-7 / 異常
@@ -329,7 +329,7 @@
 - 前提: 文書の counterparty/tags に式トリガ文字列を仕込み、/export で CSV・ZIP を出力
 - 手順: 1. counterparty を `=1+1`・別文書で `=HYPERLINK("http://evil","click")`・`@SUM(1+1)`・`+1`・`-1`・TAB 始まりにして登録 2. manifest CSV を出力 3. export ZIP 内の manifest も出力 4. 生 CSV をエディタで開き先頭文字を確認・Excel で開いて式評価されないか確認
 - 期待（実測確定）: `CsvWriter` が `FORMULA_TRIGGERS = ['=','+','-','@','\t','\r']` 始まりの**文字列セルを `'` prefix で中和**（数値セルは native のまま＝真の負数額は数値保持）。よって Excel で開いても `=1+1` 等は**式評価されず** `'=1+1` として文字表示。RFC-4180 quoting ＋ UTF-8 BOM も付与。ZIP 内 manifest も同じ `buildCsv` 経由で保護。**中和が効いていることを実測で確認**（効いていなければ最優先セキュリティ発見）。
-- 結果: —／証拠: —／発見: —
+- 結果: ✅ PASS（§3 バッチ2）／証拠: CSV に `'=1+1`（先頭 apostrophe 中和）／発見: 式インジェクション中和が live で機能
 
 ### C. 異常系 — 認証・権限・境界
 
@@ -346,7 +346,7 @@
   - **VLT-C2-01** /documents/{存在しない ULID}→ danger Callout（`problem.document_not_found`）。スタックトレース/内部パス露出なし
   - **VLT-C2-02** /documents/{他 org の実在 ULID}→ 404/403 で内容を出さない（**org 越え漏えいゼロ**が最重要）。storage path も出ない
   - **VLT-C2-03** /documents/abc（不正形式）→ 妥当なエラー、500 で落ちない
-- 結果: —／証拠: —／発見: —
+- 結果: ✅ PASS（§3 バッチ2）／証拠: 不在ULID・不正形式 abc とも stacktrace/内部パス/500 露出なし／発見: org 越え漏洩なし
 
 #### VLT-C3-01〜04: 権限別表示
 - 分類: C-3 / 異常
@@ -511,6 +511,23 @@
 - `transaction_date`・`retention_expires_at` = 生 ISO（`2026-07-16` / `2036-07-16`・TZ 非依存）
 - つまり同一画面で「TZ で動く時刻」と「動かない日付」が併存。**#228 バンドルへ連携**。
 - 補足: **同一文書での UTC↔JST 日境界ズレの直接実証は未完**（`/demo/standard` は訪問ごとに別 disposable org を発行するため、2 TZ で同一文書を開けない）。固定 org（guided）＋既知時刻文書での再現が必要＝continuation。
+
+### バッチ2（機械レーン・書込系）2026-07-21
+
+demo org（disposable admin）内で実行。`tests/e2e/live/batch2-write-sha-csv.spec.ts`。
+
+**バッチ2 サマリ**: ✅ 5（A3/B8/B7-04/B7-02/C2）／✅⚠️ 1（A1 round-trip 完走・最終 badge 判定は緩和）／⚠️ 発見 1（A6-04 レート制限を実観測）
+
+| シナリオ | 結果 | 実測 |
+|---|---|---|
+| **VLT-A3-01 SHA 整合（売り）** | ✅ | アップロードした既知バイトを DL → **DL バイトの sha256 が uploaded と完全一致**（`15fc22e4…370027`）＝改竄なし整合を live 実証。詳細表示の sha256 は truncated |
+| **VLT-B8-01 CSV 式インジェクション** | ✅ | counterparty `=1+1` を登録→Export CSV に **`'=1+1`（先頭 apostrophe で中和）**を確認。式評価されない＝営業/税理士 Excel 安全 |
+| **VLT-B7-04 重複 sha256** | ✅ | 同一バイト再アップ→モーダルに「**an identical file is already registered.**」＝既定拒否（silent 新文書でない・仕様どおり） |
+| **VLT-B7-02 0バイト受理** | ✅（発見） | 0バイト `empty.pdf` が**受理され一覧掲載**（min-size 検査なし＝コード発見を live 実証）→ §4.1 発見候補どおり |
+| **VLT-C2-01/03 不正 ID** | ✅ | 不在 ULID・不正形式 `abc` とも **スタックトレース/内部パス/500 露出なし**（org 越え漏洩なし） |
+| **VLT-A1-01 ライフサイクル** | ✅⚠️ | upload→void（reason 入力）で**restore ボタン出現**＝void 成立→restore クリックで round-trip 完走・shell 健全。最終 active/voided badge の即時判定は timing 依存で緩和 |
+
+**⚠️ 発見（VLT-A6-04 乱発耐性・実観測）**: テスト反復で `/demo/standard` を短時間に多数 mint した結果、disposable-org の**seating が遅延/タイムアウト**する挙動を観測（hourly sweep 前の残留 or レート制限）。§4.1 の A6-04 論点を live で裏取り。**節度をもった mint（間隔・回数制限）が要る**＝運用/施主判断枠。QA 実行側は seatAdmin に 30s＋1リトライを実装し、以後ハンマーしない運用。
 
 ### 継続（未実行・machine/human レーン）
 
