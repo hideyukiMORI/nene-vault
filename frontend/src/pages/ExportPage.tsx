@@ -74,8 +74,8 @@ export function ExportPage() {
         <p className="lede">{t('export.description')}</p>
       </div>
 
-      <div className="card p-md stack-md">
-        <div className="grid-2">
+      <div className="card p-4.5 space-y-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <Field label={t('export.form.date_from_label')}>
             <Input
               type="date"
@@ -107,7 +107,7 @@ export function ExportPage() {
         </Field>
 
         <Field label={t('export.form.format_label')}>
-          <div className="stack-xs">
+          <div className="space-y-1.5">
             {(['zip', 'csv'] as const).map((f) => (
               <label key={f} className="radio">
                 <input

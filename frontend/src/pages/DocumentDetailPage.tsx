@@ -96,7 +96,7 @@ export function DocumentDetailPage() {
             <div className="titlebar">
               <span className="eyebrow">{t('document.detail.title')}</span>
               <h1 className="page-title">{doc.counterparty_name}</h1>
-              <div className="row gap-sm wrap">
+              <div className="flex items-center gap-2 flex-wrap">
                 <span
                   className={doc.status === 'voided' ? 'badge badge-danger' : 'badge badge-success'}
                 >
@@ -115,7 +115,7 @@ export function DocumentDetailPage() {
               </div>
             </div>
 
-            <div className="row gap-sm wrap">
+            <div className="flex items-center gap-2 flex-wrap">
               <Button
                 variant="secondary"
                 onClick={() => {
@@ -165,8 +165,8 @@ export function DocumentDetailPage() {
             </div>
           </div>
 
-          <section className="card p-md">
-            <div className="row gap-sm mb-stack-md">
+          <section className="card p-4.5">
+            <div className="flex items-center gap-2 mb-stack-md">
               <span className="tick" />
               <h2 className="subtitle">{t('document.detail.metadata_section')}</h2>
             </div>
@@ -198,7 +198,7 @@ export function DocumentDetailPage() {
               {doc.tags.length > 0 && (
                 <div className="col2">
                   <dt>{t('document.metadata.tags')}</dt>
-                  <dd className="row gap-sm wrap">
+                  <dd className="flex items-center gap-2 flex-wrap">
                     {doc.tags.map((tag) => (
                       <span key={tag} className="tag">
                         {tag}
@@ -210,8 +210,8 @@ export function DocumentDetailPage() {
             </dl>
           </section>
 
-          <section className="card p-md">
-            <div className="row gap-sm mb-stack-md">
+          <section className="card p-4.5">
+            <div className="flex items-center gap-2 mb-stack-md">
               <span className="tick" />
               <h2 className="subtitle">{t('document.detail.file_section')}</h2>
             </div>
@@ -227,8 +227,8 @@ export function DocumentDetailPage() {
             </dl>
           </section>
 
-          <section className="card p-md">
-            <div className="row gap-sm mb-stack-md">
+          <section className="card p-4.5">
+            <div className="flex items-center gap-2 mb-stack-md">
               <span className="tick" />
               <h2 className="subtitle">{t('document.history.title')}</h2>
             </div>

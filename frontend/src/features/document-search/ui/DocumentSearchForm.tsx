@@ -30,9 +30,9 @@ export function DocumentSearchForm({
       onSubmit={(e) => {
         void onSubmit(e);
       }}
-      className="card p-md stack-md"
+      className="card p-4.5 space-y-4"
     >
-      <div className="grid-2">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <Field label={t('document.search.date_from_label')}>
           <Input type="date" {...register('transaction_date_from')} />
         </Field>
@@ -41,7 +41,7 @@ export function DocumentSearchForm({
         </Field>
       </div>
 
-      <div className="grid-2">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <Field label={t('document.search.amount_min_label')}>
           <Input type="number" placeholder="0" {...register('amount_min')} />
         </Field>
@@ -50,7 +50,7 @@ export function DocumentSearchForm({
         </Field>
       </div>
 
-      <div className="grid-2">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <Field label={t('document.search.counterparty_label')}>
           <Input
             type="text"
@@ -70,12 +70,12 @@ export function DocumentSearchForm({
         </Field>
       </div>
 
-      <div className="row between wrap gap-md">
+      <div className="flex items-center justify-between flex-wrap gap-3.5">
         <Checkbox
           label={t('document.search.include_voided_label')}
           {...register('include_voided')}
         />
-        <div className="row gap-sm">
+        <div className="flex items-center gap-2">
           <Button type="button" variant="secondary" onClick={onReset}>
             {t('document.search.reset_button')}
           </Button>

@@ -60,7 +60,7 @@ function UserFormModal({ onClose }: { onClose: () => void }) {
             mutation.mutate(values);
           })(e);
         }}
-        className="modal-body stack-md"
+        className="modal-body space-y-4"
       >
         <Field
           label={t('user.form.email_label')}
@@ -92,7 +92,7 @@ function UserFormModal({ onClose }: { onClose: () => void }) {
           </Select>
         </Field>
         {submitError !== null && <p className="field-error">{t(submitError)}</p>}
-        <div className="row end gap-sm">
+        <div className="flex items-center justify-end gap-2 max-md:flex-col-reverse max-md:items-stretch max-md:gap-2.5">
           <Button type="button" variant="secondary" onClick={onClose} disabled={mutation.isPending}>
             {t('common.buttons.cancel')}
           </Button>

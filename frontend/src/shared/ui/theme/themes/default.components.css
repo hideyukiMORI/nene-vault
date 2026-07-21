@@ -350,62 +350,6 @@
     }
 
     /* ---- layout primitives ---- */
-    .stack-xl > * + * {
-      margin-top: 30px;
-    }
-    .stack-lg > * + * {
-      margin-top: 22px;
-    }
-    .stack-md > * + * {
-      margin-top: 16px;
-    }
-    .stack-sm > * + * {
-      margin-top: 10px;
-    }
-    .stack-xs > * + * {
-      margin-top: 6px;
-    }
-    .row {
-      display: flex;
-      align-items: center;
-    }
-    .between {
-      justify-content: space-between;
-    }
-    .end {
-      justify-content: flex-end;
-    }
-    .wrap {
-      flex-wrap: wrap;
-    }
-    .gap-sm {
-      gap: 8px;
-    }
-    .gap-md {
-      gap: 14px;
-    }
-    .gap-lg {
-      gap: 22px;
-    }
-    .grid-2 {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 16px;
-    }
-    .grid-3 {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 16px;
-    }
-    .grid-4 {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 16px;
-    }
-    .flex1 {
-      flex: 1;
-      min-width: 0;
-    }
 
     /* ---- cards / panels ---- */
     .card {
@@ -416,12 +360,6 @@
     }
     .card.flush {
       box-shadow: none;
-    }
-    .p-md {
-      padding: 18px;
-    }
-    .p-lg {
-      padding: 24px;
     }
     .card-head {
       display: flex;
@@ -1366,18 +1304,8 @@
 
     /* ---- both tablet & mobile: relax dense grids ---- */
     @media (max-width: 1023px) {
-      .grid-3 {
-        grid-template-columns: 1fr 1fr;
-      }
-      .grid-4 {
-        grid-template-columns: 1fr 1fr;
-      }
     }
     @media (max-width: 640px) {
-      .grid-2,
-      .grid-3 {
-        grid-template-columns: 1fr;
-      }
       .dl {
         grid-template-columns: 1fr;
         row-gap: 14px;
@@ -1535,9 +1463,6 @@
         align-items: flex-start;
         gap: 14px;
       }
-      .stack-lg > * + * {
-        margin-top: 18px;
-      }
 
       /* touch-sized controls */
       .btn {
@@ -1559,14 +1484,6 @@
       }
 
       /* a form's action row spans full width, primary on its own line & reachable */
-      :where(form) .row.end {
-        flex-direction: column-reverse;
-        align-items: stretch;
-        gap: 10px;
-      }
-      :where(form .row.end) .btn {
-        width: 100%;
-      }
 
       /* pagination stacks */
       .pagination {
@@ -1574,9 +1491,6 @@
         gap: 12px;
         align-items: stretch;
         text-align: center;
-      }
-      .pagination .row {
-        justify-content: center;
       }
       .pagination .btn {
         flex: 1;

@@ -34,7 +34,7 @@ export function Pagination({
   return (
     <div className="pagination">
       <span>{showingLabel}</span>
-      <div className="row gap-sm">
+      <div className="flex items-center gap-2 max-md:justify-center">
         <Button variant="secondary" size="sm" onClick={onPrev} disabled={!canPrev}>
           {previousLabel}
         </Button>

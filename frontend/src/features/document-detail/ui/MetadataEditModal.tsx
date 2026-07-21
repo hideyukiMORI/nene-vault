@@ -36,7 +36,7 @@ export function MetadataEditModal({ doc, onClose, ocrPrefill }: MetadataEditModa
         onSubmit={(e) => {
           void onSubmit(e);
         }}
-        className="modal-body stack-md"
+        className="modal-body space-y-4"
       >
         <p className="muted body-sm">{t('document.metadata_edit.description')}</p>
 
@@ -58,7 +58,7 @@ export function MetadataEditModal({ doc, onClose, ocrPrefill }: MetadataEditModa
           </Select>
         </Field>
 
-        <div className="grid-2">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <Field label={t('document.metadata.transaction_date')}>
             <Input type="date" {...register('transaction_date')} />
           </Field>
@@ -77,7 +77,7 @@ export function MetadataEditModal({ doc, onClose, ocrPrefill }: MetadataEditModa
 
         {submitError !== null && <p className="field-error">{t(submitError)}</p>}
 
-        <div className="row end gap-sm">
+        <div className="flex items-center justify-end gap-2 max-md:flex-col-reverse max-md:items-stretch max-md:gap-2.5">
           <Button type="button" variant="secondary" onClick={onClose} disabled={isSubmitting}>
             {t('common.buttons.cancel')}
           </Button>

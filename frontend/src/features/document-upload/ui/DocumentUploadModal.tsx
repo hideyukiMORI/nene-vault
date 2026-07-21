@@ -34,7 +34,7 @@ export function DocumentUploadModal({ onClose }: DocumentUploadModalProps) {
         onSubmit={(e) => {
           void onSubmit(e);
         }}
-        className="modal-body stack-md"
+        className="modal-body space-y-4"
       >
         <Field
           label={t('document.upload.file_label')}
@@ -74,7 +74,7 @@ export function DocumentUploadModal({ onClose }: DocumentUploadModalProps) {
           </Select>
         </Field>
 
-        <div className="grid-2">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <Field
             label={t('document.upload.transaction_date_label')}
             hint={t('document.upload.transaction_date_hint')}
@@ -100,7 +100,7 @@ export function DocumentUploadModal({ onClose }: DocumentUploadModalProps) {
 
         {submitError !== null && <p className="field-error">{t(submitError)}</p>}
 
-        <div className="row end gap-sm">
+        <div className="flex items-center justify-end gap-2 max-md:flex-col-reverse max-md:items-stretch max-md:gap-2.5">
           <Button type="button" variant="secondary" onClick={onClose} disabled={isSubmitting}>
             {t('common.buttons.cancel')}
           </Button>

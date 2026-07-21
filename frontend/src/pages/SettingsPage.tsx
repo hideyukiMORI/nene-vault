@@ -95,7 +95,7 @@ export function SettingsPage() {
         <EmptyState>{t('common.status.loading')}</EmptyState>
       ) : (
         <form
-          className="card p-md stack-md"
+          className="card p-4.5 space-y-4"
           onSubmit={(e) => {
             void form.handleSubmit((values) => {
               mutation.mutate({
