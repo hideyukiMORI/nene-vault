@@ -32,7 +32,7 @@ export function VoidModal({ documentId, onClose }: VoidModalProps) {
         }}
         className="modal-body space-y-4"
       >
-        <p className="muted body-sm">{t('document.void.description')}</p>
+        <p className="text-text-muted body-sm">{t('document.void.description')}</p>
 
         <Callout tone="warn">{t('document.void.warning')}</Callout>
 

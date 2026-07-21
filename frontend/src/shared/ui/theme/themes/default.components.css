@@ -18,18 +18,9 @@
 
   @layer main {
     /* ---- text helpers ---- */
-    .muted {
-      color: var(--color-text-muted);
-    }
-    .faint {
-      color: var(--color-text-faint);
-    }
     .mono {
       font-family: var(--font-mono);
       font-feature-settings: 'zero' 1;
-    }
-    .tabular {
-      font-variant-numeric: tabular-nums;
     }
     .upper {
       text-transform: uppercase;
@@ -241,11 +232,6 @@
     }
 
     /* ---- main column ---- */
-    .main {
-      display: flex;
-      flex-direction: column;
-      min-width: 0;
-    }
     .topbar {
       position: sticky;
       top: 0;
@@ -798,11 +784,6 @@
         oklch(95% 0.012 83) 0%,
         var(--color-surface) 60%
       );
-    }
-    .center-top {
-      display: flex;
-      justify-content: flex-end;
-      padding: 18px 24px;
     }
     .center-card {
       margin: auto;

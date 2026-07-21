@@ -264,7 +264,7 @@ export function AppShell({
         </div>
       </aside>
 
-      <div className="main">
+      <div className="flex flex-col min-w-0">
         <header className="topbar">
           <nav className="crumbs" aria-label={breadcrumbLabel}>
             {pathname === '/' || leafLabel === '' ? (

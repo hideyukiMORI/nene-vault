@@ -155,7 +155,7 @@ export function SettingsPage() {
           </Field>
 
           {settings?.updated_at !== null && settings?.updated_at !== undefined && (
-            <p className="muted label-xs">
+            <p className="text-text-muted label-xs">
               {t('vault_settings.fields.updated_at_label')}:{' '}
               {formatDateTime(settings.updated_at, locale)}
             </p>

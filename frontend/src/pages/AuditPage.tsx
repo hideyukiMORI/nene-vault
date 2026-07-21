@@ -388,13 +388,15 @@ export function AuditPage() {
                       <td className="pri">
                         {t(dynamicMessageKey(`audit_event.action.${event.action}`))}
                       </td>
-                      <td className="muted mono label-xs">
+                      <td className="text-text-muted mono label-xs">
                         {event.entity_type}/{event.entity_id}
                       </td>
-                      <td className="muted">
+                      <td className="text-text-muted">
                         {event.actor_user_id !== null ? String(event.actor_user_id) : '—'}
                       </td>
-                      <td className="muted mono">{formatDateTime(event.created_at, locale)}</td>
+                      <td className="text-text-muted mono">
+                        {formatDateTime(event.created_at, locale)}
+                      </td>
                       <td>
                         <ChangeSummary event={event} />
                       </td>
