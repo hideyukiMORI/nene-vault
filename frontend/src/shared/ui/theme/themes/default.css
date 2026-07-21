@@ -23,6 +23,7 @@
 @theme {
   /* ---- paper / surfaces — warm, never sterile white ---- */
   --color-surface: oklch(97.2% 0.007 83);
+  --color-x-page-glow: oklch(95% 0.012 83);
   --color-surface-raised: oklch(99.4% 0.004 83);
   --color-surface-overlay: oklch(98% 0.006 83);
   --color-surface-sunken: oklch(95.4% 0.008 83);

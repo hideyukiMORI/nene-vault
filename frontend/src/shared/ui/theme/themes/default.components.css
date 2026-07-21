@@ -627,16 +627,6 @@
     }
 
     /* ---- centered screens (login / forbidden) ---- */
-    .center {
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      background: radial-gradient(
-        120% 80% at 50% -10%,
-        oklch(95% 0.012 83) 0%,
-        var(--color-surface) 60%
-      );
-    }
     .center-card {
       margin: auto;
       width: 100%;

@@ -18,7 +18,7 @@ export function LoginForm({ onLoggedIn }: LoginFormProps) {
     useLoginPage();
 
   return (
-    <div className="center">
+    <div className="min-h-screen flex flex-col page-glow">
       <div className="flex justify-end px-6 py-4.5">
         <LanguageSwitcher
           label={t('navigation.language')}
