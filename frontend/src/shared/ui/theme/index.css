@@ -36,6 +36,22 @@
   z-index: var(--z-modal);
 }
 
+/* drawer slide-in panel width (min() 合成は utility で表現不能＝page-glow precedent）
+   ＋ named z-index（TW4 に z namespace 無し・値を実態 90/91 へ是正した --z-scrim/--z-drawer
+   を参照。旧 60/70 は dead-on-arrival だった）＋ opacity/visibility の複合 transition。 */
+@utility w-drawer {
+  width: min(540px, 94vw);
+}
+@utility z-scrim {
+  z-index: var(--z-scrim);
+}
+@utility z-drawer {
+  z-index: var(--z-drawer);
+}
+@utility transition-fade {
+  transition-property: opacity, visibility;
+}
+
 @import './active.css';
 /* NOTE: imported WITHOUT `layer(base)` — this is the canonical form, not a
    deviation. base.css already wraps its rules in `@layer base { … }`, and layer

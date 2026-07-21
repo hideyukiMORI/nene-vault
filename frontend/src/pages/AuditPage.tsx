@@ -145,32 +145,40 @@ function AuditDetailDrawer({ event, open, onClose }: DrawerProps) {
     <>
       <button
         type="button"
-        className={open ? 'drawer-overlay is-open' : 'drawer-overlay'}
+        className={
+          open
+            ? 'fixed inset-0 bg-x-scrim/42 z-scrim transition-fade duration-180 opacity-100 visible'
+            : 'fixed inset-0 bg-x-scrim/42 z-scrim transition-fade duration-180 opacity-0 invisible'
+        }
         aria-label={t('common.buttons.close')}
         tabIndex={open ? 0 : -1}
         onClick={onClose}
       />
       <aside
-        className={open ? 'drawer is-open' : 'drawer'}
+        className={
+          open
+            ? 'fixed top-0 right-0 h-screen w-drawer bg-surface-raised border-l border-x-line-mid shadow-lg z-drawer flex flex-col transition-transform duration-240 ease-drawer translate-x-0 max-md:top-auto max-md:bottom-0 max-md:left-0 max-md:right-0 max-md:w-full max-md:h-auto max-md:max-h-dialog max-md:border-l-0 max-md:border-t max-md:rounded-t-sheet'
+            : 'fixed top-0 right-0 h-screen w-drawer bg-surface-raised border-l border-x-line-mid shadow-lg z-drawer flex flex-col transition-transform duration-240 ease-drawer translate-x-full max-md:top-auto max-md:bottom-0 max-md:left-0 max-md:right-0 max-md:w-full max-md:h-auto max-md:max-h-dialog max-md:border-l-0 max-md:border-t max-md:rounded-t-sheet max-md:translate-x-0 max-md:translate-y-full'
+        }
         role="dialog"
         aria-modal="true"
         aria-hidden={!open}
       >
         {event !== null && (
           <>
-            <div className="drawer-head">
+            <div className="flex items-start gap-3 justify-between px-5.5 pt-4.5 pb-4 border-b border-border max-md:pt-5.5 max-md:relative max-md:before:absolute max-md:before:top-2.25 max-md:before:left-1/2 max-md:before:-translate-x-1/2 max-md:before:w-9.5 max-md:before:h-1 max-md:before:rounded-full max-md:before:bg-x-line-mid">
               <div>
                 <div className="text-2xs tracking-eyebrow uppercase text-x-brass-deep font-semibold mb-1.25">
                   {t('audit_event.detail.record')} #{event.id}
                 </div>
-                <h2>
+                <h2 className="text-h2 font-semibold flex items-center gap-2.25">
                   <span className="inline-block w-0.75 h-3.75 bg-x-brass rounded-px flex-none" />
                   <span>{t(dynamicMessageKey(`audit_event.action.${event.action}`))}</span>
                 </h2>
               </div>
               <button
                 type="button"
-                className="drawer-close"
+                className="bg-transparent border-0 text-modal-close cursor-pointer text-text-faint leading-none px-1.75 py-0.5 rounded-sm flex-none hover:text-x-ink-deep hover:bg-surface-sunken max-md:w-10 max-md:h-10 max-md:flex max-md:items-center max-md:justify-center max-md:text-2xl"
                 aria-label={t('common.buttons.close')}
                 onClick={onClose}
               >

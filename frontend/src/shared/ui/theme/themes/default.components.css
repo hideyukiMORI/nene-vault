@@ -728,69 +728,6 @@
     }
 
     /* ---- audit detail drawer ---- */
-    .drawer-overlay {
-      position: fixed;
-      inset: 0;
-      background: oklch(24% 0.02 256 / 42%);
-      z-index: 90;
-      opacity: 0;
-      visibility: hidden;
-      transition:
-        opacity 0.18s,
-        visibility 0.18s;
-    }
-    .drawer-overlay.is-open {
-      opacity: 1;
-      visibility: visible;
-    }
-    .drawer {
-      position: fixed;
-      top: 0;
-      right: 0;
-      height: 100vh;
-      width: min(540px, 94vw);
-      background: var(--color-surface-raised);
-      border-left: 1px solid var(--color-x-line-mid);
-      box-shadow: var(--shadow-lg);
-      z-index: 91;
-      display: flex;
-      flex-direction: column;
-      transform: translateX(100%);
-      transition: transform 0.24s cubic-bezier(0.32, 0.72, 0, 1);
-    }
-    .drawer.is-open {
-      transform: none;
-    }
-    .drawer-head {
-      display: flex;
-      align-items: flex-start;
-      gap: 12px;
-      justify-content: space-between;
-      padding: 18px 22px 16px;
-      border-bottom: 1px solid var(--color-border);
-    }
-    .drawer-head h2 {
-      font-size: var(--text-h2);
-      font-weight: 600;
-      display: flex;
-      align-items: center;
-      gap: 9px;
-    }
-    .drawer-close {
-      background: none;
-      border: 0;
-      font-size: 1.3rem;
-      cursor: pointer;
-      color: var(--color-text-faint);
-      line-height: 1;
-      padding: 2px 7px;
-      border-radius: var(--radius-sm);
-      flex: none;
-    }
-    .drawer-close:hover {
-      color: var(--color-x-ink-deep);
-      background: var(--color-surface-sunken);
-    }
     .drawer-meta {
       display: grid;
       grid-template-columns: 1fr 1fr;
@@ -1216,45 +1153,6 @@
       }
 
       /* audit detail drawer becomes a bottom sheet with a grab handle */
-      .drawer {
-        top: auto;
-        bottom: 0;
-        left: 0;
-        right: 0;
-        width: 100%;
-        height: auto;
-        max-height: 90vh;
-        border-left: 0;
-        border-top: 1px solid var(--color-x-line-mid);
-        border-radius: 14px 14px 0 0;
-        transform: translateY(100%);
-      }
-      .drawer.is-open {
-        transform: none;
-      }
-      .drawer-head {
-        padding-top: 22px;
-        position: relative;
-      }
-      .drawer-head::before {
-        content: '';
-        position: absolute;
-        top: 9px;
-        left: 50%;
-        transform: translateX(-50%);
-        width: 38px;
-        height: 4px;
-        border-radius: 999px;
-        background: var(--color-x-line-mid);
-      }
-      .drawer-close {
-        width: 40px;
-        height: 40px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 1.5rem;
-      }
       .drawer-meta {
         grid-template-columns: 1fr;
         gap: 12px;

@@ -102,6 +102,7 @@
   --radius-sm: 4px;
   --radius-md: 6px;
   --radius-lg: 8px;
+  --radius-sheet: 14px;
   --radius-full: 999px;
 
   /* ---- spacing scale (semantic, used by utilities) ---- */
@@ -129,8 +130,8 @@
   /* ---- z-index ---- */
   --z-rail: 50;
   --z-topbar: 30;
-  --z-scrim: 60;
-  --z-drawer: 70;
+  --z-scrim: 90;
+  --z-drawer: 91;
   --z-modal: 100;
 
   /* ---- letter-spacing (tracking) ---- */
@@ -143,6 +144,9 @@
 
   /* ---- line-height (leading) ---- */
   --leading-brand: 1.05;
+
+  /* ---- easing ---- */
+  --ease-drawer: cubic-bezier(0.32, 0.72, 0, 1);
   --leading-diff: 1.55;
   --leading-pre: 1.6;
 
