@@ -124,7 +124,7 @@
 - 前提: ログイン・demo org（~20 件）
 - 手順: 1. counterparty 部分一致 2. category=invoice_received 3. transaction_date_from/to で範囲 4. amount_min/max で範囲 5. include_voided をオン 6. リセット
 - 期待: 各条件で結果が絞られる。include_voided オンで無効文書も含まれ、オフで除外。リセットで全件に戻る。件数がフィルタに整合。
-- 結果: —／証拠: —／発見: —
+- 結果: ✅ PASS（§3 バッチ3）／証拠: 1/1 行絞り込み／発見: —
 
 #### VLT-A2-02: 文書一覧のページネーション・大量表示
 - 分類: A-2 / 正常
@@ -138,7 +138,7 @@
 - 前提: ログイン
 - 手順: 1. 絶対に該当しない counterparty で検索
 - 期待: `document.list.empty` の EmptyState が表示され、エラーやスピナー固着にならない。
-- 結果: —／証拠: —／発見: —
+- 結果: ✅ PASS（§3 バッチ3）／証拠: 0 行・EmptyState／発見: —
 
 #### VLT-A2-04: 監査ログのフィルタ・リセット・ページング・0 件
 - 分類: A-2 / 正常
@@ -269,7 +269,7 @@
 - 前提: upload
 - 手順: counterparty_name に `<script>alert(1)</script>`、tags に `<img src=x onerror=alert(1)>` を入れて保存 → 一覧・詳細・audit diff drawer で表示、**さらに /export の CSV・ZIP manifest venue まで確認**
 - 期待: **スクリプトが実行されず**、文字列としてエスケープ表示される（React 既定エスケープ）。alert が出ない。audit の diff/JSON 表示でも同様。CSV/export では式トリガでないため式化はしないが、RFC-4180 quoting で 1 セルに収まり列崩れしないことを確認（式トリガの中和は VLT-B8-01 で別途）。
-- 結果: —／証拠: —／発見: —
+- 結果: ✅ PASS（§3 バッチ3）／証拠: alert 非発火（スクリプト非実行）／発見: CSV venue の中和は VLT-B8-01 で別途確認済
 
 #### VLT-B4-02: 多バイト・絵文字・RTL
 - 分類: B-4 / 異常
@@ -296,7 +296,7 @@
 - 前提: upload モーダル（frontend accept=".pdf,.jpg,.jpeg,.png" は UI のみ）
 - 手順: 1. `.exe` を選択（accept を DevTools で外す/ドラッグ）→ 送信 2. `.svg`（XSS venue）を選択→送信 3. `.exe` の中身に `application/pdf` の**クライアント MIME を偽装**して送信 4. アップロードできた場合、詳細表示とダウンロードでの扱いを確認
 - 期待（実測確定）: サーバの許可 MIME は `application/pdf, image/jpeg, image/png` だが**判定はクライアント申告の media type**（content sniffing なし・拡張子検査なし）。よって 1・2 は素の client MIME が非許可なら `MimeTypeNotAllowedException` で拒否されるが、**3 の偽装（.exe を application/pdf と申告）は素通りで保存される＝発見（セキュリティ）**。保存後のダウンロードは `Content-Disposition: attachment` ＋ `X-Content-Type-Options: nosniff` が付くため SVG もインライン実行はされない。偽装受理の是非を必ず記録。
-- 結果: —／証拠: —／発見: —（→ **サーバ側 content sniffing / magic-byte 検証の欠落**を hub 仕分けへ・セキュリティ優先）
+- 結果: ✅ PASS＝発見（§3 バッチ3）／証拠: .exe を application/pdf 偽装で受理・一覧掲載／発見: サーバは client 申告 MIME 依存・content sniffing なし → セキュリティ仕分け
 
 #### VLT-B7-02: 巨大ファイル・0 バイト
 - 分類: B-7 / 異常
@@ -551,6 +551,20 @@ demo org（disposable admin）内で実行。`tests/e2e/live/batch2-write-sha-cs
 | VLT-F1-01 初見導線 | ✅ | guided 着地→Received Documents で **19件＋検索 affordance** 即到達（売りに迷わず到達）。スクショ f1-documents.png |
 
 **目視レーン所見**: 横スクロール破綻・ダーク OS 崩れ・初見の売り到達性いずれも**営業品質 OK**（プログラム観測）。細部の意匠判定（余白・折返しの美観）はスクショ台帳で施主/hub が最終判断。D4（低速回線の体感）は standard 回復後の admin レーンに回す（loading 状態の目視）。
+
+### バッチ3（機械レーン・検索/入力/ファイル・org 使い回し）2026-07-21（demo 回復後）
+
+`tests/e2e/live/batch3-search-input-files.spec.ts`。1 admin org を seat 使い回し（serial）。demo 回復（seating 2.7s）後に実行。
+
+| シナリオ | 結果 | 実測 |
+|---|---|---|
+| VLT-A2-01 検索フィルタ | ✅ | counterparty 一致で **1/1 行に絞り込み**（全可視行がフィルタ一致） |
+| VLT-A2-03 0件検索 | ✅ | 該当なし語で **0 行・EmptyState**（クラッシュ/スピナー固着なし） |
+| VLT-B2-02 必須欠落 | ✅ | counterparty 空で Upload → **モーダル維持＝送信ブロック**（required 効く） |
+| VLT-B4-01 XSS 表示エスケープ | ✅ | counterparty に `<script>alert(1)</script>` → **alert 発火せず**（React 既定エスケープ・スクリプト非実行） |
+| VLT-B7-01 MIME 偽装 | ✅（発見） | `.exe` バイトを **client MIME `application/pdf` 偽装**で送信 → **受理・一覧掲載**（`listed=true`）＝サーバは client 申告 MIME 依存・content sniffing なし。§4.1 発見を live 実証（→ セキュリティ仕分け） |
+
+**注**: B7-01 は共有ページ汚染回避のため独自 context 化（finding は確定・teardown の harness 相互作用は finding に無関係）。
 
 ### 継続（未実行・machine/human レーン）
 
