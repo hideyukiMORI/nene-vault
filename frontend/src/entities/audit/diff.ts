@@ -22,6 +22,41 @@ export function formatAuditValue(value: unknown): string {
 }
 
 /**
+ * Key-order-independent deep equality. Two objects with the same entries in a
+ * different key order are equal; arrays stay order-sensitive. Used instead of
+ * `JSON.stringify` comparison so a change in the server's JSON serialization
+ * order does not surface as a spurious `mod` in the audit change summary.
+ */
+function deepEqual(a: unknown, b: unknown): boolean {
+  if (a === b) {
+    return true;
+  }
+  if (typeof a !== 'object' || typeof b !== 'object' || a === null || b === null) {
+    return false;
+  }
+  const aIsArray = Array.isArray(a);
+  const bIsArray = Array.isArray(b);
+  if (aIsArray !== bIsArray) {
+    return false;
+  }
+  if (aIsArray && bIsArray) {
+    const aArr = a as unknown[];
+    const bArr = b as unknown[];
+    return aArr.length === bArr.length && aArr.every((item, i) => deepEqual(item, bArr[i]));
+  }
+  const aObj = a as Record<string, unknown>;
+  const bObj = b as Record<string, unknown>;
+  const aKeys = Object.keys(aObj);
+  const bKeys = Object.keys(bObj);
+  return (
+    aKeys.length === bKeys.length &&
+    aKeys.every(
+      (key) => Object.prototype.hasOwnProperty.call(bObj, key) && deepEqual(aObj[key], bObj[key]),
+    )
+  );
+}
+
+/**
  * Returns the fields that changed between two snapshots. When `before` is null
  * (a creation event), every field of `after` is reported as an addition.
  */
@@ -46,7 +81,7 @@ export function diffAuditEvent(
   for (const key of keys) {
     const b = before[key];
     const a = afterObj[key];
-    if (JSON.stringify(b) !== JSON.stringify(a)) {
+    if (!deepEqual(b, a)) {
       fields.push({ key, kind: 'mod', before: b, after: a });
     }
   }

@@ -55,6 +55,22 @@ describe('diffAuditEvent', () => {
     expect(diffAuditEvent(before, after)).toEqual([]);
   });
 
+  it('treats objects with the same entries in a different key order as equal', () => {
+    const before = { meta: { a: 1, b: 2 } };
+    const after = { meta: { b: 2, a: 1 } };
+
+    expect(diffAuditEvent(before, after)).toEqual([]);
+  });
+
+  it('keeps array element order significant', () => {
+    const before = { tags: ['a', 'b'] };
+    const after = { tags: ['b', 'a'] };
+
+    expect(diffAuditEvent(before, after)).toEqual([
+      { key: 'tags', kind: 'mod', before: ['a', 'b'], after: ['b', 'a'] },
+    ]);
+  });
+
   it('detects changes inside nested structures', () => {
     const before = { meta: { n: 1 } };
     const after = { meta: { n: 2 } };
