@@ -18,6 +18,9 @@ final readonly class UpdateDocumentMetadataHandler
     /** @var list<string> */
     private const VALID_CATEGORIES = ['invoice_received', 'contract', 'receipt', 'delivery_note', 'other'];
 
+    /** amount_cents is a signed 32-bit DB column; app-layer range guard (QA VLT-B1-02). */
+    private const MAX_AMOUNT_CENTS = 2147483647;
+
     public function __construct(
         private UpdateDocumentMetadataUseCaseInterface $useCase,
         private JsonResponseFactory $response,
@@ -59,6 +62,11 @@ final readonly class UpdateDocumentMetadataHandler
         if (isset($body['amount_cents']) && $body['amount_cents'] !== '') {
             if (!is_numeric($body['amount_cents']) || (int) $body['amount_cents'] != $body['amount_cents']) {
                 $errors[] = new ValidationError('amount_cents', 'Please enter a valid integer amount.', 'invalid_amount');
+            } elseif ((int) $body['amount_cents'] < 0 || (int) $body['amount_cents'] > self::MAX_AMOUNT_CENTS) {
+                // Range-check at the app layer so an out-of-range value returns a
+                // friendly 422 instead of overflowing the signed-32-bit DB column
+                // and surfacing as a raw server error (QA VLT-B1-02).
+                $errors[] = new ValidationError('amount_cents', 'Amount must be between 0 and 2,147,483,647.', 'amount_out_of_range');
             } else {
                 $amountCents = (int) $body['amount_cents'];
             }
