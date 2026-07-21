@@ -375,6 +375,18 @@ final readonly class DocumentServiceProvider implements ServiceProviderInterface
                 },
             )
             ->set(
+                EmptyFileExceptionHandler::class,
+                static function (ContainerInterface $c): EmptyFileExceptionHandler {
+                    $pd = $c->get(ProblemDetailsResponseFactory::class);
+
+                    if (!$pd instanceof ProblemDetailsResponseFactory) {
+                        throw new LogicException('ProblemDetailsResponseFactory service is invalid.');
+                    }
+
+                    return new EmptyFileExceptionHandler($pd);
+                },
+            )
+            ->set(
                 FileTooLargeExceptionHandler::class,
                 static function (ContainerInterface $c): FileTooLargeExceptionHandler {
                     $pd = $c->get(ProblemDetailsResponseFactory::class);
