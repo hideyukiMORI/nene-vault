@@ -18,6 +18,24 @@
   );
 }
 
+/* Dialog max-heights: TW4 has no vh token namespace, so these single-property
+   viewport heights are @utility-ized (same precedent as page-glow) to keep the
+   arbitrary-value ban (規約⑤) intact. NOTE: dvh would be more correct on mobile
+   (iOS URL bar) — deferred to a post-parity improvement PR to hold EXACT parity. */
+@utility max-h-dialog {
+  max-height: 90vh;
+}
+@utility max-h-sheet {
+  max-height: 92vh;
+}
+
+/* z-index:100 の named 参照。TW4 の z-index は静的値+arbitrary のみで named
+   namespace が無いため、既存 --z-modal トークンを @utility 経由で参照して
+   arbitrary（z-[100]）を回避する。 */
+@utility z-modal {
+  z-index: var(--z-modal);
+}
+
 @import './active.css';
 /* NOTE: imported WITHOUT `layer(base)` — this is the canonical form, not a
    deviation. base.css already wraps its rules in `@layer base { … }`, and layer

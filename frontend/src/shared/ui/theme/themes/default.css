@@ -24,6 +24,7 @@
   /* ---- paper / surfaces — warm, never sterile white ---- */
   --color-surface: oklch(97.2% 0.007 83);
   --color-x-page-glow: oklch(95% 0.012 83);
+  --color-x-scrim: oklch(24% 0.02 256);
   --color-surface-raised: oklch(99.4% 0.004 83);
   --color-surface-overlay: oklch(98% 0.006 83);
   --color-surface-sunken: oklch(95.4% 0.008 83);
@@ -93,6 +94,7 @@
   --text-xs: 0.75rem;
   --text-3xs: 0.5625rem;
   --text-brand: 1.18rem;
+  --text-modal-close: 1.3rem;
   --text-2xs: 0.6875rem;
 
   /* ---- geometry ---- */
@@ -146,4 +148,6 @@
 
   /* ---- prose width ---- */
   --container-lede: 60ch;
+  --container-modal: 520px;
+  --container-modal-sm: 432px;
 }
