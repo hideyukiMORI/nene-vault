@@ -8,17 +8,15 @@ import { useUsers, useCreateUser, useDeleteUser } from '@/entities/user';
 import type { User } from '@/entities/user';
 import { messageKeyForError } from '@/shared/i18n/map-problem-details';
 import { useTranslation } from '@/shared/i18n/use-translation';
-import {
-  AppShell,
-  Button,
-  Callout,
-  EmptyState,
-  Field,
-  Input,
-  Modal,
-  Pagination,
-  Select,
-} from '@/shared/ui';
+import { AppShell } from '@/shared/ui/components/AppShell';
+import { Button } from '@/shared/ui/primitives/Button';
+import { Callout } from '@/shared/ui/components/Callout';
+import { EmptyState } from '@/shared/ui/components/EmptyState';
+import { Field } from '@/shared/ui/components/Field';
+import { Input } from '@/shared/ui/primitives/Input';
+import { Modal } from '@/shared/ui/components/Modal';
+import { Pagination } from '@/shared/ui/components/Pagination';
+import { Select } from '@/shared/ui/primitives/Select';
 
 const PAGE_SIZE = 20;
 

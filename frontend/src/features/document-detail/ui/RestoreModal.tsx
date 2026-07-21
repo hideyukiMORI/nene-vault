@@ -1,7 +1,8 @@
 import { useRestoreDocument } from '@/entities/document';
 import { messageKeyForError } from '@/shared/i18n/map-problem-details';
 import { useTranslation } from '@/shared/i18n/use-translation';
-import { Button, Modal } from '@/shared/ui';
+import { Button } from '@/shared/ui/primitives/Button';
+import { Modal } from '@/shared/ui/components/Modal';
 
 interface RestoreModalProps {
   documentId: string;

@@ -1,6 +1,9 @@
 import type { AuthSession } from '@/entities/auth';
 import { useTranslation } from '@/shared/i18n/use-translation';
-import { BrandMark, Button, Field, Input } from '@/shared/ui';
+import { BrandMark } from '@/shared/ui/primitives/BrandMark';
+import { Button } from '@/shared/ui/primitives/Button';
+import { Field } from '@/shared/ui/components/Field';
+import { Input } from '@/shared/ui/primitives/Input';
 import { LanguageSwitcher } from '@/shared/ui/components/LanguageSwitcher';
 import { useLoginPage } from '../model/use-login';
 

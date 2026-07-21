@@ -4,7 +4,11 @@ import { useDocumentSearch, DocumentSearchForm, DocumentTable } from '@/features
 import { DocumentUploadModal } from '@/features/document-upload';
 import { authStore } from '@/entities/auth';
 import { useTranslation } from '@/shared/i18n/use-translation';
-import { AppShell, Button, Callout, EmptyState, Pagination } from '@/shared/ui';
+import { AppShell } from '@/shared/ui/components/AppShell';
+import { Button } from '@/shared/ui/primitives/Button';
+import { Callout } from '@/shared/ui/components/Callout';
+import { EmptyState } from '@/shared/ui/components/EmptyState';
+import { Pagination } from '@/shared/ui/components/Pagination';
 
 export function DocumentsPage() {
   const { t } = useTranslation();

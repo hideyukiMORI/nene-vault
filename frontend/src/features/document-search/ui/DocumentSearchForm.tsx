@@ -1,6 +1,10 @@
 import type { UseFormReturn } from 'react-hook-form';
 import { useTranslation } from '@/shared/i18n/use-translation';
-import { Button, Checkbox, Field, Input, Select } from '@/shared/ui';
+import { Button } from '@/shared/ui/primitives/Button';
+import { Checkbox } from '@/shared/ui/primitives/Checkbox';
+import { Field } from '@/shared/ui/components/Field';
+import { Input } from '@/shared/ui/primitives/Input';
+import { Select } from '@/shared/ui/primitives/Select';
 import type { SearchFormValues } from '../model/use-document-search';
 
 interface DocumentSearchFormProps {
