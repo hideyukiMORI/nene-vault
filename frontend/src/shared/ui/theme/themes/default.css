@@ -132,6 +132,11 @@
   --tracking-eyebrow: 0.16em;
   --tracking-tight: -0.005em;
   --tracking-title: -0.01em;
+  --tracking-label: 0.06em;
+
+  /* ---- line-height (leading) ---- */
+  --leading-diff: 1.55;
+  --leading-pre: 1.6;
 
   /* ---- prose width ---- */
   --container-lede: 60ch;

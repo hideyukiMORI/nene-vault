@@ -34,11 +34,11 @@ function ChangeSummary({ event }: { event: AuditEvent }) {
 
   if (event.before_json === null) {
     return (
-      <div className="chg-sum">
+      <div className="flex items-center gap-2 flex-wrap min-w-0">
         <span className="chg-kv">
           <span className="k">{t('audit_event.summary.created')}</span>
         </span>
-        <span className="chg-more">
+        <span className="text-2xs text-text-faint whitespace-nowrap">
           {t('audit_event.summary.fields', { count: String(fields.length) })}
         </span>
       </div>
@@ -47,10 +47,10 @@ function ChangeSummary({ event }: { event: AuditEvent }) {
 
   const first = fields[0];
   if (first === undefined) {
-    return <span className="chg-more">—</span>;
+    return <span className="text-2xs text-text-faint whitespace-nowrap">—</span>;
   }
   return (
-    <div className="chg-sum">
+    <div className="flex items-center gap-2 flex-wrap min-w-0">
       <span className="chg-kv">
         <span className="k">{first.key}</span>
         <span className="b">{formatAuditValue(first.before)}</span>
@@ -58,7 +58,7 @@ function ChangeSummary({ event }: { event: AuditEvent }) {
         <span className="a">{formatAuditValue(first.after)}</span>
       </span>
       {fields.length > 1 && (
-        <span className="chg-more">
+        <span className="text-2xs text-text-faint whitespace-nowrap">
           {t('audit_event.summary.more', { count: String(fields.length - 1) })}
         </span>
       )}
@@ -75,7 +75,11 @@ interface DrawerProps {
 function DiffView({ fields, isCreate }: { fields: AuditDiffField[]; isCreate: boolean }) {
   const { t } = useTranslation();
   if (fields.length === 0) {
-    return <div className="diff-empty">{t('audit_event.detail.no_params')}</div>;
+    return (
+      <div className="text-sm text-text-muted bg-surface-overlay border border-dashed border-x-line-mid rounded-md p-4 text-center">
+        {t('audit_event.detail.no_params')}
+      </div>
+    );
   }
   return (
     <div>
@@ -88,15 +92,19 @@ function DiffView({ fields, isCreate }: { fields: AuditDiffField[]; isCreate: bo
           );
         return (
           <div key={f.key} className={isCreate ? 'diff-field diff-single' : 'diff-field'}>
-            <div className="diff-key">
+            <div className="font-mono text-xs text-x-ink-deep font-medium mb-1.75 flex items-center gap-2">
               {f.key} {tag}
             </div>
             <div className="diff-pair">
               {!isCreate && (
-                <div className="diff-val diff-before">{formatAuditValue(f.before)}</div>
+                <div className="font-mono text-2xs leading-diff rounded-sm py-2 px-2.5 break-all whitespace-pre-wrap bg-surface-sunken border border-border text-text-muted">
+                  {formatAuditValue(f.before)}
+                </div>
               )}
               {!isCreate && <div className="diff-arrow">{ArrowIcon}</div>}
-              <div className="diff-val diff-after">{formatAuditValue(f.after)}</div>
+              <div className="font-mono text-2xs leading-diff rounded-sm py-2 px-2.5 break-all whitespace-pre-wrap bg-x-brass-soft border border-x-brass-line text-x-brass-deep">
+                {formatAuditValue(f.after)}
+              </div>
             </div>
           </div>
         );
@@ -228,17 +236,23 @@ function AuditDetailDrawer({ event, open, onClose }: DrawerProps) {
                 <div>
                   {!isCreate && (
                     <div className="json-block">
-                      <div className="json-label">{t('audit_event.list.table.before')}</div>
-                      <pre className="json-pre">{JSON.stringify(event.before_json, null, 2)}</pre>
+                      <div className="text-2xs text-text-muted uppercase tracking-label font-semibold mb-1.5">
+                        {t('audit_event.list.table.before')}
+                      </div>
+                      <pre className="font-mono text-2xs leading-pre bg-surface-sunken border border-border rounded-sm py-3 px-3.25 whitespace-pre overflow-x-auto text-text-primary">
+                        {JSON.stringify(event.before_json, null, 2)}
+                      </pre>
                     </div>
                   )}
                   <div className="json-block">
-                    <div className="json-label">
+                    <div className="text-2xs text-text-muted uppercase tracking-label font-semibold mb-1.5">
                       {isCreate
                         ? t('audit_event.detail.created_values')
                         : t('audit_event.list.table.after')}
                     </div>
-                    <pre className="json-pre">{JSON.stringify(event.after_json, null, 2)}</pre>
+                    <pre className="font-mono text-2xs leading-pre bg-surface-sunken border border-border rounded-sm py-3 px-3.25 whitespace-pre overflow-x-auto text-text-primary">
+                      {JSON.stringify(event.after_json, null, 2)}
+                    </pre>
                   </div>
                 </div>
               )}

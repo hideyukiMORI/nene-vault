@@ -42,14 +42,18 @@ export function DocumentHistoryTable({ events }: DocumentHistoryTableProps) {
               </td>
               <td>
                 {event.before_json !== null ? (
-                  <pre className="tbl-diff">{JSON.stringify(event.before_json, null, 2)}</pre>
+                  <pre className="font-mono text-2xs text-text-muted bg-surface-sunken border border-border rounded-sm py-1.75 px-2.25 whitespace-pre-wrap max-w-56 leading-normal overflow-hidden">
+                    {JSON.stringify(event.before_json, null, 2)}
+                  </pre>
                 ) : (
                   '—'
                 )}
               </td>
               <td>
                 {event.after_json !== null ? (
-                  <pre className="tbl-diff">{JSON.stringify(event.after_json, null, 2)}</pre>
+                  <pre className="font-mono text-2xs text-text-muted bg-surface-sunken border border-border rounded-sm py-1.75 px-2.25 whitespace-pre-wrap max-w-56 leading-normal overflow-hidden">
+                    {JSON.stringify(event.after_json, null, 2)}
+                  </pre>
                 ) : (
                   '—'
                 )}
