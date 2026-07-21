@@ -31,7 +31,7 @@ export function LoginForm({ onLoggedIn }: LoginFormProps) {
       </div>
       <form className="center-card" onSubmit={handleSubmit(onLoggedIn)} noValidate>
         <div className="head">
-          <div className="brand-lock">
+          <div className="inline-flex flex-col items-center gap-3">
             <BrandMark size={46} className="text-x-seal" title="NeNe Vault" />
             <div className="brand-name">
               NeNe <span className="text-x-brass">Vault</span>

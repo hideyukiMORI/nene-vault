@@ -10,7 +10,7 @@ export function ForbiddenPage() {
     <div className="center">
       <div className="center-card">
         <div className="head">
-          <div className="brand-lock">
+          <div className="inline-flex flex-col items-center gap-3">
             <BrandMark size={40} className="text-x-seal" title="NeNe Vault" />
           </div>
         </div>

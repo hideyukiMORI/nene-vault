@@ -30,7 +30,7 @@ export function VoidModal({ documentId, onClose }: VoidModalProps) {
         onSubmit={(e) => {
           void onSubmit(e);
         }}
-        className="modal-body space-y-4"
+        className="p-5.5 space-y-4"
       >
         <p className="text-text-muted body-sm">{t('document.void.description')}</p>
 

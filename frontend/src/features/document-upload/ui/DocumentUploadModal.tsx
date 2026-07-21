@@ -34,7 +34,7 @@ export function DocumentUploadModal({ onClose }: DocumentUploadModalProps) {
         onSubmit={(e) => {
           void onSubmit(e);
         }}
-        className="modal-body space-y-4"
+        className="p-5.5 space-y-4"
       >
         <Field
           label={t('document.upload.file_label')}

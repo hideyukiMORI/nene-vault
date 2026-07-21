@@ -61,12 +61,6 @@
       padding: 20px 18px 18px;
       border-bottom: 1px solid var(--color-x-rail-line);
     }
-    .brand-mark {
-      width: 34px;
-      height: 34px;
-      flex: none;
-      display: block;
-    }
     .brand-name {
       font-family: var(--font-serif);
       font-size: 1.18rem;
@@ -501,14 +495,6 @@
       font-weight: 600;
       color: var(--color-x-ink-deep);
     }
-    .empty-state {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 48px 24px;
-      color: var(--color-text-muted);
-      font-size: var(--text-sm);
-    }
 
     /* ---- badges / tags ---- */
     .badge {
@@ -545,15 +531,6 @@
     }
     .badge-muted {
       background: var(--color-x-sunk-deep);
-      color: var(--color-text-muted);
-    }
-    .tag {
-      display: inline-flex;
-      border-radius: var(--radius-sm);
-      background: var(--color-surface-overlay);
-      border: 1px solid var(--color-x-line-mid);
-      padding: 3px 9px;
-      font-size: var(--text-2xs);
       color: var(--color-text-muted);
     }
 
@@ -698,12 +675,6 @@
     .center-card .body {
       padding: 24px 30px 30px;
     }
-    .brand-lock {
-      display: inline-flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 12px;
-    }
 
     /* ---- modal ---- */
     .modal-overlay {
@@ -757,9 +728,6 @@
     .modal-close:hover {
       color: var(--color-x-ink-deep);
       background: var(--color-surface-sunken);
-    }
-    .modal-body {
-      padding: 22px;
     }
     .modal-foot {
       display: flex;
@@ -922,11 +890,6 @@
     .drawer-close:hover {
       color: var(--color-x-ink-deep);
       background: var(--color-surface-sunken);
-    }
-    .drawer-body {
-      overflow: auto;
-      flex: 1;
-      padding: 20px 22px 28px;
     }
     .drawer-meta {
       display: grid;

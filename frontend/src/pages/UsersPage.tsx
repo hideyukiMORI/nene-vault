@@ -60,7 +60,7 @@ function UserFormModal({ onClose }: { onClose: () => void }) {
             mutation.mutate(values);
           })(e);
         }}
-        className="modal-body space-y-4"
+        className="p-5.5 space-y-4"
       >
         <Field
           label={t('user.form.email_label')}
