@@ -24,6 +24,10 @@
     "stylelint": "stylelint \"src/**/*.css\"",
     "check": "npm run type-check && npm run lint && npm run format && npm run test && npm run knip && npm run stylelint && npm run build-storybook"
   },
+  "//overrides": "js-yaml is pulled transitively by @redocly/openapi-core and trips the CI npm audit high gate (GHSA-52cp-r559-cp3m). Bump it here rather than via `npm audit fix` (platform-binary risk) or a redocly bump (churn). (#273)",
+  "overrides": {
+    "js-yaml": "^4.3.0"
+  },
   "dependencies": {
     "@hideyukimori/nene2-client": "^1.1.0",
     "@hookform/resolvers": "^3.10.0",
