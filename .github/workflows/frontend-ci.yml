@@ -35,5 +35,7 @@ jobs:
       - name: Check (type-check, lint, format, coverage:check, knip, storybook build)
         run: npm run check
 
+      # audit-ci = npm audit ＋ advisory 単位の allowlist（理由・期限つき例外）。
+      # allowlist に無い high/critical は fail。config = frontend/audit-ci.jsonc
       - name: Audit (fail on high/critical)
-        run: npm audit --audit-level=high
+        run: npm run audit

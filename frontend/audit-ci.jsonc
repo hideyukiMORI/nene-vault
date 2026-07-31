@@ -1,0 +1,42 @@
+{
+  // Dependency-vulnerability gate for CI（フリート展開 07-31・施主GO 07-29・board 行77）。
+  // allowlist は advisory 単位（GHSA id）・severity は下げない。エントリの条件:
+  // (1) advisory id (2) この艦で当てはまらない理由（実測・想定でなく）(3) 期限 (4) 何が来たら外せるか。
+  // 期限切れは「更新」でなく「再検証タスク」。
+  "$schema": "https://github.com/IBM/audit-ci/raw/main/docs/schema.json",
+  "moderate": false,
+  "high": true,
+  "critical": true,
+  "allowlist": [
+    // GHSA-qwww-vcr4-c8h2 — react-router "RSC Mode CSRF Bypass"（high）。
+    // 脆弱範囲 7.12.0–8.2.0・7.x 系に修正なし（修正は react-router v8>=8.2.1＝破壊的移行）。
+    //
+    // この艦で当てはまらない理由（この tree で実測・2026-07-31）:
+    // 本艦の admin UI は Vite ビルドの静的 SPA。react-router-dom 7.18.1 を 20 ファイルが
+    // import し、ルーターは src/app/router.tsx の createBrowserRouter のみ。route レベルの
+    // action/loader は 0（grep 実測・ヒットは UI コールバック等の同名フィールドのみ）。
+    // @react-router/dev / react-router/rsc / createStaticHandler / StaticRouterProvider は
+    // いずれも 0 件＝advisory の攻撃経路（サーバが 400 応答前に route action を実行する）に
+    // 対応する実体が client-only バンドルには存在しない。
+    //
+    // 期限: 2026-08-31。react-router v8 移行波（NENE2 RR8 再評価と同乗）で外す。
+    // 期限を過ぎたら PR で再論証する——黙って延長しない。
+    "GHSA-qwww-vcr4-c8h2",
+
+    // GHSA-mh99-v99m-4gvg — brace-expansion "DoS via unbounded expansion"（high）。
+    // 脆弱範囲 <=5.0.7・修正は 5.0.8。**採れる場所では採る**: overrides
+    // "brace-expansion@5": "^5.0.8"（本 PR 同梱・従前 5.0.7）。1.x/2.x 系には patched release が
+    // 存在せず、5.0.8 を強制すると minimatch@3 系の消費者が壊れる（named export 化・
+    // フリート実測 2026-07-29）。
+    //
+    // 残余リスクが許容できる理由（この tree で実測・2026-07-31）:
+    // brace-expansion は本艦で **dev 専用**（package-lock の全コピーが dev:true・
+    // 出荷バンドルに含まれず、リクエスト経路に到達しない）。残る脆弱コピーは
+    // 1.1.16 ×2（minimatch@3 経由）・2.1.2 ×1＝lint/codegen ツーリングが自リポの committed パターンを処理するだけで、
+    // 攻撃者供給の brace パターンが入る口が無い。
+    //
+    // 期限: 2026-08-31。eslint 10 / plugin major 波（チェーンが minimatch@10 →
+    // brace-expansion@^5 へ動く）で外れる。期限時に再検証——反射で延長しない。
+    "GHSA-mh99-v99m-4gvg",
+  ],
+}
