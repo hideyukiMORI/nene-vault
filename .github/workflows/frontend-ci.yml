@@ -39,6 +39,3 @@ jobs:
       # allowlist に無い high/critical は fail。config = frontend/audit-ci.jsonc
       - name: Audit (fail on high/critical)
         run: npm run audit
-
-      - name: Audit (fail on high/critical)
-        run: npm audit --audit-level=high
