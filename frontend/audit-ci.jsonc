@@ -23,20 +23,23 @@
     // 期限を過ぎたら PR で再論証する——黙って延長しない。
     "GHSA-qwww-vcr4-c8h2",
 
-    // GHSA-mh99-v99m-4gvg — brace-expansion "DoS via unbounded expansion"（high）。
-    // 脆弱範囲 <=5.0.7・修正は 5.0.8。**採れる場所では採る**: overrides
-    // "brace-expansion@5": "^5.0.8"（本 PR 同梱・従前 5.0.7）。1.x/2.x 系には patched release が
-    // 存在せず、5.0.8 を強制すると minimatch@3 系の消費者が壊れる（named export 化・
-    // フリート実測 2026-07-29）。
+    // ── 撤去済み: GHSA-mh99-v99m-4gvg（brace-expansion DoS・#353 で削除・2026-08-05）──
+    // 「patch が出たから外した」のではない。**エントリの前提が執筆時点で既に誤っていた**。
     //
-    // 残余リスクが許容できる理由（この tree で実測・2026-07-31）:
-    // brace-expansion は本艦で **dev 専用**（package-lock の全コピーが dev:true・
-    // 出荷バンドルに含まれず、リクエスト経路に到達しない）。残る脆弱コピーは
-    // 1.1.16 ×2（minimatch@3 経由）・2.1.2 ×1＝lint/codegen ツーリングが自リポの committed パターンを処理するだけで、
-    // 攻撃者供給の brace パターンが入る口が無い。
+    // 旧エントリの主張:「1.x/2.x 系には patched release が存在せず、5.0.8 を強制すると
+    // minimatch@3 系の消費者が壊れる（named export 化）」。後半は真だが、前半は誤り。
+    // 誤りの正体 = 「brace-expansion@5 を 1.x/2.x 消費者に流し込めない」を
+    // 「1.x/2.x に patch が無い」と取り違えた。各系列は自前の patch 線を持っていた。
     //
-    // 期限: 2026-08-31。eslint 10 / plugin major 波（チェーンが minimatch@10 →
-    // brace-expansion@^5 へ動く）で外れる。期限時に再検証——反射で延長しない。
-    "GHSA-mh99-v99m-4gvg",
+    // npm view brace-expansion time 実測（2026-08-05）— エントリ執筆は 07-31 12:56 UTC:
+    //   2.1.3 = 07-28 10:16Z / 1.1.17 = 07-29 10:45Z / 2.1.4・1.1.18 = 07-30 10:15-10:17Z
+    //   → 全系列の patch が執筆の 1〜3 日前に存在した。例外は当初から不要だった。
+    //
+    // 正解は最初から系列内 bump（親の宣言は ^1.1.7 / ^2.0.1 の caret なので lockfile 更新のみ・
+    // package.json 無変更・export 形も不変＝named export の罠を踏まない）。
+    // 現在値 1.1.18 / 2.1.4 / 5.0.9 で mh99・rgw5 とも解消（本 PR で実測）。
+    //
+    // 教訓: allowlist の条件(2)「当てはまらない理由」は**執筆時点で実測**する。
+    // 「patch が無い」は npm view で1コマンド確認できる——想定で書かない。
   ],
 }
