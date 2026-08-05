@@ -31,8 +31,18 @@ jobs:
 
       # npm run check = type-check + lint + format + coverage:check
       # (vitest --coverage + shrink-only ratchet) + knip + stylelint
-      # + build-storybook.
-      - name: Check (type-check, lint, format, coverage:check, knip, storybook build)
+      # + registries:check + build（本番バンドル・#352）+ build-storybook。
+      #
+      # 🔴 build の射程を誤読しないこと（#352 で実測・2026-08-05 @ 2c725d5）:
+      # build は **CSS を守らない**。base.css に不正 CSS（`color: ;`・閉じない @media）を
+      # 注入した実測では stylelint rc=2 に対し build rc=0・build-storybook rc=0 だった。
+      # CSS の守りは stylelint 側で、build を足しても増えない（invoice #742 と同型）。
+      #
+      # build が実際に塞ぐのは **本番バンドル経路の解決性**。main.tsx から到達する
+      # .ts/.tsx 78 本のうち 71 本は storybook のどの story からも到達せず、
+      # そこに解決不能な import があっても type-check / lint / stylelint / knip /
+      # build-storybook は全て rc=0 で素通りする（負テスト実測・#352 参照）。
+      - name: Check (type-check, lint, format, coverage:check, knip, build, storybook build)
         run: npm run check
 
       # audit-ci = npm audit ＋ advisory 単位の allowlist（理由・期限つき例外）。
