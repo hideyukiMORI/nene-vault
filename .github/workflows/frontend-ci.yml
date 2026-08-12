@@ -8,6 +8,27 @@ on:
     branches:
       - main
 
+  # 週次 schedule — audit-ci（依存の既知脆弱性）を毎週拾う。
+  # 艦ごとに分をずらしてフリート内同時発火を回避（このリポは 35 分）。
+  # 🔴 制約: public リポの scheduled workflow は 60 日リポジトリ活動が無いと
+  # GitHub 側で自動的に無効化される（公式仕様）。長期休眠すると週次検知も止まる。
+  schedule:
+    - cron: '35 0 * * 1'      # 月曜 00:35 UTC = 09:35 JST
+
+  # 手動トリガー（simulate_failure で失敗通知経路を検証できる）
+  workflow_dispatch:
+    inputs:
+      simulate_failure:
+        description: '意図的に check を失敗させ、失敗通知の経路を検証する'
+        type: boolean
+        default: false
+
+# concurrency: event_name を含めないと schedule/workflow_dispatch の実行が
+# push の実行に cancel される（nene-origin PR #412 で実測）。
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}-${{ github.event_name }}
+  cancel-in-progress: true
+
 jobs:
   frontend-check:
     runs-on: ubuntu-latest
@@ -16,6 +37,10 @@ jobs:
         working-directory: frontend
 
     steps:
+      - name: Simulate failure (validation only)
+        if: inputs.simulate_failure
+        run: exit 1
+
       - name: Checkout
         uses: actions/checkout@v5
 
@@ -49,3 +74,28 @@ jobs:
       # allowlist に無い high/critical は fail。config = frontend/audit-ci.jsonc
       - name: Audit (fail on high/critical)
         run: npm run audit
+
+  notify-failure:
+    name: Open an issue when the scheduled run fails
+    if: failure() && (github.event_name == 'schedule' || inputs.simulate_failure)
+    needs: [frontend-check]
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write
+    env:
+      ISSUE_TITLE: '🔴 nene-vault: 週次 CI（schedule）が失敗しています'
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      GH_REPO: ${{ github.repository }}
+      RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+    steps:
+      - name: Create or update the failure issue
+        run: |
+          set -euo pipefail
+          existing="$(gh issue list --state open --limit 100 --json number,title \
+            | jq -r --arg t "$ISSUE_TITLE" 'map(select(.title == $t)) | .[0].number // empty')"
+          body="週次の schedule 実行が失敗しました。 実行: ${RUN_URL}"
+          if [ -n "$existing" ]; then
+            gh issue comment "$existing" --body "$body"
+          else
+            gh issue create --title "$ISSUE_TITLE" --body "$body"
+          fi
