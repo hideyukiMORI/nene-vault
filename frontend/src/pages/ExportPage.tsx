@@ -7,6 +7,7 @@ import { AppChrome } from '@/features/app-chrome';
 import { Button } from '@/shared/ui/primitives/Button';
 import { Checkbox } from '@/shared/ui/primitives/Checkbox';
 import { Field } from '@/shared/ui/components/Field';
+import { CHOICE_LABEL } from '@/shared/ui/primitives/fieldBase';
 import { Input } from '@/shared/ui/primitives/Input';
 
 export function ExportPage() {
@@ -113,7 +114,7 @@ export function ExportPage() {
         <Field label={t('export.form.format_label')}>
           <div className="space-y-1.5">
             {(['zip', 'csv'] as const).map((f) => (
-              <label key={f} className="radio">
+              <label key={f} className={CHOICE_LABEL}>
                 <input
                   type="radio"
                   name="export-format"

@@ -42,4 +42,32 @@ describe('Input', () => {
     render(<Input readOnly value="test value" />);
     expect(screen.getByDisplayValue('test value')).toBeInTheDocument();
   });
+
+  // Regression guard for the `.input` drain (#361). Per 判例#34 these assert the
+  // *replacement utilities*, not a class name: a class name survives its CSS
+  // being deleted, so `toHaveClass('input')` would have passed straight through
+  // the silent-regression case that #337/#338 were about.
+  it('carries the regenerated field utilities', () => {
+    render(<Input />);
+    const el = screen.getByRole('textbox');
+    // shared base — box, colour and focus ring
+    expect(el).toHaveClass('border-x-line-mid', 'bg-surface-raised', 'rounded-sm');
+    expect(el).toHaveClass('py-2', 'px-2.75', 'text-body', 'text-x-ink-deep');
+    expect(el).toHaveClass('focus:border-accent', 'focus:ring-3', 'focus:ring-accent-soft');
+    // input-only additions
+    expect(el).toHaveClass('placeholder:text-text-faint');
+    // touch block that replaced @media (max-width: 767px)
+    expect(el).toHaveClass('max-md:py-2.75', 'max-md:px-3', 'max-md:text-touch');
+    // the retired component class must be gone
+    expect(el).not.toHaveClass('input');
+  });
+
+  it('keeps the aria-invalid styling hook from #345', () => {
+    render(<Input aria-invalid />);
+    expect(screen.getByRole('textbox')).toHaveClass(
+      'aria-invalid:border-warn',
+      'aria-invalid:ring-3',
+      'aria-invalid:ring-warn-soft',
+    );
+  });
 });
