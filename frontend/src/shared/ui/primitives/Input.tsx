@@ -1,5 +1,7 @@
 import { forwardRef, type InputHTMLAttributes } from 'react';
 
+import { FIELD_BASE, FIELD_PLACEHOLDER } from './fieldBase';
+
 export type InputProps = InputHTMLAttributes<HTMLInputElement>;
 
 // forwardRef so React Hook Form's register() can attach its ref and read the
@@ -15,7 +17,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(function Input(
   return (
     <input
       ref={ref}
-      className={`input aria-invalid:border-warn aria-invalid:ring-3 aria-invalid:ring-warn-soft ${className ?? ''}`}
+      className={`${FIELD_BASE} ${FIELD_PLACEHOLDER} aria-invalid:border-warn aria-invalid:ring-3 aria-invalid:ring-warn-soft ${className ?? ''}`}
       {...rest}
     />
   );

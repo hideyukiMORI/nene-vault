@@ -267,86 +267,13 @@
     /* ---- buttons ---- */
 
     /* ---- forms ---- */
-    .field-label {
-      font-size: var(--text-xs);
-      color: var(--color-text-muted);
-      font-weight: 500;
-    }
-    .input,
-    .select,
-    .textarea {
-      font: inherit;
-      font-size: var(--text-body);
-      width: 100%;
-      border: 1px solid var(--color-x-line-mid);
-      background: var(--color-surface-raised);
-      border-radius: var(--radius-sm);
-      padding: 8px 11px;
-      color: var(--color-x-ink-deep);
-      transition:
-        border-color 0.12s,
-        box-shadow 0.12s;
-    }
-    .input::placeholder,
-    .textarea::placeholder {
-      color: var(--color-text-faint);
-    }
-    .input:focus,
-    .select:focus,
-    .textarea:focus {
-      outline: none;
-      border-color: var(--color-accent);
-      box-shadow: 0 0 0 3px var(--color-accent-soft);
-    }
-    .textarea {
-      min-height: 88px;
-      resize: vertical;
-      line-height: 1.55;
-    }
-    select.select {
-      appearance: none;
-      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%236b6456' stroke-width='2.5'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
-      background-repeat: no-repeat;
-      background-position: right 11px center;
-      padding-right: 30px;
-    }
-    .checkbox,
-    .radio {
-      display: inline-flex;
-      align-items: center;
-      gap: 9px;
-      cursor: pointer;
-      font-size: var(--text-sm);
-      color: var(--color-text-primary);
-    }
-    .checkbox input,
-    .radio input {
-      width: 16px;
-      height: 16px;
-      accent-color: var(--color-accent);
-      flex: none;
-    }
-    .file-input {
-      font: inherit;
-      font-size: var(--text-sm);
-      color: var(--color-text-muted);
-      width: 100%;
-    }
-    .file-input::file-selector-button {
-      font: inherit;
-      font-size: var(--text-xs);
-      font-weight: 600;
-      margin-right: 12px;
-      border: 0;
-      border-radius: var(--radius-sm);
-      background: var(--color-accent);
-      color: var(--color-on-accent);
-      padding: 7px 13px;
-      cursor: pointer;
-    }
-    :where(.file-input)::file-selector-button:hover {
-      background: var(--color-accent-hover);
-    }
+    /* Regenerated as Tailwind utilities + tokens (C5 W3 波(a), #361). The seven
+       classes (.field-label/.input/.select/.textarea/.checkbox/.radio/.file-input)
+       now live on the primitives themselves; `font: inherit` is dropped because
+       TW4 preflight already declares it for form controls (same precedent as the
+       .btn drain, #340). The select chevron and the field line-height could not be
+       expressed as utilities and became @utility select-chevron / --leading-field
+       (page-glow precedent, 判例#31「arbitrary 回避のトークン追加は正道」). */
 
     /* ---- tables ---- */
     .tbl-wrap {
@@ -893,16 +820,9 @@
         padding-bottom: 96px;
       }
 
-      /* touch-sized controls */
-      .input,
-      .select,
-      .textarea {
-        padding: 11px 12px;
-        font-size: 16px; /* 16px stops iOS zoom */
-      }
-      .field-label {
-        font-size: var(--text-xs);
-      }
+      /* touch-sized controls → max-md:py-2.75 max-md:px-3 max-md:text-base on the
+         primitives (#361). The old `.field-label` override here restated the base
+         font-size (var(--text-xs)) verbatim, so dropping it is paint-neutral. */
 
       /* a form's action row spans full width, primary on its own line & reachable */
 

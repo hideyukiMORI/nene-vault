@@ -33,7 +33,8 @@ export function Field({
 }: FieldProps) {
   return (
     <div className="flex flex-col gap-1.5">
-      <label className="field-label">
+      {/* Regenerated from `.field-label` (#361). */}
+      <label className="text-xs leading-inherit text-text-muted font-medium">
         {label}
         {required && requiredMarker !== undefined && requiredMarker !== null && (
           <span className="text-danger ml-1.5 text-2xs font-semibold">{requiredMarker}</span>

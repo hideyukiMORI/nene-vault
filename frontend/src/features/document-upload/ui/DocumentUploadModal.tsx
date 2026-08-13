@@ -46,7 +46,8 @@ export function DocumentUploadModal({ onClose }: DocumentUploadModalProps) {
           <input
             type="file"
             accept=".pdf,.jpg,.jpeg,.png"
-            className="file-input"
+            // Regenerated from `.file-input` (+ its ::file-selector-button rules), #361.
+            className="text-sm leading-inherit text-text-muted w-full file:text-xs file:leading-inherit file:font-semibold file:mr-3 file:border-0 file:rounded-sm file:bg-accent file:text-on-accent file:py-1.75 file:px-3.25 file:cursor-pointer hover:file:bg-accent-hover"
             {...register('file')}
           />
         </Field>

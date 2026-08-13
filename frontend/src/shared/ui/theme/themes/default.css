@@ -96,6 +96,10 @@
   --text-brand: 1.18rem;
   --text-modal-close: 1.3rem;
   --text-2xs: 0.6875rem;
+  /* touch-sized form control on small screens — 16px is the threshold below which
+     iOS Safari zooms on focus. Font-size only (no paired --text-touch--line-height)
+     so it stays a 1:1 replacement for the old `font-size: 16px` (#361). */
+  --text-touch: 1rem;
 
   /* ---- geometry ---- */
   --radius-px: 1px;
@@ -145,6 +149,9 @@
 
   /* ---- line-height (leading) ---- */
   --leading-brand: 1.05;
+  /* multi-line form control (textarea); same ratio as --leading-diff but a
+     distinct semantic slot — see #361. */
+  --leading-field: 1.55;
 
   /* ---- easing ---- */
   --ease-drawer: cubic-bezier(0.32, 0.72, 0, 1);

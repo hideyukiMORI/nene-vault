@@ -60,6 +60,37 @@
     transform 0.04s;
 }
 
+/* line-height を継承のままにする。⚠️ 実測（#361）: テーマは `--text-xs` / `--text-sm` の
+   *値* だけを上書きしており、Tailwind 既定の相棒 `--text-xs--line-height` /
+   `--text-sm--line-height` は生き残る。そのため `text-xs` / `text-sm` は
+   `line-height: var(--tw-leading, var(--text-*--line-height))` を道連れに出力する
+   （`--text-body` / `--text-2xs` / `--text-touch` は相棒が無いので font-size のみ）。
+   font-size だけを指定していた component class を utility へ移すときに素で当てると、
+   継承だった line-height が 1.333…/1.4286 に変わる＝silent な paint 変化になる。
+   `--tw-leading` ごと inherit へ倒すので、text-* との記述順に依存しない。 */
+@utility leading-inherit {
+  --tw-leading: inherit;
+  line-height: inherit;
+}
+
+/* form control の複合 transition（border-color と box-shadow の2プロパティ＝
+   transition-colors も transition-shadow も単独では一致しない・btn-transition と同型）。 */
+@utility field-transition {
+  transition:
+    border-color 0.12s,
+    box-shadow 0.12s;
+}
+
+/* select の chevron（data-URI 背景＋位置指定の合成）。arbitrary な background-image は
+   規約⑤で禁止のため @utility 化が正道（page-glow precedent）。stroke は
+   --color-text-muted 相当の #6b6456 を元 CSS からそのまま引き継ぐ。 */
+@utility select-chevron {
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%236b6456' stroke-width='2.5'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 11px center;
+}
+
 @import './active.css';
 /* NOTE: imported WITHOUT `layer(base)` — this is the canonical form, not a
    deviation. base.css already wraps its rules in `@layer base { … }`, and layer
