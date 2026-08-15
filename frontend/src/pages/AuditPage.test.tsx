@@ -63,6 +63,55 @@ describe('AuditPage', () => {
     expect(within(dialog).getByText(/Sample Inc\./)).toBeInTheDocument();
   });
 
+  // Regression guard for the `.diff-arrow` drain (#371) — asserts the
+  // replacement utilities rather than the retired class name (判例#34). The
+  // seeded fixture is a creation event, so the arrow never rendered in any test
+  // before this one: deleting its CSS would have gone unnoticed.
+  it('carries the regenerated diff-arrow utilities on a change event', async () => {
+    server.use(
+      http.get('/admin/audit-events', () =>
+        HttpResponse.json({
+          ...mockAuditEventList,
+          items: [
+            {
+              ...mockAuditEventList.items[0],
+              action: 'document.metadata_updated',
+              before_json: { counterparty_name: 'Old Inc.' },
+              after_json: { counterparty_name: 'New Inc.' },
+            },
+          ],
+        }),
+      ),
+    );
+    renderPage();
+
+    const row = await screen.findByRole('button', {
+      name: (name) => name.replace(/\s/g, '').includes(ENTITY_TEXT),
+    });
+    await userEvent.click(row);
+    const dialog = await screen.findByRole('dialog');
+    // `formatAuditValue` quotes strings, so the before box reads `"Old Inc."`.
+    expect(within(dialog).getByText('"Old Inc."')).toBeInTheDocument();
+
+    // A function matcher reaches the arrow the same way the entity cell above is
+    // matched: on structure, not on the classes under test (which would make the
+    // assertion circular). It also keeps this inside
+    // testing-library/no-node-access rather than buying a lint override.
+    const arrow = within(dialog).getByText(
+      (_content, el) =>
+        el?.tagName === 'DIV' && el.children.length === 1 && el.children[0]?.tagName === 'svg',
+    );
+    expect(arrow).toHaveClass('flex', 'items-center', 'justify-center', 'text-text-faint');
+    // The old `@media (max-width: 767px)` half of the rule.
+    expect(arrow).toHaveClass('max-md:justify-start', 'max-md:py-px', 'max-md:pl-0.75');
+    expect(arrow).not.toHaveClass('diff-arrow');
+
+    // Scoped with `within(arrow)` rather than walking to `parentElement`, which
+    // testing-library/no-node-access forbids.
+    const icon = within(arrow).getByText((_content, el) => el?.tagName === 'svg');
+    expect(icon).toHaveClass('w-3.75', 'h-3.75', 'stroke-current', 'max-md:rotate-90');
+  });
+
   it('shows the empty state and no table when there are no events', async () => {
     server.use(
       http.get('/admin/audit-events', () =>

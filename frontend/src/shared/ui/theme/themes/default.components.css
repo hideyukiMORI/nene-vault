@@ -560,17 +560,9 @@
       align-items: stretch;
       gap: 8px;
     }
-    .diff-arrow {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: var(--color-text-faint);
-    }
-    .diff-arrow svg {
-      width: 15px;
-      height: 15px;
-      stroke: currentColor;
-    }
+    /* `.diff-arrow` and its `svg` child were regenerated as utilities on the
+       AuditPage markup — the icon is used at that one call site, so the child
+       selector became element utilities (express-first, #371). */
     .diff-single .diff-pair {
       grid-template-columns: 1fr;
     }
@@ -886,13 +878,8 @@
         grid-template-columns: 1fr;
         gap: 6px;
       }
-      .diff-arrow {
-        justify-content: flex-start;
-        padding: 1px 0 1px 3px;
-      }
-      .diff-arrow svg {
-        transform: rotate(90deg);
-      }
+      /* the `.diff-arrow` half of this block moved to `max-md:` utilities at the
+         call site (#371); `.diff-pair` above still carries its own. */
 
       /* audit table reflows into tappable cards */
       .audit-table,
