@@ -10,6 +10,7 @@ import { messageKeyForError } from '@/shared/i18n/map-problem-details';
 import { useTranslation } from '@/shared/i18n/use-translation';
 import { AppChrome } from '@/features/app-chrome';
 import { Button } from '@/shared/ui/primitives/Button';
+import { BADGE_BASE } from '@/shared/ui/primitives/badgeBase';
 import { Callout } from '@/shared/ui/components/Callout';
 import { EmptyState } from '@/shared/ui/components/EmptyState';
 import { Field } from '@/shared/ui/components/Field';
@@ -123,7 +124,7 @@ function UserRow({
       <td data-label={t('user.list.table.role')}>{t(`user.role.${user.role}`)}</td>
       <td data-label={t('user.list.table.status')}>
         <span
-          className="badge data-[tone=success]:bg-success-soft data-[tone=success]:text-success data-[tone=muted]:bg-x-sunk-deep data-[tone=muted]:text-text-muted"
+          className={`${BADGE_BASE} data-[tone=success]:bg-success-soft data-[tone=success]:text-success data-[tone=muted]:bg-x-sunk-deep data-[tone=muted]:text-text-muted`}
           data-tone={user.status === 'active' ? 'success' : 'muted'}
         >
           {t(`user.status.${user.status}`)}

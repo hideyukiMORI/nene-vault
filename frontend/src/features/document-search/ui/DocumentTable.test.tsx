@@ -62,4 +62,28 @@ describe('DocumentTable', () => {
     renderWithProviders(<DocumentTable documents={[mockDocument]} onSelectDocument={vi.fn()} />);
     expect(screen.getByText('Active')).toBeInTheDocument();
   });
+
+  // Regression guard for the `.badge` drain (#369) — asserts the replacement
+  // utilities rather than the retired class name (判例#34). The two tests above
+  // only assert the label text, so deleting the CSS would have gone unnoticed.
+  it('carries the regenerated badge utilities', () => {
+    renderWithProviders(<DocumentTable documents={[mockDocument]} onSelectDocument={vi.fn()} />);
+    const badge = screen.getByText('Active');
+    expect(badge).toHaveClass('inline-flex', 'items-center', 'gap-1.5', 'rounded-full');
+    expect(badge).toHaveClass('px-2.5', 'py-0.75', 'text-2xs', 'font-semibold');
+    // The old rule set `line-height: 1.4` explicitly; `text-2xs` has no partner
+    // `--text-2xs--line-height` to supply one, so the ratio needs its own token
+    // (判例40).
+    expect(badge).toHaveClass('leading-badge');
+    // `.badge::before` — the dot.
+    expect(badge).toHaveClass(
+      'before:w-1.5',
+      'before:h-1.5',
+      'before:rounded-full',
+      'before:bg-current',
+    );
+    // Tone stays runtime-driven at the use site.
+    expect(badge).toHaveAttribute('data-tone', 'success');
+    expect(badge).not.toHaveClass('badge');
+  });
 });
