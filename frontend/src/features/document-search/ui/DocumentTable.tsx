@@ -1,6 +1,7 @@
 import { useTranslation } from '@/shared/i18n/use-translation';
 import { formatJpy, formatDate } from '@/shared/lib/format';
 import { EmptyState } from '@/shared/ui/components/EmptyState';
+import { BADGE_BASE } from '@/shared/ui/primitives/badgeBase';
 import type { VaultDocument } from '@/entities/document';
 
 interface DocumentTableProps {
@@ -55,7 +56,7 @@ export function DocumentTable({ documents, onSelectDocument }: DocumentTableProp
               <td data-label={labels.category}>{t(`document.category.${doc.category}`)}</td>
               <td data-label={labels.status}>
                 <span
-                  className="badge data-[tone=danger]:bg-danger-soft data-[tone=danger]:text-danger data-[tone=success]:bg-success-soft data-[tone=success]:text-success"
+                  className={`${BADGE_BASE} data-[tone=danger]:bg-danger-soft data-[tone=danger]:text-danger data-[tone=success]:bg-success-soft data-[tone=success]:text-success`}
                   data-tone={doc.status === 'voided' ? 'danger' : 'success'}
                 >
                   {t(`document.status.${doc.status}`)}

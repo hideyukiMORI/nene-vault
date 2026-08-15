@@ -149,6 +149,9 @@
 
   /* ---- line-height (leading) ---- */
   --leading-brand: 1.05;
+  /* status badge; the old `.badge` set this ratio explicitly, so it survives the
+     drain as a named slot rather than an inherited value — see #369. */
+  --leading-badge: 1.4;
   /* multi-line form control (textarea); same ratio as --leading-diff but a
      distinct semantic slot — see #361. */
   --leading-field: 1.55;

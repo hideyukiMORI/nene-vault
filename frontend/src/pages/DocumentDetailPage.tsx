@@ -14,6 +14,7 @@ import { useTranslation } from '@/shared/i18n/use-translation';
 import { formatJpy, formatDate, formatDateTime } from '@/shared/lib/format';
 import { AppChrome } from '@/features/app-chrome';
 import { Button } from '@/shared/ui/primitives/Button';
+import { BADGE_BASE } from '@/shared/ui/primitives/badgeBase';
 import { Callout } from '@/shared/ui/components/Callout';
 import { EmptyState } from '@/shared/ui/components/EmptyState';
 
@@ -102,18 +103,18 @@ export function DocumentDetailPage() {
               </h1>
               <div className="flex items-center gap-2 flex-wrap">
                 <span
-                  className="badge data-[tone=danger]:bg-danger-soft data-[tone=danger]:text-danger data-[tone=success]:bg-success-soft data-[tone=success]:text-success"
+                  className={`${BADGE_BASE} data-[tone=danger]:bg-danger-soft data-[tone=danger]:text-danger data-[tone=success]:bg-success-soft data-[tone=success]:text-success`}
                   data-tone={doc.status === 'voided' ? 'danger' : 'success'}
                 >
                   {t(`document.status.${doc.status}`)}
                 </span>
                 {doc.date_uncertain && (
-                  <span className="badge bg-warn-soft text-warn">
+                  <span className={`${BADGE_BASE} bg-warn-soft text-warn`}>
                     {t('document.detail.date_uncertain_badge')}
                   </span>
                 )}
                 {!doc.is_metadata_confirmed && (
-                  <span className="badge bg-x-sunk-deep text-text-muted">
+                  <span className={`${BADGE_BASE} bg-x-sunk-deep text-text-muted`}>
                     {t('document.detail.metadata_unconfirmed_badge')}
                   </span>
                 )}

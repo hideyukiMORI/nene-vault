@@ -320,26 +320,10 @@
     }
 
     /* ---- badges / tags ---- */
-    .badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      border-radius: var(--radius-full);
-      padding: 3px 10px;
-      font-size: var(--text-2xs);
-      font-weight: 600;
-      line-height: 1.4;
-    }
-    .badge::before {
-      content: '';
-      width: 6px;
-      height: 6px;
-      border-radius: 50%;
-      background: currentColor;
-    }
-    :where(.badge).no-dot::before {
-      display: none;
-    }
+
+    /* `.badge` was regenerated as BADGE_BASE (shared/ui/primitives/badgeBase.ts)
+       and `.no-dot` was removed as a dead rule — no element in the repo ever
+       carried the class (#369). */
 
     /* ---- definition lists ---- */
     .dl {
