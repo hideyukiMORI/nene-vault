@@ -1,6 +1,18 @@
 @layer theme, base, vendor, legacy, components, utilities;
 @import 'tailwindcss';
 
+/* 🔴 `@utility` を足してよい基準（hub 裁定 2026-08-15・#371）
+   ───────────────────────────────────────────────────────────
+   @utility 化してよいのは、**単一プロパティ（または不可分な1宣言）で、子孫セレクタ・
+   擬似要素・状態を含まないもの**に限る。それを超える（＝構造を持つ）ものは温存する。
+
+   歯止めが無いと `@utility` は component class の別名置き場になり、規約⑤（arbitrary 禁止）
+   の逃げ道が C5 drain の抜け道に変わる。判定は「迷ったら考える」ではなく**この基準との照合**で行う。
+
+     🟢 可: `diff-cols`（grid-template-columns 1宣言）/ `select-chevron` / `max-h-dialog` / `page-glow`
+     🔴 不可: `.tbl`（26行・`table.tbl thead th` ほか）/ `.dl`（`.dl > div` / `.dl dt` / `.dl dd`）
+              ＝ 温存側（台帳 #333・B群 #368） */
+
 /* Custom utility: slashed zero via the low-level OpenType feature (exact parity
    with the retired `.mono` component class, whose numerals used `'zero' 1`). */
 @utility zero-slash {
@@ -89,6 +101,14 @@
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%236b6456' stroke-width='2.5'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
   background-repeat: no-repeat;
   background-position: right 11px center;
+}
+
+/* 監査差分の before / arrow / after を並べる3カラム（旧 `.diff-pair` の
+   `grid-template-columns: 1fr 22px 1fr`）。中央は矢印の固定幅なので `grid-cols-N`
+   の等分では書けず、arbitrary は規約⑤で禁止 → @utility 化が正道（#371）。
+   上の基準に照らして 1宣言・子孫なし・擬似要素なし＝可。 */
+@utility diff-cols {
+  grid-template-columns: 1fr 22px 1fr;
 }
 
 @import './active.css';

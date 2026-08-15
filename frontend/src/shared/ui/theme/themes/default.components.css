@@ -551,21 +551,11 @@
       background: var(--color-accent);
       color: var(--color-on-accent);
     }
-    .diff-field + .diff-field {
-      margin-top: 13px;
-    }
-    .diff-pair {
-      display: grid;
-      grid-template-columns: 1fr 22px 1fr;
-      align-items: stretch;
-      gap: 8px;
-    }
-    /* `.diff-arrow` and its `svg` child were regenerated as utilities on the
-       AuditPage markup — the icon is used at that one call site, so the child
-       selector became element utilities (express-first, #371). */
-    .diff-single .diff-pair {
-      grid-template-columns: 1fr;
-    }
+    /* The whole `.diff-*` family was regenerated as utilities on the AuditPage
+       markup (#371): `.diff-arrow` and its `svg` child express-first onto the
+       elements, `.diff-field`'s sibling margin as `[&+&]:`, and `.diff-pair` /
+       `.diff-single` as mobile-first columns with `@utility diff-cols` for the
+       one template the `grid-cols-N` scale cannot express. */
     .json-block + .json-block {
       margin-top: 14px;
     }
@@ -873,13 +863,10 @@
       }
 
       /* audit detail drawer becomes a bottom sheet with a grab handle */
-      /* diff stacks vertically: before above, arrow turns down, after below */
-      .diff-pair {
-        grid-template-columns: 1fr;
-        gap: 6px;
-      }
-      /* the `.diff-arrow` half of this block moved to `max-md:` utilities at the
-         call site (#371); `.diff-pair` above still carries its own. */
+      /* the diff's vertical stacking (before above, arrow turned down, after
+         below) is now the *default* at the call site, with the 3-column form
+         applied from `md:` upward — mobile-first, so this block holds nothing
+         for `.diff-*` any more (#371). */
 
       /* audit table reflows into tappable cards */
       .audit-table,

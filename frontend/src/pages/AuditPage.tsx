@@ -21,6 +21,21 @@ const ChevronIcon = (
     <path d="m9 6 6 6-6 6" />
   </svg>
 );
+// The retired `.diff-field` carried one rule — the margin between consecutive
+// fields — so it survives as a self-referencing sibling variant rather than a
+// class (#371).
+const DIFF_FIELD = '[&+&]:mt-3.25';
+
+// The retired `.diff-pair` was written desktop-first (3 columns, overridden to 1
+// below 768px). Regenerated mobile-first: one column by default, the 3-column
+// template from `md:` up. The two forms agree at every width — `md:` is
+// `>= 48rem` = 768px, exactly where the old `@media (max-width: 767px)` block
+// stopped applying. `.diff-single` (creation events, no "before" side) is simply
+// the absence of `md:diff-cols`: the ancestor selector collapses into the
+// `isCreate` branch the call site already has, so no `data-*` dimension is
+// invented for a boolean the markup already knows (判例#33 ガード①).
+const DIFF_PAIR = 'grid items-stretch grid-cols-1 gap-1.5 md:gap-2';
+
 // `w-3.75 h-3.75 stroke-current` is the old `.diff-arrow svg` rule, and
 // `max-md:rotate-90` its `@media (max-width: 767px)` half — expressed on the
 // element because this icon has exactly one call site (#371).
@@ -105,11 +120,11 @@ function DiffView({ fields, isCreate }: { fields: AuditDiffField[]; isCreate: bo
             </span>
           );
         return (
-          <div key={f.key} className={isCreate ? 'diff-field diff-single' : 'diff-field'}>
+          <div key={f.key} className={DIFF_FIELD}>
             <div className="font-mono text-xs text-x-ink-deep font-medium mb-1.75 flex items-center gap-2">
               {f.key} {tag}
             </div>
-            <div className="diff-pair">
+            <div className={isCreate ? DIFF_PAIR : `${DIFF_PAIR} md:diff-cols`}>
               {!isCreate && (
                 <div className="font-mono text-2xs leading-diff rounded-sm py-2 px-2.5 break-all whitespace-pre-wrap bg-surface-sunken border border-border text-text-muted">
                   {formatAuditValue(f.before)}

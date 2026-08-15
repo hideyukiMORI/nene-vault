@@ -110,6 +110,45 @@ describe('AuditPage', () => {
     // testing-library/no-node-access forbids.
     const icon = within(arrow).getByText((_content, el) => el?.tagName === 'svg');
     expect(icon).toHaveClass('w-3.75', 'h-3.75', 'stroke-current', 'max-md:rotate-90');
+
+    // `.diff-pair` / `.diff-field` (#371). Reached through the arrow rather than
+    // by class, again to keep the assertion non-circular.
+    const pair = within(dialog).getByText(
+      (_content, el) =>
+        el?.tagName === 'DIV' && el.children.length === 3 && el.children[1] === arrow,
+    );
+    expect(pair).toHaveClass('grid', 'items-stretch', 'grid-cols-1', 'gap-1.5', 'md:gap-2');
+    // A change event keeps the three-column template from `md:` up.
+    expect(pair).toHaveClass('md:diff-cols');
+    expect(pair).not.toHaveClass('diff-pair');
+
+    const field = within(dialog).getByText(
+      (_content, el) =>
+        el?.tagName === 'DIV' && el.children.length === 2 && el.children[1] === pair,
+    );
+    expect(field).toHaveClass('[&+&]:mt-3.25');
+    expect(field).not.toHaveClass('diff-field');
+  });
+
+  // The creation-event half of the same drain: `.diff-single .diff-pair` (one
+  // column at every width) became the absence of `md:diff-cols` (#371).
+  it('omits the three-column template on a creation event', async () => {
+    renderPage();
+
+    const row = await screen.findByRole('button', {
+      name: (name) => name.replace(/\s/g, '').includes(ENTITY_TEXT),
+    });
+    await userEvent.click(row);
+    const dialog = await screen.findByRole('dialog');
+
+    const afterBox = within(dialog).getByText(/Sample Inc\./);
+    const pair = within(dialog).getByText(
+      (_content, el) =>
+        el?.tagName === 'DIV' && el.children.length === 1 && el.children[0] === afterBox,
+    );
+    expect(pair).toHaveClass('grid', 'grid-cols-1', 'gap-1.5', 'md:gap-2');
+    expect(pair).not.toHaveClass('md:diff-cols');
+    expect(pair).not.toHaveClass('diff-single');
   });
 
   it('shows the empty state and no table when there are no events', async () => {
