@@ -21,8 +21,18 @@ const ChevronIcon = (
     <path d="m9 6 6 6-6 6" />
   </svg>
 );
+// `w-3.75 h-3.75 stroke-current` is the old `.diff-arrow svg` rule, and
+// `max-md:rotate-90` its `@media (max-width: 767px)` half — expressed on the
+// element because this icon has exactly one call site (#371).
 const ArrowIcon = (
-  <svg viewBox="0 0 24 24" fill="none" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+  <svg
+    viewBox="0 0 24 24"
+    fill="none"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    className="w-3.75 h-3.75 stroke-current max-md:rotate-90"
+  >
     <path d="M5 12h14M13 6l6 6-6 6" />
   </svg>
 );
@@ -105,7 +115,11 @@ function DiffView({ fields, isCreate }: { fields: AuditDiffField[]; isCreate: bo
                   {formatAuditValue(f.before)}
                 </div>
               )}
-              {!isCreate && <div className="diff-arrow">{ArrowIcon}</div>}
+              {!isCreate && (
+                <div className="flex items-center justify-center text-text-faint max-md:justify-start max-md:py-px max-md:pl-0.75">
+                  {ArrowIcon}
+                </div>
+              )}
               <div className="font-mono text-2xs leading-diff rounded-sm py-2 px-2.5 break-all whitespace-pre-wrap bg-x-brass-soft border border-x-brass-line text-x-brass-deep">
                 {formatAuditValue(f.after)}
               </div>
