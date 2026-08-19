@@ -120,6 +120,10 @@ Public OpenAPI summaries, descriptions, and examples: **English only**.
 | Status enum | `status` field | `"active"`, `"voided"` |
 | Source enum | `source` field | `"web_upload"`, `"email_inbound"`, `"api"`, `"scan_upload"` |
 | List envelope | `items`, `limit`, `offset` | Same as NENE2 list pattern |
+
+> `cents` = the currency's **minor unit**, not 1/100 of the display amount.
+> **JPY has zero decimal places (ISO 4217), so `*_cents` stores whole yen — never multiply by 100.**
+> Example: ¥1,500 is stored as `1500`. A value like `116480` means ¥116,480, not ¥1,164.80.
 | File hash | `file_sha256` | 64-char hex string |
 
 Do not mix camelCase in public JSON. Do not use floats for money. Do not expose storage paths.
@@ -152,6 +156,10 @@ Problem Details `title` and `detail`: English.
 | Status column | `status` ENUM | `'active'`, `'voided'` |
 | Soft void | `voided_at`, `voided_by`, `void_reason` | — |
 | Retention | `retention_years INT`, `retention_expires_at DATE` | — |
+
+> `cents` = the currency's **minor unit**, not 1/100 of the display amount.
+> **JPY has zero decimal places (ISO 4217), so `*_cents` stores whole yen — never multiply by 100.**
+> Example: ¥1,500 is stored as `1500`. A value like `116480` means ¥116,480, not ¥1,164.80.
 | Index names | `idx_{table}_{columns}` | `idx_vault_documents_org_date` |
 | Unique constraints | `uniq_{table}_{columns}` | `uniq_document_versions_doc_version` |
 | Audit table | `audit_events` | Append-only; no soft delete column |

@@ -69,6 +69,10 @@ Any change that touches **document storage, file serving, search, metadata editi
 - **Float and DECIMAL for money are prohibited** in DB, API JSON, and tests.
 - Do not require `amount_cents` for document creation.
 
+> `cents` = the currency's **minor unit**, not 1/100 of the display amount.
+> **JPY has zero decimal places (ISO 4217), so `*_cents` stores whole yen — never multiply by 100.**
+> Example: ¥1,500 is stored as `1500`. A value like `116480` means ¥116,480, not ¥1,164.80.
+
 ### Audit trail
 
 - Every mutating use case **MUST** call `AuditRecorder` in the **same DB transaction** as the mutation.
