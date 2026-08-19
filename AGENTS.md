@@ -49,6 +49,10 @@ See [ADR 0009](docs/adr/0009-separate-from-billing-and-reconciliation.md).
 - Do **not** add expense approval workflows or journal entries
 - **Follow NENE2 conventions** — `docs/development/nene2-compliance.md`
 - Namespace: `NeneVault\`; money: integer cents; document metadata only
+
+> `cents` = the currency's **minor unit**, not 1/100 of the display amount.
+> **JPY has zero decimal places (ISO 4217), so `*_cents` stores whole yen — never multiply by 100.**
+> Example: ¥1,500 is stored as `1500`. A value like `116480` means ¥116,480, not ¥1,164.80.
 - **Repository docs: English only** (ADR 0008)
 
 ## Framework

@@ -105,6 +105,10 @@ Use `final readonly` classes and `declare(strict_types=1);` in every PHP file.
 - `retention_expires_at` = `transaction_date + retention_years` (computed at upload; see ADR 0004).
 - Default `retention_years = 10` (not 7 — see ADR 0004).
 
+> `cents` = the currency's **minor unit**, not 1/100 of the display amount.
+> **JPY has zero decimal places (ISO 4217), so `*_cents` stores whole yen — never multiply by 100.**
+> Example: ¥1,500 is stored as `1500`. A value like `116480` means ¥116,480, not ¥1,164.80.
+
 ---
 
 ## 7. Audit trail

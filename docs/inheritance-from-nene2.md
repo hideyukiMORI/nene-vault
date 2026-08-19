@@ -60,6 +60,10 @@ Install NENE2 as a Composer dependency and treat `vendor/hideyukimori/nene2/docs
 | File integrity | SHA-256 hash verified on every download; no byte overwrites |
 | Audit trail | UseCase-layer `AuditRecorder` with before/after; same DB transaction as mutation (ADR 0014) |
 | Retention | 10-year default from `transaction_date`; no auto-purge (ADR 0004) |
+
+> `cents` = the currency's **minor unit**, not 1/100 of the display amount.
+> **JPY has zero decimal places (ISO 4217), so `*_cents` stores whole yen — never multiply by 100.**
+> Example: ¥1,500 is stored as `1500`. A value like `116480` means ¥116,480, not ¥1,164.80.
 | Coding standards | `docs/development/coding-standards.md` — NENE2 baseline + vault additions |
 | Backend standards | `docs/development/backend-standards.md` — PHP/API strict policy |
 | Naming conventions | `docs/development/naming-conventions.md` — vault-domain identifiers |
