@@ -8,11 +8,37 @@ on:
     branches:
       - main
 
+  # 手動トリガー（simulate_failure で失敗通知経路を検証できる）。
+  # notify-failure を足すなら、これは必須。通知装置は「壊して赤にできること」まで
+  # 確かめて初めて完成で、それを確かめる手段が dispatch だけだから（#381・#379）。
+  workflow_dispatch:
+    inputs:
+      simulate_failure:
+        description: '意図的に check を失敗させ、失敗通知の経路を検証する'
+        type: boolean
+        default: false
+
+  # 🔴 schedule は **意図的に置いていない**（#381 の射程外）。
+  # PHP 監査を週次で再走させる方式は施主判断待ちで、選択肢は
+  # (a) ここに schedule を足す / (b) audit を frontend へ寄せる /
+  # (c) 週次専用 weekly-audit.yml を新設。ここに足すと (a) で確定してしまう。
+
+# concurrency: event_name を含めないと workflow_dispatch の実行が push の実行に
+# cancel される（nene-origin PR #412 で実測・frontend-ci.yml と同じ理由）。
+# dispatch が黙って消えると、上の simulate_failure による検証自体が成立しない。
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}-${{ github.event_name }}
+  cancel-in-progress: true
+
 jobs:
   check:
     runs-on: ubuntu-latest
 
     steps:
+      - name: Simulate failure (validation only)
+        if: inputs.simulate_failure
+        run: exit 1
+
       - name: Checkout
         uses: actions/checkout@v5
 
@@ -56,3 +82,44 @@ jobs:
       # (force="true", #18) — so runner-level env pollution cannot break it.
       - name: Run checks
         run: composer check
+
+  notify-failure:
+    name: Open an issue when an unattended run fails
+    # 🔴 発火条件は frontend-ci.yml と **意図的に違う**（#381）。
+    #
+    # frontend は `schedule || simulate_failure`。それをそのまま写すと、backend には
+    # schedule が無いので **この job は simulate_failure 以外では永久に発火しない** ——
+    # 「装置はあるが原理的に赤にならない」ものが1つ増えるだけになる（#379 で問題にした形）。
+    #
+    # そこで backend は push（= main への merge 後の実行）を含める。main が赤い状態は、
+    # マージした人が立ち去れば誰も見ていない＝まさに通知が要る「無人の実行」。
+    # pull_request は含めない — PR の赤は作者が見ているので issue にする価値がなく、ノイズになる。
+    # schedule 節は先に書いておく: (a) に決まればそのまま効き、(c) になっても無害に残るだけ。
+    if: >-
+      failure() && (
+        github.event_name == 'schedule' ||
+        github.event_name == 'push' ||
+        inputs.simulate_failure
+      )
+    needs: [check]
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write
+    env:
+      ISSUE_TITLE: '🔴 nene-vault: Backend CI（無人実行）が失敗しています'
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      GH_REPO: ${{ github.repository }}
+      RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+    steps:
+      - name: Create or update the failure issue
+        run: |
+          set -euo pipefail
+          # --limit は open issue の総数より大きく取る（frontend-ci.yml と同じ理由・#381）。
+          existing="$(gh issue list --state open --limit 1000 --json number,title \
+            | jq -r --arg t "$ISSUE_TITLE" 'map(select(.title == $t)) | .[0].number // empty')"
+          body="Backend CI の無人実行（${{ github.event_name }}）が失敗しました。 実行: ${RUN_URL}"
+          if [ -n "$existing" ]; then
+            gh issue comment "$existing" --body "$body"
+          else
+            gh issue create --title "$ISSUE_TITLE" --body "$body"
+          fi
