@@ -91,7 +91,11 @@ jobs:
       - name: Create or update the failure issue
         run: |
           set -euo pipefail
-          existing="$(gh issue list --state open --limit 100 --json number,title \
+          # --limit は open issue の総数より大きく取る。既定(30)や 100 のままだと
+          # open が上限を超えた瞬間に同名 issue を取りこぼし、dedup が黙って
+          # 重複起票へフォールバックする（#381）。重複こそが「通知が読まれなくなる」
+          # 原因なので、dedup が静かに壊れる形は避ける。参照実装 = nene-serve PR #218。
+          existing="$(gh issue list --state open --limit 1000 --json number,title \
             | jq -r --arg t "$ISSUE_TITLE" 'map(select(.title == $t)) | .[0].number // empty')"
           body="週次の schedule 実行が失敗しました。 実行: ${RUN_URL}"
           if [ -n "$existing" ]; then
