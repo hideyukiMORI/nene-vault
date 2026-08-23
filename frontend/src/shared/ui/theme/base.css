@@ -32,14 +32,18 @@
   a {
     color: inherit;
   }
-  /* 🔴 The `@media (max-width: 767px) { input, select, textarea { font-size: … } }` block
-     that lived here from #387 to #390 is gone: the kit's controls now carry
-     `--text-x-slot-control-size: max(var(--text-x-md), var(--text-x-ios-floor))`, which keeps
-     them at or above the 16px that stops iOS Safari zooming on focus — at every width, not
-     only below the breakpoint, and without a media query.
+  /* 🔴 The mobile iOS floor is NOT here, and cannot be.
+     `themes/default.css` sets `--text-x-slot-control-size` to this product's 0.875rem so
+     inputs read the same size as the text around them. That is under the 16px at which iOS
+     Safari zooms on focus, so the floor is wanted on phones and not on desktop — a token
+     that varies by width.
 
-     ⚠️ That makes form controls 16px on desktop too, where this product's body text is
-     0.875rem. It is a visible change and it is the kit's default; overriding the slot is one
-     line if we decide otherwise. The one control still written by hand — the file input in
-     the upload modal — does not take text, so it never triggered the zoom. */
+     This file may hold `@media` but not custom properties (ST-08); `themes/*.css` may hold
+     custom properties but not `@media` (AM-9). The two are deliberately exclusive and
+     exhaustive, so a width-conditional token has no home here — and an element rule cannot
+     stand in for one, because the kit's control utility lives in `@layer utilities`, which
+     wins over `@layer base` whatever the specificity.
+
+     ⇒ Raised with the kit instead: `max(var(--text-x-md), var(--text-x-ios-floor))` cannot
+     ask how wide the window is, so the floor lands at every width. Tracked as #393. */
 }
