@@ -1,4 +1,4 @@
-import { FormField, Input, Select, Stack } from '@hideyukimori/nene2-ui';
+import { EmptyState, FormField, Input, Select, Stack } from '@hideyukimori/nene2-ui';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
@@ -14,7 +14,6 @@ import { AppChrome } from '@/features/app-chrome';
 import { Button } from '@/shared/ui/primitives/Button';
 import { BADGE_BASE } from '@/shared/ui/primitives/badgeBase';
 import { Callout } from '@/shared/ui/components/Callout';
-import { EmptyState } from '@/shared/ui/components/EmptyState';
 import { Modal } from '@/shared/ui/components/Modal';
 import { Pagination } from '@/shared/ui/components/Pagination';
 
@@ -216,11 +215,11 @@ export function UsersPage() {
       {isError && <Callout tone="danger">{t('common.status.error')}</Callout>}
 
       {isLoading ? (
-        <EmptyState>{t('common.status.loading')}</EmptyState>
+        <EmptyState message={t('common.status.loading')} />
       ) : (
         <div className="card shadow-none">
           {users.length === 0 ? (
-            <EmptyState>{t('user.list.empty')}</EmptyState>
+            <EmptyState message={t('user.list.empty')} />
           ) : (
             <div className="tbl-wrap">
               <table className="tbl tbl-cards">

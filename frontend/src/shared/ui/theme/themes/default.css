@@ -165,4 +165,16 @@
   --container-lede: 60ch;
   --container-modal: 520px;
   --container-modal-sm: 432px;
+
+  /* ── @hideyukimori/nene2-ui slots ─────────────────────────────────────────
+     🔴 Slots only. The scale itself (`--spacing-x-3xs` … `--spacing-x-2xl`) is the kit's
+     and is not redefined here: a slot chooses a step, it may not invent one. Retuning the
+     scale to this product's old histogram fits *worse* — 84% exact but 24px worst case,
+     against the kit's 47% / 4px (kit README).
+
+     `npm run slot-values` fails if a literal ever appears in one of these. */
+
+  /* Empty/loading/error states sat at `py-12` (3rem) before the migration; the kit's
+     default is one step smaller. Same value, chosen from the scale rather than typed. */
+  --spacing-x-slot-state-pad-y: var(--spacing-x-2xl);
 }

@@ -1,4 +1,4 @@
-import { Stack } from '@hideyukimori/nene2-ui';
+import { EmptyState, Stack } from '@hideyukimori/nene2-ui';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useDocumentSearch, DocumentSearchForm, DocumentTable } from '@/features/document-search';
@@ -8,7 +8,6 @@ import { useTranslation } from '@/shared/i18n/use-translation';
 import { AppChrome } from '@/features/app-chrome';
 import { Button } from '@/shared/ui/primitives/Button';
 import { Callout } from '@/shared/ui/components/Callout';
-import { EmptyState } from '@/shared/ui/components/EmptyState';
 import { Pagination } from '@/shared/ui/components/Pagination';
 
 export function DocumentsPage() {
@@ -65,7 +64,7 @@ export function DocumentsPage() {
       {isError && <Callout tone="danger">{t('common.status.error')}</Callout>}
 
       {isLoading ? (
-        <EmptyState>{t('common.status.loading')}</EmptyState>
+        <EmptyState message={t('common.status.loading')} />
       ) : (
         <div className="card shadow-none">
           <DocumentTable

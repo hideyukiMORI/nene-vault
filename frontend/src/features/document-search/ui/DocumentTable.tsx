@@ -1,6 +1,6 @@
+import { EmptyState } from '@hideyukimori/nene2-ui';
 import { useTranslation } from '@/shared/i18n/use-translation';
 import { formatJpy, formatDate } from '@/shared/lib/format';
-import { EmptyState } from '@/shared/ui/components/EmptyState';
 import { BADGE_BASE } from '@/shared/ui/primitives/badgeBase';
 import type { VaultDocument } from '@/entities/document';
 
@@ -13,7 +13,7 @@ export function DocumentTable({ documents, onSelectDocument }: DocumentTableProp
   const { t, locale } = useTranslation();
 
   if (documents.length === 0) {
-    return <EmptyState>{t('document.list.empty')}</EmptyState>;
+    return <EmptyState message={t('document.list.empty')} />;
   }
 
   const labels = {

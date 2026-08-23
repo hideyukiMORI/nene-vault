@@ -1,4 +1,4 @@
-import { Box, FormField, Grid, Input, Stack } from '@hideyukimori/nene2-ui';
+import { Box, EmptyState, FormField, Grid, Input, Stack } from '@hideyukimori/nene2-ui';
 import { dynamicMessageKey } from '@/shared/i18n/catalogs';
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -10,7 +10,6 @@ import { formatDateTime } from '@/shared/lib/format';
 import { AppChrome } from '@/features/app-chrome';
 import { Button } from '@/shared/ui/primitives/Button';
 import { Callout } from '@/shared/ui/components/Callout';
-import { EmptyState } from '@/shared/ui/components/EmptyState';
 import { Pagination } from '@/shared/ui/components/Pagination';
 
 const PAGE_SIZE = 20;
@@ -428,11 +427,11 @@ export function AuditPage() {
       {isError && <Callout tone="danger">{t('common.status.error')}</Callout>}
 
       {isLoading ? (
-        <EmptyState>{t('common.status.loading')}</EmptyState>
+        <EmptyState message={t('common.status.loading')} />
       ) : (
         <div className="card shadow-none">
           {events.length === 0 ? (
-            <EmptyState>{t('audit_event.list.empty')}</EmptyState>
+            <EmptyState message={t('audit_event.list.empty')} />
           ) : (
             <div className="tbl-wrap">
               <table className="tbl audit-table">

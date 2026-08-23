@@ -1,4 +1,4 @@
-import { Stack } from '@hideyukimori/nene2-ui';
+import { EmptyState, Stack } from '@hideyukimori/nene2-ui';
 import { useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useDocumentById, fetchDocumentBlob, useOcrSuggest } from '@/entities/document';
@@ -17,7 +17,6 @@ import { AppChrome } from '@/features/app-chrome';
 import { Button } from '@/shared/ui/primitives/Button';
 import { BADGE_BASE } from '@/shared/ui/primitives/badgeBase';
 import { Callout } from '@/shared/ui/components/Callout';
-import { EmptyState } from '@/shared/ui/components/EmptyState';
 
 type Modal = 'void' | 'restore' | 'metadata-edit' | null;
 
@@ -89,7 +88,7 @@ export function DocumentDetailPage() {
         ← {t('navigation.documents')}
       </button>
 
-      {isLoading && <EmptyState>{t('common.status.loading')}</EmptyState>}
+      {isLoading && <EmptyState message={t('common.status.loading')} />}
       {isError && <Callout tone="danger">{t('common.status.error')}</Callout>}
 
       {doc !== undefined && (

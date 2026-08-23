@@ -1,4 +1,4 @@
-import { FormField, Input, Stack } from '@hideyukimori/nene2-ui';
+import { EmptyState, FormField, Input, Stack } from '@hideyukimori/nene2-ui';
 import { useEffect } from 'react';
 import { useForm, useWatch } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -12,7 +12,6 @@ import { formatDateTime } from '@/shared/lib/format';
 import { AppChrome } from '@/features/app-chrome';
 import { Button } from '@/shared/ui/primitives/Button';
 import { Callout } from '@/shared/ui/components/Callout';
-import { EmptyState } from '@/shared/ui/components/EmptyState';
 import { useNavigate } from 'react-router-dom';
 
 const settingsSchema = z.object({
@@ -100,7 +99,7 @@ export function SettingsPage() {
       </Stack>
 
       {isLoading ? (
-        <EmptyState>{t('common.status.loading')}</EmptyState>
+        <EmptyState message={t('common.status.loading')} />
       ) : (
         <form
           className="card p-x-md"
