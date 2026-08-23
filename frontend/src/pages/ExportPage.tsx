@@ -137,20 +137,18 @@ export function ExportPage() {
             </Stack>
           </FormField>
 
-          {/* Wrapped so the label keeps its own width. The kit's Checkbox hardcodes the
-              `<label>`'s className and forwards the caller's to the `<input>`, so there is
-              no way to say `self-start` from here; a block wrapper is the only place left
-              to say it. As a flex item the label would otherwise span the whole card, and
-              the click target would sit where nothing is drawn. */}
-          <div>
-            <Checkbox
-              label={t('export.form.include_voided_label')}
-              checked={includeVoided}
-              onChange={(e) => {
-                setIncludeVoided(e.target.checked);
-              }}
-            />
-          </div>
+          {/* `self-start` so the label keeps its own width — as a flex item it would
+              otherwise span the whole card and put the click target where nothing is drawn.
+              Said directly on the control since 0.11.0: `className` lands on the `<label>`
+              now, and the box takes `inputClassName`. Until then this needed a wrapper. */}
+          <Checkbox
+            className="self-start"
+            label={t('export.form.include_voided_label')}
+            checked={includeVoided}
+            onChange={(e) => {
+              setIncludeVoided(e.target.checked);
+            }}
+          />
 
           {exportError !== null && <p className="text-2xs text-danger">{exportError}</p>}
           {exportSuccess && <p className="success body-sm">{t('export.messages.downloaded')}</p>}

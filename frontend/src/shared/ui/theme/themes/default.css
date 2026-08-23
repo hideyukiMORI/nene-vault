@@ -233,6 +233,27 @@
   --radius-x-slot-button: var(--radius-x-xs); /* 4px — was `rounded-sm` */
   --radius-x-slot-alert: var(--radius-x-sm); /* 6px — was `rounded-md` */
 
+  /* Control colours. Three of the four differ from the kit's defaults — measured against
+     the pre-migration `FIELD_BASE` and confirmed in a real browser against production
+     (#399). `bg` already matches, so it is not restated. */
+  --color-x-slot-control-fg: var(--color-x-ink-deep); /* 24% vs the kit's 31% */
+  --color-x-slot-control-border: var(--color-x-line-mid); /* 84% vs 89% */
+  --color-x-slot-control-placeholder: var(--color-text-faint); /* 60% vs 49% */
+
+  /* 🔴 Font sizes for Button and the choice controls. Both default to `inherit` in the kit
+     — deliberately, because those two components never carried a size, so choosing a step
+     upstream would move every ship's rendering. This product's did carry one: `text-sm`,
+     which here is 0.8125rem.
+
+     ⚠️ 13px is not a step in the kit's type scale (0.6875 / 0.75 / 0.875 / 1 / 1.125 /
+     1.5rem). It is referenced from this product's own scale, the same way the alert colours
+     are referenced from its palette. The kit's scale was measured from what ships write as
+     Tailwind classes, so a value that only ever existed as a token was invisible to it —
+     the same shape as the radius scale missing everything but 8px (#395). Whether the scale
+     should grow a step is upstream's call; measuring it wants computed styles, not classes. */
+  --text-x-slot-button-size: var(--text-sm);
+  --text-x-slot-choice-size: var(--text-sm);
+
   --spacing-x-slot-control-pad-y: var(--spacing-x-2xs);
   --spacing-x-slot-control-pad-x: var(--spacing-x-xs);
 
