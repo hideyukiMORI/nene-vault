@@ -1,4 +1,4 @@
-import { EmptyState, Stack } from '@hideyukimori/nene2-ui';
+import { Button, EmptyState, InlineAlert, Stack } from '@hideyukimori/nene2-ui';
 import { useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useDocumentById, fetchDocumentBlob, useOcrSuggest } from '@/entities/document';
@@ -14,9 +14,7 @@ import type { OcrPrefill } from '@/features/document-detail';
 import { useTranslation } from '@/shared/i18n/use-translation';
 import { formatJpy, formatDate, formatDateTime } from '@/shared/lib/format';
 import { AppChrome } from '@/features/app-chrome';
-import { Button } from '@/shared/ui/primitives/Button';
 import { BADGE_BASE } from '@/shared/ui/primitives/badgeBase';
-import { Callout } from '@/shared/ui/components/Callout';
 
 type Modal = 'void' | 'restore' | 'metadata-edit' | null;
 
@@ -89,7 +87,7 @@ export function DocumentDetailPage() {
       </button>
 
       {isLoading && <EmptyState message={t('common.status.loading')} />}
-      {isError && <Callout tone="danger">{t('common.status.error')}</Callout>}
+      {isError && <InlineAlert tone="danger">{t('common.status.error')}</InlineAlert>}
 
       {doc !== undefined && (
         <>

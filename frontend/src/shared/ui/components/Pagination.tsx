@@ -1,4 +1,4 @@
-import { Button } from '@/shared/ui/primitives/Button';
+import { Button } from '@hideyukimori/nene2-ui';
 
 interface PaginationProps {
   total: number;
@@ -17,6 +17,16 @@ interface PaginationProps {
   nextLabel: string;
 }
 
+/**
+ * The page-level pagination row: a rule separating it from the table above, the range on the
+ * left and the controls on the right.
+ *
+ * 🔴 Not `@hideyukimori/nene2-ui`'s `Pagination`, which is a bare `<nav>` holding the two
+ * buttons and the status between them, with no row chrome and no `className` (#390 wave 3).
+ * Adopting it would move the range from the left to the middle and drop the rule and the
+ * padding on three screens. Same name, different component. The buttons inside *are* the
+ * kit's — which is the part that was duplicated.
+ */
 export function Pagination({
   total,
   canPrev,

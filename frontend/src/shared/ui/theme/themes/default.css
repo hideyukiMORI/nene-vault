@@ -177,4 +177,24 @@
   /* Empty/loading/error states sat at `py-12` (3rem) before the migration; the kit's
      default is one step smaller. Same value, chosen from the scale rather than typed. */
   --spacing-x-slot-state-pad-y: var(--spacing-x-2xl);
+
+  /* 🔴 Alerts: this product distinguishes "careful" from "failed" by hue, and tints the
+     background. The kit's defaults give warn and danger the same three colours on purpose —
+     its palette has one alert hue, and a second one is a decision the product makes. This is
+     that decision, and it is why the slots exist rather than the colours being hardcoded.
+
+     Losing it is not a cosmetic regression: a warning and a failure would become
+     indistinguishable to anyone looking at the screen. `role` still differs, but the role is
+     read out — it is not seen. Guarded by Alert.tones.test.ts. */
+  --color-x-slot-alert-warn-bg: var(--color-warn-soft);
+  --color-x-slot-alert-warn-fg: var(--color-on-warn);
+  --color-x-slot-alert-warn-border: var(--color-warn);
+  --color-x-slot-alert-danger-bg: var(--color-danger-soft);
+  --color-x-slot-alert-danger-fg: var(--color-x-danger-hover);
+  --color-x-slot-alert-danger-border: var(--color-danger);
+
+  /* Field hint sat one step lighter than the label before the migration (#389); the kit's
+     default puts both at `--color-text-muted`. Sizes for hint and error come from the kit's
+     type scale and already match, so only the colour is restored here. */
+  --color-x-slot-field-hint: var(--color-text-faint);
 }

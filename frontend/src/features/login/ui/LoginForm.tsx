@@ -1,9 +1,8 @@
-import { Box, FormField, Input, Stack } from '@hideyukimori/nene2-ui';
+import { Box, Button, FormField, Input, Stack } from '@hideyukimori/nene2-ui';
 import type { AuthSession } from '@/shared/api/auth-session';
 import { SUPPORTED_LOCALES, type SupportedLocale } from '@/shared/i18n/locales';
 import { useTranslation } from '@/shared/i18n/use-translation';
 import { BrandMark } from '@/shared/ui/primitives/BrandMark';
-import { Button } from '@/shared/ui/primitives/Button';
 import { LanguageSwitcher } from '@/shared/ui/components/LanguageSwitcher';
 import { useLoginPage } from '../model/use-login';
 

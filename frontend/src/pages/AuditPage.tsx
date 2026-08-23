@@ -1,4 +1,13 @@
-import { Box, EmptyState, FormField, Grid, Input, Stack } from '@hideyukimori/nene2-ui';
+import {
+  Box,
+  Button,
+  EmptyState,
+  FormField,
+  Grid,
+  InlineAlert,
+  Input,
+  Stack,
+} from '@hideyukimori/nene2-ui';
 import { dynamicMessageKey } from '@/shared/i18n/catalogs';
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -8,8 +17,6 @@ import { authStore } from '@/shared/api/auth-session';
 import { useTranslation } from '@/shared/i18n/use-translation';
 import { formatDateTime } from '@/shared/lib/format';
 import { AppChrome } from '@/features/app-chrome';
-import { Button } from '@/shared/ui/primitives/Button';
-import { Callout } from '@/shared/ui/components/Callout';
 import { Pagination } from '@/shared/ui/components/Pagination';
 
 const PAGE_SIZE = 20;
@@ -424,7 +431,7 @@ export function AuditPage() {
         </Stack>
       </Box>
 
-      {isError && <Callout tone="danger">{t('common.status.error')}</Callout>}
+      {isError && <InlineAlert tone="danger">{t('common.status.error')}</InlineAlert>}
 
       {isLoading ? (
         <EmptyState message={t('common.status.loading')} />

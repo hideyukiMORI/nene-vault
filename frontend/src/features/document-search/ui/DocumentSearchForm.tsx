@@ -1,8 +1,6 @@
 import type { UseFormReturn } from 'react-hook-form';
-import { FormField, Grid, Input, Select, Stack } from '@hideyukimori/nene2-ui';
+import { Button, Checkbox, FormField, Grid, Input, Select, Stack } from '@hideyukimori/nene2-ui';
 import { useTranslation } from '@/shared/i18n/use-translation';
-import { Button } from '@/shared/ui/primitives/Button';
-import { Checkbox } from '@/shared/ui/primitives/Checkbox';
 import type { SearchFormValues } from '../model/use-document-search';
 
 interface DocumentSearchFormProps {

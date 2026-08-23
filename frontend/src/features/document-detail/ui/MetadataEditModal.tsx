@@ -1,7 +1,6 @@
-import { FormField, Grid, Input, Select, Stack } from '@hideyukimori/nene2-ui';
+import { Button, FormField, Grid, Input, Select, Stack } from '@hideyukimori/nene2-ui';
 import { useTranslation } from '@/shared/i18n/use-translation';
 import { fieldErrorText } from '@/shared/i18n/validation-keys';
-import { Button } from '@/shared/ui/primitives/Button';
 import { Modal } from '@/shared/ui/components/Modal';
 import type { VaultDocument } from '@/entities/document';
 import { useMetadataEditForm } from '../model/use-metadata-edit';

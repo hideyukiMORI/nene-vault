@@ -32,20 +32,14 @@
   a {
     color: inherit;
   }
-  /* 🔴 iOS Safari zooms the page when a focused control's font-size is under 16px, and
-     this product's body text is 0.875rem (14px). vault's own Input/Select/Textarea carried
-     `max-md:text-touch` for exactly that reason; `@hideyukimori/nene2-ui`'s controls set no
-     font-size at all, so migrating to them (#387) would have inherited the 14px and brought
-     the zoom back on every form.
+  /* 🔴 The `@media (max-width: 767px) { input, select, textarea { font-size: … } }` block
+     that lived here from #387 to #390 is gone: the kit's controls now carry
+     `--text-x-slot-control-size: max(var(--text-x-md), var(--text-x-ios-floor))`, which keeps
+     them at or above the 16px that stops iOS Safari zooming on focus — at every width, not
+     only below the breakpoint, and without a media query.
 
-     Held here rather than as a className on each control: it is one product-wide fact about
-     this theme's body size, and repeating a value at ~20 call sites is the pattern the kit
-     exists to end. Reported upstream — if the kit takes it on, this block goes away. */
-  @media (max-width: 767px) {
-    input,
-    select,
-    textarea {
-      font-size: var(--text-touch);
-    }
-  }
+     ⚠️ That makes form controls 16px on desktop too, where this product's body text is
+     0.875rem. It is a visible change and it is the kit's default; overriding the slot is one
+     line if we decide otherwise. The one control still written by hand — the file input in
+     the upload modal — does not take text, so it never triggered the zoom. */
 }

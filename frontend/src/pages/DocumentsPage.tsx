@@ -1,4 +1,4 @@
-import { EmptyState, Stack } from '@hideyukimori/nene2-ui';
+import { Button, EmptyState, InlineAlert, Stack } from '@hideyukimori/nene2-ui';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useDocumentSearch, DocumentSearchForm, DocumentTable } from '@/features/document-search';
@@ -6,8 +6,6 @@ import { DocumentUploadModal } from '@/features/document-upload';
 import { authStore } from '@/shared/api/auth-session';
 import { useTranslation } from '@/shared/i18n/use-translation';
 import { AppChrome } from '@/features/app-chrome';
-import { Button } from '@/shared/ui/primitives/Button';
-import { Callout } from '@/shared/ui/components/Callout';
 import { Pagination } from '@/shared/ui/components/Pagination';
 
 export function DocumentsPage() {
@@ -61,7 +59,7 @@ export function DocumentsPage() {
 
       <DocumentSearchForm form={form} onSubmit={onSubmit} onReset={onReset} isLoading={isLoading} />
 
-      {isError && <Callout tone="danger">{t('common.status.error')}</Callout>}
+      {isError && <InlineAlert tone="danger">{t('common.status.error')}</InlineAlert>}
 
       {isLoading ? (
         <EmptyState message={t('common.status.loading')} />
