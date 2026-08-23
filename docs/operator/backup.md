@@ -24,19 +24,110 @@ The SQLite database is a single file at `DB_NAME` (default `var/nene_vault.sqlit
 
 ### Online backup (no downtime)
 
-```sh
-# Atomic copy via SQLite backup API
-sqlite3 var/nene_vault.sqlite ".backup /backups/nene_vault_$(date +%Y%m%d).sqlite"
-```
-
-Or using PHP:
+Take the copy, verify it, and only then move it into place. A backup that is not
+asserted on is not a backup — it is a file that will be found wanting during a
+restore, which is the one moment you cannot afford to find out.
 
 ```sh
-php -r "
-\$src = new PDO('sqlite:var/nene_vault.sqlite');
-\$src->exec(\"VACUUM INTO '/backups/nene_vault_\$(date +%Y%m%d).sqlite'\");
-"
+#!/bin/sh
+set -eu
+
+src=var/nene_vault.sqlite
+out=/backups/nene_vault_$(date +%Y%m%d).sqlite
+tmp=$out.part
+
+rm -f "$tmp"
+
+php -r '
+  $src = $argv[1];
+  $tmp = $argv[2];
+  (new PDO("sqlite:$src"))->exec(sprintf("VACUUM INTO %s", (new PDO("sqlite::memory:"))->quote($tmp)));
+
+  $check = (new PDO("sqlite:$tmp"))->query("PRAGMA integrity_check")->fetchColumn();
+  if ($check !== "ok") {
+      fwrite(STDERR, "integrity_check: $check\n");
+      exit(1);
+  }
+' "$src" "$tmp"
+
+mv "$tmp" "$out"
 ```
+
+The `rm -f` is not tidiness. `VACUUM INTO` refuses a target that already holds
+data — `file is not a database` — so a partial file left by a failed run would
+block every subsequent backup until someone cleared it by hand. Removing it up
+front makes the script re-runnable.
+
+A run that fails the check exits non-zero, leaves the `.part` file behind for
+inspection, and **does not touch the backup already in place** — the same
+guarantee the MySQL commands give.
+
+If the `sqlite3` CLI is installed, the same shape works with it:
+
+```sh
+sqlite3 "$src" ".backup '$tmp'"
+[ "$(sqlite3 "$tmp" 'PRAGMA integrity_check;')" = ok ] || exit 1
+```
+
+> ⚠️ **Prefer the PHP form.** Any host running Vault has PHP — it is the
+> application runtime. The `sqlite3` CLI is a separate package and is frequently
+> absent, including on hosts where Vault itself runs perfectly well.
+
+### Verifying a SQLite backup
+
+`PRAGMA integrity_check` returns the single string `ok` on a sound database, and
+either a list of problems or an error on a damaged one. Like the MySQL dump
+marker, it is useful at two moments.
+
+**1. Immediately after taking it** — shown above.
+
+**2. After the fact, across backups you already hold:**
+
+```sh
+set -eu
+
+for f in /backups/nene_vault_*.sqlite; do
+  php -r '
+    try {
+      $r = (new PDO("sqlite:" . $argv[1]))->query("PRAGMA integrity_check")->fetchColumn();
+      printf("%-9s %s\n", $r === "ok" ? "OK" : "DAMAGED", $argv[1]);
+      exit($r === "ok" ? 0 : 1);
+    } catch (Throwable $e) {
+      printf("%-9s %s (%s)\n", "UNREADABLE", $argv[1], $e->getMessage());
+      exit(1);
+    }
+  ' "$f" || true   # keep auditing the remaining files
+done
+```
+
+> ⚠️ The `|| true` above is deliberate and is the **only** place this guide
+> permits it: this loop audits a set and must not stop at the first bad file. Never
+> use it in the backup itself — see the warning at the end of the MySQL section.
+
+#### Why `integrity_check` and not a size check
+
+🔑 **A truncated SQLite file is not an empty file.** A copy that died at 40 %
+still opens as far as the filesystem is concerned, and `[ -s "$f" ]` passes on it
+without complaint. `integrity_check` refuses it — SQLite's header records the
+database size in pages, so a short file is detected even when the truncation
+lands exactly on a page boundary.
+
+#### What `integrity_check` cannot tell you
+
+It answers *"is this file a sound database?"*, not *"is this the data you meant to
+back up?"*. A backup that is structurally perfect but taken from the wrong
+generation — or taken while writes were still landing — returns `ok` with rows
+missing.
+
+🔑 **An empty file is a sound database.** A zero-byte `.sqlite` passes
+`integrity_check` with `ok`, because that is exactly what a database with no
+tables looks like on disk. So the check cannot, on its own, distinguish a good
+backup from a step that ran and produced nothing.
+
+Structure and contents are two different questions. The second one is answered in
+the next section, by reconciling the database against the files — which is also
+what catches the empty-backup case, since zero rows cannot account for the files
+on disk.
 
 ### File backup
 
@@ -47,6 +138,96 @@ rsync -av --progress \
   /var/nene-vault/files/ \
   /backups/nene-vault-files-$(date +%Y%m%d)/
 ```
+
+### Verifying a file backup
+
+🔑 **Vault verifies SHA-256 on every download.** Backups of those same files are
+held to the same standard, or the guarantee stops at the edge of the running
+system.
+
+`document_versions` carries `file_path` (relative to `NENE_VAULT_STORAGE_PATH`)
+and `file_sha256` for every stored file. That is enough to reconcile a backup
+against itself, with no access to the live system:
+
+```php
+<?php
+// verify-backup.php <backup.sqlite> <backup files root>
+[$db, $root] = [$argv[1], rtrim($argv[2], '/')];
+
+$pdo = new PDO("sqlite:$db");
+$pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+$rows = $pdo->query(
+    'SELECT file_path, file_sha256 FROM document_versions'
+)->fetchAll(PDO::FETCH_ASSOC);
+
+$ok = $missing = $mismatch = 0;
+$seen = [];
+
+foreach ($rows as $r) {
+    $abs = $root . '/' . $r['file_path'];
+    $seen[$r['file_path']] = true;
+
+    if (!is_file($abs)) {
+        fwrite(STDERR, "MISSING   {$r['file_path']}\n");
+        $missing++;
+    } elseif (hash_file('sha256', $abs) !== $r['file_sha256']) {
+        fwrite(STDERR, "MISMATCH  {$r['file_path']}\n");
+        $mismatch++;
+    } else {
+        $ok++;
+    }
+}
+
+$orphan = 0;
+$walk = new RecursiveIteratorIterator(
+    new RecursiveDirectoryIterator($root, FilesystemIterator::SKIP_DOTS)
+);
+
+foreach ($walk as $f) {
+    if (!$f->isFile()) {
+        continue;
+    }
+    $rel = substr($f->getPathname(), strlen($root) + 1);
+    if (!isset($seen[$rel])) {
+        fwrite(STDERR, "ORPHAN    $rel\n");
+        $orphan++;
+    }
+}
+
+printf(
+    "rows=%d ok=%d missing=%d mismatch=%d orphan=%d\n",
+    count($rows), $ok, $missing, $mismatch, $orphan
+);
+
+exit(($missing || $mismatch) ? 1 : 0);
+```
+
+```sh
+php verify-backup.php \
+  /backups/nene_vault_20260823.sqlite \
+  /backups/nene-vault-files-20260823
+```
+
+**Why SHA-256 and not size or count.** A file that is corrupted in transit is
+usually the *same length* as the original — a flipped byte changes the content
+and nothing else. Counting files, or comparing sizes, passes such a backup. The
+hash is the only check that does not.
+
+**MISSING and ORPHAN are not the same failure.** They are the two directions of
+the same skew, and the guide's rule that the database and the files must be taken
+together is what they enforce:
+
+| Reading | Means | Severity |
+|---|---|---|
+| `missing > 0` | The database references a file the backup does not hold | 🔴 **Data loss.** Exits non-zero |
+| `mismatch > 0` | The file is there but its bytes are not the ones Vault recorded | 🔴 **Silent corruption.** Exits non-zero |
+| `orphan > 0` | Files present that no row references | 🟡 Exits **zero** |
+
+An orphan count that is small and stable is normal — deleted-then-restored
+versions and stray temporary files both land there. An orphan count that *jumps*
+between runs means the database is older than the files: the copies were not
+taken together. The opposite skew — files older than the database — appears as
+`missing`, which is why that one is fatal and this one is not.
 
 ### Recommended schedule
 
