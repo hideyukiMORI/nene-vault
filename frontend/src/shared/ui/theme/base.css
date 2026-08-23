@@ -32,18 +32,19 @@
   a {
     color: inherit;
   }
-  /* 🔴 The mobile iOS floor is NOT here, and cannot be.
-     `themes/default.css` sets `--text-x-slot-control-size` to this product's 0.875rem so
-     inputs read the same size as the text around them. That is under the 16px at which iOS
-     Safari zooms on focus, so the floor is wanted on phones and not on desktop — a token
-     that varies by width.
+  /* 🔴 The touch-device font floor is not here, and does not need to be.
+     From #393 the kit carries it as its own slot, applied under `pointer-coarse:` — so the
+     product picks the pointer-fine size in `themes/default.css` and the floor comes along
+     for touch devices on its own.
 
-     This file may hold `@media` but not custom properties (ST-08); `themes/*.css` may hold
-     custom properties but not `@media` (AM-9). The two are deliberately exclusive and
-     exhaustive, so a width-conditional token has no home here — and an element rule cannot
-     stand in for one, because the kit's control utility lives in `@layer utilities`, which
-     wins over `@layer base` whatever the specificity.
+     Recorded because the first attempt cost two round trips: a width-conditional token has
+     no home in this repo. `themes/*.css` may hold custom properties but not `@media`
+     (AM-9); this file may hold `@media` but not custom properties (ST-08). The two are
+     deliberately exclusive and exhaustive, and an element rule cannot stand in — the kit's
+     control utility is in `@layer utilities`, which wins over `@layer base` at any
+     specificity. The answer was upstream, not a way around the rules.
 
-     ⇒ Raised with the kit instead: `max(var(--text-x-md), var(--text-x-ios-floor))` cannot
-     ask how wide the window is, so the floor lands at every width. Tracked as #393. */
+     🔑 And the kit's answer was better than the one asked for: it splits on `pointer-coarse`
+     rather than width, because the zoom is a property of touch input, not of narrow
+     windows — a landscape iPad is wide and still needs the floor. */
 }

@@ -204,16 +204,23 @@
   --spacing-x-slot-control-pad-y: var(--spacing-x-2xs);
   --spacing-x-slot-control-pad-x: var(--spacing-x-xs);
 
-  /* 🔴 14px, not the kit's `max(--text-x-md, --text-x-ios-floor)`.
-     The floor exists because iOS Safari zooms when a focused control is under 16px, and the
-     kit applies it at every width because `max()` cannot ask how wide the window is. This
-     product's body text is 0.875rem, so a 16px input reads as a different size from
-     everything around it — which is what the owner saw.
+  /* 0.875rem, matching this product's body text — a control that reads as a different size
+     from the words around it is what the owner saw at the 0.6.0 default of 1rem.
 
-     The floor is not dropped: it moves to the media query below, which is the only place
-     that can distinguish "on a phone" from "not". It stays in the slot rather than becoming
-     an element rule, because the kit's controls now set a font-size themselves — a rule in
-     `@layer base` would lose to their utility. */
+     🔴 This is the *pointer-fine* size only. The 16px that stops iOS Safari zooming on focus
+     lives in a second slot, `--text-x-slot-control-touch-size`, which the kit applies under
+     `pointer-coarse:` — so a phone and a landscape iPad get the floor while a desktop keeps
+     this. Until 0.7.0 the kit had one slot holding `max(--text-x-md, --text-x-ios-floor)`,
+     which could not tell the two apart; overriding it here dropped the floor everywhere
+     (#393, reported and fixed upstream).
+
+     🔴 DO NOT override `--text-x-slot-control-touch-size`. Lowering it silently reinstates
+     the zoom on every touch device, and `npm run slot-values` will NOT catch it — a lower
+     step is still a `var()` into the scale, so the rule that guards this file is blind to
+     it. `control-touch-floor.test.ts` is what actually holds the line.
+
+     🔑 The floor is a device constraint, not a design value. It is the one number here that
+     is not ours to choose. */
   --text-x-slot-control-size: var(--text-x-sm);
 
   /* Field hint sat one step lighter than the label before the migration (#389); the kit's
