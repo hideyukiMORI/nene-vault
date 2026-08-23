@@ -12,6 +12,19 @@ describe('DocumentTable', () => {
     expect(screen.getByText(/No documents/i)).toBeInTheDocument();
   });
 
+  /**
+   * The empty state is centred and announced. Both used to be asserted against vault's own
+   * `EmptyState` component, which #390 replaced with the kit's — so the assertion moved here,
+   * to the rendered result, rather than being deleted with the component. A guarantee the
+   * product makes does not stop being the product's when the implementation moves upstream.
+   */
+  it('centres the empty state and announces it', () => {
+    renderWithProviders(<DocumentTable documents={[]} onSelectDocument={vi.fn()} />);
+    const node = screen.getByText(/No documents/i);
+    expect(node).toHaveClass('text-center');
+    expect(node).toHaveAttribute('role', 'status');
+  });
+
   it('renders a row for each document', () => {
     renderWithProviders(
       <DocumentTable documents={[mockDocument, mockVoidedDocument]} onSelectDocument={vi.fn()} />,
