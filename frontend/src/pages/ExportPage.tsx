@@ -118,7 +118,10 @@ export function ExportPage() {
           </FormField>
 
           <FormField id="export-format" label={t('export.form.format_label')}>
-            <Stack gap="2xs">
+            {/* `align="start"` so the labels keep their own width. A Stack blockifies its
+                children, and a choice label that spans the full row moves the click target
+                somewhere the eye does not expect it. */}
+            <Stack align="start" gap="2xs">
               {(['zip', 'csv'] as const).map((f) => (
                 <Radio
                   key={f}
@@ -134,13 +137,20 @@ export function ExportPage() {
             </Stack>
           </FormField>
 
-          <Checkbox
-            label={t('export.form.include_voided_label')}
-            checked={includeVoided}
-            onChange={(e) => {
-              setIncludeVoided(e.target.checked);
-            }}
-          />
+          {/* Wrapped so the label keeps its own width. The kit's Checkbox hardcodes the
+              `<label>`'s className and forwards the caller's to the `<input>`, so there is
+              no way to say `self-start` from here; a block wrapper is the only place left
+              to say it. As a flex item the label would otherwise span the whole card, and
+              the click target would sit where nothing is drawn. */}
+          <div>
+            <Checkbox
+              label={t('export.form.include_voided_label')}
+              checked={includeVoided}
+              onChange={(e) => {
+                setIncludeVoided(e.target.checked);
+              }}
+            />
+          </div>
 
           {exportError !== null && <p className="text-2xs text-danger">{exportError}</p>}
           {exportSuccess && <p className="success body-sm">{t('export.messages.downloaded')}</p>}
