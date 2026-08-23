@@ -118,7 +118,10 @@ export function ExportPage() {
           </FormField>
 
           <FormField id="export-format" label={t('export.form.format_label')}>
-            <Stack gap="2xs">
+            {/* `align="start"` so the labels keep their own width. A Stack blockifies its
+                children, and a choice label that spans the full row moves the click target
+                somewhere the eye does not expect it. */}
+            <Stack align="start" gap="2xs">
               {(['zip', 'csv'] as const).map((f) => (
                 <Radio
                   key={f}
@@ -134,7 +137,12 @@ export function ExportPage() {
             </Stack>
           </FormField>
 
+          {/* `self-start` so the label keeps its own width — as a flex item it would
+              otherwise span the whole card and put the click target where nothing is drawn.
+              Said directly on the control since 0.11.0: `className` lands on the `<label>`
+              now, and the box takes `inputClassName`. Until then this needed a wrapper. */}
           <Checkbox
+            className="self-start"
             label={t('export.form.include_voided_label')}
             checked={includeVoided}
             onChange={(e) => {
@@ -145,7 +153,7 @@ export function ExportPage() {
           {exportError !== null && <p className="text-2xs text-danger">{exportError}</p>}
           {exportSuccess && <p className="success body-sm">{t('export.messages.downloaded')}</p>}
 
-          <Stack>
+          <div>
             <Button
               variant="primary"
               onClick={() => {
@@ -155,7 +163,7 @@ export function ExportPage() {
             >
               {isExporting ? t('common.status.processing') : t('export.form.submit')}
             </Button>
-          </Stack>
+          </div>
         </Stack>
       </Box>
     </AppChrome>

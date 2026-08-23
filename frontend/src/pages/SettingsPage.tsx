@@ -12,6 +12,9 @@ import { formatDateTime } from '@/shared/lib/format';
 import { AppChrome } from '@/features/app-chrome';
 import { useNavigate } from 'react-router-dom';
 
+/** Referenced by the retention input's `aria-describedby`, so it lives next to both. */
+const RETENTION_WARNING_ID = 'settings-retention-warning';
+
 const settingsSchema = z.object({
   retention_years: z.coerce
     .number()
@@ -123,19 +126,41 @@ export function SettingsPage() {
                 type="number"
                 min={7}
                 max={99}
-                // The live under-10-years notice is a *warning*, not a validation error, so it
-                // sets aria-invalid directly. FormField's own wiring covers the error case and
-                // an explicit prop wins over it (see the kit's useFieldWiring).
-                aria-invalid={retentionWarn || undefined}
+                /* 🔴 No `aria-invalid` here. Eight years is under the recommended ten and over
+                   the `min` of seven — the value passes validation, and `aria-invalid` says it
+                   did not. It used to be set, which told assistive technology the field was
+                   wrong while the reason went unlinked: the exact shape #385 was opened for,
+                   surviving in the one place that is not an error at all.
+
+                   The notice is linked instead. Only when there is no real validation error —
+                   an explicit `aria-describedby` wins over FormField's own wiring, and an
+                   error outranks a recommendation. */
+                aria-describedby={
+                  retentionWarn && errors.retention_years === undefined
+                    ? RETENTION_WARNING_ID
+                    : undefined
+                }
+                /* 🔴 The amber outline the notice used to draw. Before the migration it came
+                   from vault's own Input, which carried `aria-invalid:border-warn` and friends
+                   — attribute and paint from one source (FC-1.8). The kit's Input reads
+                   `aria-invalid` for wiring and paints nothing from it, so the outline went
+                   away in W1 and nothing noticed: the test asserted the attribute, and the
+                   attribute was still there. Restored here until the kit has a warning state
+                   for controls (#399). */
+                className={retentionWarn ? 'border-warn ring-3 ring-warn-soft' : undefined}
                 // valueAsNumber so the watched value is numeric *while typing* — the
                 // under-10-years compliance warning must render live, not only after
                 // save → re-fetch coerces the value server-side.
                 {...register('retention_years', { valueAsNumber: true })}
               />
               {retentionWarn && (
-                <InlineAlert tone="warn">
-                  {t('vault_settings.fields.retention_warning')}
-                </InlineAlert>
+                /* Wrapped to carry the id: the kit's InlineAlert takes neither `id` nor
+                   `className`, so there is nowhere else to put one (#399). */
+                <div id={RETENTION_WARNING_ID}>
+                  <InlineAlert tone="warn">
+                    {t('vault_settings.fields.retention_warning')}
+                  </InlineAlert>
+                </div>
               )}
             </FormField>
 
@@ -185,11 +210,11 @@ export function SettingsPage() {
             )}
             {submitError !== null && <p className="text-2xs text-danger">{t(submitError)}</p>}
 
-            <Stack>
+            <div>
               <Button type="submit" variant="primary" disabled={mutation.isPending}>
                 {mutation.isPending ? t('common.status.saving') : t('vault_settings.save_button')}
               </Button>
-            </Stack>
+            </div>
           </Stack>
         </form>
       )}

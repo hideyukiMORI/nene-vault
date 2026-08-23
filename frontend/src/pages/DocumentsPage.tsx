@@ -1,4 +1,4 @@
-import { Button, EmptyState, InlineAlert, Stack } from '@hideyukimori/nene2-ui';
+import { Button, EmptyState, Icon, InlineAlert, Stack } from '@hideyukimori/nene2-ui';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useDocumentSearch, DocumentSearchForm, DocumentTable } from '@/features/document-search';
@@ -36,23 +36,23 @@ export function DocumentsPage() {
             {t('document.list.title')}
           </h1>
         </Stack>
+        {/* 🔴 `inline-flex items-center` and the gap are on the call site because the kit's
+            Button does not lay out its own children — it sets no display, so an icon and a
+            label sit on the text baseline with nothing between them. vault's own Button
+            carried `inline-flex items-center justify-center gap-1.75`. Raised as #398; this
+            className goes away when the kit takes it on. */}
         <Button
           variant="primary"
+          className="inline-flex items-center gap-x-2xs"
           onClick={() => {
             setShowUpload(true);
           }}
         >
-          <svg
-            viewBox="0 0 24 24"
-            fill="none"
-            strokeWidth="1.8"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          >
+          <Icon decorative size="sm" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round">
             <path d="M12 19V6" />
             <path d="m6 11 6-6 6 6" />
             <path d="M5 20h14" />
-          </svg>
+          </Icon>
           {t('document.list.upload_button')}
         </Button>
       </div>
