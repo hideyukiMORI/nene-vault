@@ -6,11 +6,10 @@
  *
  * Does not: manage focus-trap routing, fetch, or know entity shapes.
  */
+import { Stack, Text } from '@hideyukimori/nene2-ui';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { Modal } from './Modal';
 import { Button } from '../primitives/Button';
-import { Stack } from '../primitives/Stack';
-import { Text } from '../primitives/Text';
 
 const meta: Meta<typeof Modal> = {
   title: 'Components/Modal',
@@ -21,9 +20,7 @@ const meta: Meta<typeof Modal> = {
     <Modal {...args}>
       <div className="p-inline-lg">
         <Stack gap="md">
-          <Text tone="muted" className="text-body-sm">
-            Modal body content goes here.
-          </Text>
+          <Text tone="muted">Modal body content goes here.</Text>
           <div className="flex justify-end gap-inline-md">
             <Button variant="secondary" onClick={args.onClose}>
               Cancel

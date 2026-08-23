@@ -1,6 +1,7 @@
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
+import { VALIDATION } from '@/shared/i18n/validation-keys';
 import { useUpdateDocumentMetadata } from '@/entities/document';
 import type { VaultDocument } from '@/entities/document';
 import { messageKeyForError } from '@/shared/i18n/map-problem-details';
@@ -8,7 +9,7 @@ import { messageKeyForError } from '@/shared/i18n/map-problem-details';
 const metadataSchema = z.object({
   transaction_date: z.string().optional(),
   amount_cents: z.string().optional(),
-  counterparty_name: z.string().min(1),
+  counterparty_name: z.string().min(1, VALIDATION.required),
   category: z.enum(['invoice_received', 'contract', 'receipt', 'delivery_note', 'other']),
   tags: z.string().optional(),
 });

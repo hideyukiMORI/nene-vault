@@ -1,23 +1,10 @@
-// Shared base utilities for the text-entry form controls (Input / Select /
-// Textarea), regenerated from the retired `.input`/`.select`/`.textarea`
-// component classes (C5 W3 波(a), #361).
+// Shared base utility for the choice controls.
 //
-// The three controls carried one shared rule in `default.components.css`, so the
-// utility string is shared here rather than triplicated. `font: inherit` from the
-// old rule is intentionally absent: Tailwind v4's preflight already declares it
-// for form controls — the same drop that the `.btn` drain measured and recorded
-// (#340).
-//
-// The `max-md:` trio reproduces the old `@media (max-width: 767px)` touch block
-// (padding 11px/12px, font-size 16px). `text-touch` is a font-size-only token, so
-// it does not smuggle in a line-height the old declaration never set.
-export const FIELD_BASE =
-  'text-body w-full border border-x-line-mid bg-surface-raised rounded-sm py-2 px-2.75 ' +
-  'text-x-ink-deep field-transition focus:outline-none focus:border-accent focus:ring-3 ' +
-  'focus:ring-accent-soft max-md:py-2.75 max-md:px-3 max-md:text-touch';
-
-// `.input::placeholder` / `.textarea::placeholder` — select has no placeholder.
-export const FIELD_PLACEHOLDER = 'placeholder:text-text-faint';
+// 🔴 `FIELD_BASE` / `FIELD_PLACEHOLDER` lived here until #387. They were the regenerated
+// `.input`/`.select`/`.textarea` rules from the C5 W3 drain (#361), and they went with the
+// components they served when those moved to `@hideyukimori/nene2-ui`. The one part that did
+// not travel — the `max-md:` font-size bump that keeps iOS Safari from zooming on focus —
+// is now a base-layer rule in `theme/base.css`, because the kit's controls set no font-size.
 
 // `.checkbox` and `.radio` were one shared rule (plus `.checkbox input`/`.radio
 // input` for the control itself), so the label wrapper keeps a single utility

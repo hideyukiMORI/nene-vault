@@ -1,14 +1,15 @@
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
+import { VALIDATION } from '@/shared/i18n/validation-keys';
 import { useUploadDocument } from '@/entities/document';
 import { messageKeyForError } from '@/shared/i18n/map-problem-details';
 
 const uploadSchema = z.object({
-  file: z.instanceof(FileList).refine((list) => list.length > 0, 'required'),
+  file: z.instanceof(FileList).refine((list) => list.length > 0, VALIDATION.required),
   transaction_date: z.string().optional(),
   amount_cents: z.string().optional(),
-  counterparty_name: z.string().min(1),
+  counterparty_name: z.string().min(1, VALIDATION.required),
   category: z.enum(['invoice_received', 'contract', 'receipt', 'delivery_note', 'other']),
   tags: z.string().optional(),
 });

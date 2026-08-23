@@ -1,3 +1,4 @@
+import { Grid, Stack } from '@hideyukimori/nene2-ui';
 import type { ReactNode } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { authStore } from '@/shared/api/auth-session';
@@ -117,13 +118,13 @@ export function HomePage() {
 
   return (
     <AppChrome onLogout={handleLogout} userEmail={session?.email} userRole={session?.role}>
-      <div className="flex flex-col gap-1.5">
+      <Stack gap="2xs">
         <span className="text-2xs tracking-eyebrow uppercase text-x-brass-deep font-semibold">
           {t('home.eyebrow')}
         </span>
         <h1 className="text-h1 font-semibold tracking-title text-x-ink-deep">{t('home.title')}</h1>
         <p className="text-text-muted text-sm max-w-lede">{t('home.lede')}</p>
-      </div>
+      </Stack>
 
       <div>
         <div className="flex items-center gap-2 mb-stack-sm">
@@ -132,7 +133,7 @@ export function HomePage() {
             {t('home.quick_access')}
           </h2>
         </div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <Grid cols={{ base: 1, sm: 2 }} gap="sm">
           {visibleLinks.map((link) => (
             <button
               key={link.to}
@@ -150,7 +151,7 @@ export function HomePage() {
               <span className="arr">→</span>
             </button>
           ))}
-        </div>
+        </Grid>
       </div>
     </AppChrome>
   );

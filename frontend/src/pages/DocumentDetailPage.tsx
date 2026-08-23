@@ -1,3 +1,4 @@
+import { Stack } from '@hideyukimori/nene2-ui';
 import { useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useDocumentById, fetchDocumentBlob, useOcrSuggest } from '@/entities/document';
@@ -94,14 +95,14 @@ export function DocumentDetailPage() {
       {doc !== undefined && (
         <>
           <div className="flex items-end justify-between gap-4 max-md:flex-col max-md:items-start max-md:gap-3.5">
-            <div className="flex flex-col gap-1.5">
+            <Stack gap="2xs">
               <span className="text-2xs tracking-eyebrow uppercase text-x-brass-deep font-semibold">
                 {t('document.detail.title')}
               </span>
               <h1 className="text-h1 font-semibold tracking-title text-x-ink-deep">
                 {doc.counterparty_name}
               </h1>
-              <div className="flex items-center gap-2 flex-wrap">
+              <Stack direction="horizontal" align="center" wrap gap="2xs">
                 <span
                   className={`${BADGE_BASE} data-[tone=danger]:bg-danger-soft data-[tone=danger]:text-danger data-[tone=success]:bg-success-soft data-[tone=success]:text-success`}
                   data-tone={doc.status === 'voided' ? 'danger' : 'success'}
@@ -118,10 +119,10 @@ export function DocumentDetailPage() {
                     {t('document.detail.metadata_unconfirmed_badge')}
                   </span>
                 )}
-              </div>
-            </div>
+              </Stack>
+            </Stack>
 
-            <div className="flex items-center gap-2 flex-wrap">
+            <Stack direction="horizontal" align="center" wrap gap="2xs">
               <Button
                 variant="secondary"
                 onClick={() => {
@@ -168,7 +169,7 @@ export function DocumentDetailPage() {
                   {t('common.buttons.restore')}
                 </Button>
               )}
-            </div>
+            </Stack>
           </div>
 
           <section className="card p-4.5">

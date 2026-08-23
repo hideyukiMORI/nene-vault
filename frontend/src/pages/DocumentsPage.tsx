@@ -1,3 +1,4 @@
+import { Stack } from '@hideyukimori/nene2-ui';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useDocumentSearch, DocumentSearchForm, DocumentTable } from '@/features/document-search';
@@ -30,14 +31,14 @@ export function DocumentsPage() {
   return (
     <AppChrome onLogout={handleLogout} userEmail={session?.email} userRole={session?.role}>
       <div className="flex items-end justify-between gap-4 max-md:flex-col max-md:items-start max-md:gap-3.5">
-        <div className="flex flex-col gap-1.5">
+        <Stack gap="2xs">
           <span className="text-2xs tracking-eyebrow uppercase text-x-brass-deep font-semibold">
             {t('navigation.documents')}
           </span>
           <h1 className="text-h1 font-semibold tracking-title text-x-ink-deep">
             {t('document.list.title')}
           </h1>
-        </div>
+        </Stack>
         <Button
           variant="primary"
           onClick={() => {
