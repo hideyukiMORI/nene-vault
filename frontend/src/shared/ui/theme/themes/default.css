@@ -201,6 +201,22 @@
 
      All three are slots, so all three are ours to choose. Each is the nearest step to the
      old value: 8px is `2xs` exactly, 11px lands on `xs` (12px, +1px). */
+  /* Corners. Set only for the three kit components this product actually renders; `card`,
+     `modal` and `badge` are still its own, so their slots are left at the kit default rather
+     than given values nothing reads.
+
+     All three land on a step exactly — 0.8.0 chose the scale from the fleet's own
+     distribution (10 ships, 25 values, 266 uses) rather than promoting one ship's, so the
+     values that were already here are in it (#395).
+
+     🔴 The scale itself, `--radius-x-pill` included, is not redefined. A product whose
+     design has no rounded corners points its slots at `--radius-x-none`; it does not set
+     `--radius-x-pill: 0`. Redefining a step changes what the name means for the whole fleet;
+     redefining a slot changes one ship. Only the second is the mechanism. */
+  --radius-x-slot-control: var(--radius-x-xs); /* 4px — was `rounded-sm` */
+  --radius-x-slot-button: var(--radius-x-xs); /* 4px — was `rounded-sm` */
+  --radius-x-slot-alert: var(--radius-x-sm); /* 6px — was `rounded-md` */
+
   --spacing-x-slot-control-pad-y: var(--spacing-x-2xs);
   --spacing-x-slot-control-pad-x: var(--spacing-x-xs);
 
