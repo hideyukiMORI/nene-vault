@@ -1,8 +1,7 @@
-import { Box, Stack } from '@hideyukimori/nene2-ui';
+import { Box, Button, Stack } from '@hideyukimori/nene2-ui';
 import { useRestoreDocument } from '@/entities/document';
 import { messageKeyForError } from '@/shared/i18n/map-problem-details';
 import { useTranslation } from '@/shared/i18n/use-translation';
-import { Button } from '@/shared/ui/primitives/Button';
 import { Modal } from '@/shared/ui/components/Modal';
 
 interface RestoreModalProps {

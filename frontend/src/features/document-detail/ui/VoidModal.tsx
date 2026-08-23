@@ -1,8 +1,6 @@
-import { FormField, Input, Stack, Textarea } from '@hideyukimori/nene2-ui';
+import { Button, FormField, InlineAlert, Input, Stack, Textarea } from '@hideyukimori/nene2-ui';
 import { useTranslation } from '@/shared/i18n/use-translation';
 import { fieldErrorText } from '@/shared/i18n/validation-keys';
-import { Button } from '@/shared/ui/primitives/Button';
-import { Callout } from '@/shared/ui/components/Callout';
 import { Modal } from '@/shared/ui/components/Modal';
 import { useVoidDocumentForm } from '../model/use-void-document';
 
@@ -34,7 +32,7 @@ export function VoidModal({ documentId, onClose }: VoidModalProps) {
         <Stack gap="sm">
           <p className="text-text-muted body-sm">{t('document.void.description')}</p>
 
-          <Callout tone="warn">{t('document.void.warning')}</Callout>
+          <InlineAlert tone="warn">{t('document.void.warning')}</InlineAlert>
 
           <FormField
             id="void-reason"

@@ -1,13 +1,19 @@
-import { Box, FormField, Grid, Input, Stack } from '@hideyukimori/nene2-ui';
+import {
+  Box,
+  Button,
+  Checkbox,
+  FormField,
+  Grid,
+  Input,
+  Radio,
+  Stack,
+} from '@hideyukimori/nene2-ui';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { authStore } from '@/shared/api/auth-session';
 import { useExportDocuments } from '@/entities/document';
 import { useTranslation } from '@/shared/i18n/use-translation';
 import { AppChrome } from '@/features/app-chrome';
-import { Button } from '@/shared/ui/primitives/Button';
-import { Checkbox } from '@/shared/ui/primitives/Checkbox';
-import { CHOICE_LABEL } from '@/shared/ui/primitives/fieldBase';
 
 export function ExportPage() {
   const { t } = useTranslation();
@@ -114,20 +120,16 @@ export function ExportPage() {
           <FormField id="export-format" label={t('export.form.format_label')}>
             <Stack gap="2xs">
               {(['zip', 'csv'] as const).map((f) => (
-                <label key={f} className={CHOICE_LABEL}>
-                  <input
-                    type="radio"
-                    name="export-format"
-                    value={f}
-                    checked={format === f}
-                    onChange={() => {
-                      setFormat(f);
-                    }}
-                  />
-                  <span>
-                    {t(f === 'zip' ? 'export.form.format_zip' : 'export.form.format_csv')}
-                  </span>
-                </label>
+                <Radio
+                  key={f}
+                  name="export-format"
+                  value={f}
+                  checked={format === f}
+                  onChange={() => {
+                    setFormat(f);
+                  }}
+                  label={t(f === 'zip' ? 'export.form.format_zip' : 'export.form.format_csv')}
+                />
               ))}
             </Stack>
           </FormField>

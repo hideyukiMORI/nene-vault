@@ -1,4 +1,4 @@
-import { EmptyState, FormField, Input, Stack } from '@hideyukimori/nene2-ui';
+import { Button, EmptyState, FormField, InlineAlert, Input, Stack } from '@hideyukimori/nene2-ui';
 import { useEffect } from 'react';
 import { useForm, useWatch } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -10,8 +10,6 @@ import { messageKeyForError } from '@/shared/i18n/map-problem-details';
 import { useTranslation } from '@/shared/i18n/use-translation';
 import { formatDateTime } from '@/shared/lib/format';
 import { AppChrome } from '@/features/app-chrome';
-import { Button } from '@/shared/ui/primitives/Button';
-import { Callout } from '@/shared/ui/components/Callout';
 import { useNavigate } from 'react-router-dom';
 
 const settingsSchema = z.object({
@@ -135,7 +133,9 @@ export function SettingsPage() {
                 {...register('retention_years', { valueAsNumber: true })}
               />
               {retentionWarn && (
-                <Callout tone="warn">{t('vault_settings.fields.retention_warning')}</Callout>
+                <InlineAlert tone="warn">
+                  {t('vault_settings.fields.retention_warning')}
+                </InlineAlert>
               )}
             </FormField>
 

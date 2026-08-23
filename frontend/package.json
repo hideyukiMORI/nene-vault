@@ -2,7 +2,7 @@
   "name": "nene-vault-frontend",
   "private": true,
   "version": "0.0.0",
-  "//": "version is intentionally pinned to 0.0.0 \u2014 the single source of the product version is the repo-root VERSION file (#231)",
+  "//": "version is intentionally pinned to 0.0.0 — the single source of the product version is the repo-root VERSION file (#231)",
   "type": "module",
   "engines": {
     "node": ">=22"
@@ -40,7 +40,7 @@
   },
   "dependencies": {
     "@hideyukimori/nene2-client": "^1.1.0",
-    "@hideyukimori/nene2-ui": "^0.4.0",
+    "@hideyukimori/nene2-ui": "^0.6.0",
     "@hookform/resolvers": "^3.10.0",
     "@tanstack/react-query": "^5.62.11",
     "react": "^19.2.6",

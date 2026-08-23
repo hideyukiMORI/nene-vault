@@ -1,4 +1,12 @@
-import { EmptyState, FormField, Input, Select, Stack } from '@hideyukimori/nene2-ui';
+import {
+  Button,
+  EmptyState,
+  FormField,
+  InlineAlert,
+  Input,
+  Select,
+  Stack,
+} from '@hideyukimori/nene2-ui';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
@@ -11,9 +19,7 @@ import type { User } from '@/entities/user';
 import { messageKeyForError } from '@/shared/i18n/map-problem-details';
 import { useTranslation } from '@/shared/i18n/use-translation';
 import { AppChrome } from '@/features/app-chrome';
-import { Button } from '@/shared/ui/primitives/Button';
 import { BADGE_BASE } from '@/shared/ui/primitives/badgeBase';
-import { Callout } from '@/shared/ui/components/Callout';
 import { Modal } from '@/shared/ui/components/Modal';
 import { Pagination } from '@/shared/ui/components/Pagination';
 
@@ -212,7 +218,7 @@ export function UsersPage() {
         </Button>
       </div>
 
-      {isError && <Callout tone="danger">{t('common.status.error')}</Callout>}
+      {isError && <InlineAlert tone="danger">{t('common.status.error')}</InlineAlert>}
 
       {isLoading ? (
         <EmptyState message={t('common.status.loading')} />
