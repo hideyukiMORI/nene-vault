@@ -213,6 +213,22 @@
      design has no rounded corners points its slots at `--radius-x-none`; it does not set
      `--radius-x-pill: 0`. Redefining a step changes what the name means for the whole fleet;
      redefining a slot changes one ship. Only the second is the mechanism. */
+  /* Button padding. The kit's default y is one step up from what this product used, which
+     made every button 4px taller — 39 of them. `2xs` is the old value exactly. The x default
+     is already the nearest step (16px against the old 15px), so it is left alone.
+
+     🔴 This drops the touch-device height below 44px, and there is no way to hold it here.
+     Before the migration this product carried `max-md:min-h-11.5` (46px) alongside a larger
+     mobile padding; the kit has no equivalent, and its 12px default cleared 44px only by
+     arithmetic accident — an accident that cannot survive the slot being overridden, which
+     is what the slot is for. Raised as #397, in the shape that #393 settled for the font
+     floor: a second slot the product does not get to lower. */
+  --spacing-x-slot-button-pad-y: var(--spacing-x-2xs);
+
+  /* Alert padding, composed — the old rule was 13px vertical and 15px horizontal, and one
+     value for all four sides cannot say that. Each lands within 1px of a step. */
+  --spacing-x-slot-alert-pad: var(--spacing-x-xs) var(--spacing-x-sm);
+
   --radius-x-slot-control: var(--radius-x-xs); /* 4px — was `rounded-sm` */
   --radius-x-slot-button: var(--radius-x-xs); /* 4px — was `rounded-sm` */
   --radius-x-slot-alert: var(--radius-x-sm); /* 6px — was `rounded-md` */
