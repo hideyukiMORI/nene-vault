@@ -145,7 +145,7 @@ export function ExportPage() {
           {exportError !== null && <p className="text-2xs text-danger">{exportError}</p>}
           {exportSuccess && <p className="success body-sm">{t('export.messages.downloaded')}</p>}
 
-          <Stack>
+          <div>
             <Button
               variant="primary"
               onClick={() => {
@@ -155,7 +155,7 @@ export function ExportPage() {
             >
               {isExporting ? t('common.status.processing') : t('export.form.submit')}
             </Button>
-          </Stack>
+          </div>
         </Stack>
       </Box>
     </AppChrome>
