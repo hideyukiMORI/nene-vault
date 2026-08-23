@@ -1,10 +1,9 @@
+import { FormField, Input, Stack, Textarea } from '@hideyukimori/nene2-ui';
 import { useTranslation } from '@/shared/i18n/use-translation';
+import { fieldErrorText } from '@/shared/i18n/validation-keys';
 import { Button } from '@/shared/ui/primitives/Button';
 import { Callout } from '@/shared/ui/components/Callout';
-import { Field } from '@/shared/ui/components/Field';
-import { Input } from '@/shared/ui/primitives/Input';
 import { Modal } from '@/shared/ui/components/Modal';
-import { Textarea } from '@/shared/ui/primitives/Textarea';
 import { useVoidDocumentForm } from '../model/use-void-document';
 
 interface VoidModalProps {
@@ -30,39 +29,48 @@ export function VoidModal({ documentId, onClose }: VoidModalProps) {
         onSubmit={(e) => {
           void onSubmit(e);
         }}
-        className="p-5.5 space-y-4"
+        className="p-x-lg"
       >
-        <p className="text-text-muted body-sm">{t('document.void.description')}</p>
+        <Stack gap="sm">
+          <p className="text-text-muted body-sm">{t('document.void.description')}</p>
 
-        <Callout tone="warn">{t('document.void.warning')}</Callout>
+          <Callout tone="warn">{t('document.void.warning')}</Callout>
 
-        <Field
-          label={t('document.void.reason_label')}
-          required
-          requiredMarker={t('common.required_marker')}
-          error={errors.void_reason !== undefined ? t('common.required_marker') : undefined}
-        >
-          <Input
-            type="text"
-            placeholder={t('document.void.reason_placeholder')}
-            {...register('void_reason')}
-          />
-        </Field>
+          <FormField
+            id="void-reason"
+            label={t('document.void.reason_label')}
+            required
+            requiredMarker={t('common.required_marker')}
+            error={fieldErrorText(t, errors.void_reason)}
+          >
+            <Input
+              type="text"
+              placeholder={t('document.void.reason_placeholder')}
+              {...register('void_reason')}
+            />
+          </FormField>
 
-        <Field label={t('document.void.note_label')}>
-          <Textarea {...register('void_note')} />
-        </Field>
+          <FormField id="void-note" label={t('document.void.note_label')}>
+            <Textarea {...register('void_note')} />
+          </FormField>
 
-        {submitError !== null && <p className="text-2xs text-danger">{t(submitError)}</p>}
+          {submitError !== null && <p className="text-2xs text-danger">{t(submitError)}</p>}
 
-        <div className="flex items-center justify-end gap-2 max-md:flex-col-reverse max-md:items-stretch max-md:gap-2.5">
-          <Button type="button" variant="secondary" onClick={onClose} disabled={isSubmitting}>
-            {t('common.buttons.cancel')}
-          </Button>
-          <Button type="submit" variant="danger" disabled={isSubmitting}>
-            {isSubmitting ? t('common.status.processing') : t('document.void.confirm_button')}
-          </Button>
-        </div>
+          <Stack
+            direction="horizontal"
+            align="center"
+            justify="end"
+            gap="2xs"
+            className="max-md:flex-col-reverse max-md:items-stretch max-md:gap-2.5"
+          >
+            <Button type="button" variant="secondary" onClick={onClose} disabled={isSubmitting}>
+              {t('common.buttons.cancel')}
+            </Button>
+            <Button type="submit" variant="danger" disabled={isSubmitting}>
+              {isSubmitting ? t('common.status.processing') : t('document.void.confirm_button')}
+            </Button>
+          </Stack>
+        </Stack>
       </form>
     </Modal>
   );

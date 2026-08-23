@@ -4,11 +4,10 @@ import { authStore } from '@/shared/api/auth-session';
 import { useExportDocuments } from '@/entities/document';
 import { useTranslation } from '@/shared/i18n/use-translation';
 import { AppChrome } from '@/features/app-chrome';
+import { Box, FormField, Grid, Input, Stack } from '@hideyukimori/nene2-ui';
 import { Button } from '@/shared/ui/primitives/Button';
 import { Checkbox } from '@/shared/ui/primitives/Checkbox';
-import { Field } from '@/shared/ui/components/Field';
 import { CHOICE_LABEL } from '@/shared/ui/primitives/fieldBase';
-import { Input } from '@/shared/ui/primitives/Input';
 
 export function ExportPage() {
   const { t } = useTranslation();
@@ -79,80 +78,84 @@ export function ExportPage() {
         <p className="text-text-muted text-sm max-w-lede">{t('export.description')}</p>
       </div>
 
-      <div className="card p-4.5 space-y-4">
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <Field label={t('export.form.date_from_label')}>
-            <Input
-              type="date"
-              value={dateFrom}
-              onChange={(e) => {
-                setDateFrom(e.target.value);
-              }}
-            />
-          </Field>
-          <Field label={t('export.form.date_to_label')}>
-            <Input
-              type="date"
-              value={dateTo}
-              onChange={(e) => {
-                setDateTo(e.target.value);
-              }}
-            />
-          </Field>
-        </div>
+      <Box className="card" pad="md">
+        <Stack gap="sm">
+          <Grid cols={{ base: 1, sm: 2 }} gap="sm">
+            <FormField id="export-date-from" label={t('export.form.date_from_label')}>
+              <Input
+                type="date"
+                value={dateFrom}
+                onChange={(e) => {
+                  setDateFrom(e.target.value);
+                }}
+              />
+            </FormField>
+            <FormField id="export-date-to" label={t('export.form.date_to_label')}>
+              <Input
+                type="date"
+                value={dateTo}
+                onChange={(e) => {
+                  setDateTo(e.target.value);
+                }}
+              />
+            </FormField>
+          </Grid>
 
-        <Field label={t('export.form.counterparty_label')}>
-          <Input
-            type="text"
-            value={counterparty}
+          <FormField id="export-counterparty" label={t('export.form.counterparty_label')}>
+            <Input
+              type="text"
+              value={counterparty}
+              onChange={(e) => {
+                setCounterparty(e.target.value);
+              }}
+            />
+          </FormField>
+
+          <FormField id="export-format" label={t('export.form.format_label')}>
+            <div className="space-y-1.5">
+              {(['zip', 'csv'] as const).map((f) => (
+                <label key={f} className={CHOICE_LABEL}>
+                  <input
+                    type="radio"
+                    name="export-format"
+                    value={f}
+                    checked={format === f}
+                    onChange={() => {
+                      setFormat(f);
+                    }}
+                  />
+                  <span>
+                    {t(f === 'zip' ? 'export.form.format_zip' : 'export.form.format_csv')}
+                  </span>
+                </label>
+              ))}
+            </div>
+          </FormField>
+
+          <Checkbox
+            label={t('export.form.include_voided_label')}
+            checked={includeVoided}
             onChange={(e) => {
-              setCounterparty(e.target.value);
+              setIncludeVoided(e.target.checked);
             }}
           />
-        </Field>
 
-        <Field label={t('export.form.format_label')}>
-          <div className="space-y-1.5">
-            {(['zip', 'csv'] as const).map((f) => (
-              <label key={f} className={CHOICE_LABEL}>
-                <input
-                  type="radio"
-                  name="export-format"
-                  value={f}
-                  checked={format === f}
-                  onChange={() => {
-                    setFormat(f);
-                  }}
-                />
-                <span>{t(f === 'zip' ? 'export.form.format_zip' : 'export.form.format_csv')}</span>
-              </label>
-            ))}
-          </div>
-        </Field>
+          {exportError !== null && <p className="text-2xs text-danger">{exportError}</p>}
+          {exportSuccess && <p className="success body-sm">{t('export.messages.downloaded')}</p>}
 
-        <Checkbox
-          label={t('export.form.include_voided_label')}
-          checked={includeVoided}
-          onChange={(e) => {
-            setIncludeVoided(e.target.checked);
-          }}
-        />
-
-        {exportError !== null && <p className="text-2xs text-danger">{exportError}</p>}
-        {exportSuccess && <p className="success body-sm">{t('export.messages.downloaded')}</p>}
-
-        <div>
-          <Button
-            variant="primary"
-            onClick={() => {
-              void handleExport();
-            }}
-            disabled={isExporting}
-          >
-            {isExporting ? t('common.status.processing') : t('export.form.submit')}
-          </Button>
-        </div>
-      </div>
+          <Stack>
+            <Button
+              variant="primary"
+              onClick={() => {
+                void handleExport();
+              }}
+              disabled={isExporting}
+            >
+              {isExporting ? t('common.status.processing') : t('export.form.submit')}
+            </Button>
+          </Stack>
+        </Stack>
+      </Box>
     </AppChrome>
   );
 }

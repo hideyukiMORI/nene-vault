@@ -50,4 +50,51 @@ describe('LoginForm (rendered)', () => {
     expect(onLoggedIn).not.toHaveBeenCalled();
     expect(authStore.getToken()).toBeNull();
   });
+
+  /**
+   * Acceptance condition for the nene2-ui migration (#387, from #385).
+   *
+   * 🔴 Before the migration this form set `aria-invalid` on both fields and rendered no
+   * message at all: `useLoginPage` returned booleans, so there was nothing to render.
+   * Assistive technology was told the field was wrong and never told why — and neither
+   * was anyone else. `FormField` links the message; the model now has to supply one.
+   */
+  it('names which field is wrong, and links the reason to it', async () => {
+    renderWithProviders(<LoginForm onLoggedIn={vi.fn()} />);
+
+    const email = screen.getAllByRole('textbox')[0] as HTMLElement;
+    await userEvent.type(email, 'not-an-email');
+    await userEvent.click(screen.getByRole('button', { name: /log|ログイン/i }));
+
+    // The message exists and is about the format, not merely "required".
+    const message = await screen.findByText(/メールアドレス|email address/i, {
+      selector: '[role="alert"]',
+    });
+
+    // …and the control points at it, which is the half that was missing.
+    await waitFor(() => {
+      expect(email).toHaveAttribute('aria-invalid', 'true');
+    });
+    expect(email).toHaveAttribute('aria-describedby', message.id);
+    expect(message.id).not.toBe('');
+  });
+
+  it('reports the empty password separately from the email', async () => {
+    renderWithProviders(<LoginForm onLoggedIn={vi.fn()} />);
+
+    await userEvent.type(screen.getAllByRole('textbox')[0] as HTMLElement, 'admin@example.com');
+    await userEvent.click(screen.getByRole('button', { name: /log|ログイン/i }));
+
+    const password = screen.getByPlaceholderText(/password|パスワード/i);
+    await waitFor(() => {
+      expect(password).toHaveAttribute('aria-invalid', 'true');
+    });
+
+    const message = await screen.findByText(/必須|required/i, { selector: '[role="alert"]' });
+    expect(password).toHaveAttribute('aria-describedby', message.id);
+    expect(message.id).not.toBe('');
+
+    // The email was valid, so it must not be marked.
+    expect(screen.getAllByRole('textbox')[0]).not.toHaveAttribute('aria-invalid', 'true');
+  });
 });

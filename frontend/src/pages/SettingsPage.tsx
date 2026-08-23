@@ -2,6 +2,8 @@ import { useEffect } from 'react';
 import { useForm, useWatch } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
+import { VALIDATION, fieldErrorText } from '@/shared/i18n/validation-keys';
+import { FormField, Input, Stack } from '@hideyukimori/nene2-ui';
 import { authStore } from '@/shared/api/auth-session';
 import { useVaultSettings, useUpdateVaultSettings } from '@/entities/vault-settings';
 import { messageKeyForError } from '@/shared/i18n/map-problem-details';
@@ -11,12 +13,14 @@ import { AppChrome } from '@/features/app-chrome';
 import { Button } from '@/shared/ui/primitives/Button';
 import { Callout } from '@/shared/ui/components/Callout';
 import { EmptyState } from '@/shared/ui/components/EmptyState';
-import { Field } from '@/shared/ui/components/Field';
-import { Input } from '@/shared/ui/primitives/Input';
 import { useNavigate } from 'react-router-dom';
 
 const settingsSchema = z.object({
-  retention_years: z.coerce.number().int().min(7).max(99),
+  retention_years: z.coerce
+    .number()
+    .int(VALIDATION.invalidFormat)
+    .min(7, VALIDATION.tooSmall)
+    .max(99, VALIDATION.tooLarge),
   storage_path_override: z.string().optional(),
   invoice_api_base_url: z.string().optional(),
   clear_api_base_url: z.string().optional(),
@@ -99,7 +103,7 @@ export function SettingsPage() {
         <EmptyState>{t('common.status.loading')}</EmptyState>
       ) : (
         <form
-          className="card p-4.5 space-y-4"
+          className="card p-x-md"
           onSubmit={(e) => {
             void form.handleSubmit((values) => {
               mutation.mutate({
@@ -111,70 +115,83 @@ export function SettingsPage() {
             })(e);
           }}
         >
-          <Field
-            label={t('vault_settings.fields.retention_years_label')}
-            hint={t('vault_settings.fields.retention_years_hint')}
-            error={errors.retention_years !== undefined ? t('common.required_marker') : undefined}
-          >
-            <Input
-              type="number"
-              min={7}
-              max={99}
-              aria-invalid={retentionWarn || undefined}
-              // valueAsNumber so the watched value is numeric *while typing* — the
-              // under-10-years compliance warning must render live, not only after
-              // save → re-fetch coerces the value server-side.
-              {...register('retention_years', { valueAsNumber: true })}
-            />
-            {retentionWarn && (
-              <Callout tone="warn">{t('vault_settings.fields.retention_warning')}</Callout>
+          <Stack gap="sm">
+            <FormField
+              id="settings-retention-years"
+              label={t('vault_settings.fields.retention_years_label')}
+              hint={t('vault_settings.fields.retention_years_hint')}
+              error={fieldErrorText(t, errors.retention_years)}
+            >
+              <Input
+                type="number"
+                min={7}
+                max={99}
+                // The live under-10-years notice is a *warning*, not a validation error, so it
+                // sets aria-invalid directly. FormField's own wiring covers the error case and
+                // an explicit prop wins over it (see the kit's useFieldWiring).
+                aria-invalid={retentionWarn || undefined}
+                // valueAsNumber so the watched value is numeric *while typing* — the
+                // under-10-years compliance warning must render live, not only after
+                // save → re-fetch coerces the value server-side.
+                {...register('retention_years', { valueAsNumber: true })}
+              />
+              {retentionWarn && (
+                <Callout tone="warn">{t('vault_settings.fields.retention_warning')}</Callout>
+              )}
+            </FormField>
+
+            <FormField
+              id="settings-storage-path"
+              label={t('vault_settings.fields.storage_path_label')}
+              hint={t('vault_settings.fields.storage_path_hint')}
+            >
+              <Input
+                type="text"
+                placeholder={t('vault_settings.fields.storage_path_placeholder')}
+                {...register('storage_path_override')}
+              />
+            </FormField>
+
+            <FormField
+              id="settings-invoice-api-base-url"
+              label={t('vault_settings.fields.invoice_api_base_url_label')}
+            >
+              <Input
+                type="url"
+                placeholder={t('vault_settings.fields.invoice_api_base_url_placeholder')}
+                {...register('invoice_api_base_url')}
+              />
+            </FormField>
+
+            <FormField
+              id="settings-clear-api-base-url"
+              label={t('vault_settings.fields.clear_api_base_url_label')}
+            >
+              <Input
+                type="url"
+                placeholder={t('vault_settings.fields.clear_api_base_url_placeholder')}
+                {...register('clear_api_base_url')}
+              />
+            </FormField>
+
+            {settings?.updated_at !== null && settings?.updated_at !== undefined && (
+              <p className="text-text-muted label-xs">
+                {t('vault_settings.fields.updated_at_label')}:{' '}
+                {formatDateTime(settings.updated_at, locale)}
+              </p>
             )}
-          </Field>
 
-          <Field
-            label={t('vault_settings.fields.storage_path_label')}
-            hint={t('vault_settings.fields.storage_path_hint')}
-          >
-            <Input
-              type="text"
-              placeholder={t('vault_settings.fields.storage_path_placeholder')}
-              {...register('storage_path_override')}
-            />
-          </Field>
+            {mutation.isSuccess && (
+              <p className="success body-sm">{t('vault_settings.messages.saved')}</p>
+            )}
+            {submitError !== null && <p className="text-2xs text-danger">{t(submitError)}</p>}
 
-          <Field label={t('vault_settings.fields.invoice_api_base_url_label')}>
-            <Input
-              type="url"
-              placeholder={t('vault_settings.fields.invoice_api_base_url_placeholder')}
-              {...register('invoice_api_base_url')}
-            />
-          </Field>
-
-          <Field label={t('vault_settings.fields.clear_api_base_url_label')}>
-            <Input
-              type="url"
-              placeholder={t('vault_settings.fields.clear_api_base_url_placeholder')}
-              {...register('clear_api_base_url')}
-            />
-          </Field>
-
-          {settings?.updated_at !== null && settings?.updated_at !== undefined && (
-            <p className="text-text-muted label-xs">
-              {t('vault_settings.fields.updated_at_label')}:{' '}
-              {formatDateTime(settings.updated_at, locale)}
-            </p>
-          )}
-
-          {mutation.isSuccess && (
-            <p className="success body-sm">{t('vault_settings.messages.saved')}</p>
-          )}
-          {submitError !== null && <p className="text-2xs text-danger">{t(submitError)}</p>}
-
-          <div>
-            <Button type="submit" variant="primary" disabled={mutation.isPending}>
-              {mutation.isPending ? t('common.status.saving') : t('vault_settings.save_button')}
-            </Button>
-          </div>
+            <Stack>
+              <Button type="submit" variant="primary" disabled={mutation.isPending}>
+                {mutation.isPending ? t('common.status.saving') : t('vault_settings.save_button')}
+              </Button>
+            </Stack>
+          </Stack>
         </form>
       )}
     </AppChrome>

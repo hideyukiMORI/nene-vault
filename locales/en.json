@@ -474,6 +474,7 @@
     "required": "This field is required.",
     "invalid_format": "The format is invalid.",
     "invalid_email": "Please enter a valid email address.",
+    "password_too_short": "The password must be at least {{min}} characters.",
     "invalid_slug": "Only lowercase letters, numbers, and hyphens are allowed.",
     "too_small": "The value is too small.",
     "too_large": "The value is too large.",

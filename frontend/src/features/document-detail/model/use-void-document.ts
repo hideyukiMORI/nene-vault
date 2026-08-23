@@ -1,11 +1,12 @@
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
+import { VALIDATION } from '@/shared/i18n/validation-keys';
 import { useVoidDocument } from '@/entities/document';
 import { messageKeyForError } from '@/shared/i18n/map-problem-details';
 
 const voidSchema = z.object({
-  void_reason: z.string().min(1),
+  void_reason: z.string().min(1, VALIDATION.required),
   void_note: z.string().optional(),
 });
 

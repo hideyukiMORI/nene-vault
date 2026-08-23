@@ -1,10 +1,8 @@
 import type { UseFormReturn } from 'react-hook-form';
+import { FormField, Grid, Input, Select, Stack } from '@hideyukimori/nene2-ui';
 import { useTranslation } from '@/shared/i18n/use-translation';
 import { Button } from '@/shared/ui/primitives/Button';
 import { Checkbox } from '@/shared/ui/primitives/Checkbox';
-import { Field } from '@/shared/ui/components/Field';
-import { Input } from '@/shared/ui/primitives/Input';
-import { Select } from '@/shared/ui/primitives/Select';
 import type { SearchFormValues } from '../model/use-document-search';
 
 interface DocumentSearchFormProps {
@@ -30,60 +28,69 @@ export function DocumentSearchForm({
       onSubmit={(e) => {
         void onSubmit(e);
       }}
-      className="card p-4.5 space-y-4"
+      className="card p-x-md"
     >
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        <Field label={t('document.search.date_from_label')}>
-          <Input type="date" {...register('transaction_date_from')} />
-        </Field>
-        <Field label={t('document.search.date_to_label')}>
-          <Input type="date" {...register('transaction_date_to')} />
-        </Field>
-      </div>
+      <Stack gap="sm">
+        <Grid cols={{ base: 1, sm: 2 }} gap="sm">
+          <FormField id="search-date-from" label={t('document.search.date_from_label')}>
+            <Input type="date" {...register('transaction_date_from')} />
+          </FormField>
+          <FormField id="search-date-to" label={t('document.search.date_to_label')}>
+            <Input type="date" {...register('transaction_date_to')} />
+          </FormField>
+        </Grid>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        <Field label={t('document.search.amount_min_label')}>
-          <Input type="number" placeholder="0" {...register('amount_min')} />
-        </Field>
-        <Field label={t('document.search.amount_max_label')}>
-          <Input type="number" placeholder="0" {...register('amount_max')} />
-        </Field>
-      </div>
+        <Grid cols={{ base: 1, sm: 2 }} gap="sm">
+          <FormField id="search-amount-min" label={t('document.search.amount_min_label')}>
+            <Input type="number" placeholder="0" {...register('amount_min')} />
+          </FormField>
+          <FormField id="search-amount-max" label={t('document.search.amount_max_label')}>
+            <Input type="number" placeholder="0" {...register('amount_max')} />
+          </FormField>
+        </Grid>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        <Field label={t('document.search.counterparty_label')}>
-          <Input
-            type="text"
-            placeholder={t('document.upload.counterparty_placeholder')}
-            {...register('counterparty_name')}
+        <Grid cols={{ base: 1, sm: 2 }} gap="sm">
+          <FormField id="search-counterparty" label={t('document.search.counterparty_label')}>
+            <Input
+              type="text"
+              placeholder={t('document.upload.counterparty_placeholder')}
+              {...register('counterparty_name')}
+            />
+          </FormField>
+          <FormField id="search-category" label={t('document.search.category_label')}>
+            <Select {...register('category')}>
+              <option value="">{t('common.none')}</option>
+              {CATEGORIES.map((cat) => (
+                <option key={cat} value={cat}>
+                  {t(`document.category.${cat}`)}
+                </option>
+              ))}
+            </Select>
+          </FormField>
+        </Grid>
+
+        <Stack
+          direction="horizontal"
+          align="center"
+          justify="between"
+          wrap
+          gap="sm"
+          className="gap-3.5"
+        >
+          <Checkbox
+            label={t('document.search.include_voided_label')}
+            {...register('include_voided')}
           />
-        </Field>
-        <Field label={t('document.search.category_label')}>
-          <Select {...register('category')}>
-            <option value="">{t('common.none')}</option>
-            {CATEGORIES.map((cat) => (
-              <option key={cat} value={cat}>
-                {t(`document.category.${cat}`)}
-              </option>
-            ))}
-          </Select>
-        </Field>
-      </div>
-
-      <div className="flex items-center justify-between flex-wrap gap-3.5">
-        <Checkbox
-          label={t('document.search.include_voided_label')}
-          {...register('include_voided')}
-        />
-        <div className="flex items-center gap-2">
-          <Button type="button" variant="secondary" onClick={onReset}>
-            {t('document.search.reset_button')}
-          </Button>
-          <Button type="submit" variant="primary" disabled={isLoading}>
-            {t('document.search.search_button')}
-          </Button>
-        </div>
-      </div>
+          <Stack direction="horizontal" align="center" gap="2xs">
+            <Button type="button" variant="secondary" onClick={onReset}>
+              {t('document.search.reset_button')}
+            </Button>
+            <Button type="submit" variant="primary" disabled={isLoading}>
+              {t('document.search.search_button')}
+            </Button>
+          </Stack>
+        </Stack>
+      </Stack>
     </form>
   );
 }

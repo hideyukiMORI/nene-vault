@@ -5,7 +5,6 @@
     "direction": "ltr",
     "note": "Primary locale. Statutory field labels appear in Japanese in both locales (ADR 0005)."
   },
-
   "common": {
     "buttons": {
       "save": "保存",
@@ -65,7 +64,6 @@
     "no": "いいえ",
     "none": "なし"
   },
-
   "auth": {
     "login": {
       "title": "NeNe Vault ログイン",
@@ -88,7 +86,6 @@
       "account_inactive": "このアカウントは無効です。管理者にお問い合わせください。"
     }
   },
-
   "navigation": {
     "home": "ホーム",
     "documents": "受取書類",
@@ -104,7 +101,6 @@
     "breadcrumb": "パンくずリスト",
     "back_home": "ホームに戻る"
   },
-
   "home": {
     "eyebrow": "概況",
     "title": "おかえりなさい",
@@ -115,7 +111,6 @@
     "link_settings": "保存年数・外部連携",
     "link_export": "ZIP / CSV で一括出力"
   },
-
   "organization": {
     "list": {
       "title": "組織一覧",
@@ -166,7 +161,6 @@
       "not_found": "指定された組織が見つかりません。"
     }
   },
-
   "user": {
     "list": {
       "title": "ユーザー一覧",
@@ -217,7 +211,6 @@
       "cannot_delete_self": "自分自身のアカウントは削除できません。"
     }
   },
-
   "vault_settings": {
     "title": "保管設定",
     "save_button": "設定を保存",
@@ -239,7 +232,6 @@
       "saved": "保管設定を保存しました。"
     }
   },
-
   "document": {
     "list": {
       "title": "受取書類一覧",
@@ -382,7 +374,6 @@
       "restored": "書類を復元しました。"
     }
   },
-
   "audit_event": {
     "summary": {
       "created": "新規登録",
@@ -448,7 +439,6 @@
       "document_link": "関連リンク"
     }
   },
-
   "export": {
     "title": "書類エクスポート",
     "description": "指定期間の書類をZIPファイルとマニフェストCSVとしてダウンロードします。",
@@ -480,11 +470,11 @@
       "downloaded": "ダウンロードしました。"
     }
   },
-
   "validation": {
     "required": "この項目は必須です。",
     "invalid_format": "入力形式が正しくありません。",
     "invalid_email": "有効なメールアドレスを入力してください。",
+    "password_too_short": "パスワードは{{min}}文字以上で入力してください。",
     "invalid_slug": "英小文字・数字・ハイフンのみ使用できます。",
     "too_small": "値が小さすぎます。",
     "too_large": "値が大きすぎます。",
@@ -494,7 +484,6 @@
     "file_too_large": "ファイルサイズが上限を超えています。",
     "duplicate_file": "同一のファイルが既に登録されています。"
   },
-
   "problem": {
     "unauthorized": "認証が必要です。ログインしてください。",
     "forbidden": "この操作を行う権限がありません。",
@@ -519,7 +508,6 @@
     "user_email_conflict": "このメールアドレスは既に使用されています。",
     "ocr_failed": "OCR の実行に失敗しました。サーバーの設定を確認してください。"
   },
-
   "compliance": {
     "scanner_warning": {
       "title": "スキャナ保存に関するご注意",

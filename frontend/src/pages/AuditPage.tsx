@@ -1,3 +1,4 @@
+import { FormField, Input } from '@hideyukimori/nene2-ui';
 import { dynamicMessageKey } from '@/shared/i18n/catalogs';
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -10,8 +11,6 @@ import { AppChrome } from '@/features/app-chrome';
 import { Button } from '@/shared/ui/primitives/Button';
 import { Callout } from '@/shared/ui/components/Callout';
 import { EmptyState } from '@/shared/ui/components/EmptyState';
-import { Field } from '@/shared/ui/components/Field';
-import { Input } from '@/shared/ui/primitives/Input';
 import { Pagination } from '@/shared/ui/components/Pagination';
 
 const PAGE_SIZE = 20;
@@ -125,17 +124,27 @@ function DiffView({ fields, isCreate }: { fields: AuditDiffField[]; isCreate: bo
               {f.key} {tag}
             </div>
             <div className={isCreate ? DIFF_PAIR : `${DIFF_PAIR} md:diff-cols`}>
+              {/* 🔴 The arrow used to be the only thing carrying "this became that", and it
+                  carried it visually only: no text sat between the two values, so assistive
+                  technology read them as two unrelated strings (#387). Naming both sides is
+                  sturdier than labelling the arrow — it still reads correctly for someone who
+                  lands on one value directly, and it survives the arrow being restyled. */}
               {!isCreate && (
                 <div className="font-mono text-2xs leading-diff rounded-sm py-2 px-2.5 break-all whitespace-pre-wrap bg-surface-sunken border border-border text-text-muted">
+                  <span className="sr-only">{t('audit_event.list.table.before')}: </span>
                   {formatAuditValue(f.before)}
                 </div>
               )}
               {!isCreate && (
-                <div className="flex items-center justify-center text-text-faint max-md:justify-start max-md:py-px max-md:pl-0.75">
+                <div
+                  aria-hidden="true"
+                  className="flex items-center justify-center text-text-faint max-md:justify-start max-md:py-px max-md:pl-0.75"
+                >
                   {ArrowIcon}
                 </div>
               )}
               <div className="font-mono text-2xs leading-diff rounded-sm py-2 px-2.5 break-all whitespace-pre-wrap bg-x-brass-soft border border-x-brass-line text-x-brass-deep">
+                <span className="sr-only">{t('audit_event.list.table.after')}: </span>
                 {formatAuditValue(f.after)}
               </div>
             </div>
@@ -370,7 +379,10 @@ export function AuditPage() {
 
       <div className="card p-4.5 space-y-4">
         <div className="grid grid-cols-3 gap-4">
-          <Field label={t('audit_event.list.filter.entity_type_label')}>
+          <FormField
+            id="audit-filter-entity-type"
+            label={t('audit_event.list.filter.entity_type_label')}
+          >
             <Input
               type="text"
               value={filterEntityType}
@@ -378,8 +390,11 @@ export function AuditPage() {
                 setFilterEntityType(e.target.value);
               }}
             />
-          </Field>
-          <Field label={t('audit_event.list.filter.entity_id_label')}>
+          </FormField>
+          <FormField
+            id="audit-filter-entity-id"
+            label={t('audit_event.list.filter.entity_id_label')}
+          >
             <Input
               type="text"
               value={filterEntityId}
@@ -387,8 +402,8 @@ export function AuditPage() {
                 setFilterEntityId(e.target.value);
               }}
             />
-          </Field>
-          <Field label={t('audit_event.list.filter.action_label')}>
+          </FormField>
+          <FormField id="audit-filter-action" label={t('audit_event.list.filter.action_label')}>
             <Input
               type="text"
               value={filterAction}
@@ -396,7 +411,7 @@ export function AuditPage() {
                 setFilterAction(e.target.value);
               }}
             />
-          </Field>
+          </FormField>
         </div>
         <div className="flex items-center gap-2 justify-end">
           <Button variant="secondary" onClick={handleReset}>
@@ -462,7 +477,11 @@ export function AuditPage() {
                         <ChangeSummary event={event} />
                       </td>
                       <td className="chev-cell">
-                        <span className="row-chev">{ChevronIcon}</span>
+                        {/* The row itself is the control (tabIndex + Enter/Space); the
+                            chevron only points at what the row already announces. */}
+                        <span className="row-chev" aria-hidden="true">
+                          {ChevronIcon}
+                        </span>
                       </td>
                     </tr>
                   ))}

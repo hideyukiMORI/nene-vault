@@ -1,5 +1,13 @@
 @layer theme, base, vendor, legacy, components, utilities;
 @import 'tailwindcss';
+@import '@hideyukimori/nene2-ui/themes/default.css';
+
+/* 🔴 Required. Tailwind v4's automatic content detection does not walk `node_modules`,
+   and every class the kit ships lives in its `dist/`. Without this line the build stays
+   green and generates none of them — measured here on 2026-08-23: 47.1 KB instead of
+   58.6 KB, with every gap, focus ring and disabled treatment missing (#387).
+   `npm run source-probe` fails if this line is ever removed. */
+@source '../../../../node_modules/@hideyukimori/nene2-ui/dist';
 
 /* 🔴 `@utility` を足してよい基準（hub 裁定 2026-08-15・#371）
    ───────────────────────────────────────────────────────────
