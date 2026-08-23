@@ -1,10 +1,10 @@
+import { Box, FormField, Grid, Input, Stack } from '@hideyukimori/nene2-ui';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { authStore } from '@/shared/api/auth-session';
 import { useExportDocuments } from '@/entities/document';
 import { useTranslation } from '@/shared/i18n/use-translation';
 import { AppChrome } from '@/features/app-chrome';
-import { Box, FormField, Grid, Input, Stack } from '@hideyukimori/nene2-ui';
 import { Button } from '@/shared/ui/primitives/Button';
 import { Checkbox } from '@/shared/ui/primitives/Checkbox';
 import { CHOICE_LABEL } from '@/shared/ui/primitives/fieldBase';
@@ -68,7 +68,7 @@ export function ExportPage() {
       userRole={session?.role}
       width="narrow"
     >
-      <div className="flex flex-col gap-1.5">
+      <Stack gap="2xs">
         <span className="text-2xs tracking-eyebrow uppercase text-x-brass-deep font-semibold">
           {t('navigation.export')}
         </span>
@@ -76,7 +76,7 @@ export function ExportPage() {
           {t('export.title')}
         </h1>
         <p className="text-text-muted text-sm max-w-lede">{t('export.description')}</p>
-      </div>
+      </Stack>
 
       <Box className="card" pad="md">
         <Stack gap="sm">
@@ -112,7 +112,7 @@ export function ExportPage() {
           </FormField>
 
           <FormField id="export-format" label={t('export.form.format_label')}>
-            <div className="space-y-1.5">
+            <Stack gap="2xs">
               {(['zip', 'csv'] as const).map((f) => (
                 <label key={f} className={CHOICE_LABEL}>
                   <input
@@ -129,7 +129,7 @@ export function ExportPage() {
                   </span>
                 </label>
               ))}
-            </div>
+            </Stack>
           </FormField>
 
           <Checkbox

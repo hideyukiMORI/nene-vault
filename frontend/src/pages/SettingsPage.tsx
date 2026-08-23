@@ -1,9 +1,9 @@
+import { FormField, Input, Stack } from '@hideyukimori/nene2-ui';
 import { useEffect } from 'react';
 import { useForm, useWatch } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { VALIDATION, fieldErrorText } from '@/shared/i18n/validation-keys';
-import { FormField, Input, Stack } from '@hideyukimori/nene2-ui';
 import { authStore } from '@/shared/api/auth-session';
 import { useVaultSettings, useUpdateVaultSettings } from '@/entities/vault-settings';
 import { messageKeyForError } from '@/shared/i18n/map-problem-details';
@@ -90,14 +90,14 @@ export function SettingsPage() {
       userRole={session?.role}
       width="narrow"
     >
-      <div className="flex flex-col gap-1.5">
+      <Stack gap="2xs">
         <span className="text-2xs tracking-eyebrow uppercase text-x-brass-deep font-semibold">
           {t('navigation.settings')}
         </span>
         <h1 className="text-h1 font-semibold tracking-title text-x-ink-deep">
           {t('vault_settings.title')}
         </h1>
-      </div>
+      </Stack>
 
       {isLoading ? (
         <EmptyState>{t('common.status.loading')}</EmptyState>

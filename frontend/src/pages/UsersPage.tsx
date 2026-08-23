@@ -1,3 +1,4 @@
+import { FormField, Input, Select, Stack } from '@hideyukimori/nene2-ui';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
@@ -7,7 +8,6 @@ import { VALIDATION, fieldErrorText } from '@/shared/i18n/validation-keys';
 import { authStore } from '@/shared/api/auth-session';
 import { useUsers, useCreateUser, useDeleteUser } from '@/entities/user';
 import type { User } from '@/entities/user';
-import { FormField, Input, Select, Stack } from '@hideyukimori/nene2-ui';
 import { messageKeyForError } from '@/shared/i18n/map-problem-details';
 import { useTranslation } from '@/shared/i18n/use-translation';
 import { AppChrome } from '@/features/app-chrome';
@@ -195,14 +195,14 @@ export function UsersPage() {
   return (
     <AppChrome onLogout={handleLogout} userEmail={session?.email} userRole={session?.role}>
       <div className="flex items-end justify-between gap-4 max-md:flex-col max-md:items-start max-md:gap-3.5">
-        <div className="flex flex-col gap-1.5">
+        <Stack gap="2xs">
           <span className="text-2xs tracking-eyebrow uppercase text-x-brass-deep font-semibold">
             {t('navigation.group_admin')}
           </span>
           <h1 className="text-h1 font-semibold tracking-title text-x-ink-deep">
             {t('user.list.title')}
           </h1>
-        </div>
+        </Stack>
         <Button
           variant="primary"
           onClick={() => {

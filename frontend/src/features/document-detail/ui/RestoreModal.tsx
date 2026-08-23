@@ -1,3 +1,4 @@
+import { Box, Stack } from '@hideyukimori/nene2-ui';
 import { useRestoreDocument } from '@/entities/document';
 import { messageKeyForError } from '@/shared/i18n/map-problem-details';
 import { useTranslation } from '@/shared/i18n/use-translation';
@@ -23,27 +24,34 @@ export function RestoreModal({ documentId, onClose }: RestoreModalProps) {
       onClose={onClose}
       closeLabel={t('common.buttons.close')}
     >
-      <div className="p-5.5 space-y-4">
-        <p className="text-text-muted body-sm">{t('document.restore.description')}</p>
-        {submitError !== null && <p className="text-2xs text-danger">{t(submitError)}</p>}
-        <div className="flex items-center justify-end gap-2 max-md:flex-col-reverse max-md:items-stretch max-md:gap-2.5">
-          <Button type="button" variant="secondary" onClick={onClose} disabled={mutation.isPending}>
-            {t('common.buttons.cancel')}
-          </Button>
-          <Button
-            type="button"
-            variant="primary"
-            disabled={mutation.isPending}
-            onClick={() => {
-              mutation.mutate(documentId);
-            }}
-          >
-            {mutation.isPending
-              ? t('common.status.processing')
-              : t('document.restore.confirm_button')}
-          </Button>
-        </div>
-      </div>
+      <Box pad="lg">
+        <Stack gap="sm">
+          <p className="text-text-muted body-sm">{t('document.restore.description')}</p>
+          {submitError !== null && <p className="text-2xs text-danger">{t(submitError)}</p>}
+          <div className="flex items-center justify-end gap-2 max-md:flex-col-reverse max-md:items-stretch max-md:gap-2.5">
+            <Button
+              type="button"
+              variant="secondary"
+              onClick={onClose}
+              disabled={mutation.isPending}
+            >
+              {t('common.buttons.cancel')}
+            </Button>
+            <Button
+              type="button"
+              variant="primary"
+              disabled={mutation.isPending}
+              onClick={() => {
+                mutation.mutate(documentId);
+              }}
+            >
+              {mutation.isPending
+                ? t('common.status.processing')
+                : t('document.restore.confirm_button')}
+            </Button>
+          </div>
+        </Stack>
+      </Box>
     </Modal>
   );
 }

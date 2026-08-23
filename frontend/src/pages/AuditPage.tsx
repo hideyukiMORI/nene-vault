@@ -1,4 +1,4 @@
-import { FormField, Input } from '@hideyukimori/nene2-ui';
+import { Box, FormField, Grid, Input, Stack } from '@hideyukimori/nene2-ui';
 import { dynamicMessageKey } from '@/shared/i18n/catalogs';
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -58,14 +58,14 @@ function ChangeSummary({ event }: { event: AuditEvent }) {
 
   if (event.before_json === null) {
     return (
-      <div className="flex items-center gap-2 flex-wrap min-w-0">
+      <Stack direction="horizontal" align="center" wrap gap="2xs" className="min-w-0">
         <span className="chg-kv">
           <span className="k">{t('audit_event.summary.created')}</span>
         </span>
         <span className="text-2xs text-text-faint whitespace-nowrap">
           {t('audit_event.summary.fields', { count: String(fields.length) })}
         </span>
-      </div>
+      </Stack>
     );
   }
 
@@ -74,7 +74,7 @@ function ChangeSummary({ event }: { event: AuditEvent }) {
     return <span className="text-2xs text-text-faint whitespace-nowrap">—</span>;
   }
   return (
-    <div className="flex items-center gap-2 flex-wrap min-w-0">
+    <Stack direction="horizontal" align="center" wrap gap="2xs" className="min-w-0">
       <span className="chg-kv">
         <span className="k">{first.key}</span>
         <span className="b">{formatAuditValue(first.before)}</span>
@@ -86,7 +86,7 @@ function ChangeSummary({ event }: { event: AuditEvent }) {
           {t('audit_event.summary.more', { count: String(fields.length - 1) })}
         </span>
       )}
-    </div>
+    </Stack>
   );
 }
 
@@ -367,7 +367,7 @@ export function AuditPage() {
 
   return (
     <AppChrome onLogout={handleLogout} userEmail={session?.email} userRole={session?.role}>
-      <div className="flex flex-col gap-1.5">
+      <Stack gap="2xs">
         <span className="text-2xs tracking-eyebrow uppercase text-x-brass-deep font-semibold">
           {t('navigation.group_admin')}
         </span>
@@ -375,53 +375,55 @@ export function AuditPage() {
           {t('audit_event.list.title')}
         </h1>
         <p className="text-text-muted text-sm max-w-lede">{t('audit_event.list.lede')}</p>
-      </div>
+      </Stack>
 
-      <div className="card p-4.5 space-y-4">
-        <div className="grid grid-cols-3 gap-4">
-          <FormField
-            id="audit-filter-entity-type"
-            label={t('audit_event.list.filter.entity_type_label')}
-          >
-            <Input
-              type="text"
-              value={filterEntityType}
-              onChange={(e) => {
-                setFilterEntityType(e.target.value);
-              }}
-            />
-          </FormField>
-          <FormField
-            id="audit-filter-entity-id"
-            label={t('audit_event.list.filter.entity_id_label')}
-          >
-            <Input
-              type="text"
-              value={filterEntityId}
-              onChange={(e) => {
-                setFilterEntityId(e.target.value);
-              }}
-            />
-          </FormField>
-          <FormField id="audit-filter-action" label={t('audit_event.list.filter.action_label')}>
-            <Input
-              type="text"
-              value={filterAction}
-              onChange={(e) => {
-                setFilterAction(e.target.value);
-              }}
-            />
-          </FormField>
-        </div>
-        <div className="flex items-center gap-2 justify-end">
-          <Button variant="secondary" onClick={handleReset}>
-            {t('document.search.reset_button')}
-          </Button>
-          <Button variant="primary" onClick={handleSearch} disabled={isLoading}>
-            {t('document.search.search_button')}
-          </Button>
-        </div>
-      </div>
+      <Box className="card" pad="md">
+        <Stack gap="sm">
+          <Grid cols={3} gap="sm">
+            <FormField
+              id="audit-filter-entity-type"
+              label={t('audit_event.list.filter.entity_type_label')}
+            >
+              <Input
+                type="text"
+                value={filterEntityType}
+                onChange={(e) => {
+                  setFilterEntityType(e.target.value);
+                }}
+              />
+            </FormField>
+            <FormField
+              id="audit-filter-entity-id"
+              label={t('audit_event.list.filter.entity_id_label')}
+            >
+              <Input
+                type="text"
+                value={filterEntityId}
+                onChange={(e) => {
+                  setFilterEntityId(e.target.value);
+                }}
+              />
+            </FormField>
+            <FormField id="audit-filter-action" label={t('audit_event.list.filter.action_label')}>
+              <Input
+                type="text"
+                value={filterAction}
+                onChange={(e) => {
+                  setFilterAction(e.target.value);
+                }}
+              />
+            </FormField>
+          </Grid>
+          <Stack direction="horizontal" align="center" justify="end" gap="2xs">
+            <Button variant="secondary" onClick={handleReset}>
+              {t('document.search.reset_button')}
+            </Button>
+            <Button variant="primary" onClick={handleSearch} disabled={isLoading}>
+              {t('document.search.search_button')}
+            </Button>
+          </Stack>
+        </Stack>
+      </Box>
 
       {isError && <Callout tone="danger">{t('common.status.error')}</Callout>}
 
