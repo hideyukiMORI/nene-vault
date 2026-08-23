@@ -47,7 +47,13 @@ describe('DocumentDetailPage download', () => {
 
     // The button stays disabled until the history response resolves the
     // current version's ULID (the detail payload only has the ordinal number).
-    const button = await screen.findByRole('button', { name: 'Download' });
+    //
+    // 🔴 Explicit timeout. The default 1000ms is enough for `vitest run` and not always
+    // enough for `vitest run --coverage`, which is what `npm run check` and CI actually
+    // execute: measured 2026-08-24, 0 failures in 13 plain runs and 2 in 3 coverage runs.
+    // The suite was passing on the machine and failing on the gate — the same test, told
+    // apart only by how the gate runs it.
+    const button = await screen.findByRole('button', { name: 'Download' }, { timeout: 5000 });
     await waitFor(() => {
       expect(button).toBeEnabled();
     });
