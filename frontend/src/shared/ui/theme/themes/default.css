@@ -259,6 +259,16 @@
   --radius-x-slot-button: var(--radius-x-xs); /* 4px — was `rounded-sm` */
   --radius-x-slot-alert: var(--radius-x-sm); /* 6px — was `rounded-md` */
 
+  /* 🔴 Dialog widths. The kit's `size` maps to `--container-x-slot-modal-*`, whose defaults
+     are the fleet's container steps (28rem / 32rem / 36rem = 448 / 512 / 576px). This product
+     shipped 432px and 520px — measured on the live build, not recalled — and neither is a
+     step of that scale, so both are named here the way the alert colours are named from this
+     palette. `lg` is left at the kit's default: nothing here uses it.
+     ⚠️ Only `sm` and `md` are restated. Adding a step to the fleet's container scale would be
+     upstream's call (#395's precedent for radius). */
+  --container-x-slot-modal-sm: var(--container-modal-sm); /* 432px */
+  --container-x-slot-modal-md: var(--container-modal); /* 520px */
+
   /* 🔴 6px, not the kit's 8px default. The retired `.card` rule used `--radius-md` (6px);
      the kit's `--radius-x-slot-card` points at `--radius-x-md`, which is 8px on the fleet's
      scale. Left unset, migrating to the kit's `Card` rounds every panel 2px more — measured

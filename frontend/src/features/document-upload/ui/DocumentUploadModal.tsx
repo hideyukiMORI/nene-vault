@@ -1,8 +1,7 @@
-import { Button, FormField, Grid, Input, Select, Stack } from '@hideyukimori/nene2-ui';
+import { Button, FormField, Grid, Input, Modal, Select, Stack } from '@hideyukimori/nene2-ui';
 import { env } from '@/shared/config/env';
 import { useTranslation } from '@/shared/i18n/use-translation';
 import { fieldErrorText } from '@/shared/i18n/validation-keys';
-import { Modal } from '@/shared/ui/components/Modal';
 import { useDocumentUpload } from '../model/use-document-upload';
 
 const CATEGORIES = ['invoice_received', 'contract', 'receipt', 'delivery_note', 'other'] as const;
@@ -23,6 +22,8 @@ export function DocumentUploadModal({ onClose }: DocumentUploadModalProps) {
 
   return (
     <Modal
+      open
+      header
       title={t('document.upload.title')}
       onClose={onClose}
       size="md"

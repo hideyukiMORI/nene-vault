@@ -5,6 +5,7 @@ import {
   FormField,
   InlineAlert,
   Input,
+  Modal,
   Select,
   Stack,
 } from '@hideyukimori/nene2-ui';
@@ -21,7 +22,6 @@ import { messageKeyForError } from '@/shared/i18n/map-problem-details';
 import { useTranslation } from '@/shared/i18n/use-translation';
 import { AppChrome } from '@/features/app-chrome';
 import { BADGE_BASE } from '@/shared/ui/primitives/badgeBase';
-import { Modal } from '@/shared/ui/components/Modal';
 import { Pagination } from '@/shared/ui/components/Pagination';
 
 const PAGE_SIZE = 20;
@@ -57,6 +57,9 @@ function UserFormModal({ onClose }: { onClose: () => void }) {
 
   return (
     <Modal
+      open
+      header
+      size="sm"
       title={t('user.form.create_title')}
       onClose={onClose}
       closeLabel={t('common.buttons.close')}
