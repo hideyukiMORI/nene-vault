@@ -18,30 +18,8 @@
 
   @layer main {
     /* ---- text helpers ---- */
-    .link {
-      color: var(--color-accent);
-      background: none;
-      border: 0;
-      cursor: pointer;
-      font: inherit;
-      font-size: var(--text-sm);
-      text-decoration: none;
-    }
-    .link:hover {
-      color: var(--color-x-navy-deep);
-      text-decoration: underline;
-      text-underline-offset: 2px;
-    }
-    .link.is-danger {
-      color: var(--color-danger);
-    }
 
     /* ---- app shell: dark rail + paper canvas ---- */
-    .layout {
-      display: grid;
-      grid-template-columns: var(--rail-width) minmax(0, 1fr);
-      min-height: 100vh;
-    }
     .rail {
       position: sticky;
       top: 0;
@@ -171,34 +149,6 @@
     }
 
     /* ---- main column ---- */
-    .lang {
-      display: inline-flex;
-      align-items: center;
-      gap: 7px;
-      font-size: var(--text-xs);
-      color: var(--color-text-muted);
-    }
-    .lang select {
-      font: inherit;
-      font-size: var(--text-xs);
-      border: 1px solid var(--color-x-line-mid);
-      background: var(--color-surface-raised);
-      border-radius: var(--radius-sm);
-      padding: 5px 8px;
-      color: var(--color-text-primary);
-    }
-    .content {
-      padding: 30px 28px 56px;
-      width: 100%;
-      max-width: var(--content-max);
-      margin: 0 auto;
-    }
-    .content.is-narrow {
-      max-width: var(--content-narrow);
-    }
-    .content.is-mid {
-      max-width: var(--content-mid);
-    }
 
     /* ---- page header ---- */
 
@@ -350,23 +300,6 @@
     }
 
     /* ---- centered screens (login / forbidden) ---- */
-    .center-card {
-      margin: auto;
-      width: 100%;
-      max-width: 392px;
-      background: var(--color-surface-raised);
-      border: 1px solid var(--color-x-line-mid);
-      border-radius: var(--radius-lg);
-      box-shadow: var(--shadow-lg);
-      overflow: hidden;
-    }
-    .center-card .head {
-      padding: 30px 30px 4px;
-      text-align: center;
-    }
-    .center-card .body {
-      padding: 24px 30px 30px;
-    }
 
     /* ---- modal ---- */
 
@@ -428,45 +361,11 @@
     }
 
     /* ---- audit detail drawer ---- */
-    .params-head {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 12px;
-      margin-bottom: 14px;
-    }
-    .seg {
-      display: inline-flex;
-      border: 1px solid var(--color-x-line-mid);
-      border-radius: var(--radius-sm);
-      overflow: hidden;
-      background: var(--color-surface-raised);
-    }
-    .seg button {
-      font: inherit;
-      font-size: var(--text-2xs);
-      font-weight: 600;
-      padding: 5px 11px;
-      border: 0;
-      background: transparent;
-      color: var(--color-text-muted);
-      cursor: pointer;
-    }
-    .seg button + button {
-      border-left: 1px solid var(--color-x-line-mid);
-    }
-    :where(.seg) button.is-on {
-      background: var(--color-accent);
-      color: var(--color-on-accent);
-    }
     /* The whole `.diff-*` family was regenerated as utilities on the AuditPage
        markup (#371): `.diff-arrow` and its `svg` child express-first onto the
        elements, `.diff-field`'s sibling margin as `[&+&]:`, and `.diff-pair` /
        `.diff-single` as mobile-first columns with `@utility diff-cols` for the
        one template the `grid-cols-N` scale cannot express. */
-    .json-block + .json-block {
-      margin-top: 14px;
-    }
   }
 
   @layer responsive {
@@ -479,16 +378,10 @@
 
     /* ---- ultra-wide: keep content from sprawling ---- */
     @media (min-width: 1500px) {
-      .content {
-        max-width: 1280px;
-      }
     }
 
     /* ---- tablet: collapse the rail to an icon-only column ---- */
     @media (min-width: 768px) and (max-width: 1023px) {
-      .layout {
-        grid-template-columns: 66px minmax(0, 1fr);
-      }
       .rail-brand {
         justify-content: center;
         padding: 18px 0;
@@ -531,10 +424,6 @@
       .out {
         display: none;
       }
-      .content {
-        padding-left: 22px;
-        padding-right: 22px;
-      }
     }
 
     /* ---- both tablet & mobile: relax dense grids ---- */
@@ -555,10 +444,6 @@
        ============================================================ */
     @media (max-width: 767px) {
       /* shell becomes a single scrolling column */
-      .layout {
-        display: block;
-        min-height: 100vh;
-      }
 
       /* the dark rail drops to a fixed bottom tab bar (thumb zone) */
       .rail {
@@ -656,25 +541,6 @@
         color: oklch(76% 0.1 77);
         font-weight: 700;
         --rail-icon-op: 1;
-      }
-      .lang {
-        font-size: 0;
-        gap: 0;
-      }
-      .lang select {
-        font-size: var(--text-2xs);
-        padding: 6px 7px;
-      }
-
-      /* content: edge-to-edge, with room for the bottom bar */
-      .content,
-      .content.is-narrow,
-      .content.is-mid {
-        padding: 20px 16px;
-        max-width: 100%;
-      }
-      .content {
-        padding-bottom: 96px;
       }
 
       /* touch-sized controls → max-md:py-2.75 max-md:px-3 max-md:text-base on the

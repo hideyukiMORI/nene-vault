@@ -150,12 +150,19 @@ describe('AppShell interactions', () => {
   // Regression (#313): the content wrapper's vertical rhythm lived in the map
   // string, which the drain codemod (className literals only) never rewrote —
   // so `.stack-lg` was dropped from CSS while the reference lingered. Assert the
-  // wrapper now carries the utility form and no drained component class survives.
-  it('wraps content in the space-y utility, not the drained .stack-lg', () => {
+  // wrapper carries the utility form and that no drained component class survives.
+  //
+  // 🔴 `.content` joined that list in #428 and this assertion had to follow: it read
+  // `toHaveClass('content', 'space-y-5.5')`, so a test written to catch a *lingering
+  // reference to a drained class* was itself holding one. The list below is the classes
+  // this wrapper has carried and lost, and it is the part that must keep growing.
+  it('wraps content in utilities, carrying no drained component class', () => {
     renderShell({ role: 'admin' });
 
     const content = screen.getByRole('main');
-    expect(content).toHaveClass('content', 'space-y-5.5');
-    expect(content).not.toHaveClass('stack-lg');
+    expect(content).toHaveClass('space-y-5.5');
+    for (const drained of ['stack-lg', 'content', 'is-mid', 'is-narrow']) {
+      expect(content).not.toHaveClass(drained);
+    }
   });
 });
