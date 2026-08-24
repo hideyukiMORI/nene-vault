@@ -216,30 +216,6 @@
        carried the class (#369). */
 
     /* ---- definition lists ---- */
-    .dl {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      column-gap: 28px;
-      row-gap: 16px;
-    }
-    .dl > div {
-      min-width: 0;
-    }
-    .dl dt {
-      font-size: var(--text-2xs);
-      color: var(--color-text-muted);
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-      font-weight: 600;
-      margin-bottom: 3px;
-    }
-    .dl dd {
-      font-size: var(--text-sm);
-      color: var(--color-x-ink-deep);
-    }
-    .dl .col2 {
-      grid-column: span 2;
-    }
 
     /* ---- callouts ---- */
 
@@ -430,13 +406,6 @@
     @media (max-width: 1023px) {
     }
     @media (max-width: 640px) {
-      .dl {
-        grid-template-columns: 1fr;
-        row-gap: 14px;
-      }
-      .dl .col2 {
-        grid-column: auto;
-      }
     }
 
     /* ============================================================
