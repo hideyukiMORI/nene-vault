@@ -171,24 +171,6 @@
     }
 
     /* ---- main column ---- */
-    .env {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      font-size: var(--text-2xs);
-      color: var(--color-text-muted);
-      border: 1px solid var(--color-x-line-mid);
-      border-radius: var(--radius-full);
-      padding: 3px 10px;
-      background: var(--color-surface-raised);
-      white-space: nowrap;
-    }
-    .env .dot {
-      width: 6px;
-      height: 6px;
-      border-radius: 50%;
-      background: var(--color-success);
-    }
     .lang {
       display: inline-flex;
       align-items: center;
