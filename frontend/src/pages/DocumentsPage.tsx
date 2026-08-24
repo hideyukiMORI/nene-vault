@@ -36,14 +36,12 @@ export function DocumentsPage() {
             {t('document.list.title')}
           </h1>
         </Stack>
-        {/* 🔴 `inline-flex items-center` and the gap are on the call site because the kit's
-            Button does not lay out its own children — it sets no display, so an icon and a
-            label sit on the text baseline with nothing between them. vault's own Button
-            carried `inline-flex items-center justify-center gap-1.75`. Raised as #398; this
-            className goes away when the kit takes it on. */}
+        {/* No layout className here. Until 0.13.0 the kit's Button set no display, so an icon
+            and a label sat on the text baseline with nothing between them and this call site
+            carried `inline-flex items-center gap-x-2xs` itself (#398). The kit lays out its
+            own children now; the gap is `--spacing-x-slot-button-gap` in the theme. */}
         <Button
           variant="primary"
-          className="inline-flex items-center gap-x-2xs"
           onClick={() => {
             setShowUpload(true);
           }}
