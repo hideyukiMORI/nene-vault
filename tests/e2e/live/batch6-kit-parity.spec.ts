@@ -200,6 +200,17 @@ async function read(page: Page, probes: Probe[]): Promise<ScreenReading> {
     try {
       out[probe.name] = await page.locator(probe.selector).first().evaluate(
         (node, props: string[]) => {
+          // 🔴 A detached node is not a measurement. `getComputedStyle` returns empty strings
+          // for an element that is no longer in the document, and `locator.evaluate` resolves
+          // the element before it runs — so a re-render in between leaves the handle pointing
+          // at the old node and the call succeeds with nothing in it. No exception, so the
+          // catch below never sees it, and nine empty values line up next to real ones as if
+          // the whole component differed (measured 2026-08-24 on `sm button (Previous)`).
+          //
+          // ⚠️ Deliberately not retried. That this happened is itself information — a screen
+          // that re-renders under the probe is worth knowing about, and quietly taking the
+          // measurement again erases it.
+          if (!(node as Element).isConnected) return null;
           const cs = getComputedStyle(node as Element);
           const m: Record<string, string> = {};
           for (const p of props) m[p] = cs.getPropertyValue(p).trim();
@@ -508,8 +519,10 @@ test('VLT-K1-01: kit parity — production vs local, computed styles', async ({ 
       const pm = p[probeDef.name];
       const lm = l[probeDef.name];
       if (pm === null || pm === undefined || lm === null || lm === undefined) {
+        // "matched nothing" covers both a selector that found no element and one whose element
+        // had gone by the time it was read — from here they are the same fact: no measurement.
         unresolved.push(
-          `${screen.name} / ${probeDef.name} — ${pm == null ? 'production' : ''}${pm == null && lm == null ? ' and ' : ''}${lm == null ? 'local' : ''} matched nothing`,
+          `${screen.name} / ${probeDef.name} — ${pm == null ? 'production' : ''}${pm == null && lm == null ? ' and ' : ''}${lm == null ? 'local' : ''} did not yield a measurement`,
         );
         continue;
       }

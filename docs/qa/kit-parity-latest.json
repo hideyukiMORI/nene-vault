@@ -1,18 +1,13 @@
 {
-  "measuredAt": "2026-08-24T09:36:40.420Z",
+  "measuredAt": "2026-08-24T09:48:16.298Z",
   "productionKitClasses": 0,
   "localKitClasses": 71,
-  "matched": 186,
-  "differing": 53,
-  "unresolved": [],
+  "matched": 192,
+  "differing": 32,
+  "unresolved": [
+    "audit / sm button (Previous) — local did not yield a measurement"
+  ],
   "rows": [
-    {
-      "screen": "documents",
-      "element": "primary button (Upload)",
-      "property": "font-weight",
-      "production": "600",
-      "local": "500"
-    },
     {
       "screen": "documents",
       "element": "primary button (Upload)",
@@ -32,7 +27,7 @@
       "element": "primary button (Upload)",
       "property": "width",
       "production": "163px",
-      "local": "166px"
+      "local": "167px"
     },
     {
       "screen": "documents",
@@ -40,27 +35,6 @@
       "property": "padding",
       "production": "8px 15px",
       "local": "8px 16px"
-    },
-    {
-      "screen": "documents",
-      "element": "secondary button (Clear)",
-      "property": "font-weight",
-      "production": "600",
-      "local": "500"
-    },
-    {
-      "screen": "documents",
-      "element": "secondary button (Clear)",
-      "property": "color",
-      "production": "oklch(0.24 0.02 256)",
-      "local": "oklch(0.31 0.02 256)"
-    },
-    {
-      "screen": "documents",
-      "element": "secondary button (Clear)",
-      "property": "border-color",
-      "production": "oklch(0.76 0.013 78)",
-      "local": "oklch(0.89 0.009 83)"
     },
     {
       "screen": "documents",
@@ -82,13 +56,6 @@
       "property": "padding",
       "production": "8px 15px",
       "local": "8px 16px"
-    },
-    {
-      "screen": "documents",
-      "element": "submit button (Search)",
-      "property": "font-weight",
-      "production": "600",
-      "local": "500"
     },
     {
       "screen": "documents",
@@ -134,87 +101,10 @@
     },
     {
       "screen": "audit",
-      "element": "sm button (Previous)",
-      "property": "font-weight",
-      "production": "600",
-      "local": "500"
-    },
-    {
-      "screen": "audit",
-      "element": "sm button (Previous)",
-      "property": "line-height",
-      "production": "18.6px",
-      "local": "16px"
-    },
-    {
-      "screen": "audit",
-      "element": "sm button (Previous)",
-      "property": "color",
-      "production": "oklch(0.24 0.02 256)",
-      "local": "oklch(0.31 0.02 256)"
-    },
-    {
-      "screen": "audit",
-      "element": "sm button (Previous)",
-      "property": "border-color",
-      "production": "oklch(0.76 0.013 78)",
-      "local": "oklch(0.89 0.009 83)"
-    },
-    {
-      "screen": "audit",
-      "element": "sm button (Previous)",
-      "property": "gap",
-      "production": "7px",
-      "local": "8px"
-    },
-    {
-      "screen": "audit",
-      "element": "sm button (Previous)",
-      "property": "width",
-      "production": "73px",
-      "local": "75px"
-    },
-    {
-      "screen": "audit",
-      "element": "sm button (Previous)",
-      "property": "height",
-      "production": "30.5938px",
-      "local": "26px"
-    },
-    {
-      "screen": "audit",
-      "element": "sm button (Previous)",
-      "property": "padding",
-      "production": "5px 11px",
-      "local": "4px 12px"
-    },
-    {
-      "screen": "audit",
-      "element": "sm button (Next)",
-      "property": "font-weight",
-      "production": "600",
-      "local": "500"
-    },
-    {
-      "screen": "audit",
       "element": "sm button (Next)",
       "property": "line-height",
       "production": "18.6px",
       "local": "16px"
-    },
-    {
-      "screen": "audit",
-      "element": "sm button (Next)",
-      "property": "color",
-      "production": "oklch(0.24 0.02 256)",
-      "local": "oklch(0.31 0.02 256)"
-    },
-    {
-      "screen": "audit",
-      "element": "sm button (Next)",
-      "property": "border-color",
-      "production": "oklch(0.76 0.013 78)",
-      "local": "oklch(0.89 0.009 83)"
     },
     {
       "screen": "audit",
@@ -228,7 +118,7 @@
       "element": "sm button (Next)",
       "property": "width",
       "production": "51px",
-      "local": "52px"
+      "local": "53px"
     },
     {
       "screen": "audit",
@@ -247,37 +137,9 @@
     {
       "screen": "audit",
       "element": "secondary button (Clear)",
-      "property": "font-weight",
-      "production": "600",
-      "local": "500"
-    },
-    {
-      "screen": "audit",
-      "element": "secondary button (Clear)",
-      "property": "color",
-      "production": "oklch(0.24 0.02 256)",
-      "local": "oklch(0.31 0.02 256)"
-    },
-    {
-      "screen": "audit",
-      "element": "secondary button (Clear)",
-      "property": "border-color",
-      "production": "oklch(0.76 0.013 78)",
-      "local": "oklch(0.89 0.009 83)"
-    },
-    {
-      "screen": "audit",
-      "element": "secondary button (Clear)",
       "property": "gap",
       "production": "7px",
       "local": "8px"
-    },
-    {
-      "screen": "audit",
-      "element": "primary button (Search)",
-      "property": "font-weight",
-      "production": "600",
-      "local": "500"
     },
     {
       "screen": "audit",
@@ -345,13 +207,6 @@
     {
       "screen": "settings",
       "element": "save button",
-      "property": "font-weight",
-      "production": "600",
-      "local": "500"
-    },
-    {
-      "screen": "settings",
-      "element": "save button",
       "property": "box-shadow",
       "production": "oklch(0.28 0.02 256 / 0.07) 0px 1px 2px 0px",
       "local": "none"
@@ -368,7 +223,7 @@
       "element": "save button",
       "property": "width",
       "production": "114px",
-      "local": "115px"
+      "local": "116px"
     },
     {
       "screen": "settings",
