@@ -1,6 +1,7 @@
 import { expect, test, type Browser, type Page } from '@playwright/test';
 import { mkdirSync, writeFileSync } from 'node:fs';
 import { readFileSync } from 'node:fs';
+import { resolve } from 'node:path';
 import { seatAdmin } from './_helpers';
 
 /**
@@ -44,7 +45,23 @@ import { seatAdmin } from './_helpers';
  */
 
 const LOCAL_URL = process.env.NENE_VAULT_PARITY_LOCAL_URL ?? 'http://localhost:5186';
-const REPORT_DIR = 'docs/qa';
+/**
+ * 🔴 Resolved from Playwright's `rootDir`, not from the working directory and not from
+ * `import.meta`.
+ *
+ * Playwright runs with its config's directory as CWD — `frontend/` here — so the bare relative
+ * path this started with wrote the report to `frontend/docs/qa/`, a directory that should not
+ * exist and that nobody would look in. `batch5-visual.spec.ts` has the same bare path and its
+ * screenshots have been landing there too; raised separately rather than changed from here.
+ *
+ * ⚠️ The obvious fix, `import.meta.url`, does not work: the nearest package.json is not
+ * `type: module`, so this file is loaded as CJS and `import.meta` is a syntax error — which
+ * Playwright reports as **"No tests found"**, not as a broken file. Another spelling of today's
+ * shape: the failure presented as an empty result rather than an error.
+ */
+function reportDir(rootDir: string): string {
+  return resolve(rootDir, '../../../docs/qa');
+}
 /** Per-probe ceiling. An element that is not there within this is reported as absent. */
 const PROBE_TIMEOUT_MS = 5_000;
 /** Per-screen settle ceiling. Exceeding it is logged, never fatal. */
@@ -69,7 +86,7 @@ interface Screen {
 
 const BOX = ['width', 'height', 'padding', 'border-width', 'border-radius'];
 const TYPE = ['font-size', 'font-weight', 'line-height', 'color'];
-const FILL = ['background-color', 'border-color', 'display', 'gap', 'align-items'];
+const FILL = ['background-color', 'border-color', 'box-shadow', 'display', 'gap', 'align-items'];
 
 /**
  * 🔴 The inventory is explicit, not discovered. A crawler would compare whatever it found and
@@ -476,8 +493,9 @@ test('VLT-K1-01: kit parity — production vs local, computed styles', async ({ 
 
   const stamp = new Date().toISOString();
   const report = { measuredAt: stamp, productionKitClasses: prodKit, localKitClasses: localKit, matched, differing: rows.length, unresolved, rows };
-  mkdirSync(REPORT_DIR, { recursive: true });
-  writeFileSync(`${REPORT_DIR}/kit-parity-latest.json`, `${JSON.stringify(report, null, 2)}\n`);
+  const outDir = reportDir(test.info().config.rootDir);
+  mkdirSync(outDir, { recursive: true });
+  writeFileSync(`${outDir}/kit-parity-latest.json`, `${JSON.stringify(report, null, 2)}\n`);
 
   console.log(`\nkit parity — matched ${matched} / differing ${rows.length} (measured ${stamp})`);
   console.log(`kit-classed elements: production ${prodKit} · local ${localKit}\n`);
@@ -491,5 +509,5 @@ test('VLT-K1-01: kit parity — production vs local, computed styles', async ({ 
     console.log('\nunresolved probes (measured nothing — NOT agreement):');
     for (const u of unresolved) console.log(`  ${u}`);
   }
-  console.log(`\nreport written to ${REPORT_DIR}/kit-parity-latest.json`);
+  console.log(`\nreport written to ${outDir}/kit-parity-latest.json`);
 });
