@@ -287,6 +287,29 @@
      larger. Deleting this line is what produces that, not the kit's default on its own. */
   --text-x-slot-button-sm-size: var(--text-xs);
 
+  /* 🔴 Three slots the migration left at the kit's defaults, found by comparing computed
+     styles against the production build in a real browser (#404 harness, 2026-08-24). Each
+     was carried by this product's own `Button` before W1 and is in the git history of
+     `shared/ui/primitives/Button.tsx` at `fcb65a6~1`; none of the four checks in
+     `npm run check` looks at a colour or a weight, so all three were green for a day.
+
+       weight   `font-semibold` in BASE            600 → 500   every button on every screen
+       fg       `text-x-ink-deep` on secondary     24% → 31%
+       border   `border-border-strong` on secondary 76% → 89%
+
+     ⚠️ The weight one is the widest: it is in BASE, so it reaches all 39 buttons, and a
+     500 next to a 600 is the kind of difference that reads as "this looks a bit off" rather
+     than as a defect with a name. */
+  --font-weight-x-slot-button: var(--font-weight-semibold);
+  --color-x-slot-button-secondary-fg: var(--color-x-ink-deep);
+  --color-x-slot-button-secondary-border: var(--color-border-strong);
+
+  /* 🔴 NOT set: `--color-x-slot-button-ghost-fg`. The pre-W1 ghost variant was
+     `text-text-muted` against the kit's `text-text-primary`, so the slot would be wrong if
+     the variant were used — measured 2026-08-24, it is used **zero** times. Setting a slot
+     for a variant nothing renders would be a value no one can check. Recorded here so the
+     next person to write `variant="ghost"` finds the number rather than rediscovering it. */
+
   --spacing-x-slot-control-pad-y: var(--spacing-x-2xs);
   --spacing-x-slot-control-pad-x: var(--spacing-x-xs);
 
