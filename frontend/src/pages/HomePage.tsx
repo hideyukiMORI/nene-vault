@@ -126,7 +126,7 @@ export function HomePage() {
           {t('home.eyebrow')}
         </span>
         <h1 className="text-h1 font-semibold tracking-title text-x-ink-deep">{t('home.title')}</h1>
-        <p className="text-text-muted text-sm max-w-lede">{t('home.lede')}</p>
+        <p className="text-text-muted text-sm leading-inherit max-w-lede">{t('home.lede')}</p>
       </Stack>
 
       <div>

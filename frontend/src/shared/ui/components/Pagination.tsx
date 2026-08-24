@@ -41,8 +41,22 @@ export function Pagination({
     return null;
   }
 
+  // 🔴 `leading-inherit` next to `text-xs`, and it is not decoration (#410).
+  //
+  // The retired `.pagination` rule set a font-size and no line-height, so everything inside
+  // inherited the body's 1.55. Draining it to `text-xs` on 2026-07-22 (08123b4) brought
+  // Tailwind's companion `--text-xs--line-height` (1.333) along, and the `sm` buttons in here
+  // inherited that instead — 18.6px became 16px and the buttons lost 4.6px of height. It has
+  // been in `main` since July; nothing compared against a rendered page until #404.
+  //
+  // 🔑 The `sm` size was a red herring. `sm` buttons exist nowhere else in this product, so
+  // "only sm is wrong" was really "only this container is wrong" (measured 2026-08-24).
+  //
+  // ⚠️ 判例40's neutraliser did not exist yet when this was drained — `leading-inherit` was
+  // added on 08-13, three weeks later. This is a regression nothing could have caught at the
+  // time, corrected now rather than a design value being changed back (owner ruling 08-24).
   return (
-    <div className="flex items-center justify-between px-4 py-3 border-t border-border text-xs text-text-muted max-md:flex-col max-md:gap-3 max-md:items-stretch max-md:text-center">
+    <div className="flex items-center justify-between px-4 py-3 border-t border-border text-xs leading-inherit text-text-muted max-md:flex-col max-md:gap-3 max-md:items-stretch max-md:text-center">
       <span>{showingLabel}</span>
       <div className="flex items-center gap-2 max-md:justify-center">
         {/* max-md:flex-1 preserves the retired `.pagination .btn { flex: 1 }`

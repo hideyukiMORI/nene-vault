@@ -245,7 +245,7 @@ function AuditDetailDrawer({ event, open, onClose }: DrawerProps) {
             </div>
 
             <div className="overflow-auto flex-1 pt-5 px-5.5 pb-7">
-              <dl className="grid grid-cols-2 gap-x-5.5 gap-y-3.25 pb-4.5 border-b border-border mb-4.5 max-md:grid-cols-1 max-md:gap-3 [&_dt]:text-2xs [&_dt]:text-text-muted [&_dt]:uppercase [&_dt]:tracking-meta [&_dt]:font-semibold [&_dt]:mb-0.75 [&_dd]:text-sm [&_dd]:text-x-ink-deep">
+              <dl className="grid grid-cols-2 gap-x-5.5 gap-y-3.25 pb-4.5 border-b border-border mb-4.5 max-md:grid-cols-1 max-md:gap-3 [&_dt]:text-2xs [&_dt]:text-text-muted [&_dt]:uppercase [&_dt]:tracking-meta [&_dt]:font-semibold [&_dt]:mb-0.75 [&_dd]:text-sm [&_dd]:leading-inherit [&_dd]:text-x-ink-deep">
                 <div>
                   <dt>{t('audit_event.list.table.actor')}</dt>
                   <dd className="font-mono zero-slash">
@@ -399,7 +399,9 @@ export function AuditPage() {
         <h1 className="text-h1 font-semibold tracking-title text-x-ink-deep">
           {t('audit_event.list.title')}
         </h1>
-        <p className="text-text-muted text-sm max-w-lede">{t('audit_event.list.lede')}</p>
+        <p className="text-text-muted text-sm leading-inherit max-w-lede">
+          {t('audit_event.list.lede')}
+        </p>
       </Stack>
 
       <Card raised pad="md">
