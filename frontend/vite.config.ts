@@ -32,6 +32,12 @@ export default defineConfig(({ mode }) => {
       proxy: {
         '/admin': { target, changeOrigin: true },
         '/health': { target, changeOrigin: true },
+        // The demo entry points are backend routes that hand back an HTML bootstrap page and
+        // then land the visitor in this SPA. In production both live on one origin; in dev the
+        // SPA is 5186 and the API is 8600, so without this line `/demo/standard` is answered by
+        // Vite with index.html — a 200 that is not the demo, which is the worst of the three
+        // possible answers. Off unless the backend has DEMO_MODE set; it 404s otherwise.
+        '/demo': { target, changeOrigin: true },
       },
     },
   };
