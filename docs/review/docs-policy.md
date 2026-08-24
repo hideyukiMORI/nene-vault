@@ -30,7 +30,8 @@ Use for: workflow changes, ADR additions, roadmap updates, Cursor rules, AGENTS.
 
 - [ ] `docs/roadmap.md` is updated if the change affects phases.
 - [ ] `docs/milestones/` is updated if an acceptance criterion changes.
-- [ ] `docs/todo/current.md` reflects current in-progress and next items.
+- [ ] The current work board (private `nene-origin/internal-docs/vault/todo/current.md`)
+      reflects current in-progress and next items.
 
 ## Language policy (ADR 0008)
 
