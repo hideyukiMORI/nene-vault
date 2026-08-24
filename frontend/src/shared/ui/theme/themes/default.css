@@ -311,6 +311,15 @@
      ⚠️ The weight one is the widest: it is in BASE, so it reaches all 39 buttons, and a
      500 next to a 600 is the kind of difference that reads as "this looks a bit off" rather
      than as a defect with a name. */
+  /* 🔴 The primary button's shadow, back. The retired `.btn` carried `shadow-sm` and the
+     migration dropped it — not because a value was wrong but because the kit had no shadow
+     slot at all (#409; `--shadow-x-slot-*` was the only dimension at zero). 0.15.0 added the
+     dimension with defaults that copy today's rendering, so this line is the one override
+     that restores this product's own value.
+     ⚠️ `--shadow-x-slot-card-raised` and `--shadow-x-slot-toast` default to `--shadow-sm`,
+     which is what this theme wants, so they are not restated. */
+  --shadow-x-slot-button-primary: var(--shadow-sm);
+
   --font-weight-x-slot-button: var(--font-weight-semibold);
   --color-x-slot-button-secondary-fg: var(--color-x-ink-deep);
   --color-x-slot-button-secondary-border: var(--color-border-strong);

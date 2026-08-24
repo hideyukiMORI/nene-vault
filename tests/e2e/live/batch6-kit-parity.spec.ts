@@ -121,7 +121,15 @@ const SCREENS: Screen[] = [
     probes: [
       { name: 'primary button (Upload)', selector: 'button:has-text("Upload Document")', props: [...TYPE, ...FILL, ...BOX] },
       { name: 'secondary button (Clear)', selector: 'button:has-text("Clear")', props: [...TYPE, ...FILL, ...BOX] },
-      { name: 'submit button (Search)', selector: 'button[type="submit"]', props: [...TYPE, ...FILL, ...BOX] },
+      // ⚠️ Not `button[type="submit"]`. Production has **zero** of them on this screen
+      // (measured 2026-08-25): its pre-migration Button set no `type`, and a bare `<button>`
+      // defaults to `submit` only as an *IDL* value — `[type="submit"]` matches the attribute,
+      // which is absent. The kit sets `type="button"` explicitly, so the attribute selector
+      // resolved on one side and not the other, and the row it produced compared this
+      // product's Search button against whatever the auto-wait eventually settled on.
+      // 🔑 A probe that resolves on only one side does not report as unresolved — it reports
+      // as a difference. Match on the text, which is the same object on both sides.
+      { name: 'primary button (Search)', selector: 'button:has-text("Search")', props: [...TYPE, ...FILL, ...BOX] },
       { name: 'search text input', selector: 'input[type="text"]', props: [...TYPE, ...FILL, ...BOX] },
       { name: 'search select', selector: 'select', props: [...TYPE, ...FILL, ...BOX] },
       { name: 'choice label (include voided)', selector: 'label:has(input[type="checkbox"])', props: [...TYPE, ...FILL] },
