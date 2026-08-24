@@ -396,35 +396,6 @@
       color: var(--color-accent);
       transform: translateX(2px);
     }
-    .chg-kv {
-      display: inline-flex;
-      align-items: center;
-      flex-wrap: wrap;
-      gap: 7px;
-      min-width: 0;
-      font-family: var(--font-mono);
-      font-size: var(--text-2xs);
-      white-space: normal;
-    }
-    .chg-kv .k {
-      color: var(--color-text-muted);
-    }
-    .chg-kv .b {
-      color: var(--color-text-faint);
-      background: var(--color-surface-sunken);
-      border: 1px solid var(--color-border);
-      border-radius: 3px;
-      padding: 1px 6px;
-      overflow-wrap: anywhere;
-    }
-    .chg-kv .a {
-      color: var(--color-x-brass-deep);
-      background: var(--color-x-brass-soft);
-      border: 1px solid var(--color-x-brass-line);
-      border-radius: 3px;
-      padding: 1px 6px;
-      overflow-wrap: anywhere;
-    }
     /* fixed layout + breakable long tokens so the audit table never scrolls */
     table.audit-table {
       table-layout: fixed;
@@ -448,9 +419,6 @@
     :where(.audit-row) td:nth-child(2) {
       overflow-wrap: anywhere;
       word-break: break-word;
-    }
-    .chg-kv .ar {
-      color: var(--color-text-faint);
     }
     .row-chev {
       color: var(--color-text-faint);
