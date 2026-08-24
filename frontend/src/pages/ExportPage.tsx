@@ -1,6 +1,6 @@
 import {
-  Box,
   Button,
+  Card,
   Checkbox,
   FormField,
   Grid,
@@ -84,7 +84,7 @@ export function ExportPage() {
         <p className="text-text-muted text-sm max-w-lede">{t('export.description')}</p>
       </Stack>
 
-      <Box className="card" pad="md">
+      <Card raised pad="md">
         <Stack gap="sm">
           <Grid cols={{ base: 1, sm: 2 }} gap="sm">
             <FormField id="export-date-from" label={t('export.form.date_from_label')}>
@@ -165,7 +165,7 @@ export function ExportPage() {
             </Button>
           </div>
         </Stack>
-      </Box>
+      </Card>
     </AppChrome>
   );
 }

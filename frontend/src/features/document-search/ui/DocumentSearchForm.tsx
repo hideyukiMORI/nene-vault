@@ -26,7 +26,11 @@ export function DocumentSearchForm({
       onSubmit={(e) => {
         void onSubmit(e);
       }}
-      className="card p-x-md"
+      /* Not the kit's Card: it renders a `<div>` and this is the search form itself.
+         The four declarations of the retired `.card` rule are spelled out instead — the
+         same drain the class would have had, done at the one call site that cannot take
+         the component (#417). */
+      className="bg-surface-raised border border-border rounded-md shadow-sm p-x-md"
     >
       <Stack gap="sm">
         <Grid cols={{ base: 1, sm: 2 }} gap="sm">

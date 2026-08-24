@@ -1,6 +1,6 @@
 import {
-  Box,
   Button,
+  Card,
   EmptyState,
   FormField,
   Grid,
@@ -383,7 +383,7 @@ export function AuditPage() {
         <p className="text-text-muted text-sm max-w-lede">{t('audit_event.list.lede')}</p>
       </Stack>
 
-      <Box className="card" pad="md">
+      <Card raised pad="md">
         <Stack gap="sm">
           <Grid cols={3} gap="sm">
             <FormField
@@ -429,14 +429,14 @@ export function AuditPage() {
             </Button>
           </Stack>
         </Stack>
-      </Box>
+      </Card>
 
       {isError && <InlineAlert tone="danger">{t('common.status.error')}</InlineAlert>}
 
       {isLoading ? (
         <EmptyState message={t('common.status.loading')} />
       ) : (
-        <div className="card shadow-none">
+        <Card pad="none">
           {events.length === 0 ? (
             <EmptyState message={t('audit_event.list.empty')} />
           ) : (
@@ -515,7 +515,7 @@ export function AuditPage() {
             previousLabel={t('common.buttons.previous')}
             nextLabel={t('common.buttons.next')}
           />
-        </div>
+        </Card>
       )}
 
       <AuditDetailDrawer

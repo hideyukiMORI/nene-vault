@@ -103,7 +103,9 @@ export function SettingsPage() {
         <EmptyState message={t('common.status.loading')} />
       ) : (
         <form
-          className="card p-x-md"
+          /* `<form>`, so not the kit's Card (which is a `<div>`) — the retired `.card`
+             rule is spelled out here instead (#417). */
+          className="bg-surface-raised border border-border rounded-md shadow-sm p-x-md"
           onSubmit={(e) => {
             void form.handleSubmit((values) => {
               mutation.mutate({

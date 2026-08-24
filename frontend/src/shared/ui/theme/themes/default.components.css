@@ -256,14 +256,6 @@
 
     /* ---- layout primitives ---- */
 
-    /* ---- cards / panels ---- */
-    .card {
-      background: var(--color-surface-raised);
-      border: 1px solid var(--color-border);
-      border-radius: var(--radius-md);
-      box-shadow: var(--shadow-sm);
-    }
-
     /* ---- buttons ---- */
 
     /* ---- forms ---- */

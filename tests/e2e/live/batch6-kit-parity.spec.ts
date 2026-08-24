@@ -128,6 +128,14 @@ const SCREENS: Screen[] = [
       { name: 'choice box', selector: 'input[type="checkbox"]', props: [...BOX, 'accent-color'] },
       { name: 'field label', selector: 'form label:not(:has(input))', props: TYPE },
       { name: 'rail nav (own markup — control row)', selector: 'nav.rail-nav', props: [...FILL, 'width'] },
+      // 🔴 The card, probed before it is migrated. `.card` is one CSS rule of four
+      // declarations and the kit's `Card` carries all four in slots — but it is also
+      // `flex flex-col`, and a flex container blockifies its children. That is the same
+      // mechanism that produced a regression in wave 1 when a `<div>` became a `<Stack>`.
+      // Probing the card and the first thing inside it is what makes that measurable
+      // rather than a thing to be careful about.
+      { name: 'card (search form)', selector: 'form.card, .card', props: [...FILL, ...BOX] },
+      { name: 'card first child', selector: '.card > *', props: ['display', 'width', 'height'] },
     ],
   },
   {
