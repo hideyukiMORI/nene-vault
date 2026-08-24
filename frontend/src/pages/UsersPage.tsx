@@ -1,5 +1,6 @@
 import {
   Button,
+  Card,
   EmptyState,
   FormField,
   InlineAlert,
@@ -223,7 +224,7 @@ export function UsersPage() {
       {isLoading ? (
         <EmptyState message={t('common.status.loading')} />
       ) : (
-        <div className="card shadow-none">
+        <Card pad="none">
           {users.length === 0 ? (
             <EmptyState message={t('user.list.empty')} />
           ) : (
@@ -269,7 +270,7 @@ export function UsersPage() {
             previousLabel={t('common.buttons.previous')}
             nextLabel={t('common.buttons.next')}
           />
-        </div>
+        </Card>
       )}
 
       {showCreate && (

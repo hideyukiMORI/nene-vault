@@ -255,6 +255,13 @@
   --radius-x-slot-button: var(--radius-x-xs); /* 4px — was `rounded-sm` */
   --radius-x-slot-alert: var(--radius-x-sm); /* 6px — was `rounded-md` */
 
+  /* 🔴 6px, not the kit's 8px default. The retired `.card` rule used `--radius-md` (6px);
+     the kit's `--radius-x-slot-card` points at `--radius-x-md`, which is 8px on the fleet's
+     scale. Left unset, migrating to the kit's `Card` rounds every panel 2px more — measured
+     on all seven of them, 2026-08-24 (#417). Same shape as the three button slots in #407:
+     the defect is not a wrong value, it is a slot nobody set. */
+  --radius-x-slot-card: var(--radius-x-sm);
+
   /* Control colours. Three of the four differ from the kit's defaults — measured against
      the pre-migration `FIELD_BASE` and confirmed in a real browser against production
      (#399). `bg` already matches, so it is not restated. */

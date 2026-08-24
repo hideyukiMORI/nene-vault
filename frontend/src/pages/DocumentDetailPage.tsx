@@ -1,4 +1,4 @@
-import { Button, EmptyState, InlineAlert, Stack } from '@hideyukimori/nene2-ui';
+import { Button, Card, EmptyState, InlineAlert, Stack } from '@hideyukimori/nene2-ui';
 import { useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useDocumentById, fetchDocumentBlob, useOcrSuggest } from '@/entities/document';
@@ -169,7 +169,7 @@ export function DocumentDetailPage() {
             </Stack>
           </div>
 
-          <section className="card p-4.5">
+          <Card raised pad="md">
             <div className="flex items-center gap-2 mb-stack-md">
               <span className="inline-block w-0.75 h-3.75 bg-x-brass rounded-px flex-none" />
               <h2 className="text-h2 font-semibold tracking-tight text-x-ink-deep flex items-center gap-2.25">
@@ -219,9 +219,9 @@ export function DocumentDetailPage() {
                 </div>
               )}
             </dl>
-          </section>
+          </Card>
 
-          <section className="card p-4.5">
+          <Card raised pad="md">
             <div className="flex items-center gap-2 mb-stack-md">
               <span className="inline-block w-0.75 h-3.75 bg-x-brass rounded-px flex-none" />
               <h2 className="text-h2 font-semibold tracking-tight text-x-ink-deep flex items-center gap-2.25">
@@ -238,9 +238,9 @@ export function DocumentDetailPage() {
                 <dd className="font-mono zero-slash break-all">{doc.file_sha256}</dd>
               </div>
             </dl>
-          </section>
+          </Card>
 
-          <section className="card p-4.5">
+          <Card raised pad="md">
             <div className="flex items-center gap-2 mb-stack-md">
               <span className="inline-block w-0.75 h-3.75 bg-x-brass rounded-px flex-none" />
               <h2 className="text-h2 font-semibold tracking-tight text-x-ink-deep flex items-center gap-2.25">
@@ -248,7 +248,7 @@ export function DocumentDetailPage() {
               </h2>
             </div>
             <DocumentHistoryTable events={history?.audit_events ?? []} />
-          </section>
+          </Card>
         </>
       )}
 

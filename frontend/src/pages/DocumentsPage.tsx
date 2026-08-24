@@ -1,4 +1,4 @@
-import { Button, EmptyState, Icon, InlineAlert, Stack } from '@hideyukimori/nene2-ui';
+import { Button, Card, EmptyState, Icon, InlineAlert, Stack } from '@hideyukimori/nene2-ui';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useDocumentSearch, DocumentSearchForm, DocumentTable } from '@/features/document-search';
@@ -62,7 +62,7 @@ export function DocumentsPage() {
       {isLoading ? (
         <EmptyState message={t('common.status.loading')} />
       ) : (
-        <div className="card shadow-none">
+        <Card pad="none">
           <DocumentTable
             documents={documents}
             onSelectDocument={(id) => {
@@ -83,7 +83,7 @@ export function DocumentsPage() {
             previousLabel={t('common.buttons.previous')}
             nextLabel={t('common.buttons.next')}
           />
-        </div>
+        </Card>
       )}
 
       {showUpload && (
