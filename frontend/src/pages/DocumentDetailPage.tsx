@@ -176,7 +176,7 @@ export function DocumentDetailPage() {
                 {t('document.detail.metadata_section')}
               </h2>
             </div>
-            <dl className="dl">
+            <dl className="grid grid-cols-2 gap-x-7 gap-y-4 max-sm:grid-cols-1 max-sm:gap-y-3.5 [&>div]:min-w-0 [&_dt]:text-2xs [&_dt]:text-text-muted [&_dt]:uppercase [&_dt]:tracking-meta [&_dt]:font-semibold [&_dt]:mb-0.75 [&_dd]:text-sm [&_dd]:leading-inherit [&_dd]:text-x-ink-deep">
               <div>
                 <dt>{t('document.metadata.transaction_date')}</dt>
                 <dd className="font-mono zero-slash">{formatDate(doc.transaction_date)}</dd>
@@ -204,7 +204,7 @@ export function DocumentDetailPage() {
                 <dd className="font-mono zero-slash">{formatDate(doc.retention_expires_at)}</dd>
               </div>
               {doc.tags.length > 0 && (
-                <div className="col2">
+                <div className="col-span-2 max-sm:col-auto">
                   <dt>{t('document.metadata.tags')}</dt>
                   <dd className="flex items-center gap-2 flex-wrap">
                     {doc.tags.map((tag) => (
@@ -228,12 +228,12 @@ export function DocumentDetailPage() {
                 {t('document.detail.file_section')}
               </h2>
             </div>
-            <dl className="dl">
+            <dl className="grid grid-cols-2 gap-x-7 gap-y-4 max-sm:grid-cols-1 max-sm:gap-y-3.5 [&>div]:min-w-0 [&_dt]:text-2xs [&_dt]:text-text-muted [&_dt]:uppercase [&_dt]:tracking-meta [&_dt]:font-semibold [&_dt]:mb-0.75 [&_dd]:text-sm [&_dd]:leading-inherit [&_dd]:text-x-ink-deep">
               <div>
                 <dt>{t('document.metadata.version_number')}</dt>
                 <dd className="font-mono zero-slash">{doc.version_number}</dd>
               </div>
-              <div className="col2">
+              <div className="col-span-2 max-sm:col-auto">
                 <dt>{t('document.metadata.file_sha256')}</dt>
                 <dd className="font-mono zero-slash break-all">{doc.file_sha256}</dd>
               </div>
