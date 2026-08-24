@@ -28,12 +28,29 @@ describe('SettingsPage retention warning', () => {
     await userEvent.type(input, '8');
 
     await waitFor(() => {
-      // 🔴 The paint, not the attribute. This used to assert `aria-invalid="true"` as a proxy
-      // for the amber outline, because vault's own Input drew it from that attribute (FC-1.8).
-      // The kit's Input does not, so the outline vanished in the migration while the assertion
-      // kept passing — the attribute survived, the CSS behind it did not. Assert what is drawn.
-      expect(input).toHaveClass('border-warn', 'ring-warn-soft');
+      // 🔴 Two assertions, and they have to fail for different reasons.
+      //
+      //   1. this page marks the field   — `data-warn` is on the input
+      //   2. the kit paints that mark    — the classes keyed off it are on the input
+      //
+      // Asserting only (1) is the shape that already got through here once: the attribute
+      // survived the migration, the paint did not, and the test stayed green because it was
+      // checking a stand-in that lived in the same component as the thing it stood for. The
+      // moment the implementation moved upstream, the stand-in stayed behind.
+      //
+      // Asserting only (2) would pass on a field that is never marked at all.
+      //
+      // ⚠️ Neither reaches computed style — jsdom has no compiled CSS. What they do reach is
+      // the two edits that actually removed the signal last time: dropping `data-warn` here,
+      // and the kit dropping `VALIDITY_CLASS` upstream. Verified by making each of those
+      // edits and watching this go red (2026-08-24).
+      expect(input).toHaveAttribute('data-warn');
     });
+
+    // Outside the `waitFor`: the class list is fixed at render, so there is nothing to wait
+    // for here — and one assertion per callback is the lint rule.
+    expect(input.className).toContain('data-[warn]:border-x-slot-control-warn-border');
+    expect(input.className).toContain('data-[warn]:bg-x-slot-control-warn-bg');
   });
 
   /**
@@ -68,8 +85,11 @@ describe('SettingsPage retention warning', () => {
     // …and the reason it is flagged has to be reachable from the field. Compared by id
     // rather than by walking the DOM: what matters is that the field points at the element
     // holding the notice, which is exactly what a screen reader follows.
+    //
+    // The id sits on the alert itself since 0.12.0 — `InlineAlert` takes an `id` now, so the
+    // wrapper this used to read through (`.parentElement`) is gone.
     const describedBy = input.getAttribute('aria-describedby');
     expect(describedBy).not.toBeNull();
-    expect(screen.getByRole('status').parentElement?.id).toBe(describedBy);
+    expect(screen.getByRole('status').id).toBe(describedBy);
   });
 });

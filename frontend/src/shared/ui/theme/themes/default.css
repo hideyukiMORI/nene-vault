@@ -217,13 +217,30 @@
      made every button 4px taller — 39 of them. `2xs` is the old value exactly. The x default
      is already the nearest step (16px against the old 15px), so it is left alone.
 
-     🔴 This drops the touch-device height below 44px, and there is no way to hold it here.
-     Before the migration this product carried `max-md:min-h-11.5` (46px) alongside a larger
-     mobile padding; the kit has no equivalent, and its 12px default cleared 44px only by
-     arithmetic accident — an accident that cannot survive the slot being overridden, which
-     is what the slot is for. Raised as #397, in the shape that #393 settled for the font
-     floor: a second slot the product does not get to lower. */
+     🟢 Lowering the padding used to drop the touch-device height below 44px, with no way to
+     hold it from here — the kit's 12px default cleared 44px only by arithmetic accident, and
+     an accident cannot survive the slot being overridden, which is what the slot is for.
+     Settled upstream in 0.14.0 (#397): `--spacing-x-slot-control-touch-min` is a second slot
+     the product does not get to lower, applied under `pointer-coarse:`. Same shape as the
+     font floor (#393). The padding here is free to be the old value again. */
   --spacing-x-slot-button-pad-y: var(--spacing-x-2xs);
+
+  /* 🔴 DO NOT override `--spacing-x-slot-control-touch-min`. 44px is WCAG 2.5.5 and the
+     Apple HIG minimum — a device constraint, not a design value, and the same class of
+     number as `--text-x-slot-control-touch-size`. `slot-values` will NOT catch a lower
+     value here either: a smaller step is still a `var()` into the scale.
+     `control-touch-floor.test.ts` is what holds the line.
+
+     ⚠️ On touch devices this moves two things, both deliberately left at the kit's default:
+       · `md` buttons 46px → 44px. The old 46 came from `max-md:min-h-11.5`, an ad-hoc value,
+         not a step of any scale.
+       · `sm` buttons 38px → 44px. 38 was below the floor — this is a fix, not a regression.
+     Desktop rendering is unchanged. */
+
+  /* Button gap. 0.13.0 gave `Button` `inline-flex` and a gap of its own, which is what the
+     upload button was writing at its call site (#398). The old value was 7px; `2xs` is 8px,
+     the nearest step, and it is what that call site already used. */
+  --spacing-x-slot-button-gap: var(--spacing-x-2xs);
 
   /* Alert padding, composed — the old rule was 13px vertical and 15px horizontal, and one
      value for all four sides cannot say that. Each lands within 1px of a step. */
@@ -253,6 +270,12 @@
      should grow a step is upstream's call; measuring it wants computed styles, not classes. */
   --text-x-slot-button-size: var(--text-sm);
   --text-x-slot-choice-size: var(--text-sm);
+
+  /* `sm` buttons shipped one step below `md` here — `text-xs`, 0.75rem. Until 0.13.0 the kit
+     had one font slot against two padding slots, so both sizes rendered alike; the slot pair
+     is symmetric now (#398). The kit's default is `inherit`, which would put `sm` at body
+     size — larger than `md`. */
+  --text-x-slot-button-sm-size: var(--text-xs);
 
   --spacing-x-slot-control-pad-y: var(--spacing-x-2xs);
   --spacing-x-slot-control-pad-x: var(--spacing-x-xs);

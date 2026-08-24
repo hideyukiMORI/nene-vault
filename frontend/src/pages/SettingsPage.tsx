@@ -140,27 +140,30 @@ export function SettingsPage() {
                     ? RETENTION_WARNING_ID
                     : undefined
                 }
-                /* 🔴 The amber outline the notice used to draw. Before the migration it came
-                   from vault's own Input, which carried `aria-invalid:border-warn` and friends
-                   — attribute and paint from one source (FC-1.8). The kit's Input reads
-                   `aria-invalid` for wiring and paints nothing from it, so the outline went
-                   away in W1 and nothing noticed: the test asserted the attribute, and the
-                   attribute was still there. Restored here until the kit has a warning state
-                   for controls (#399). */
-                className={retentionWarn ? 'border-warn ring-3 ring-warn-soft' : undefined}
+                /* 🔴 The amber paint, back where it belongs. Before the migration it came
+                   from vault's own Input (`aria-invalid:border-warn` and friends — attribute
+                   and paint from one source, FC-1.8); W1 moved the Input upstream and the
+                   paint did not come along, which nothing noticed because the test asserted
+                   the attribute and the attribute was still there.
+
+                   0.12.0 gave the kit a warning state that is deliberately NOT `aria-invalid`
+                   (#399): `data-warn` carries no ARIA meaning, so a legal value is painted
+                   without being announced as an error. Presence is what the selector matches,
+                   so the value is the empty string — `data-warn={false}` would still render
+                   the attribute. The two assertions in
+                   `SettingsPage.test.tsx` are what hold this — the mark and the paint, separately. */
+                data-warn={retentionWarn ? '' : undefined}
                 // valueAsNumber so the watched value is numeric *while typing* — the
                 // under-10-years compliance warning must render live, not only after
                 // save → re-fetch coerces the value server-side.
                 {...register('retention_years', { valueAsNumber: true })}
               />
               {retentionWarn && (
-                /* Wrapped to carry the id: the kit's InlineAlert takes neither `id` nor
-                   `className`, so there is nowhere else to put one (#399). */
-                <div id={RETENTION_WARNING_ID}>
-                  <InlineAlert tone="warn">
-                    {t('vault_settings.fields.retention_warning')}
-                  </InlineAlert>
-                </div>
+                /* The id goes on the alert itself since 0.12.0 (#399); before that the kit's
+                   InlineAlert took neither `id` nor `className` and this needed a wrapper. */
+                <InlineAlert id={RETENTION_WARNING_ID} tone="warn">
+                  {t('vault_settings.fields.retention_warning')}
+                </InlineAlert>
               )}
             </FormField>
 
