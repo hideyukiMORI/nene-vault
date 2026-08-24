@@ -162,6 +162,15 @@
   line-height: inherit;
 }
 
+/* quick-link カードの複合 transition（border-color と background の2プロパティ）。
+   `btn-transition` は transform を含み、`field-transition` は box-shadow を含むので
+   どちらも一致しない。1宣言なので歯止め基準を満たす（#426）。 */
+@utility qlink-transition {
+  transition:
+    border-color 0.12s,
+    background 0.12s;
+}
+
 /* form control の複合 transition（border-color と box-shadow の2プロパティ＝
    transition-colors も transition-shadow も単独では一致しない・btn-transition と同型）。 */
 @utility field-transition {
