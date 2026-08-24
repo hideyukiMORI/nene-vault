@@ -49,6 +49,12 @@
 
 /* `font-size: 0`（ラベル文字を視覚的に消し、支援技術には残す）。TW4 に段が無く
    arbitrary は規約⑤で禁止なので @utility 化が正道。単一宣言（#428）。 */
+/* `.avatar` の 0.8rem。段（0.6875 / 0.75 / 0.8125rem）に無い直値で、arbitrary は
+   規約⑤で禁止なので @utility 化が正道。単一宣言（#432）。 */
+@utility text-avatar {
+  font-size: 0.8rem;
+}
+
 @utility text-zero {
   font-size: 0;
 }
