@@ -1,0 +1,381 @@
+{
+  "measuredAt": "2026-08-24T09:36:40.420Z",
+  "productionKitClasses": 0,
+  "localKitClasses": 71,
+  "matched": 186,
+  "differing": 53,
+  "unresolved": [],
+  "rows": [
+    {
+      "screen": "documents",
+      "element": "primary button (Upload)",
+      "property": "font-weight",
+      "production": "600",
+      "local": "500"
+    },
+    {
+      "screen": "documents",
+      "element": "primary button (Upload)",
+      "property": "box-shadow",
+      "production": "oklch(0.28 0.02 256 / 0.07) 0px 1px 2px 0px",
+      "local": "none"
+    },
+    {
+      "screen": "documents",
+      "element": "primary button (Upload)",
+      "property": "gap",
+      "production": "7px",
+      "local": "8px"
+    },
+    {
+      "screen": "documents",
+      "element": "primary button (Upload)",
+      "property": "width",
+      "production": "163px",
+      "local": "166px"
+    },
+    {
+      "screen": "documents",
+      "element": "primary button (Upload)",
+      "property": "padding",
+      "production": "8px 15px",
+      "local": "8px 16px"
+    },
+    {
+      "screen": "documents",
+      "element": "secondary button (Clear)",
+      "property": "font-weight",
+      "production": "600",
+      "local": "500"
+    },
+    {
+      "screen": "documents",
+      "element": "secondary button (Clear)",
+      "property": "color",
+      "production": "oklch(0.24 0.02 256)",
+      "local": "oklch(0.31 0.02 256)"
+    },
+    {
+      "screen": "documents",
+      "element": "secondary button (Clear)",
+      "property": "border-color",
+      "production": "oklch(0.76 0.013 78)",
+      "local": "oklch(0.89 0.009 83)"
+    },
+    {
+      "screen": "documents",
+      "element": "secondary button (Clear)",
+      "property": "gap",
+      "production": "7px",
+      "local": "8px"
+    },
+    {
+      "screen": "documents",
+      "element": "secondary button (Clear)",
+      "property": "width",
+      "production": "63px",
+      "local": "65px"
+    },
+    {
+      "screen": "documents",
+      "element": "secondary button (Clear)",
+      "property": "padding",
+      "production": "8px 15px",
+      "local": "8px 16px"
+    },
+    {
+      "screen": "documents",
+      "element": "submit button (Search)",
+      "property": "font-weight",
+      "production": "600",
+      "local": "500"
+    },
+    {
+      "screen": "documents",
+      "element": "submit button (Search)",
+      "property": "gap",
+      "production": "7px",
+      "local": "8px"
+    },
+    {
+      "screen": "documents",
+      "element": "submit button (Search)",
+      "property": "width",
+      "production": "74px",
+      "local": "76px"
+    },
+    {
+      "screen": "documents",
+      "element": "submit button (Search)",
+      "property": "padding",
+      "production": "8px 15px",
+      "local": "8px 16px"
+    },
+    {
+      "screen": "documents",
+      "element": "search text input",
+      "property": "width",
+      "production": "535px",
+      "local": "533px"
+    },
+    {
+      "screen": "documents",
+      "element": "search text input",
+      "property": "padding",
+      "production": "8px 11px",
+      "local": "8px 12px"
+    },
+    {
+      "screen": "documents",
+      "element": "choice label (include voided)",
+      "property": "gap",
+      "production": "9px",
+      "local": "8px"
+    },
+    {
+      "screen": "audit",
+      "element": "sm button (Previous)",
+      "property": "font-weight",
+      "production": "600",
+      "local": "500"
+    },
+    {
+      "screen": "audit",
+      "element": "sm button (Previous)",
+      "property": "line-height",
+      "production": "18.6px",
+      "local": "16px"
+    },
+    {
+      "screen": "audit",
+      "element": "sm button (Previous)",
+      "property": "color",
+      "production": "oklch(0.24 0.02 256)",
+      "local": "oklch(0.31 0.02 256)"
+    },
+    {
+      "screen": "audit",
+      "element": "sm button (Previous)",
+      "property": "border-color",
+      "production": "oklch(0.76 0.013 78)",
+      "local": "oklch(0.89 0.009 83)"
+    },
+    {
+      "screen": "audit",
+      "element": "sm button (Previous)",
+      "property": "gap",
+      "production": "7px",
+      "local": "8px"
+    },
+    {
+      "screen": "audit",
+      "element": "sm button (Previous)",
+      "property": "width",
+      "production": "73px",
+      "local": "75px"
+    },
+    {
+      "screen": "audit",
+      "element": "sm button (Previous)",
+      "property": "height",
+      "production": "30.5938px",
+      "local": "26px"
+    },
+    {
+      "screen": "audit",
+      "element": "sm button (Previous)",
+      "property": "padding",
+      "production": "5px 11px",
+      "local": "4px 12px"
+    },
+    {
+      "screen": "audit",
+      "element": "sm button (Next)",
+      "property": "font-weight",
+      "production": "600",
+      "local": "500"
+    },
+    {
+      "screen": "audit",
+      "element": "sm button (Next)",
+      "property": "line-height",
+      "production": "18.6px",
+      "local": "16px"
+    },
+    {
+      "screen": "audit",
+      "element": "sm button (Next)",
+      "property": "color",
+      "production": "oklch(0.24 0.02 256)",
+      "local": "oklch(0.31 0.02 256)"
+    },
+    {
+      "screen": "audit",
+      "element": "sm button (Next)",
+      "property": "border-color",
+      "production": "oklch(0.76 0.013 78)",
+      "local": "oklch(0.89 0.009 83)"
+    },
+    {
+      "screen": "audit",
+      "element": "sm button (Next)",
+      "property": "gap",
+      "production": "7px",
+      "local": "8px"
+    },
+    {
+      "screen": "audit",
+      "element": "sm button (Next)",
+      "property": "width",
+      "production": "51px",
+      "local": "52px"
+    },
+    {
+      "screen": "audit",
+      "element": "sm button (Next)",
+      "property": "height",
+      "production": "30.5938px",
+      "local": "26px"
+    },
+    {
+      "screen": "audit",
+      "element": "sm button (Next)",
+      "property": "padding",
+      "production": "5px 11px",
+      "local": "4px 12px"
+    },
+    {
+      "screen": "audit",
+      "element": "secondary button (Clear)",
+      "property": "font-weight",
+      "production": "600",
+      "local": "500"
+    },
+    {
+      "screen": "audit",
+      "element": "secondary button (Clear)",
+      "property": "color",
+      "production": "oklch(0.24 0.02 256)",
+      "local": "oklch(0.31 0.02 256)"
+    },
+    {
+      "screen": "audit",
+      "element": "secondary button (Clear)",
+      "property": "border-color",
+      "production": "oklch(0.76 0.013 78)",
+      "local": "oklch(0.89 0.009 83)"
+    },
+    {
+      "screen": "audit",
+      "element": "secondary button (Clear)",
+      "property": "gap",
+      "production": "7px",
+      "local": "8px"
+    },
+    {
+      "screen": "audit",
+      "element": "primary button (Search)",
+      "property": "font-weight",
+      "production": "600",
+      "local": "500"
+    },
+    {
+      "screen": "audit",
+      "element": "primary button (Search)",
+      "property": "box-shadow",
+      "production": "oklch(0.28 0.02 256 / 0.07) 0px 1px 2px 0px",
+      "local": "none"
+    },
+    {
+      "screen": "audit",
+      "element": "primary button (Search)",
+      "property": "gap",
+      "production": "7px",
+      "local": "8px"
+    },
+    {
+      "screen": "export",
+      "element": "radio label",
+      "property": "display",
+      "production": "inline-flex",
+      "local": "flex"
+    },
+    {
+      "screen": "export",
+      "element": "radio label",
+      "property": "gap",
+      "production": "9px",
+      "local": "8px"
+    },
+    {
+      "screen": "export",
+      "element": "checkbox label",
+      "property": "display",
+      "production": "inline-flex",
+      "local": "flex"
+    },
+    {
+      "screen": "export",
+      "element": "checkbox label",
+      "property": "gap",
+      "production": "9px",
+      "local": "8px"
+    },
+    {
+      "screen": "settings",
+      "element": "number input (retention)",
+      "property": "width",
+      "production": "586px",
+      "local": "582px"
+    },
+    {
+      "screen": "settings",
+      "element": "number input (retention)",
+      "property": "padding",
+      "production": "8px 11px",
+      "local": "8px 12px"
+    },
+    {
+      "screen": "settings",
+      "element": "field hint",
+      "property": "line-height",
+      "production": "16.5px",
+      "local": "17.05px"
+    },
+    {
+      "screen": "settings",
+      "element": "save button",
+      "property": "font-weight",
+      "production": "600",
+      "local": "500"
+    },
+    {
+      "screen": "settings",
+      "element": "save button",
+      "property": "box-shadow",
+      "production": "oklch(0.28 0.02 256 / 0.07) 0px 1px 2px 0px",
+      "local": "none"
+    },
+    {
+      "screen": "settings",
+      "element": "save button",
+      "property": "gap",
+      "production": "7px",
+      "local": "8px"
+    },
+    {
+      "screen": "settings",
+      "element": "save button",
+      "property": "width",
+      "production": "114px",
+      "local": "115px"
+    },
+    {
+      "screen": "settings",
+      "element": "save button",
+      "property": "padding",
+      "production": "8px 15px",
+      "local": "8px 16px"
+    }
+  ]
+}

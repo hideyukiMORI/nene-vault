@@ -55,6 +55,12 @@ services:
       # Absolute path — Apache's CWD is not /var/www/html, so a relative path
       # would resolve incorrectly at request time.
       DB_NAME: /var/www/html/var/nene_vault.sqlite
+      # Demo routes (/demo/standard, /demo/guided). Off unless explicitly asked for —
+      # anything but 1/true/yes 404s, and the .env.example warning ("never enable on an
+      # instance holding real records") is the reason the default here stays empty.
+      # Needed locally by tests/e2e/live/batch6-kit-parity.spec.ts, which seats both sides
+      # of its comparison through /demo/standard so that it needs no credentials.
+      DEMO_MODE: "${DEMO_MODE:-}"
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
       interval: 10s
