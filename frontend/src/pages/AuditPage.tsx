@@ -65,8 +65,8 @@ function ChangeSummary({ event }: { event: AuditEvent }) {
   if (event.before_json === null) {
     return (
       <Stack direction="horizontal" align="center" wrap gap="2xs" className="min-w-0">
-        <span className="chg-kv">
-          <span className="k">{t('audit_event.summary.created')}</span>
+        <span className="inline-flex items-center flex-wrap gap-1.75 min-w-0 font-mono text-2xs whitespace-normal">
+          <span className="text-text-muted">{t('audit_event.summary.created')}</span>
         </span>
         <span className="text-2xs text-text-faint whitespace-nowrap">
           {t('audit_event.summary.fields', { count: String(fields.length) })}
@@ -81,11 +81,21 @@ function ChangeSummary({ event }: { event: AuditEvent }) {
   }
   return (
     <Stack direction="horizontal" align="center" wrap gap="2xs" className="min-w-0">
-      <span className="chg-kv">
-        <span className="k">{first.key}</span>
-        <span className="b">{formatAuditValue(first.before)}</span>
-        <span className="ar">→</span>
-        <span className="a">{formatAuditValue(first.after)}</span>
+      {/* Regenerated from `.chg-kv` and its four descendant rules (#422). The children carry
+          their own utilities rather than a `[&_.k]:*` variant — removing the descendant
+          selector is the point of the drain, so re-expressing it in another spelling would
+          not be one.
+          ⚠️ `rounded-sm` is 4px against the old rule's 3px: 3px is not a step of this scale,
+          and adding one is upstream's call (#395). Measured, and the only difference left. */}
+      <span className="inline-flex items-center flex-wrap gap-1.75 min-w-0 font-mono text-2xs whitespace-normal">
+        <span className="text-text-muted">{first.key}</span>
+        <span className="text-text-faint bg-surface-sunken border-border border rounded-sm py-px px-1.5 wrap-anywhere">
+          {formatAuditValue(first.before)}
+        </span>
+        <span className="text-text-faint">→</span>
+        <span className="text-x-brass-deep bg-x-brass-soft border-x-brass-line border rounded-sm py-px px-1.5 wrap-anywhere">
+          {formatAuditValue(first.after)}
+        </span>
       </span>
       {fields.length > 1 && (
         <span className="text-2xs text-text-faint whitespace-nowrap">
