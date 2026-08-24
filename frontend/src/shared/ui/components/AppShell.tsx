@@ -273,14 +273,33 @@ export function AppShell({
         </nav>
 
         <div className="rail-foot">
-          <div className="avatar" aria-hidden="true">
+          {/* Regenerated from `.avatar` / `.who` / `.out` and their descendant rules (#432).
+              🔴 `.rail-foot .avatar` and `.rail-foot .who` were scoped by the rail, but the
+              rail is only where these live — the scoping was not a dependency, so the
+              breakpoint rules become `max-md:hidden` on the elements themselves and the
+              preserved `.rail-foot` (判例#36) is not touched.
+              🔴 `.out` is the one that changes shape: below 768px the retired rules turned it
+              from a bare icon button into a framed 38px square. Both forms are here. */}
+          <div
+            className="w-7.5 h-7.5 flex-none rounded-sm bg-x-brass-deep text-x-on-brass flex items-center justify-center font-semibold text-avatar leading-inherit uppercase max-md:hidden"
+            aria-hidden="true"
+          >
             {avatarLetter}
           </div>
-          <div className="who">
-            <b>{userEmail ?? '—'}</b>
-            {roleLabel !== null && roleLabel !== undefined && <span>{roleLabel}</span>}
+          <div className="min-w-0 flex-1 md:max-lg:hidden max-md:hidden">
+            <b className="block text-xs leading-inherit text-x-rail-ink font-semibold whitespace-nowrap overflow-hidden text-ellipsis">
+              {userEmail ?? '—'}
+            </b>
+            {roleLabel !== null && roleLabel !== undefined && (
+              <span className="text-2xs leading-inherit text-x-rail-faint">{roleLabel}</span>
+            )}
           </div>
-          <button type="button" className="out" onClick={onLogout} aria-label={logoutLabel}>
+          <button
+            type="button"
+            className="bg-none border-0 text-x-rail-faint cursor-pointer p-1.25 rounded-sm flex hover:text-x-rail-text hover:bg-x-rail-deep [&_svg]:w-4 [&_svg]:h-4 [&_svg]:stroke-current md:max-lg:hidden max-md:w-9.5 max-md:h-9.5 max-md:items-center max-md:justify-center max-md:text-text-muted max-md:bg-surface-raised max-md:border max-md:border-x-line-mid max-md:hover:bg-surface-sunken max-md:hover:text-x-ink-deep max-md:[&_svg]:w-4.25 max-md:[&_svg]:h-4.25"
+            onClick={onLogout}
+            aria-label={logoutLabel}
+          >
             <svg
               viewBox="0 0 24 24"
               fill="none"
