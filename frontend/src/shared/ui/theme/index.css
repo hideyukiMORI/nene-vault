@@ -23,6 +23,36 @@
 
 /* Custom utility: slashed zero via the low-level OpenType feature (exact parity
    with the retired `.mono` component class, whose numerals used `'zero' 1`). */
+/* シェルとコンテンツ幅（#428）。いずれも独自名トークンを参照する単一宣言で、
+   スケールの段ではないため数値 utility では書けない。 */
+@utility grid-cols-shell {
+  grid-template-columns: var(--rail-width) minmax(0, 1fr);
+}
+@utility grid-cols-shell-compact {
+  grid-template-columns: 66px minmax(0, 1fr);
+}
+@utility max-w-content {
+  max-width: var(--content-max);
+}
+@utility max-w-content-mid {
+  max-width: var(--content-mid);
+}
+@utility max-w-content-narrow {
+  max-width: var(--content-narrow);
+}
+/* 🔴 1500px 以上でだけ広がる上限。`--breakpoint-wide` をテーマに足して `wide:` variant を
+   生やしている——既存の段（sm/md/lg/xl/2xl）は1つも書き換えていない。段の再定義ではなく、
+   この製品固有のブレークポイントの追加。 */
+@utility max-w-content-wide {
+  max-width: var(--content-max-wide);
+}
+
+/* `font-size: 0`（ラベル文字を視覚的に消し、支援技術には残す）。TW4 に段が無く
+   arbitrary は規約⑤で禁止なので @utility 化が正道。単一宣言（#428）。 */
+@utility text-zero {
+  font-size: 0;
+}
+
 @utility zero-slash {
   font-feature-settings: 'zero' 1;
 }

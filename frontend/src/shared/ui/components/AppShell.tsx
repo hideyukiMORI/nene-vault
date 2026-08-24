@@ -130,10 +130,28 @@ interface AppShellProps {
   locales: readonly LocaleCode[];
 }
 
+/* Regenerated from `.content` / `.content.is-mid` / `.content.is-narrow` (#428).
+   🔴 The three width caps differ only in `max-width`, so the shared part is one string and
+   the cap is appended — the retired rules composed the same way (`.content` plus a modifier).
+   Breakpoints are the retired rules' exactly: ≥1500px widens to 1280px, 768–1023px narrows
+   the side padding, below 768px all three collapse to full width. */
+const CONTENT_BASE =
+  'w-full mx-auto pt-7.5 px-7 pb-14 wide:max-w-content-wide ' +
+  'md:max-lg:px-5.5 max-md:px-4 max-md:py-5 max-md:max-w-full ' +
+  'space-y-5.5 max-md:space-y-4.5';
+
+/* 🔴 Only the default width. The retired rules were
+     `.content, .content.is-narrow, .content.is-mid { padding: 20px 16px }`   (0,2,0)
+     `.content { padding-bottom: 96px }`                                      (0,1,0)
+   so on a narrow or mid page the *shorthand* won on specificity and the bottom padding
+   stayed at 20px — the 96px reached the default width only. Measured 2026-08-24: putting
+   it on all three moved mobile Settings from 664.59px tall to 740.59px. */
+const CONTENT_BOTTOM_BAR = 'max-md:pb-24';
+
 const WIDTH_CLASS: Record<NonNullable<AppShellProps['width']>, string> = {
-  default: 'content space-y-5.5 max-md:space-y-4.5',
-  mid: 'content is-mid space-y-5.5 max-md:space-y-4.5',
-  narrow: 'content is-narrow space-y-5.5 max-md:space-y-4.5',
+  default: `${CONTENT_BASE} ${CONTENT_BOTTOM_BAR} max-w-content`,
+  mid: `${CONTENT_BASE} max-w-content-mid`,
+  narrow: `${CONTENT_BASE} max-w-content-narrow`,
 };
 
 export function AppShell({
@@ -210,7 +228,12 @@ export function AppShell({
   const avatarLetter = userEmail !== undefined && userEmail !== '' ? userEmail.charAt(0) : '?';
 
   return (
-    <div className="layout">
+    <div
+      /* Regenerated from `.layout` (#428). The two grid templates are `@utility` because they
+         reference `--rail-width`, a named token rather than a step of a scale. The breakpoints
+         are the retired rule's exactly: 768–1023px compact, below 768px stacked. */
+      className="grid grid-cols-shell min-h-screen md:max-lg:grid-cols-shell-compact max-md:block"
+    >
       <aside className="rail">
         <div className="rail-brand">
           <BrandMark

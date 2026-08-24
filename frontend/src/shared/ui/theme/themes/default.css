@@ -127,6 +127,10 @@
   /* ---- layout metrics ---- */
   --rail-width: 252px;
   --topbar-height: 56px;
+  /* 🔴 1500px は既定のブレークポイント（40/48/64/80/96rem）に無いので足した名前。
+     既存の段は書き換えていない。`--content-max-wide` は 1500px 以上でだけ効く上限。 */
+  --breakpoint-wide: 1500px;
+  --content-max-wide: 1280px;
   --content-max: 1180px;
   --content-mid: 920px;
   --content-narrow: 680px;

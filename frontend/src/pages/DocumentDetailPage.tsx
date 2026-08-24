@@ -78,7 +78,7 @@ export function DocumentDetailPage() {
     >
       <button
         type="button"
-        className="link"
+        className="text-accent bg-none border-0 cursor-pointer text-sm leading-inherit no-underline hover:text-x-navy-deep hover:underline hover:underline-offset-2"
         onClick={() => {
           void navigate('/documents');
         }}

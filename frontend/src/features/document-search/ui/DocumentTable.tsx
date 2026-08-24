@@ -68,7 +68,7 @@ export function DocumentTable({ documents, onSelectDocument }: DocumentTableProp
               <td className="right" data-label={labels.actions}>
                 <button
                   type="button"
-                  className="link"
+                  className="text-accent bg-none border-0 cursor-pointer text-sm leading-inherit no-underline hover:text-x-navy-deep hover:underline hover:underline-offset-2"
                   onClick={() => {
                     onSelectDocument(doc.id);
                   }}

@@ -161,7 +161,9 @@ function UserRow({
         {user.id !== currentUserId && (
           <button
             type="button"
-            className="link is-danger"
+            /* `.link.is-danger` was one rule overriding the colour; the override is just the later
+   utility here (#428). */
+            className="text-accent bg-none border-0 cursor-pointer text-sm leading-inherit no-underline hover:text-x-navy-deep hover:underline hover:underline-offset-2 text-danger"
             onClick={() => {
               onDelete(user.id, user.email);
             }}

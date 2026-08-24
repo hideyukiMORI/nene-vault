@@ -29,10 +29,13 @@ export function LanguageSwitcher({
   onLocaleChange,
   locales,
 }: LanguageSwitcherProps) {
+  // Regenerated from `.lang` / `.lang select` (#428). Below 768px the retired rule set
+  // `font-size: 0` on the label to hide the text while keeping it for assistive tech.
   return (
-    <label className="lang">
+    <label className="inline-flex items-center gap-1.75 text-xs leading-inherit text-text-muted max-md:text-zero max-md:gap-0">
       {label}
       <select
+        className="text-xs leading-inherit border border-x-line-mid bg-surface-raised rounded-sm py-1.25 px-2 text-text-primary max-md:text-2xs max-md:py-1.5 max-md:px-1.75"
         value={locale}
         onChange={(e) => {
           onLocaleChange(e.target.value);

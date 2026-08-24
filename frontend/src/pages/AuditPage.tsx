@@ -266,7 +266,7 @@ function AuditDetailDrawer({ event, open, onClose }: DrawerProps) {
                 </div>
               </dl>
 
-              <div className="params-head">
+              <div className="flex items-center justify-between gap-3 mb-3.5">
                 <span className="text-body font-semibold tracking-tight text-x-ink-deep flex items-center gap-2.25">
                   <span className="inline-block w-0.75 h-3.75 bg-x-brass rounded-px flex-none" />
                   {t('audit_event.detail.params')}{' '}
@@ -274,10 +274,15 @@ function AuditDetailDrawer({ event, open, onClose }: DrawerProps) {
                     · {t('audit_event.summary.fields', { count: String(fields.length) })}
                   </span>
                 </span>
-                <div className="seg">
+                <div
+                  /* Regenerated from `.seg` and its three descendant rules (#428).
+                     `.seg button + button` was an adjacent-sibling border; written per button
+                     as `[&+button]:border-l` so the selector lives on the element that draws it. */
+                  className="inline-flex border border-x-line-mid rounded-sm overflow-hidden bg-surface-raised"
+                >
                   <button
                     type="button"
-                    className={view === 'diff' ? 'is-on' : ''}
+                    className={`text-2xs leading-inherit font-semibold py-1.25 px-2.75 border-0 cursor-pointer [&+button]:border-l [&+button]:border-x-line-mid ${view === 'diff' ? 'bg-accent text-on-accent' : 'bg-transparent text-text-muted'}`}
                     onClick={() => {
                       setView('diff');
                     }}
@@ -286,7 +291,7 @@ function AuditDetailDrawer({ event, open, onClose }: DrawerProps) {
                   </button>
                   <button
                     type="button"
-                    className={view === 'json' ? 'is-on' : ''}
+                    className={`text-2xs leading-inherit font-semibold py-1.25 px-2.75 border-0 cursor-pointer [&+button]:border-l [&+button]:border-x-line-mid ${view === 'json' ? 'bg-accent text-on-accent' : 'bg-transparent text-text-muted'}`}
                     onClick={() => {
                       setView('json');
                     }}
@@ -299,9 +304,13 @@ function AuditDetailDrawer({ event, open, onClose }: DrawerProps) {
               {view === 'diff' ? (
                 <DiffView fields={fields} isCreate={isCreate} />
               ) : (
-                <div>
+                <div
+                  /* `.json-block + .json-block { margin-top: 14px }` was an adjacent-sibling
+                     rule; `space-y-3.5` on the parent says the same thing without one (#428). */
+                  className="space-y-3.5"
+                >
                   {!isCreate && (
-                    <div className="json-block">
+                    <div>
                       <div className="text-2xs text-text-muted uppercase tracking-label font-semibold mb-1.5">
                         {t('audit_event.list.table.before')}
                       </div>
@@ -310,7 +319,7 @@ function AuditDetailDrawer({ event, open, onClose }: DrawerProps) {
                       </pre>
                     </div>
                   )}
-                  <div className="json-block">
+                  <div>
                     <div className="text-2xs text-text-muted uppercase tracking-label font-semibold mb-1.5">
                       {isCreate
                         ? t('audit_event.detail.created_values')

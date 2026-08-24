@@ -27,8 +27,13 @@ export function LoginForm({ onLoggedIn }: LoginFormProps) {
           locales={SUPPORTED_LOCALES}
         />
       </Box>
-      <form className="center-card" onSubmit={handleSubmit(onLoggedIn)} noValidate>
-        <div className="head">
+      {/* Regenerated from `.center-card` and its two descendant rules (#428). */}
+      <form
+        className="m-auto w-full max-w-98 bg-surface-raised border border-x-line-mid rounded-lg shadow-lg overflow-hidden"
+        onSubmit={handleSubmit(onLoggedIn)}
+        noValidate
+      >
+        <div className="pt-7.5 px-7.5 pb-1 text-center">
           <div className="inline-flex flex-col items-center gap-3">
             <BrandMark size={46} className="text-x-seal" title="NeNe Vault" />
             <div className="font-serif text-2xl font-semibold text-x-ink-deep leading-brand tracking-wordmark whitespace-nowrap">
@@ -36,7 +41,7 @@ export function LoginForm({ onLoggedIn }: LoginFormProps) {
             </div>
           </div>
         </div>
-        <Stack className="body" gap="sm">
+        <Stack className="pt-6 px-7.5 pb-7.5" gap="sm">
           <FormField id="login-email" label={t('auth.login.email_label')} error={emailError}>
             <Input
               type="email"
