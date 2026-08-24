@@ -1,13 +1,18 @@
 {
-  "measuredAt": "2026-08-24T08:48:50.259Z",
+  "measuredAt": "2026-08-24T09:36:40.420Z",
   "productionKitClasses": 0,
   "localKitClasses": 71,
-  "matched": 165,
-  "differing": 24,
-  "unresolved": [
-    "audit / primary button — production matched nothing"
-  ],
+  "matched": 186,
+  "differing": 53,
+  "unresolved": [],
   "rows": [
+    {
+      "screen": "documents",
+      "element": "primary button (Upload)",
+      "property": "font-weight",
+      "production": "600",
+      "local": "500"
+    },
     {
       "screen": "documents",
       "element": "primary button (Upload)",
@@ -27,7 +32,7 @@
       "element": "primary button (Upload)",
       "property": "width",
       "production": "163px",
-      "local": "167px"
+      "local": "166px"
     },
     {
       "screen": "documents",
@@ -35,6 +40,27 @@
       "property": "padding",
       "production": "8px 15px",
       "local": "8px 16px"
+    },
+    {
+      "screen": "documents",
+      "element": "secondary button (Clear)",
+      "property": "font-weight",
+      "production": "600",
+      "local": "500"
+    },
+    {
+      "screen": "documents",
+      "element": "secondary button (Clear)",
+      "property": "color",
+      "production": "oklch(0.24 0.02 256)",
+      "local": "oklch(0.31 0.02 256)"
+    },
+    {
+      "screen": "documents",
+      "element": "secondary button (Clear)",
+      "property": "border-color",
+      "production": "oklch(0.76 0.013 78)",
+      "local": "oklch(0.89 0.009 83)"
     },
     {
       "screen": "documents",
@@ -56,6 +82,13 @@
       "property": "padding",
       "production": "8px 15px",
       "local": "8px 16px"
+    },
+    {
+      "screen": "documents",
+      "element": "submit button (Search)",
+      "property": "font-weight",
+      "production": "600",
+      "local": "500"
     },
     {
       "screen": "documents",
@@ -97,6 +130,167 @@
       "element": "choice label (include voided)",
       "property": "gap",
       "production": "9px",
+      "local": "8px"
+    },
+    {
+      "screen": "audit",
+      "element": "sm button (Previous)",
+      "property": "font-weight",
+      "production": "600",
+      "local": "500"
+    },
+    {
+      "screen": "audit",
+      "element": "sm button (Previous)",
+      "property": "line-height",
+      "production": "18.6px",
+      "local": "16px"
+    },
+    {
+      "screen": "audit",
+      "element": "sm button (Previous)",
+      "property": "color",
+      "production": "oklch(0.24 0.02 256)",
+      "local": "oklch(0.31 0.02 256)"
+    },
+    {
+      "screen": "audit",
+      "element": "sm button (Previous)",
+      "property": "border-color",
+      "production": "oklch(0.76 0.013 78)",
+      "local": "oklch(0.89 0.009 83)"
+    },
+    {
+      "screen": "audit",
+      "element": "sm button (Previous)",
+      "property": "gap",
+      "production": "7px",
+      "local": "8px"
+    },
+    {
+      "screen": "audit",
+      "element": "sm button (Previous)",
+      "property": "width",
+      "production": "73px",
+      "local": "75px"
+    },
+    {
+      "screen": "audit",
+      "element": "sm button (Previous)",
+      "property": "height",
+      "production": "30.5938px",
+      "local": "26px"
+    },
+    {
+      "screen": "audit",
+      "element": "sm button (Previous)",
+      "property": "padding",
+      "production": "5px 11px",
+      "local": "4px 12px"
+    },
+    {
+      "screen": "audit",
+      "element": "sm button (Next)",
+      "property": "font-weight",
+      "production": "600",
+      "local": "500"
+    },
+    {
+      "screen": "audit",
+      "element": "sm button (Next)",
+      "property": "line-height",
+      "production": "18.6px",
+      "local": "16px"
+    },
+    {
+      "screen": "audit",
+      "element": "sm button (Next)",
+      "property": "color",
+      "production": "oklch(0.24 0.02 256)",
+      "local": "oklch(0.31 0.02 256)"
+    },
+    {
+      "screen": "audit",
+      "element": "sm button (Next)",
+      "property": "border-color",
+      "production": "oklch(0.76 0.013 78)",
+      "local": "oklch(0.89 0.009 83)"
+    },
+    {
+      "screen": "audit",
+      "element": "sm button (Next)",
+      "property": "gap",
+      "production": "7px",
+      "local": "8px"
+    },
+    {
+      "screen": "audit",
+      "element": "sm button (Next)",
+      "property": "width",
+      "production": "51px",
+      "local": "52px"
+    },
+    {
+      "screen": "audit",
+      "element": "sm button (Next)",
+      "property": "height",
+      "production": "30.5938px",
+      "local": "26px"
+    },
+    {
+      "screen": "audit",
+      "element": "sm button (Next)",
+      "property": "padding",
+      "production": "5px 11px",
+      "local": "4px 12px"
+    },
+    {
+      "screen": "audit",
+      "element": "secondary button (Clear)",
+      "property": "font-weight",
+      "production": "600",
+      "local": "500"
+    },
+    {
+      "screen": "audit",
+      "element": "secondary button (Clear)",
+      "property": "color",
+      "production": "oklch(0.24 0.02 256)",
+      "local": "oklch(0.31 0.02 256)"
+    },
+    {
+      "screen": "audit",
+      "element": "secondary button (Clear)",
+      "property": "border-color",
+      "production": "oklch(0.76 0.013 78)",
+      "local": "oklch(0.89 0.009 83)"
+    },
+    {
+      "screen": "audit",
+      "element": "secondary button (Clear)",
+      "property": "gap",
+      "production": "7px",
+      "local": "8px"
+    },
+    {
+      "screen": "audit",
+      "element": "primary button (Search)",
+      "property": "font-weight",
+      "production": "600",
+      "local": "500"
+    },
+    {
+      "screen": "audit",
+      "element": "primary button (Search)",
+      "property": "box-shadow",
+      "production": "oklch(0.28 0.02 256 / 0.07) 0px 1px 2px 0px",
+      "local": "none"
+    },
+    {
+      "screen": "audit",
+      "element": "primary button (Search)",
+      "property": "gap",
+      "production": "7px",
       "local": "8px"
     },
     {
@@ -151,6 +345,13 @@
     {
       "screen": "settings",
       "element": "save button",
+      "property": "font-weight",
+      "production": "600",
+      "local": "500"
+    },
+    {
+      "screen": "settings",
+      "element": "save button",
       "property": "box-shadow",
       "production": "oklch(0.28 0.02 256 / 0.07) 0px 1px 2px 0px",
       "local": "none"
@@ -167,7 +368,7 @@
       "element": "save button",
       "property": "width",
       "production": "114px",
-      "local": "116px"
+      "local": "115px"
     },
     {
       "screen": "settings",

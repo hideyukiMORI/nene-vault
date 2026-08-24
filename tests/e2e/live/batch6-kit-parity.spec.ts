@@ -13,11 +13,30 @@ import { seatAdmin } from './_helpers';
  * a scale that does not exist upstream. Six such differences were found this way on
  * 2026-08-23 and three of them were regressions this repo had introduced itself.
  *
- * 🔴 OBSERVATION, NOT PASS/FAIL — with one exception, below. The comparison assumes the
- * production demo is still the current design. That assumption holds for this ship today and
- * will not hold forever: the moment production is the older design, a hard assertion turns
- * this harness into pressure to revert. Same reason `batch5-visual` reports rather than
- * asserts. Another ship pointing this at its own site must check that assumption first.
+ * 🔴 OBSERVATION, NOT PASS/FAIL — with two exceptions, below. Same reason `batch5-visual`
+ * reports rather than asserts.
+ *
+ * 🔴 KNOW WHAT THE REFERENCE IS BEFORE READING A ROW. Production is not "the current design";
+ * it is whatever was last deployed. Measured 2026-08-24, nene-vault's demo still serves
+ * `class="btn btn-primary"` — the component-class era, which ended at `a941a87` on
+ * **2026-07-22**, a month before the kit migration. So a row here can mean any of three
+ * things and the table cannot tell them apart:
+ *
+ *   1. a regression the migration introduced   → fix it (three were, and were)
+ *   2. a change made deliberately since        → expected; the drain rounded 7px gaps to 8px
+ *   3. **a change nobody noticed at the time**  → the interesting one
+ *
+ * The third is why this is worth running even when everything is "fine": the `sm` button's
+ * line-height went 18.6px → 16px at that same drain, because `.btn` had `font: inherit` and
+ * the utility that replaced it carries Tailwind's companion line-height. That has been in
+ * `main` since July and no test noticed, because nothing compared against a rendered page.
+ *
+ * 🔑 Reading a row therefore means finding which build introduced the difference, not
+ * assuming the newer side is wrong. `git log -S` on the value is usually enough.
+ *
+ * ⚠️ A ship pointing this at its own site must establish the same thing first: not "is
+ * production the current design" but "which build is production, and what changed since".
+ * Hard assertions on top of an unexamined reference turn this into pressure to revert.
  *
  * 🔴 The one hard failure is the unstyled build. If the local side renders with none of the
  * kit's classes, every comparison "differs" and the report reads like a redesign instead of a
@@ -116,7 +135,20 @@ const SCREENS: Screen[] = [
     rail: 'Audit Log',
     urlPattern: /\/audit$/,
     probes: [
-      { name: 'primary button', selector: 'button[type="submit"]', props: [...TYPE, ...FILL] },
+      // 🔴 The `sm` size lives here, not on /documents — the pagination is the only place this
+      // product renders one. The first inventory named no `sm` probe at all, so a size whose
+      // difference #398 had already reported was outside the reach of a file whose whole job
+      // is to find differences in buttons. The second attempt put them on /documents behind a
+      // `nav` ancestor that this product's own Pagination does not have, and they resolved to
+      // nothing on both sides — which the report shows as "measured nothing", not as agreement.
+      { name: 'sm button (Previous)', selector: 'button:has-text("Previous")', props: [...TYPE, ...FILL, ...BOX] },
+      { name: 'sm button (Next)', selector: 'button:has-text("Next")', props: [...TYPE, ...FILL, ...BOX] },
+      // ⚠️ Not `button[type="submit"]`. There is no `<form>` on this screen, so production's
+      // buttons are `submit` only because a bare `<button>` defaults to it and the kit's
+      // default is `button`. Inert either way with no form to submit, but it made the probe
+      // resolve on one side and not the other.
+      { name: 'secondary button (Clear)', selector: 'button:has-text("Clear")', props: [...TYPE, ...FILL] },
+      { name: 'primary button (Search)', selector: 'button:has-text("Search")', props: [...TYPE, ...FILL] },
       { name: 'table header cell', selector: 'table thead th', props: [...TYPE, 'padding', 'border-color'] },
       { name: 'table body cell', selector: 'table tbody td', props: [...TYPE, 'padding', 'border-color'] },
     ],
