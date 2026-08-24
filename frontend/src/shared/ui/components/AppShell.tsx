@@ -273,19 +273,42 @@ export function AppShell({
       </aside>
 
       <div className="flex flex-col min-w-0">
-        <header className="topbar">
-          <nav className="crumbs" aria-label={breadcrumbLabel}>
+        {/* Regenerated from the retired `.topbar` / `.topbar .right` component classes (#419).
+            The three values that are not steps of any scale became `@utility` (single
+            declaration each, per the gate in index.css): `--z-topbar`, `--topbar-height`,
+            and `saturate(1.2)`. The rest are utilities on the scale.
+            🔴 `bg-surface-raised/92` is the 92% alpha the old rule wrote as a literal
+            `oklch(99.4% 0.004 83 / 92%)` — the same colour as `--color-surface-raised`. */}
+        <header className="sticky top-0 z-topbar flex items-center gap-4 h-topbar px-7 bg-surface-raised/92 backdrop-saturate-topbar border-b border-border max-md:h-13 max-md:pr-15 max-md:pl-4 max-md:gap-2.5">
+          {/* Regenerated from `.crumbs` / `.crumbs b` (#419 wave 2).
+              🔴 `leading-inherit` is load-bearing, not decoration. The retired rule set a
+              font-size and nothing else, so the line-height was inherited — but the theme
+              overrides only the *value* of `--text-sm` / `--text-xs`, leaving Tailwind's
+              companion `--text-*--line-height` alive, so a bare `text-sm` drags one in
+              (判例40). Without this the bar's text box changes height silently.
+              The `b` rule is written on the two `<b>` elements themselves rather than as a
+              descendant variant: there are only two, and a descendant selector is what this
+              drain exists to remove. */}
+          <nav
+            className="flex items-center gap-2 text-sm leading-inherit text-text-muted min-w-0 max-md:text-xs max-md:leading-inherit max-md:overflow-hidden max-md:whitespace-nowrap max-md:text-ellipsis"
+            aria-label={breadcrumbLabel}
+          >
             {pathname === '/' || leafLabel === '' ? (
-              <b>{navLabels.home}</b>
+              <b className="text-x-ink-deep font-semibold whitespace-nowrap overflow-hidden text-ellipsis">
+                {navLabels.home}
+              </b>
             ) : (
               <>
                 <span>{navLabels.home}</span>
                 <span className="text-text-faint">/</span>
-                <b>{leafLabel}</b>
+                <b className="text-x-ink-deep font-semibold whitespace-nowrap overflow-hidden text-ellipsis">
+                  {leafLabel}
+                </b>
               </>
             )}
           </nav>
-          <div className="right">
+          {/* `.topbar .right` — `ml-auto` is what pushes it to the end of the bar. */}
+          <div className="ml-auto flex items-center gap-3.5 max-md:gap-2">
             <LanguageSwitcher
               label={languageLabel}
               locale={locale}

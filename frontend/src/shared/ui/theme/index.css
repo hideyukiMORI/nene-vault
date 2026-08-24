@@ -56,6 +56,23 @@
   z-index: var(--z-modal);
 }
 
+/* 上部バーの named z-index と高さ。TW4 に z namespace が無いのは `z-modal` と同じ理由で、
+   高さは `--topbar-height` が独自名トークン（段ではない）なので数値 utility では書けない。
+   どちらも単一宣言・子孫なし・擬似要素なし＝`@utility` の歯止め基準を満たす（#419）。 */
+@utility z-topbar {
+  z-index: var(--z-topbar);
+}
+@utility h-topbar {
+  height: var(--topbar-height);
+}
+
+/* `backdrop-filter: saturate(1.2)`。TW4 の `backdrop-saturate-*` は 0/50/100/150/200 の
+   段しか持たず 1.2 が無い。arbitrary は規約⑤で禁止なので @utility 化が正道
+   （page-glow precedent）。単一宣言。 */
+@utility backdrop-saturate-topbar {
+  backdrop-filter: saturate(1.2);
+}
+
 /* drawer slide-in panel width (min() 合成は utility で表現不能＝page-glow precedent）
    ＋ named z-index（TW4 に z namespace 無し・値を実態 90/91 へ是正した --z-scrim/--z-drawer
    を参照。旧 60/70 は dead-on-arrival だった）＋ opacity/visibility の複合 transition。 */
@@ -87,7 +104,23 @@
    （`--text-body` / `--text-2xs` / `--text-touch` は相棒が無いので font-size のみ）。
    font-size だけを指定していた component class を utility へ移すときに素で当てると、
    継承だった line-height が 1.333…/1.4286 に変わる＝silent な paint 変化になる。
-   `--tw-leading` ごと inherit へ倒すので、text-* との記述順に依存しない。 */
+   `--tw-leading` ごと inherit へ倒すので、text-* との記述順に依存しない。
+
+   🔴 **【2026-08-24 実測で訂正】上の「記述順に依存しない」は、素の `text-*` にしか当てはまらない。**
+   `max-md:text-xs` のような **variant 付きの `text-*` には届かない**（#419 波2 で実際に漏れた）。
+
+   機序（生成 CSS を直読みして特定）:
+     `.leading-inherit{--tw-leading:inherit;line-height:inherit}`          … 44,417 バイト目
+     `@media …{ .max-md\:text-xs{…line-height:var(--tw-leading,var(--text-xs--line-height))} }` … 56,550 バイト目
+   詳細度は同じ (0,1,0) で **variant は必ず後段の `@media` に出る**ので、**source order で勝つ**。
+   そして `@property --tw-leading{syntax:"*";inherits:false}` に登録されているため、
+   **`--tw-leading: inherit` は「親から継承する」意味になり、親が未設定なので初期値へ落ちる**
+   ⇒ `var(--tw-leading, <相棒>)` は **fallback を使う**。つまり
+   **直接宣言している `line-height: inherit` の側でしか勝てない。**
+
+   ⇒ **variant 付きの `text-*` を書いたら、同じ variant の `leading-inherit` も書く**
+   （`max-md:text-xs max-md:leading-inherit`）。実測: これで差が 42 → **0** になった
+   （28要素 × 8面 × 全プロパティ = 812項目の突合）。 */
 @utility leading-inherit {
   --tw-leading: inherit;
   line-height: inherit;

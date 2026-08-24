@@ -171,40 +171,6 @@
     }
 
     /* ---- main column ---- */
-    .topbar {
-      position: sticky;
-      top: 0;
-      z-index: var(--z-topbar);
-      display: flex;
-      align-items: center;
-      gap: 16px;
-      height: var(--topbar-height);
-      padding: 0 28px;
-      background: oklch(99.4% 0.004 83 / 92%);
-      backdrop-filter: saturate(1.2);
-      border-bottom: 1px solid var(--color-border);
-    }
-    .crumbs {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      font-size: var(--text-sm);
-      color: var(--color-text-muted);
-      min-width: 0;
-    }
-    .crumbs b {
-      color: var(--color-x-ink-deep);
-      font-weight: 600;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-    .topbar .right {
-      margin-left: auto;
-      display: flex;
-      align-items: center;
-      gap: 14px;
-    }
     .env {
       display: inline-flex;
       align-items: center;
@@ -740,23 +706,6 @@
         color: oklch(76% 0.1 77);
         font-weight: 700;
         --rail-icon-op: 1;
-      }
-
-      /* top app bar */
-      .topbar {
-        height: 52px;
-        padding: 0 60px 0 16px; /* reserve right space for the logout button */
-        gap: 10px;
-      }
-      .crumbs {
-        font-size: var(--text-xs);
-        min-width: 0;
-        overflow: hidden;
-        white-space: nowrap;
-        text-overflow: ellipsis;
-      }
-      .topbar .right {
-        gap: 8px;
       }
       .lang {
         font-size: 0;
