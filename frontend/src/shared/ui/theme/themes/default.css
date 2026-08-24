@@ -239,7 +239,12 @@
 
   /* Button gap. 0.13.0 gave `Button` `inline-flex` and a gap of its own, which is what the
      upload button was writing at its call site (#398). The old value was 7px; `2xs` is 8px,
-     the nearest step, and it is what that call site already used. */
+     the nearest step, and it is what that call site already used.
+
+     🟢 A preference, not a repair. The kit ships a default of `3xs` (4px) — this line is an
+     override, and removing it renders at 4px rather than at nothing. Stated because the
+     slot below it is the opposite case, and a reader skimming two adjacent overrides will
+     otherwise read them as the same kind of thing. */
   --spacing-x-slot-button-gap: var(--spacing-x-2xs);
 
   /* Alert padding, composed — the old rule was 13px vertical and 15px horizontal, and one
@@ -273,8 +278,13 @@
 
   /* `sm` buttons shipped one step below `md` here — `text-xs`, 0.75rem. Until 0.13.0 the kit
      had one font slot against two padding slots, so both sizes rendered alike; the slot pair
-     is symmetric now (#398). The kit's default is `inherit`, which would put `sm` at body
-     size — larger than `md`. */
+     is symmetric now (#398).
+
+     🔴 Required here, and the reason is conditional. Both slots default to `inherit`, so a
+     product that overrides neither gets one size for both and nothing is wrong. The
+     inversion needs a product that overrides `md` and not `sm` — which is this one, three
+     lines up. Then `md` is 13px and `sm` inherits the 14px body: the smaller button renders
+     larger. Deleting this line is what produces that, not the kit's default on its own. */
   --text-x-slot-button-sm-size: var(--text-xs);
 
   --spacing-x-slot-control-pad-y: var(--spacing-x-2xs);
