@@ -1,8 +1,7 @@
-import { Box, Button, Stack } from '@hideyukimori/nene2-ui';
+import { Box, Button, Modal, Stack } from '@hideyukimori/nene2-ui';
 import { useRestoreDocument } from '@/entities/document';
 import { messageKeyForError } from '@/shared/i18n/map-problem-details';
 import { useTranslation } from '@/shared/i18n/use-translation';
-import { Modal } from '@/shared/ui/components/Modal';
 
 interface RestoreModalProps {
   documentId: string;
@@ -19,6 +18,9 @@ export function RestoreModal({ documentId, onClose }: RestoreModalProps) {
 
   return (
     <Modal
+      open
+      header
+      size="sm"
       title={t('document.restore.title')}
       onClose={onClose}
       closeLabel={t('common.buttons.close')}

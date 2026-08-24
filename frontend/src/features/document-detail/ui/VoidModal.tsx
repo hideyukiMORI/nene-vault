@@ -1,7 +1,14 @@
-import { Button, FormField, InlineAlert, Input, Stack, Textarea } from '@hideyukimori/nene2-ui';
+import {
+  Button,
+  FormField,
+  InlineAlert,
+  Input,
+  Modal,
+  Stack,
+  Textarea,
+} from '@hideyukimori/nene2-ui';
 import { useTranslation } from '@/shared/i18n/use-translation';
 import { fieldErrorText } from '@/shared/i18n/validation-keys';
-import { Modal } from '@/shared/ui/components/Modal';
 import { useVoidDocumentForm } from '../model/use-void-document';
 
 interface VoidModalProps {
@@ -19,6 +26,9 @@ export function VoidModal({ documentId, onClose }: VoidModalProps) {
 
   return (
     <Modal
+      open
+      header
+      size="sm"
       title={t('document.void.title')}
       onClose={onClose}
       closeLabel={t('common.buttons.close')}

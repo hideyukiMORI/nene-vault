@@ -1,7 +1,6 @@
-import { Button, FormField, Grid, Input, Select, Stack } from '@hideyukimori/nene2-ui';
+import { Button, FormField, Grid, Input, Modal, Select, Stack } from '@hideyukimori/nene2-ui';
 import { useTranslation } from '@/shared/i18n/use-translation';
 import { fieldErrorText } from '@/shared/i18n/validation-keys';
-import { Modal } from '@/shared/ui/components/Modal';
 import type { VaultDocument } from '@/entities/document';
 import { useMetadataEditForm } from '../model/use-metadata-edit';
 import type { OcrPrefill } from '../model/use-metadata-edit';
@@ -28,6 +27,8 @@ export function MetadataEditModal({ doc, onClose, ocrPrefill }: MetadataEditModa
 
   return (
     <Modal
+      open
+      header
       title={t('document.metadata_edit.title')}
       onClose={onClose}
       size="md"
