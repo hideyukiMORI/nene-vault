@@ -21,7 +21,7 @@ The following documents exist now and must be read before contributing:
 | Sibling product boundaries | `docs/integrations/sibling-products.md` |
 | Workflow | `docs/workflow.md` |
 | Roadmap | `docs/roadmap.md` |
-| Current work | `docs/todo/current.md` |
+| Current work | private `nene-origin/internal-docs/vault/todo/current.md` |
 
 The following documents are also available:
 
@@ -48,7 +48,8 @@ Follow [`docs/workflow.md`](workflow.md) — inherited from [NENE2](https://gith
 4. Push, open PR with `Closes #number`, merge after checks — **do not push directly to `main`**.
 
 - Use one branch and one PR per focused work unit.
-- Keep `docs/milestones/`, `docs/roadmap.md`, and `docs/todo/current.md` updated when direction changes.
+- Keep `docs/milestones/` and `docs/roadmap.md` updated when direction changes, and the
+  current work board in the private `nene-origin/internal-docs/vault/todo/current.md`.
 - Explain intent, impact, verification, and remaining risk in PRs.
 - Prefer documentation that helps the next developer or AI agent decide what to do without rereading chat history.
 

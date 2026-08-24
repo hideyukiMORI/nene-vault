@@ -7,7 +7,8 @@ See also: `docs/inheritance-from-nene2.md`.
 ## Standard Flow
 
 1. Create or reuse a focused GitHub Issue.
-2. Confirm context in `docs/roadmap.md`, `docs/milestones/`, and `docs/todo/current.md`.
+2. Confirm context in `docs/roadmap.md`, `docs/milestones/`, and the current work board
+   (private `nene-origin/internal-docs/vault/todo/current.md`).
 3. Create a branch from `main` named like `type/issue-number-summary`.
 4. Implement the smallest useful change.
 5. Update docs, roadmap, milestone, or TODO files when the decision or state changes.
@@ -45,7 +46,10 @@ Do not commit directly to `main`.
 
 - `docs/roadmap.md`: long-lived direction and phases
 - `docs/milestones/`: medium-sized goals and acceptance criteria
-- `docs/todo/current.md`: current task board and handoff notes
+- private `nene-origin/internal-docs/vault/todo/current.md`: current task board and handoff
+  notes. 🔴 Not in this repo — the operational logs (todo, daily) moved to the private
+  receptacle in #267 (P3), and this line pointed at the empty path for 37 days afterwards
+  (#380). If a path here does not resolve, that is the bug, not your checkout.
 - `docs/adr/`: major architecture decisions
 - `docs/inheritance-from-nene2.md`: NENE2 governance inheritance map
 
@@ -72,4 +76,5 @@ If a user explicitly says investigation only, no commit, no PR, or another narro
 
 ## Initial Issues Backlog
 
-Use GitHub Issues for all work. Current work board: `docs/todo/current.md`. No direct `main` commits.
+Use GitHub Issues for all work. Current work board: private
+`nene-origin/internal-docs/vault/todo/current.md`. No direct `main` commits.
