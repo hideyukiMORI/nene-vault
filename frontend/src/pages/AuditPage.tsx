@@ -1,6 +1,7 @@
 import {
   Button,
   Card,
+  DetailList,
   EmptyState,
   FormField,
   Grid,
@@ -245,26 +246,42 @@ function AuditDetailDrawer({ event, open, onClose }: DrawerProps) {
             </div>
 
             <div className="overflow-auto flex-1 pt-5 px-5.5 pb-7">
-              <dl className="grid grid-cols-2 gap-x-5.5 gap-y-3.25 pb-4.5 border-b border-border mb-4.5 max-md:grid-cols-1 max-md:gap-3 [&_dt]:text-2xs [&_dt]:text-text-muted [&_dt]:uppercase [&_dt]:tracking-meta [&_dt]:font-semibold [&_dt]:mb-0.75 [&_dd]:text-sm [&_dd]:leading-inherit [&_dd]:text-x-ink-deep">
-                <div>
-                  <dt>{t('audit_event.list.table.actor')}</dt>
-                  <dd className="font-mono zero-slash">
-                    {event.actor_user_id !== null ? String(event.actor_user_id) : '—'}
-                  </dd>
-                </div>
-                <div>
-                  <dt>{t('audit_event.list.table.timestamp')}</dt>
-                  <dd className="font-mono zero-slash">
-                    {formatDateTime(event.created_at, locale)}
-                  </dd>
-                </div>
-                <div className="col-span-2 max-md:col-auto">
-                  <dt>{t('audit_event.detail.entity')}</dt>
-                  <dd className="font-mono zero-slash label-xs break-all">
-                    {event.entity_type}/{event.entity_id}
-                  </dd>
-                </div>
-              </dl>
+              <div className="mb-4.5">
+                <DetailList
+                  layout="columns"
+                  rows={[
+                    {
+                      label: t('audit_event.list.table.actor'),
+                      value: (
+                        <span className="font-mono zero-slash">
+                          {event.actor_user_id !== null ? String(event.actor_user_id) : '—'}
+                        </span>
+                      ),
+                    },
+                    {
+                      label: t('audit_event.list.table.timestamp'),
+                      value: (
+                        <span className="font-mono zero-slash">
+                          {formatDateTime(event.created_at, locale)}
+                        </span>
+                      ),
+                    },
+                  ]}
+                />
+                {/* Full-width row (entity path can be long); `.label-xs` was a dead class (#350). */}
+                <DetailList
+                  rows={[
+                    {
+                      label: t('audit_event.detail.entity'),
+                      value: (
+                        <span className="font-mono zero-slash break-all">
+                          {event.entity_type}/{event.entity_id}
+                        </span>
+                      ),
+                    },
+                  ]}
+                />
+              </div>
 
               <div className="flex items-center justify-between gap-3 mb-3.5">
                 <span className="text-body font-semibold tracking-tight text-x-ink-deep flex items-center gap-2.25">
@@ -493,7 +510,7 @@ export function AuditPage() {
                       <td className="pri">
                         {t(dynamicMessageKey(`audit_event.action.${event.action}`))}
                       </td>
-                      <td className="text-text-muted font-mono zero-slash label-xs">
+                      <td className="text-text-muted font-mono zero-slash">
                         {event.entity_type}/{event.entity_id}
                       </td>
                       <td className="text-text-muted">
