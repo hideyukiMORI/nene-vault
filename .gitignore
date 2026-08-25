@@ -10,3 +10,6 @@
 .phpunit.result.cache
 /storage/vault/
 docs/qa/screenshots/*.png
+
+# Owner-review material (#439): per-wave, disposable. The generator and README stay.
+docs/qa/owner-review/*/
