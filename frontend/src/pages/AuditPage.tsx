@@ -6,6 +6,7 @@ import {
   Grid,
   InlineAlert,
   Input,
+  Pagination,
   Stack,
 } from '@hideyukimori/nene2-ui';
 import { dynamicMessageKey } from '@/shared/i18n/catalogs';
@@ -17,7 +18,6 @@ import { authStore } from '@/shared/api/auth-session';
 import { useTranslation } from '@/shared/i18n/use-translation';
 import { formatDateTime } from '@/shared/lib/format';
 import { AppChrome } from '@/features/app-chrome';
-import { Pagination } from '@/shared/ui/components/Pagination';
 
 const PAGE_SIZE = 20;
 
@@ -518,24 +518,30 @@ export function AuditPage() {
               </table>
             </div>
           )}
-          <Pagination
-            total={total}
-            canPrev={offset > 0}
-            canNext={offset + PAGE_SIZE < total}
-            onPrev={() => {
-              setOffset((o) => Math.max(0, o - PAGE_SIZE));
-            }}
-            onNext={() => {
-              setOffset((o) => o + PAGE_SIZE);
-            }}
-            showingLabel={t('common.pagination.showing', {
-              from: String(offset + 1),
-              to: String(Math.min(offset + PAGE_SIZE, total)),
-              total: String(total),
-            })}
-            previousLabel={t('common.buttons.previous')}
-            nextLabel={t('common.buttons.next')}
-          />
+          {total > 0 && (
+            <Pagination
+              label={t('common.pagination.label')}
+              className="px-4 py-3 border-t border-border text-xs leading-inherit text-text-muted"
+              size="sm"
+              stackOnMobile
+              statusPlacement="start"
+              canPrev={offset > 0}
+              canNext={offset + PAGE_SIZE < total}
+              onPrev={() => {
+                setOffset((o) => Math.max(0, o - PAGE_SIZE));
+              }}
+              onNext={() => {
+                setOffset((o) => o + PAGE_SIZE);
+              }}
+              status={t('common.pagination.showing', {
+                from: String(offset + 1),
+                to: String(Math.min(offset + PAGE_SIZE, total)),
+                total: String(total),
+              })}
+              previousLabel={t('common.buttons.previous')}
+              nextLabel={t('common.buttons.next')}
+            />
+          )}
         </Card>
       )}
 

@@ -40,6 +40,7 @@
       "empty": "データがありません"
     },
     "pagination": {
+      "label": "ページ送り",
       "items_per_page": "件/ページ",
       "showing": "{{from}}〜{{to}}件を表示（全{{total}}件）",
       "no_items": "0件"
