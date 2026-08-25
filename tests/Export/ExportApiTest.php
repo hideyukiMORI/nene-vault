@@ -171,6 +171,19 @@ final class ExportApiTest extends TestCase
         $this->assertSame('15000', $matched[$amountCol], 'numeric amount must stay un-neutralised');
     }
 
+    public function test_export_rejects_reversed_date_range(): void
+    {
+        $handler = $this->handler();
+
+        $response = $handler->handle($this->jsonRequest('POST', '/admin/vault/export', [
+            'transaction_date_from' => '2026-12-31',
+            'transaction_date_to' => '2026-01-01',
+        ]));
+
+        $this->assertSame(422, $response->getStatusCode(), (string) $response->getBody());
+        $this->assertStringContainsString('transaction_date_from', (string) $response->getBody());
+    }
+
     public function test_export_requires_auth(): void
     {
         $response = $this->handler()->handle($this->jsonRequest('POST', '/admin/vault/export', [], auth: false));
