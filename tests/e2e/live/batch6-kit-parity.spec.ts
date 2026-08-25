@@ -19,8 +19,8 @@ import { seatAdmin } from './_helpers';
  * 🔴 KNOW WHAT THE REFERENCE IS BEFORE READING A ROW. Production is not "the current design";
  * it is whatever was last deployed. Until 2026-08-25 that was the build of `97da1e0`
  * (2026-07-12 — the component-class era, `class="btn btn-primary"`), a month before the kit
- * migration. Production was `6da5eb0` (0.9.1) from 2026-08-25 20:22:53 and is **`d2f0920` (0.9.2)
- * since 2026-08-26 00:48:34 JST** — W1b, with this product's look restored over the kit through slot
+ * migration. Production was `6da5eb0` (0.9.1) from 2026-08-25 20:22:53, `d2f0920` (0.9.2) from
+ * 2026-08-26 00:48:34, and is **`c6890e4` (0.9.2.1, nene2-ui 0.17.1) since 2026-08-26 01:32:50 JST** — W1b, with this product's look restored over the kit through slot
  * values and `className` (#466). The two columns compare the same generation until the next wave.
  * A row here can mean any of three things and the table cannot tell them apart:
  *
