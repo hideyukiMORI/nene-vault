@@ -458,7 +458,11 @@ test('FEATURE-SWEEP: one happy + one failure path per feature, on production', a
     '一覧 → Action で絞り込み（voided）',
     'audit-ok',
     async () => {
-      await page.locator('table tbody tr').first().waitFor({ timeout: 20_000 });
+      // The list re-renders once after its first paint (loading → rows); a count taken in
+      // between reads 0 (measured locally 2026-08-25). Poll instead of counting once.
+      await expect
+        .poll(() => page.locator('table tbody tr').count(), { timeout: 20_000 })
+        .toBeGreaterThan(0);
       const before = await page.locator('table tbody tr').count();
       const action = page.locator('#audit-filter-action').first();
       await action.fill('document.voided'); // exact match on the stored action (measured)
