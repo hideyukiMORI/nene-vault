@@ -35,9 +35,15 @@ export function ExportPage() {
   }
 
   async function handleExport() {
-    setIsExporting(true);
     setExportError(null);
     setExportSuccess(false);
+    // #452: a reversed range used to go straight to the API and come back as an empty manifest —
+    // "downloaded", nothing in it, no hint why. ISO dates compare as strings.
+    if (dateFrom !== '' && dateTo !== '' && dateFrom > dateTo) {
+      setExportError(t('export.errors.date_range'));
+      return;
+    }
+    setIsExporting(true);
 
     try {
       // Go through the shared API client (via the entity hook) so the request
