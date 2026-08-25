@@ -129,6 +129,39 @@ the next section, by reconciling the database against the files — which is als
 what catches the empty-backup case, since zero rows cannot account for the files
 on disk.
 
+## MySQL on shared hosting (pre-deploy dump)
+
+The public demo (`DB_ADAPTER=mysql`) is the one install that is not SQLite. Take a
+manual dump before every deploy; the DB user on shared hosting has no `PROCESS`
+privilege, so **`--no-tablespaces` is required** or `mysqldump` prints an
+`Access denied … PROCESS privilege` line (the dump is still complete, but the
+non-zero exit makes a scripted run look failed — measured 2026-08-25 on HETEML).
+
+```bash
+# credentials never reach stdout or `ps`: a 0600 defaults file read from .env
+umask 077
+CNF=~/.my-vault-cnf-$$            # HETEML has no mktemp
+printf '[client]\nuser=%s\npassword=%s\nhost=%s\n' \
+  "$(grep ^DB_USER= .env | cut -d= -f2-)" \
+  "$(grep ^DB_PASSWORD= .env | cut -d= -f2-)" \
+  "$(grep ^DB_HOST= .env | cut -d= -f2-)" > "$CNF"
+OUT=~/backups/vault-pre-<version>-$(date +%Y%m%d-%H%M%S).sql.gz
+mysqldump --defaults-extra-file="$CNF" --single-transaction --no-tablespaces \
+  --routines --triggers "$(grep ^DB_NAME= .env | cut -d= -f2-)" | gzip > "$OUT"
+rm -f "$CNF"
+```
+
+Verify four things before deploying — a dump that exists is not a dump that works:
+
+1. `gzip -t "$OUT"` — readable archive
+2. `zcat "$OUT" | head -3 | grep -q 'MySQL dump'` — a real dump header
+3. `CREATE TABLE` present for `organizations users vault_documents document_versions audit_events phinxlog`
+4. `phinxlog` row count equals the number of files in `database/migrations` (pending migrations
+   show up here as a mismatch, before `phinx status` is ever run)
+
+Shared hosting also lacks `sha256sum` and `df`; verify an uploaded release ZIP with
+`php8.4 -r 'echo hash_file("sha256", "nene-vault-<version>.zip");'` against the sidecar.
+
 ### File backup
 
 Copy the entire storage directory:
