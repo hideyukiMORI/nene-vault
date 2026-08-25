@@ -460,10 +460,19 @@ test('FEATURE-SWEEP: one happy + one failure path per feature, on production', a
     async () => {
       // The list re-renders once after its first paint (loading → rows); a count taken in
       // between reads 0 (measured locally 2026-08-25). Poll instead of counting once.
-      await expect
-        .poll(() => page.locator('table tbody tr').count(), { timeout: 20_000 })
-        .toBeGreaterThan(0);
-      const before = await page.locator('table tbody tr').count();
+      // …and it can re-render more than once, so wait until two reads 300ms apart agree and
+      // are both > 0 rather than trusting the first non-zero count.
+      const stableRows = async (): Promise<number> => {
+        let prev = -1;
+        for (let i = 0; i < 40; i++) {
+          const n = await page.locator('table tbody tr').count();
+          if (n > 0 && n === prev) return n;
+          prev = n;
+          await page.waitForTimeout(300);
+        }
+        return prev;
+      };
+      const before = await stableRows();
       const action = page.locator('#audit-filter-action').first();
       await action.fill('document.voided'); // exact match on the stored action (measured)
       await page.getByRole('button', { name: 'Search', exact: true }).click();
