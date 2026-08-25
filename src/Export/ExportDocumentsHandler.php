@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace NeneVault\Export;
 
 use Nene2\Http\JsonRequestBodyParser;
+use Nene2\Validation\ValidationError;
+use Nene2\Validation\ValidationException;
 use NeneVault\Auth\RequestContext;
 use Psr\Http\Message\ResponseFactoryInterface;
 use Psr\Http\Message\ResponseInterface;
@@ -39,6 +41,18 @@ final readonly class ExportDocumentsHandler
             actorUserId: $actorUserId,
             format: $format,
         );
+
+        // #452: a reversed range is a mistake, not a query — refuse it instead of exporting nothing.
+        if ($input->transactionDateFrom !== null && $input->transactionDateTo !== null
+            && $input->transactionDateFrom > $input->transactionDateTo) {
+            throw new ValidationException([
+                new ValidationError(
+                    'transaction_date_from',
+                    'transaction_date_from must be on or before transaction_date_to.',
+                    'invalid_range',
+                ),
+            ]);
+        }
 
         $output = $this->useCase->execute($input);
 

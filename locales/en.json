@@ -441,6 +441,9 @@
     }
   },
   "export": {
+    "errors": {
+      "date_range": "The From date must be on or before the To date."
+    },
     "title": "Export Documents",
     "description": "Download documents for a date range as a ZIP file and a manifest CSV.",
     "form": {
