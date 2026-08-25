@@ -2,6 +2,8 @@ import {
   Badge,
   Button,
   Card,
+  type DataColumn,
+  DataTable,
   EmptyState,
   FormField,
   InlineAlert,
@@ -131,39 +133,43 @@ function UserFormModal({ onClose }: { onClose: () => void }) {
   );
 }
 
-function UserRow({
-  user,
-  currentUserId,
-  onDelete,
-}: {
-  user: User;
-  currentUserId: number | null;
-  onDelete: (id: number, email: string) => void;
-}) {
-  const { t } = useTranslation();
-  return (
-    <tr>
-      <td className="cell-title">
-        <span className="pri">{user.email}</span>
-      </td>
-      <td data-label={t('user.list.table.role')}>{t(`user.role.${user.role}`)}</td>
-      <td data-label={t('user.list.table.status')}>
+function userColumns(
+  t: ReturnType<typeof useTranslation>['t'],
+  currentUserId: number | null,
+  onDelete: (id: number, email: string) => void,
+): DataColumn<User>[] {
+  return [
+    {
+      key: 'email',
+      header: t('user.list.table.email'),
+      cell: (user) => <span className="font-semibold text-x-ink-deep">{user.email}</span>,
+    },
+    { key: 'role', header: t('user.list.table.role'), cell: (user) => t(`user.role.${user.role}`) },
+    {
+      key: 'status',
+      header: t('user.list.table.status'),
+      cell: (user) => (
         <Badge tone={user.status === 'active' ? 'success' : 'neutral'} className={BADGE_DOT}>
           {t(`user.status.${user.status}`)}
         </Badge>
-      </td>
-      <td
-        className="text-text-muted font-mono zero-slash"
-        data-label={t('user.list.table.created_at')}
-      >
-        {user.created_at.slice(0, 10)}
-      </td>
-      <td data-label={t('user.list.table.actions')}>
-        {user.id !== currentUserId && (
+      ),
+    },
+    {
+      key: 'created_at',
+      header: t('user.list.table.created_at'),
+      cell: (user) => (
+        <span className="text-text-muted font-mono zero-slash">{user.created_at.slice(0, 10)}</span>
+      ),
+    },
+    {
+      key: 'actions',
+      header: t('user.list.table.actions'),
+      cell: (user) =>
+        user.id !== currentUserId ? (
           <button
             type="button"
             /* `.link.is-danger` was one rule overriding the colour; the override is just the later
-   utility here (#428). */
+               utility here (#428). */
             className="text-accent bg-none border-0 cursor-pointer text-sm leading-inherit no-underline hover:text-x-navy-deep hover:underline hover:underline-offset-2 text-danger"
             onClick={() => {
               onDelete(user.id, user.email);
@@ -171,10 +177,9 @@ function UserRow({
           >
             {t('common.buttons.delete')}
           </button>
-        )}
-      </td>
-    </tr>
-  );
+        ) : null,
+    },
+  ];
 }
 
 export function UsersPage() {
@@ -231,28 +236,14 @@ export function UsersPage() {
           {users.length === 0 ? (
             <EmptyState message={t('user.list.empty')} />
           ) : (
-            <div className="tbl-wrap">
-              <table className="tbl tbl-cards">
-                <thead>
-                  <tr>
-                    <th>{t('user.list.table.email')}</th>
-                    <th>{t('user.list.table.role')}</th>
-                    <th>{t('user.list.table.status')}</th>
-                    <th>{t('user.list.table.created_at')}</th>
-                    <th>{t('user.list.table.actions')}</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {users.map((user) => (
-                    <UserRow
-                      key={user.id}
-                      user={user}
-                      currentUserId={currentUserId}
-                      onDelete={handleDelete}
-                    />
-                  ))}
-                </tbody>
-              </table>
+            <div className="overflow-x-auto">
+              <DataTable
+                columns={userColumns(t, currentUserId, handleDelete)}
+                rows={users}
+                rowKey={(user) => String(user.id)}
+                caption={t('user.list.title')}
+                collapse="sm"
+              />
             </div>
           )}
           {total > 0 && (
