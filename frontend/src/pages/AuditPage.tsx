@@ -17,6 +17,7 @@ import { useAuditEvents, diffAuditEvent, formatAuditValue } from '@/entities/aud
 import type { ListAuditEventsParams, AuditEvent, AuditDiffField } from '@/entities/audit';
 import { authStore } from '@/shared/api/auth-session';
 import { useTranslation } from '@/shared/i18n/use-translation';
+import { PAGINATION_CHROME } from '@/shared/ui/primitives/paginationChrome';
 import { formatDateTime } from '@/shared/lib/format';
 import { AppChrome } from '@/features/app-chrome';
 
@@ -538,9 +539,8 @@ export function AuditPage() {
           {total > 0 && (
             <Pagination
               label={t('common.pagination.label')}
-              className="px-4 py-3 border-t border-border text-xs leading-inherit text-text-muted"
+              className={PAGINATION_CHROME}
               size="sm"
-              stackOnMobile
               statusPlacement="start"
               canPrev={offset > 0}
               canNext={offset + PAGE_SIZE < total}

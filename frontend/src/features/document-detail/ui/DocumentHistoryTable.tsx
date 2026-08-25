@@ -1,6 +1,7 @@
 import { DataTable, type DataColumn } from '@hideyukimori/nene2-ui';
 import { dynamicMessageKey } from '@/shared/i18n/catalogs';
 import { useTranslation } from '@/shared/i18n/use-translation';
+import { TABLE_CARDS, TABLE_CHROME } from '@/shared/ui/primitives/tableChrome';
 import { formatDateTime } from '@/shared/lib/format';
 import type { AuditEvent } from '@/entities/audit';
 
@@ -66,6 +67,7 @@ export function DocumentHistoryTable({ events }: DocumentHistoryTableProps) {
   return (
     <div className="overflow-x-auto">
       <DataTable
+        className={`${TABLE_CHROME} ${TABLE_CARDS}`}
         columns={columns}
         rows={events}
         rowKey={(event) => String(event.id)}

@@ -1,7 +1,12 @@
 import { Badge, DataTable, EmptyState, type DataColumn } from '@hideyukimori/nene2-ui';
 import { useTranslation } from '@/shared/i18n/use-translation';
+import {
+  TABLE_CARDS,
+  TABLE_CHROME,
+  TABLE_CARD_TITLE_COL2,
+} from '@/shared/ui/primitives/tableChrome';
 import { formatJpy, formatDate } from '@/shared/lib/format';
-import { BADGE_DOT } from '@/shared/ui/primitives/badgeBase';
+import { BADGE_CHROME } from '@/shared/ui/primitives/badgeBase';
 import type { VaultDocument } from '@/entities/document';
 
 interface DocumentTableProps {
@@ -59,7 +64,7 @@ export function DocumentTable({ documents, onSelectDocument }: DocumentTableProp
       key: 'status',
       header: t('document.list.table.status'),
       cell: (doc) => (
-        <Badge tone={doc.status === 'voided' ? 'danger' : 'success'} className={BADGE_DOT}>
+        <Badge tone={doc.status === 'voided' ? 'danger' : 'success'} className={BADGE_CHROME}>
           {t(`document.status.${doc.status}`)}
         </Badge>
       ),
@@ -92,6 +97,7 @@ export function DocumentTable({ documents, onSelectDocument }: DocumentTableProp
   return (
     <div className="overflow-x-auto">
       <DataTable
+        className={`${TABLE_CHROME} ${TABLE_CARDS} ${TABLE_CARD_TITLE_COL2}`}
         columns={columns}
         rows={documents}
         rowKey={(doc) => doc.id}
