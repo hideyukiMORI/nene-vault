@@ -13,3 +13,6 @@ docs/qa/screenshots/*.png
 
 # Owner-review material (#439): per-wave, disposable. The generator and README stay.
 docs/qa/owner-review/*/
+
+# Feature-sweep material (#450): per-run, disposable.
+docs/qa/feature-sweep/*/
