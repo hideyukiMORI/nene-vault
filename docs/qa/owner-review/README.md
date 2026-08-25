@@ -37,7 +37,7 @@ org is minted per side per run; the viewport is switched on the same page.
 
 | column | is |
 | --- | --- |
-| **production** | whatever `vault.ayane.co.jp` served at run time — **not "the current design"**. Establish which build that is before reading a row (from 2026-08-25 20:22:53 JST: `6da5eb0`, 0.9.1; before that: `97da1e0`, 2026-07-12) |
+| **production** | whatever `vault.ayane.co.jp` served at run time — **not "the current design"**. Establish which build that is before reading a row (from 2026-08-26 00:48:34 JST: `d2f0920`, 0.9.2; 2026-08-25: `6da5eb0`, 0.9.1; before that: `97da1e0`, 2026-07-12) |
 | **local** | the build named in `meta.json` (`local HEAD`, `local nene2-ui`) |
 
 Content differs between the columns by design (each side has its own disposable org):
@@ -54,7 +54,10 @@ that could not be reached is a finding, not a blank.
 
 The owner's verdict is **GO / NG per screen, on the wave's tracking issue** (for W1: #439),
 with the `meta.json` values (`local HEAD`, kit version, production build) quoted so the
-verdict is tied to what was looked at. An NG becomes an issue on this repo or on the kit —
+verdict is tied to what was looked at. Expect a NG round: W1b's first bundle came back GO 4 /
+NG 3 because the kit's default look replaced this product's; the fix was slot values and
+`className`, not a revert — ship those *with* the migration next time (see `tableChrome.ts`,
+`badgeBase.ts`, `paginationChrome.ts`). An NG becomes an issue on this repo or on the kit —
 not a special case on the screen (DoD step 3).
 
 ## Guards

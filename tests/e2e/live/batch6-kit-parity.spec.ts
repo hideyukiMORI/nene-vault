@@ -19,8 +19,9 @@ import { seatAdmin } from './_helpers';
  * 🔴 KNOW WHAT THE REFERENCE IS BEFORE READING A ROW. Production is not "the current design";
  * it is whatever was last deployed. Until 2026-08-25 that was the build of `97da1e0`
  * (2026-07-12 — the component-class era, `class="btn btn-primary"`), a month before the kit
- * migration. **Since 2026-08-25 20:22:53 JST production is `6da5eb0` (0.9.1)**, the kit
- * build itself, so the two columns compare the same generation until the next wave deploys.
+ * migration. Production was `6da5eb0` (0.9.1) from 2026-08-25 20:22:53 and is **`d2f0920` (0.9.2)
+ * since 2026-08-26 00:48:34 JST** — W1b, with this product's look restored over the kit through slot
+ * values and `className` (#466). The two columns compare the same generation until the next wave.
  * A row here can mean any of three things and the table cannot tell them apart:
  *
  *   1. a regression the migration introduced   → fix it (three were, and were)
@@ -120,8 +121,16 @@ const SCREENS: Screen[] = [
     rail: 'Received Documents',
     urlPattern: /\/documents$/,
     probes: [
-      { name: 'primary button (Upload)', selector: 'button:has-text("Upload Document")', props: [...TYPE, ...FILL, ...BOX] },
-      { name: 'secondary button (Clear)', selector: 'button:has-text("Clear")', props: [...TYPE, ...FILL, ...BOX] },
+      {
+        name: 'primary button (Upload)',
+        selector: 'button:has-text("Upload Document")',
+        props: [...TYPE, ...FILL, ...BOX],
+      },
+      {
+        name: 'secondary button (Clear)',
+        selector: 'button:has-text("Clear")',
+        props: [...TYPE, ...FILL, ...BOX],
+      },
       // ⚠️ Not `button[type="submit"]`. Production has **zero** of them on this screen
       // (measured 2026-08-25): its pre-migration Button set no `type`, and a bare `<button>`
       // defaults to `submit` only as an *IDL* value — `[type="submit"]` matches the attribute,
@@ -130,13 +139,29 @@ const SCREENS: Screen[] = [
       // product's Search button against whatever the auto-wait eventually settled on.
       // 🔑 A probe that resolves on only one side does not report as unresolved — it reports
       // as a difference. Match on the text, which is the same object on both sides.
-      { name: 'primary button (Search)', selector: 'button:has-text("Search")', props: [...TYPE, ...FILL, ...BOX] },
-      { name: 'search text input', selector: 'input[type="text"]', props: [...TYPE, ...FILL, ...BOX] },
+      {
+        name: 'primary button (Search)',
+        selector: 'button:has-text("Search")',
+        props: [...TYPE, ...FILL, ...BOX],
+      },
+      {
+        name: 'search text input',
+        selector: 'input[type="text"]',
+        props: [...TYPE, ...FILL, ...BOX],
+      },
       { name: 'search select', selector: 'select', props: [...TYPE, ...FILL, ...BOX] },
-      { name: 'choice label (include voided)', selector: 'label:has(input[type="checkbox"])', props: [...TYPE, ...FILL] },
+      {
+        name: 'choice label (include voided)',
+        selector: 'label:has(input[type="checkbox"])',
+        props: [...TYPE, ...FILL],
+      },
       { name: 'choice box', selector: 'input[type="checkbox"]', props: [...BOX, 'accent-color'] },
       { name: 'field label', selector: 'form label:not(:has(input))', props: TYPE },
-      { name: 'rail nav (own markup — control row)', selector: 'nav.rail-nav', props: [...FILL, 'width'] },
+      {
+        name: 'rail nav (own markup — control row)',
+        selector: 'nav.rail-nav',
+        props: [...FILL, 'width'],
+      },
       // 🔴 The card, probed before it is migrated. `.card` is one CSS rule of four
       // declarations and the kit's `Card` carries all four in slots — but it is also
       // `flex flex-col`, and a flex container blockifies its children. That is the same
@@ -158,16 +183,40 @@ const SCREENS: Screen[] = [
       // is to find differences in buttons. The second attempt put them on /documents behind a
       // `nav` ancestor that this product's own Pagination does not have, and they resolved to
       // nothing on both sides — which the report shows as "measured nothing", not as agreement.
-      { name: 'sm button (Previous)', selector: 'button:has-text("Previous")', props: [...TYPE, ...FILL, ...BOX] },
-      { name: 'sm button (Next)', selector: 'button:has-text("Next")', props: [...TYPE, ...FILL, ...BOX] },
+      {
+        name: 'sm button (Previous)',
+        selector: 'button:has-text("Previous")',
+        props: [...TYPE, ...FILL, ...BOX],
+      },
+      {
+        name: 'sm button (Next)',
+        selector: 'button:has-text("Next")',
+        props: [...TYPE, ...FILL, ...BOX],
+      },
       // ⚠️ Not `button[type="submit"]`. There is no `<form>` on this screen, so production's
       // buttons are `submit` only because a bare `<button>` defaults to it and the kit's
       // default is `button`. Inert either way with no form to submit, but it made the probe
       // resolve on one side and not the other.
-      { name: 'secondary button (Clear)', selector: 'button:has-text("Clear")', props: [...TYPE, ...FILL] },
-      { name: 'primary button (Search)', selector: 'button:has-text("Search")', props: [...TYPE, ...FILL] },
-      { name: 'table header cell', selector: 'table thead th', props: [...TYPE, 'padding', 'border-color'] },
-      { name: 'table body cell', selector: 'table tbody td', props: [...TYPE, 'padding', 'border-color'] },
+      {
+        name: 'secondary button (Clear)',
+        selector: 'button:has-text("Clear")',
+        props: [...TYPE, ...FILL],
+      },
+      {
+        name: 'primary button (Search)',
+        selector: 'button:has-text("Search")',
+        props: [...TYPE, ...FILL],
+      },
+      {
+        name: 'table header cell',
+        selector: 'table thead th',
+        props: [...TYPE, 'padding', 'border-color'],
+      },
+      {
+        name: 'table body cell',
+        selector: 'table tbody td',
+        props: [...TYPE, 'padding', 'border-color'],
+      },
     ],
   },
   {
@@ -175,10 +224,22 @@ const SCREENS: Screen[] = [
     rail: 'Export',
     urlPattern: /\/export$/,
     probes: [
-      { name: 'radio label', selector: 'label:has(input[type="radio"])', props: [...TYPE, ...FILL] },
+      {
+        name: 'radio label',
+        selector: 'label:has(input[type="radio"])',
+        props: [...TYPE, ...FILL],
+      },
       { name: 'radio box', selector: 'input[type="radio"]', props: [...BOX, 'accent-color'] },
-      { name: 'checkbox label', selector: 'label:has(input[type="checkbox"])', props: [...TYPE, ...FILL] },
-      { name: 'export button', selector: 'button:has-text("Export")', props: [...TYPE, ...FILL, ...BOX] },
+      {
+        name: 'checkbox label',
+        selector: 'label:has(input[type="checkbox"])',
+        props: [...TYPE, ...FILL],
+      },
+      {
+        name: 'export button',
+        selector: 'button:has-text("Export")',
+        props: [...TYPE, ...FILL, ...BOX],
+      },
     ],
   },
   {
@@ -186,7 +247,11 @@ const SCREENS: Screen[] = [
     rail: 'Vault Settings',
     urlPattern: /\/settings$/,
     probes: [
-      { name: 'number input (retention)', selector: 'input[type="number"]', props: [...TYPE, ...FILL, ...BOX] },
+      {
+        name: 'number input (retention)',
+        selector: 'input[type="number"]',
+        props: [...TYPE, ...FILL, ...BOX],
+      },
       { name: 'field hint', selector: 'form span', props: TYPE },
       { name: 'save button', selector: 'button[type="submit"]', props: [...TYPE, ...FILL, ...BOX] },
     ],
@@ -215,27 +280,30 @@ async function read(page: Page, probes: Probe[]): Promise<ScreenReading> {
   for (const probe of probes) {
     const started = Date.now();
     try {
-      out[probe.name] = await page.locator(probe.selector).first().evaluate(
-        (node, props: string[]) => {
-          // 🔴 A detached node is not a measurement. `getComputedStyle` returns empty strings
-          // for an element that is no longer in the document, and `locator.evaluate` resolves
-          // the element before it runs — so a re-render in between leaves the handle pointing
-          // at the old node and the call succeeds with nothing in it. No exception, so the
-          // catch below never sees it, and nine empty values line up next to real ones as if
-          // the whole component differed (measured 2026-08-24 on `sm button (Previous)`).
-          //
-          // ⚠️ Deliberately not retried. That this happened is itself information — a screen
-          // that re-renders under the probe is worth knowing about, and quietly taking the
-          // measurement again erases it.
-          if (!(node as Element).isConnected) return null;
-          const cs = getComputedStyle(node as Element);
-          const m: Record<string, string> = {};
-          for (const p of props) m[p] = cs.getPropertyValue(p).trim();
-          return m;
-        },
-        probe.props,
-        { timeout: PROBE_TIMEOUT_MS },
-      );
+      out[probe.name] = await page
+        .locator(probe.selector)
+        .first()
+        .evaluate(
+          (node, props: string[]) => {
+            // 🔴 A detached node is not a measurement. `getComputedStyle` returns empty strings
+            // for an element that is no longer in the document, and `locator.evaluate` resolves
+            // the element before it runs — so a re-render in between leaves the handle pointing
+            // at the old node and the call succeeds with nothing in it. No exception, so the
+            // catch below never sees it, and nine empty values line up next to real ones as if
+            // the whole component differed (measured 2026-08-24 on `sm button (Previous)`).
+            //
+            // ⚠️ Deliberately not retried. That this happened is itself information — a screen
+            // that re-renders under the probe is worth knowing about, and quietly taking the
+            // measurement again erases it.
+            if (!(node as Element).isConnected) return null;
+            const cs = getComputedStyle(node as Element);
+            const m: Record<string, string> = {};
+            for (const p of props) m[p] = cs.getPropertyValue(p).trim();
+            return m;
+          },
+          probe.props,
+          { timeout: PROBE_TIMEOUT_MS },
+        );
     } catch {
       out[probe.name] = null;
     }
@@ -266,7 +334,11 @@ async function kitClassCount(page: Page): Promise<number> {
 }
 
 async function walk(browser: Browser, baseURL: string): Promise<Record<string, ScreenReading>> {
-  const ctx = await browser.newContext({ viewport: { width: 1440, height: 1000 }, locale: 'en-US', baseURL });
+  const ctx = await browser.newContext({
+    viewport: { width: 1440, height: 1000 },
+    locale: 'en-US',
+    baseURL,
+  });
   const page = await ctx.newPage();
   const seatStarted = Date.now();
   try {
@@ -468,7 +540,9 @@ test('VLT-K1-01: kit parity — production vs local, computed styles', async ({ 
   const served = await servedKitVersion(versionPage, LOCAL_URL);
   await versionCtx.close();
   const declared = declaredKitFloor();
-  console.log(`kit — declared ${declared ?? '(unreadable)'} · local target serves ${served ?? '(unreadable)'}`);
+  console.log(
+    `kit — declared ${declared ?? '(unreadable)'} · local target serves ${served ?? '(unreadable)'}`,
+  );
   // 🔴 Say so out loud when the guard cannot run. Silence here is what let a whole comparison
   // be published about the wrong build.
   if (served === null || declared === null) {
@@ -505,7 +579,10 @@ test('VLT-K1-01: kit parity — production vs local, computed styles', async ({ 
     ).toEqual([]);
   }
 
-  const production = await walk(browser, test.info().project.use.baseURL ?? 'https://vault.ayane.co.jp');
+  const production = await walk(
+    browser,
+    test.info().project.use.baseURL ?? 'https://vault.ayane.co.jp',
+  );
   const local = await walk(browser, LOCAL_URL);
 
   // 🔴 The one hard failure, and it applies to the LOCAL side only.
@@ -548,13 +625,27 @@ test('VLT-K1-01: kit parity — production vs local, computed styles', async ({ 
           matched += 1;
           continue;
         }
-        rows.push({ screen: screen.name, element: probeDef.name, property: prop, production: pm[prop], local: lm[prop] });
+        rows.push({
+          screen: screen.name,
+          element: probeDef.name,
+          property: prop,
+          production: pm[prop],
+          local: lm[prop],
+        });
       }
     }
   }
 
   const stamp = new Date().toISOString();
-  const report = { measuredAt: stamp, productionKitClasses: prodKit, localKitClasses: localKit, matched, differing: rows.length, unresolved, rows };
+  const report = {
+    measuredAt: stamp,
+    productionKitClasses: prodKit,
+    localKitClasses: localKit,
+    matched,
+    differing: rows.length,
+    unresolved,
+    rows,
+  };
   const outDir = reportDir(test.info().config.rootDir);
   mkdirSync(outDir, { recursive: true });
   writeFileSync(`${outDir}/kit-parity-latest.json`, `${JSON.stringify(report, null, 2)}\n`);
@@ -562,7 +653,9 @@ test('VLT-K1-01: kit parity — production vs local, computed styles', async ({ 
   console.log(`\nkit parity — matched ${matched} / differing ${rows.length} (measured ${stamp})`);
   console.log(`kit-classed elements: production ${prodKit} · local ${localKit}\n`);
   for (const r of rows) {
-    console.log(`  ${r.screen} · ${r.element} · ${r.property}\n      production ${r.production}\n      local      ${r.local}`);
+    console.log(
+      `  ${r.screen} · ${r.element} · ${r.property}\n      production ${r.production}\n      local      ${r.local}`,
+    );
   }
   if (unresolved.length > 0) {
     // 🔴 Printed as its own list. A probe that resolves on neither side reads as "no difference"
