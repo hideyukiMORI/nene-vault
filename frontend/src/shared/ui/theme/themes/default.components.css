@@ -400,66 +400,6 @@
         padding: 11px 13px;
       }
 
-      /* opt-in card tables (.tbl.tbl-cards): label/value rows, no horizontal scroll */
-      .tbl-wrap:has(.tbl-cards) {
-        overflow-x: visible;
-      }
-      .tbl.tbl-cards,
-      :where(.tbl.tbl-cards) tbody {
-        display: block;
-        width: 100%;
-      }
-      :where(.tbl.tbl-cards) thead {
-        display: none;
-      }
-      :where(.tbl.tbl-cards) tr {
-        display: block;
-        padding: 14px 16px;
-        border-bottom: 1px solid var(--color-border);
-      }
-      :where(.tbl.tbl-cards) tr:last-child {
-        border-bottom: 0;
-      }
-      :where(.tbl.tbl-cards) tr:hover {
-        background: transparent;
-      }
-      :where(.tbl.tbl-cards) td {
-        display: flex;
-        align-items: baseline;
-        gap: 12px;
-        padding: 4px 0;
-        border: 0;
-        text-align: left;
-      }
-      :where(.tbl.tbl-cards) td::before {
-        content: attr(data-label);
-        flex: none;
-        width: 6.5rem;
-        text-align: left;
-        font-size: var(--text-2xs);
-        font-weight: 600;
-        color: var(--color-text-muted);
-        text-transform: uppercase;
-        letter-spacing: 0.04em;
-      }
-      /* title cell (.cell-title): full-width heading, no label */
-      :where(.tbl.tbl-cards) td.cell-title {
-        display: block;
-        text-align: left;
-        font-size: var(--text-body);
-        font-weight: 600;
-        color: var(--color-x-ink-deep);
-        padding: 0 0 8px;
-        margin-bottom: 6px;
-        border-bottom: 1px solid var(--color-border);
-      }
-      :where(.tbl.tbl-cards) td.cell-title::before {
-        display: none;
-      }
-      :where(.tbl.tbl-cards td.cell-title) .pri {
-        font-weight: 600;
-      }
-
       /* audit detail drawer becomes a bottom sheet with a grab handle */
       /* the diff's vertical stacking (before above, arrow turned down, after
          below) is now the *default* at the call site, with the 3-column form
