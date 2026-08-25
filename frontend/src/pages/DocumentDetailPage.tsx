@@ -1,4 +1,12 @@
-import { Badge, Button, Card, EmptyState, InlineAlert, Stack } from '@hideyukimori/nene2-ui';
+import {
+  Badge,
+  Button,
+  Card,
+  DetailList,
+  EmptyState,
+  InlineAlert,
+  Stack,
+} from '@hideyukimori/nene2-ui';
 import { useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useDocumentById, fetchDocumentBlob, useOcrSuggest } from '@/entities/document';
@@ -173,49 +181,68 @@ export function DocumentDetailPage() {
                 {t('document.detail.metadata_section')}
               </h2>
             </div>
-            <dl className="grid grid-cols-2 gap-x-7 gap-y-4 max-sm:grid-cols-1 max-sm:gap-y-3.5 [&>div]:min-w-0 [&_dt]:text-2xs [&_dt]:text-text-muted [&_dt]:uppercase [&_dt]:tracking-meta [&_dt]:font-semibold [&_dt]:mb-0.75 [&_dd]:text-sm [&_dd]:leading-inherit [&_dd]:text-x-ink-deep">
-              <div>
-                <dt>{t('document.metadata.transaction_date')}</dt>
-                <dd className="font-mono zero-slash">{formatDate(doc.transaction_date)}</dd>
-              </div>
-              <div>
-                <dt>{t('document.metadata.amount_cents')}</dt>
-                <dd className="font-mono zero-slash tabular-nums">
-                  {formatJpy(doc.amount_cents, locale)}
-                </dd>
-              </div>
-              <div>
-                <dt>{t('document.metadata.category')}</dt>
-                <dd>{t(`document.category.${doc.category}`)}</dd>
-              </div>
-              <div>
-                <dt>{t('document.metadata.source')}</dt>
-                <dd>{t(`document.source.${doc.source}`)}</dd>
-              </div>
-              <div>
-                <dt>{t('document.metadata.uploaded_at')}</dt>
-                <dd className="font-mono zero-slash">{formatDateTime(doc.uploaded_at, locale)}</dd>
-              </div>
-              <div>
-                <dt>{t('document.metadata.retention_expires_at')}</dt>
-                <dd className="font-mono zero-slash">{formatDate(doc.retention_expires_at)}</dd>
-              </div>
-              {doc.tags.length > 0 && (
-                <div className="col-span-2 max-sm:col-auto">
-                  <dt>{t('document.metadata.tags')}</dt>
-                  <dd className="flex items-center gap-2 flex-wrap">
-                    {doc.tags.map((tag) => (
-                      <span
-                        key={tag}
-                        className="inline-flex rounded-sm bg-surface-overlay border border-x-line-mid px-2.25 py-0.75 text-2xs text-text-muted"
-                      >
-                        {tag}
+            <DetailList
+              layout="columns"
+              rows={[
+                {
+                  label: t('document.metadata.transaction_date'),
+                  value: (
+                    <span className="font-mono zero-slash">{formatDate(doc.transaction_date)}</span>
+                  ),
+                },
+                {
+                  label: t('document.metadata.amount_cents'),
+                  value: (
+                    <span className="font-mono zero-slash tabular-nums">
+                      {formatJpy(doc.amount_cents, locale)}
+                    </span>
+                  ),
+                },
+                {
+                  label: t('document.metadata.category'),
+                  value: t(`document.category.${doc.category}`),
+                },
+                { label: t('document.metadata.source'), value: t(`document.source.${doc.source}`) },
+                {
+                  label: t('document.metadata.uploaded_at'),
+                  value: (
+                    <span className="font-mono zero-slash">
+                      {formatDateTime(doc.uploaded_at, locale)}
+                    </span>
+                  ),
+                },
+                {
+                  label: t('document.metadata.retention_expires_at'),
+                  value: (
+                    <span className="font-mono zero-slash">
+                      {formatDate(doc.retention_expires_at)}
+                    </span>
+                  ),
+                },
+              ]}
+            />
+            {doc.tags.length > 0 && (
+              // Full-width row: the kit has no column span, so a one-row stacked list follows the grid.
+              <DetailList
+                rows={[
+                  {
+                    label: t('document.metadata.tags'),
+                    value: (
+                      <span className="flex items-center gap-2 flex-wrap">
+                        {doc.tags.map((tag) => (
+                          <span
+                            key={tag}
+                            className="inline-flex rounded-sm bg-surface-overlay border border-x-line-mid px-2.25 py-0.75 text-2xs text-text-muted"
+                          >
+                            {tag}
+                          </span>
+                        ))}
                       </span>
-                    ))}
-                  </dd>
-                </div>
-              )}
-            </dl>
+                    ),
+                  },
+                ]}
+              />
+            )}
           </Card>
 
           <Card raised pad="md">
@@ -225,16 +252,24 @@ export function DocumentDetailPage() {
                 {t('document.detail.file_section')}
               </h2>
             </div>
-            <dl className="grid grid-cols-2 gap-x-7 gap-y-4 max-sm:grid-cols-1 max-sm:gap-y-3.5 [&>div]:min-w-0 [&_dt]:text-2xs [&_dt]:text-text-muted [&_dt]:uppercase [&_dt]:tracking-meta [&_dt]:font-semibold [&_dt]:mb-0.75 [&_dd]:text-sm [&_dd]:leading-inherit [&_dd]:text-x-ink-deep">
-              <div>
-                <dt>{t('document.metadata.version_number')}</dt>
-                <dd className="font-mono zero-slash">{doc.version_number}</dd>
-              </div>
-              <div className="col-span-2 max-sm:col-auto">
-                <dt>{t('document.metadata.file_sha256')}</dt>
-                <dd className="font-mono zero-slash break-all">{doc.file_sha256}</dd>
-              </div>
-            </dl>
+            <DetailList
+              layout="columns"
+              rows={[
+                {
+                  label: t('document.metadata.version_number'),
+                  value: <span className="font-mono zero-slash">{doc.version_number}</span>,
+                },
+              ]}
+            />
+            {/* Full-width row: a 64-char hash needs the whole width; the kit has no column span. */}
+            <DetailList
+              rows={[
+                {
+                  label: t('document.metadata.file_sha256'),
+                  value: <span className="font-mono zero-slash break-all">{doc.file_sha256}</span>,
+                },
+              ]}
+            />
           </Card>
 
           <Card raised pad="md">
