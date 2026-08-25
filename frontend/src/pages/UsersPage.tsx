@@ -1,4 +1,5 @@
 import {
+  Badge,
   Button,
   Card,
   EmptyState,
@@ -22,7 +23,7 @@ import type { User } from '@/entities/user';
 import { messageKeyForError } from '@/shared/i18n/map-problem-details';
 import { useTranslation } from '@/shared/i18n/use-translation';
 import { AppChrome } from '@/features/app-chrome';
-import { BADGE_BASE } from '@/shared/ui/primitives/badgeBase';
+import { BADGE_DOT } from '@/shared/ui/primitives/badgeBase';
 
 const PAGE_SIZE = 20;
 
@@ -147,12 +148,9 @@ function UserRow({
       </td>
       <td data-label={t('user.list.table.role')}>{t(`user.role.${user.role}`)}</td>
       <td data-label={t('user.list.table.status')}>
-        <span
-          className={`${BADGE_BASE} data-[tone=success]:bg-success-soft data-[tone=success]:text-success data-[tone=muted]:bg-x-sunk-deep data-[tone=muted]:text-text-muted`}
-          data-tone={user.status === 'active' ? 'success' : 'muted'}
-        >
+        <Badge tone={user.status === 'active' ? 'success' : 'neutral'} className={BADGE_DOT}>
           {t(`user.status.${user.status}`)}
-        </span>
+        </Badge>
       </td>
       <td
         className="text-text-muted font-mono zero-slash"
