@@ -1,4 +1,12 @@
-import { Button, Card, EmptyState, Icon, InlineAlert, Stack } from '@hideyukimori/nene2-ui';
+import {
+  Button,
+  Card,
+  EmptyState,
+  Icon,
+  InlineAlert,
+  Pagination,
+  Stack,
+} from '@hideyukimori/nene2-ui';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useDocumentSearch, DocumentSearchForm, DocumentTable } from '@/features/document-search';
@@ -6,7 +14,6 @@ import { DocumentUploadModal } from '@/features/document-upload';
 import { authStore } from '@/shared/api/auth-session';
 import { useTranslation } from '@/shared/i18n/use-translation';
 import { AppChrome } from '@/features/app-chrome';
-import { Pagination } from '@/shared/ui/components/Pagination';
 
 export function DocumentsPage() {
   const { t } = useTranslation();
@@ -69,20 +76,26 @@ export function DocumentsPage() {
               void navigate(`/documents/${id}`);
             }}
           />
-          <Pagination
-            total={pagination.total}
-            canPrev={pagination.canPrev}
-            canNext={pagination.canNext}
-            onPrev={pagination.goPrev}
-            onNext={pagination.goNext}
-            showingLabel={t('common.pagination.showing', {
-              from: String(pagination.offset + 1),
-              to: String(Math.min(pagination.offset + pagination.limit, pagination.total)),
-              total: String(pagination.total),
-            })}
-            previousLabel={t('common.buttons.previous')}
-            nextLabel={t('common.buttons.next')}
-          />
+          {pagination.total > 0 && (
+            <Pagination
+              label={t('common.pagination.label')}
+              className="px-4 py-3 border-t border-border text-xs leading-inherit text-text-muted"
+              size="sm"
+              stackOnMobile
+              statusPlacement="start"
+              canPrev={pagination.canPrev}
+              canNext={pagination.canNext}
+              onPrev={pagination.goPrev}
+              onNext={pagination.goNext}
+              status={t('common.pagination.showing', {
+                from: String(pagination.offset + 1),
+                to: String(Math.min(pagination.offset + pagination.limit, pagination.total)),
+                total: String(pagination.total),
+              })}
+              previousLabel={t('common.buttons.previous')}
+              nextLabel={t('common.buttons.next')}
+            />
+          )}
         </Card>
       )}
 
