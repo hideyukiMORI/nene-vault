@@ -47,16 +47,4 @@
      🔑 And the kit's answer was better than the one asked for: it splits on `pointer-coarse`
      rather than width, because the zoom is a property of touch input, not of narrow
      windows — a landscape iPad is wide and still needs the floor. */
-
-  /* 🔴 #441 bridge — remove when `@hideyukimori/nene2-ui` ≥ 0.16.1 is applied (hub
-     ruling 2026-08-25: the kit adds `m-auto` to its `<dialog>`; this rule goes with that
-     bump). `showModal()` centres a dialog through the UA stylesheet's `dialog { margin:
-     auto }`; the `* { margin: 0 }` above (and Tailwind's preflight, same shape) wins from
-     the author origin, so the kit `Modal` rendered at (0, 0) — measured 2026-08-25 at 1280
-     and 375; production's old `.modal` centred at (380, 119). Restoring the UA value is the
-     whole fix: with this rule the dialog measures (380, 90). A default restored, not a
-     screen special case. */
-  dialog {
-    margin: auto;
-  }
 }
