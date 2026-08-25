@@ -37,7 +37,7 @@ org is minted per side per run; the viewport is switched on the same page.
 
 | column | is |
 | --- | --- |
-| **production** | whatever `vault.ayane.co.jp` served at run time — **not "the current design"**. Establish which build that is before reading a row (from 2026-08-26 00:48:34 JST: `d2f0920`, 0.9.2; 2026-08-25: `6da5eb0`, 0.9.1; before that: `97da1e0`, 2026-07-12) |
+| **production** | whatever `vault.ayane.co.jp` served at run time — **not "the current design"**. Establish which build that is before reading a row (from 2026-08-26 01:32:50 JST: `c6890e4`, 0.9.2.1; earlier that night: `d2f0920`, 0.9.2; 2026-08-25: `6da5eb0`, 0.9.1; before that: `97da1e0`, 2026-07-12) |
 | **local** | the build named in `meta.json` (`local HEAD`, `local nene2-ui`) |
 
 Content differs between the columns by design (each side has its own disposable org):
