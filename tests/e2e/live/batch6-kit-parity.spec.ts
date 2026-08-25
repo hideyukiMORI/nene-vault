@@ -17,10 +17,11 @@ import { seatAdmin } from './_helpers';
  * reports rather than asserts.
  *
  * 🔴 KNOW WHAT THE REFERENCE IS BEFORE READING A ROW. Production is not "the current design";
- * it is whatever was last deployed. Measured 2026-08-24, nene-vault's demo still serves
- * `class="btn btn-primary"` — the component-class era, which ended at `a941a87` on
- * **2026-07-22**, a month before the kit migration. So a row here can mean any of three
- * things and the table cannot tell them apart:
+ * it is whatever was last deployed. Until 2026-08-25 that was the build of `97da1e0`
+ * (2026-07-12 — the component-class era, `class="btn btn-primary"`), a month before the kit
+ * migration. **Since 2026-08-25 20:22:53 JST production is `6da5eb0` (0.9.1)**, the kit
+ * build itself, so the two columns compare the same generation until the next wave deploys.
+ * A row here can mean any of three things and the table cannot tell them apart:
  *
  *   1. a regression the migration introduced   → fix it (three were, and were)
  *   2. a change made deliberately since        → expected; the drain rounded 7px gaps to 8px
