@@ -14,6 +14,7 @@ import { DocumentUploadModal } from '@/features/document-upload';
 import { authStore } from '@/shared/api/auth-session';
 import { roleHasCapability } from '@/shared/auth/capabilities';
 import { useTranslation } from '@/shared/i18n/use-translation';
+import { PAGINATION_CHROME } from '@/shared/ui/primitives/paginationChrome';
 import { AppChrome } from '@/features/app-chrome';
 
 export function DocumentsPage() {
@@ -91,9 +92,8 @@ export function DocumentsPage() {
           {pagination.total > 0 && (
             <Pagination
               label={t('common.pagination.label')}
-              className="px-4 py-3 border-t border-border text-xs leading-inherit text-text-muted"
+              className={PAGINATION_CHROME}
               size="sm"
-              stackOnMobile
               statusPlacement="start"
               canPrev={pagination.canPrev}
               canNext={pagination.canNext}

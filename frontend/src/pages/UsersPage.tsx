@@ -24,8 +24,14 @@ import { useUsers, useCreateUser, useDeleteUser } from '@/entities/user';
 import type { User } from '@/entities/user';
 import { messageKeyForError } from '@/shared/i18n/map-problem-details';
 import { useTranslation } from '@/shared/i18n/use-translation';
+import { PAGINATION_CHROME } from '@/shared/ui/primitives/paginationChrome';
 import { AppChrome } from '@/features/app-chrome';
-import { BADGE_DOT } from '@/shared/ui/primitives/badgeBase';
+import { BADGE_CHROME } from '@/shared/ui/primitives/badgeBase';
+import {
+  TABLE_CARDS,
+  TABLE_CHROME,
+  TABLE_CARD_TITLE_COL1,
+} from '@/shared/ui/primitives/tableChrome';
 
 const PAGE_SIZE = 20;
 
@@ -149,7 +155,7 @@ function userColumns(
       key: 'status',
       header: t('user.list.table.status'),
       cell: (user) => (
-        <Badge tone={user.status === 'active' ? 'success' : 'neutral'} className={BADGE_DOT}>
+        <Badge tone={user.status === 'active' ? 'success' : 'neutral'} className={BADGE_CHROME}>
           {t(`user.status.${user.status}`)}
         </Badge>
       ),
@@ -238,6 +244,7 @@ export function UsersPage() {
           ) : (
             <div className="overflow-x-auto">
               <DataTable
+                className={`${TABLE_CHROME} ${TABLE_CARDS} ${TABLE_CARD_TITLE_COL1}`}
                 columns={userColumns(t, currentUserId, handleDelete)}
                 rows={users}
                 rowKey={(user) => String(user.id)}
@@ -249,9 +256,8 @@ export function UsersPage() {
           {total > 0 && (
             <Pagination
               label={t('common.pagination.label')}
-              className="px-4 py-3 border-t border-border text-xs leading-inherit text-text-muted"
+              className={PAGINATION_CHROME}
               size="sm"
-              stackOnMobile
               statusPlacement="start"
               canPrev={offset > 0}
               canNext={offset + PAGE_SIZE < total}

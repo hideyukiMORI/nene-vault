@@ -84,7 +84,8 @@ describe('DocumentTable', () => {
     const badge = screen.getByText('Active');
     expect(badge).toHaveClass('inline-flex', 'items-center', 'border');
     expect(badge).toHaveClass('bg-x-slot-badge-success-bg', 'text-x-slot-badge-success-fg');
-    // `.badge::before` — the dot, now `BADGE_DOT`.
+    expect(badge).toHaveClass('text-2xs', 'font-semibold', 'leading-badge');
+    // `.badge::before` — the dot, now `BADGE_CHROME`.
     expect(badge).toHaveClass(
       'gap-1.5',
       'before:w-1.5',

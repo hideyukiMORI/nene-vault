@@ -190,6 +190,33 @@
      Losing it is not a cosmetic regression: a warning and a failure would become
      indistinguishable to anyone looking at the screen. `role` still differs, but the role is
      read out — it is not seen. Guarded by Alert.tones.test.ts. */
+  /* ── Badge (W1b, owner NG 2026-08-26) ────────────────────────────────────────
+     The kit's tones are solid fills (colour on white text); this product's status badges have
+     always been the soft pill — tinted ground, coloured text, no visible border, fully round.
+     Slots choose steps, so the pill lives here as slot values; the type (2xs, semibold,
+     leading-badge) and the dot ride on `BADGE_CHROME` because the kit has no text-size slot. */
+  --color-x-slot-badge-success-bg: var(--color-success-soft);
+  --color-x-slot-badge-success-fg: var(--color-success);
+  --color-x-slot-badge-success-border: var(--color-success-soft);
+  --color-x-slot-badge-danger-bg: var(--color-danger-soft);
+  --color-x-slot-badge-danger-fg: var(--color-danger);
+  --color-x-slot-badge-danger-border: var(--color-danger-soft);
+  --color-x-slot-badge-warn-bg: var(--color-warn-soft);
+  --color-x-slot-badge-warn-fg: var(--color-warn);
+  --color-x-slot-badge-warn-border: var(--color-warn-soft);
+  --color-x-slot-badge-neutral-bg: var(--color-x-sunk-deep);
+  --color-x-slot-badge-neutral-fg: var(--color-text-muted);
+  --color-x-slot-badge-neutral-border: var(--color-x-sunk-deep);
+  --radius-x-slot-badge: var(--radius-full);
+  --spacing-x-slot-badge-pad-y: var(--spacing-x-3xs);
+
+  /* ── Table (W1b, owner NG 2026-08-26) ────────────────────────────────────────
+     Header weight and cell padding are slots; the header's size / case / tracking / ground
+     and the card layout below `sm` are not, and ride on `TABLE_CHROME` / `TABLE_CARDS`. */
+  --font-weight-x-slot-table-header: var(--font-weight-semibold);
+  --spacing-x-slot-table-cell-pad-x: var(--spacing-x-sm);
+  --spacing-x-slot-table-cell-pad-y: var(--spacing-x-xs);
+
   --color-x-slot-alert-warn-bg: var(--color-warn-soft);
   --color-x-slot-alert-warn-fg: var(--color-on-warn);
   --color-x-slot-alert-warn-border: var(--color-warn);

@@ -23,7 +23,7 @@ import type { OcrPrefill } from '@/features/document-detail';
 import { useTranslation } from '@/shared/i18n/use-translation';
 import { formatJpy, formatDate, formatDateTime } from '@/shared/lib/format';
 import { AppChrome } from '@/features/app-chrome';
-import { BADGE_DOT } from '@/shared/ui/primitives/badgeBase';
+import { BADGE_CHROME } from '@/shared/ui/primitives/badgeBase';
 
 type Modal = 'void' | 'restore' | 'metadata-edit' | null;
 
@@ -112,16 +112,19 @@ export function DocumentDetailPage() {
                 {doc.counterparty_name}
               </h1>
               <Stack direction="horizontal" align="center" wrap gap="2xs">
-                <Badge tone={doc.status === 'voided' ? 'danger' : 'success'} className={BADGE_DOT}>
+                <Badge
+                  tone={doc.status === 'voided' ? 'danger' : 'success'}
+                  className={BADGE_CHROME}
+                >
                   {t(`document.status.${doc.status}`)}
                 </Badge>
                 {doc.date_uncertain && (
-                  <Badge tone="warn" className={BADGE_DOT}>
+                  <Badge tone="warn" className={BADGE_CHROME}>
                     {t('document.detail.date_uncertain_badge')}
                   </Badge>
                 )}
                 {!doc.is_metadata_confirmed && (
-                  <Badge tone="neutral" className={BADGE_DOT}>
+                  <Badge tone="neutral" className={BADGE_CHROME}>
                     {t('document.detail.metadata_unconfirmed_badge')}
                   </Badge>
                 )}
