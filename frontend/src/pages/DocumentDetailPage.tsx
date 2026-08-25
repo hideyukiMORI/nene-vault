@@ -1,4 +1,4 @@
-import { Button, Card, EmptyState, InlineAlert, Stack } from '@hideyukimori/nene2-ui';
+import { Badge, Button, Card, EmptyState, InlineAlert, Stack } from '@hideyukimori/nene2-ui';
 import { useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useDocumentById, fetchDocumentBlob, useOcrSuggest } from '@/entities/document';
@@ -14,7 +14,7 @@ import type { OcrPrefill } from '@/features/document-detail';
 import { useTranslation } from '@/shared/i18n/use-translation';
 import { formatJpy, formatDate, formatDateTime } from '@/shared/lib/format';
 import { AppChrome } from '@/features/app-chrome';
-import { BADGE_BASE } from '@/shared/ui/primitives/badgeBase';
+import { BADGE_DOT } from '@/shared/ui/primitives/badgeBase';
 
 type Modal = 'void' | 'restore' | 'metadata-edit' | null;
 
@@ -100,21 +100,18 @@ export function DocumentDetailPage() {
                 {doc.counterparty_name}
               </h1>
               <Stack direction="horizontal" align="center" wrap gap="2xs">
-                <span
-                  className={`${BADGE_BASE} data-[tone=danger]:bg-danger-soft data-[tone=danger]:text-danger data-[tone=success]:bg-success-soft data-[tone=success]:text-success`}
-                  data-tone={doc.status === 'voided' ? 'danger' : 'success'}
-                >
+                <Badge tone={doc.status === 'voided' ? 'danger' : 'success'} className={BADGE_DOT}>
                   {t(`document.status.${doc.status}`)}
-                </span>
+                </Badge>
                 {doc.date_uncertain && (
-                  <span className={`${BADGE_BASE} bg-warn-soft text-warn`}>
+                  <Badge tone="warn" className={BADGE_DOT}>
                     {t('document.detail.date_uncertain_badge')}
-                  </span>
+                  </Badge>
                 )}
                 {!doc.is_metadata_confirmed && (
-                  <span className={`${BADGE_BASE} bg-x-sunk-deep text-text-muted`}>
+                  <Badge tone="neutral" className={BADGE_DOT}>
                     {t('document.detail.metadata_unconfirmed_badge')}
-                  </span>
+                  </Badge>
                 )}
               </Stack>
             </Stack>

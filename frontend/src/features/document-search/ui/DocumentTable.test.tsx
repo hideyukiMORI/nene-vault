@@ -76,27 +76,23 @@ describe('DocumentTable', () => {
     expect(screen.getByText('Active')).toBeInTheDocument();
   });
 
-  // Regression guard for the `.badge` drain (#369) — asserts the replacement
-  // utilities rather than the retired class name (判例#34). The two tests above
-  // only assert the label text, so deleting the CSS would have gone unnoticed.
-  it('carries the regenerated badge utilities', () => {
+  // Regression guard: the status badge is the kit's `Badge` (0.17.0, W1b) carrying this
+  // product's dot through `className`. Asserts the kit's tone slot class and the dot
+  // utilities, not a retired class name (判例#34).
+  it('renders the status as the kit Badge with the product dot', () => {
     renderWithProviders(<DocumentTable documents={[mockDocument]} onSelectDocument={vi.fn()} />);
     const badge = screen.getByText('Active');
-    expect(badge).toHaveClass('inline-flex', 'items-center', 'gap-1.5', 'rounded-full');
-    expect(badge).toHaveClass('px-2.5', 'py-0.75', 'text-2xs', 'font-semibold');
-    // The old rule set `line-height: 1.4` explicitly; `text-2xs` has no partner
-    // `--text-2xs--line-height` to supply one, so the ratio needs its own token
-    // (判例40).
-    expect(badge).toHaveClass('leading-badge');
-    // `.badge::before` — the dot.
+    expect(badge).toHaveClass('inline-flex', 'items-center', 'border');
+    expect(badge).toHaveClass('bg-x-slot-badge-success-bg', 'text-x-slot-badge-success-fg');
+    // `.badge::before` — the dot, now `BADGE_DOT`.
     expect(badge).toHaveClass(
+      'gap-1.5',
       'before:w-1.5',
       'before:h-1.5',
       'before:rounded-full',
       'before:bg-current',
     );
-    // Tone stays runtime-driven at the use site.
-    expect(badge).toHaveAttribute('data-tone', 'success');
     expect(badge).not.toHaveClass('badge');
+    expect(badge).not.toHaveAttribute('data-tone');
   });
 });
