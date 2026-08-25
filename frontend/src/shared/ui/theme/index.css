@@ -47,6 +47,15 @@
   max-width: var(--content-max-wide);
 }
 
+/* Drawer max-height: TW4 has no vh token namespace, so this single-property viewport
+   height is @utility-ized (same precedent as page-glow) to keep the arbitrary-value ban
+   (規約⑤) intact. Used by the audit drawer (AuditPage). NOTE: dvh would be more correct on
+   mobile (iOS URL bar) — deferred. `max-h-sheet` / `z-modal` were removed with the kit Modal
+   (#455): the kit dialog sits in the top layer and needs neither. */
+@utility max-h-dialog {
+  max-height: 90vh;
+}
+
 /* `font-size: 0`（ラベル文字を視覚的に消し、支援技術には残す）。TW4 に段が無く
    arbitrary は規約⑤で禁止なので @utility 化が正道。単一宣言（#428）。 */
 /* `.avatar` の 0.8rem。段（0.6875 / 0.75 / 0.8125rem）に無い直値で、arbitrary は
@@ -74,25 +83,7 @@
   );
 }
 
-/* Dialog max-heights: TW4 has no vh token namespace, so these single-property
-   viewport heights are @utility-ized (same precedent as page-glow) to keep the
-   arbitrary-value ban (規約⑤) intact. NOTE: dvh would be more correct on mobile
-   (iOS URL bar) — deferred to a post-parity improvement PR to hold EXACT parity. */
-@utility max-h-dialog {
-  max-height: 90vh;
-}
-@utility max-h-sheet {
-  max-height: 92vh;
-}
-
-/* z-index:100 の named 参照。TW4 の z-index は静的値+arbitrary のみで named
-   namespace が無いため、既存 --z-modal トークンを @utility 経由で参照して
-   arbitrary（z-[100]）を回避する。 */
-@utility z-modal {
-  z-index: var(--z-modal);
-}
-
-/* 上部バーの named z-index と高さ。TW4 に z namespace が無いのは `z-modal` と同じ理由で、
+/* 上部バーの named z-index と高さ。TW4 に z namespace が無いので named 参照は @utility 経由になり、
    高さは `--topbar-height` が独自名トークン（段ではない）なので数値 utility では書けない。
    どちらも単一宣言・子孫なし・擬似要素なし＝`@utility` の歯止め基準を満たす（#419）。 */
 @utility z-topbar {
