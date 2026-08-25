@@ -12,6 +12,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { useDocumentById, fetchDocumentBlob, useOcrSuggest } from '@/entities/document';
 import { useDocumentHistory } from '@/entities/audit';
 import { authStore } from '@/shared/api/auth-session';
+import { roleHasCapability } from '@/shared/auth/capabilities';
 import {
   VoidModal,
   RestoreModal,
@@ -31,6 +32,9 @@ export function DocumentDetailPage() {
   const { t, locale } = useTranslation();
   const navigate = useNavigate();
   const session = authStore.getSession();
+  // #451: mirror the backend capabilities so a viewer is not shown actions that 403.
+  const canEdit = roleHasCapability(session?.role, 'EditMetadata');
+  const canVoid = roleHasCapability(session?.role, 'VoidDocument');
   const [modal, setModal] = useState<Modal>(null);
   const [ocrPrefill, setOcrPrefill] = useState<OcrPrefill | undefined>(undefined);
   const { suggest: ocrSuggest, isLoading: ocrLoading } = useOcrSuggest();
@@ -134,43 +138,50 @@ export function DocumentDetailPage() {
               >
                 {t('document.detail.download_button')}
               </Button>
-              <Button
-                variant="secondary"
-                onClick={() => {
-                  void handleOcrSuggest();
-                }}
-                disabled={ocrLoading}
-              >
-                {ocrLoading ? t('common.status.loading') : t('document.detail.ocr_suggest_button')}
-              </Button>
-              <Button
-                variant="secondary"
-                onClick={() => {
-                  setOcrPrefill(undefined);
-                  setModal('metadata-edit');
-                }}
-              >
-                {t('common.buttons.edit')}
-              </Button>
-              {doc.status === 'active' ? (
-                <Button
-                  variant="danger"
-                  onClick={() => {
-                    setModal('void');
-                  }}
-                >
-                  {t('common.buttons.void')}
-                </Button>
-              ) : (
-                <Button
-                  variant="secondary"
-                  onClick={() => {
-                    setModal('restore');
-                  }}
-                >
-                  {t('common.buttons.restore')}
-                </Button>
+              {canEdit && (
+                <>
+                  <Button
+                    variant="secondary"
+                    onClick={() => {
+                      void handleOcrSuggest();
+                    }}
+                    disabled={ocrLoading}
+                  >
+                    {ocrLoading
+                      ? t('common.status.loading')
+                      : t('document.detail.ocr_suggest_button')}
+                  </Button>
+                  <Button
+                    variant="secondary"
+                    onClick={() => {
+                      setOcrPrefill(undefined);
+                      setModal('metadata-edit');
+                    }}
+                  >
+                    {t('common.buttons.edit')}
+                  </Button>
+                </>
               )}
+              {canVoid &&
+                (doc.status === 'active' ? (
+                  <Button
+                    variant="danger"
+                    onClick={() => {
+                      setModal('void');
+                    }}
+                  >
+                    {t('common.buttons.void')}
+                  </Button>
+                ) : (
+                  <Button
+                    variant="secondary"
+                    onClick={() => {
+                      setModal('restore');
+                    }}
+                  >
+                    {t('common.buttons.restore')}
+                  </Button>
+                ))}
             </Stack>
           </div>
 

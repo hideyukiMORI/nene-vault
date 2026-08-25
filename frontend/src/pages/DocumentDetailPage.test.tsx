@@ -70,3 +70,38 @@ describe('DocumentDetailPage download', () => {
     expect(mirrorHeader).toBe('Bearer test-jwt-token');
   });
 });
+
+/** #451 — a viewer must not be offered actions the API refuses (edit / void / restore). */
+describe('DocumentDetailPage action gate (#451)', () => {
+  function renderAs(role: string) {
+    authStore.setSession({
+      token: 'test-jwt-token',
+      userId: 1,
+      email: 'someone@example.com',
+      role,
+      orgId: 1,
+    });
+    return renderWithProviders(
+      <MemoryRouter initialEntries={[`/documents/${DOCUMENT_ID}`]}>
+        <Routes>
+          <Route path="/documents/:id" element={<DocumentDetailPage />} />
+        </Routes>
+      </MemoryRouter>,
+    );
+  }
+
+  it('offers Edit and Void to an admin', async () => {
+    renderAs('admin');
+    await screen.findByRole('button', { name: 'Download' }, { timeout: 5000 });
+    expect(screen.getByRole('button', { name: 'Edit' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Void' })).toBeInTheDocument();
+  });
+
+  it('hides Edit, OCR Suggest and Void from a viewer, keeps Download', async () => {
+    renderAs('viewer');
+    await screen.findByRole('button', { name: 'Download' }, { timeout: 5000 });
+    expect(screen.queryByRole('button', { name: 'Edit' })).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: /OCR Suggest/ })).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'Void' })).not.toBeInTheDocument();
+  });
+});

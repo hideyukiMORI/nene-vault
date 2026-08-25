@@ -10,7 +10,6 @@
       "classes": [
         ".audit-row",
         ".audit-table",
-        ".cell-title",
         ".chev-cell",
         ".pri",
         ".rail",
@@ -22,7 +21,6 @@
         ".right",
         ".row-chev",
         ".tbl",
-        ".tbl-cards",
         ".tbl-wrap",
       ],
     },

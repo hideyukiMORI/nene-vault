@@ -12,6 +12,7 @@ import { useNavigate } from 'react-router-dom';
 import { useDocumentSearch, DocumentSearchForm, DocumentTable } from '@/features/document-search';
 import { DocumentUploadModal } from '@/features/document-upload';
 import { authStore } from '@/shared/api/auth-session';
+import { roleHasCapability } from '@/shared/auth/capabilities';
 import { useTranslation } from '@/shared/i18n/use-translation';
 import { AppChrome } from '@/features/app-chrome';
 
@@ -19,6 +20,9 @@ export function DocumentsPage() {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const session = authStore.getSession();
+  // #451: a viewer saw the button and got a 403 on click. The gate mirrors the backend's
+  // CapabilityResolver (viewer = ViewDocuments only), the same way the rail and HomePage do.
+  const canUpload = roleHasCapability(session?.role, 'UploadDocument');
   const [showUpload, setShowUpload] = useState(false);
 
   const { form, onSubmit, onReset, result, pagination } = useDocumentSearch();
@@ -47,19 +51,27 @@ export function DocumentsPage() {
             and a label sat on the text baseline with nothing between them and this call site
             carried `inline-flex items-center gap-x-2xs` itself (#398). The kit lays out its
             own children now; the gap is `--spacing-x-slot-button-gap` in the theme. */}
-        <Button
-          variant="primary"
-          onClick={() => {
-            setShowUpload(true);
-          }}
-        >
-          <Icon decorative size="sm" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round">
-            <path d="M12 19V6" />
-            <path d="m6 11 6-6 6 6" />
-            <path d="M5 20h14" />
-          </Icon>
-          {t('document.list.upload_button')}
-        </Button>
+        {canUpload && (
+          <Button
+            variant="primary"
+            onClick={() => {
+              setShowUpload(true);
+            }}
+          >
+            <Icon
+              decorative
+              size="sm"
+              strokeWidth={1.8}
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <path d="M12 19V6" />
+              <path d="m6 11 6-6 6 6" />
+              <path d="M5 20h14" />
+            </Icon>
+            {t('document.list.upload_button')}
+          </Button>
+        )}
       </div>
 
       <DocumentSearchForm form={form} onSubmit={onSubmit} onReset={onReset} isLoading={isLoading} />
@@ -99,7 +111,7 @@ export function DocumentsPage() {
         </Card>
       )}
 
-      {showUpload && (
+      {canUpload && showUpload && (
         <DocumentUploadModal
           onClose={() => {
             setShowUpload(false);

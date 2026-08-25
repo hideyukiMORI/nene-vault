@@ -1,4 +1,4 @@
-import { Badge, EmptyState } from '@hideyukimori/nene2-ui';
+import { Badge, DataTable, EmptyState, type DataColumn } from '@hideyukimori/nene2-ui';
 import { useTranslation } from '@/shared/i18n/use-translation';
 import { formatJpy, formatDate } from '@/shared/lib/format';
 import { BADGE_DOT } from '@/shared/ui/primitives/badgeBase';
@@ -9,6 +9,14 @@ interface DocumentTableProps {
   onSelectDocument: (id: string) => void;
 }
 
+/**
+ * The received-documents list on the kit's `DataTable` (0.17.0, W1b). `collapse="sm"` reflows
+ * each row into a label/value card below `sm`, which is what the retired `.tbl-cards` did with
+ * `data-label` and `::before` — the kit now owns that mechanism (fleet #423).
+ *
+ * ⚠️ Whether the collapsed card reads the label twice (the `sr-only` header row plus the
+ * `data-label` pseudo-element) is not measurable in jsdom; the live lane checks it (#412).
+ */
 export function DocumentTable({ documents, onSelectDocument }: DocumentTableProps) {
   const { t, locale } = useTranslation();
 
@@ -16,67 +24,80 @@ export function DocumentTable({ documents, onSelectDocument }: DocumentTableProp
     return <EmptyState message={t('document.list.empty')} />;
   }
 
-  const labels = {
-    date: t('document.list.table.transaction_date'),
-    amount: t('document.list.table.amount'),
-    category: t('document.list.table.category'),
-    status: t('document.list.table.status'),
-    uploaded: t('document.list.table.uploaded_at'),
-    actions: t('document.list.table.actions'),
-  };
+  const columns: DataColumn<VaultDocument>[] = [
+    {
+      key: 'transaction_date',
+      header: t('document.list.table.transaction_date'),
+      cell: (doc) => (
+        <span className="font-mono zero-slash">
+          {formatDate(doc.transaction_date)}
+          {doc.date_uncertain && <span className="text-text-faint"> *</span>}
+        </span>
+      ),
+    },
+    {
+      key: 'counterparty_name',
+      header: t('document.list.table.counterparty_name'),
+      cell: (doc) => <span className="font-semibold text-x-ink-deep">{doc.counterparty_name}</span>,
+    },
+    {
+      key: 'amount',
+      header: t('document.list.table.amount'),
+      align: 'end',
+      cell: (doc) => (
+        <span className="tabular-nums font-mono zero-slash">
+          {formatJpy(doc.amount_cents, locale)}
+        </span>
+      ),
+    },
+    {
+      key: 'category',
+      header: t('document.list.table.category'),
+      cell: (doc) => t(`document.category.${doc.category}`),
+    },
+    {
+      key: 'status',
+      header: t('document.list.table.status'),
+      cell: (doc) => (
+        <Badge tone={doc.status === 'voided' ? 'danger' : 'success'} className={BADGE_DOT}>
+          {t(`document.status.${doc.status}`)}
+        </Badge>
+      ),
+    },
+    {
+      key: 'uploaded_at',
+      header: t('document.list.table.uploaded_at'),
+      cell: (doc) => (
+        <span className="text-text-muted font-mono zero-slash">{doc.uploaded_at.slice(0, 10)}</span>
+      ),
+    },
+    {
+      key: 'actions',
+      header: t('document.list.table.actions'),
+      align: 'end',
+      cell: (doc) => (
+        <button
+          type="button"
+          className="text-accent bg-none border-0 cursor-pointer text-sm leading-inherit no-underline hover:text-x-navy-deep hover:underline hover:underline-offset-2"
+          onClick={() => {
+            onSelectDocument(doc.id);
+          }}
+        >
+          {t('common.buttons.view_detail')}
+        </button>
+      ),
+    },
+  ];
 
   return (
-    <div className="tbl-wrap">
-      {/* tbl-cards: on mobile each row reflows into a label/value card */}
-      <table className="tbl tbl-cards">
-        <thead>
-          <tr>
-            <th>{labels.date}</th>
-            <th>{t('document.list.table.counterparty_name')}</th>
-            <th className="right">{labels.amount}</th>
-            <th>{labels.category}</th>
-            <th>{labels.status}</th>
-            <th>{labels.uploaded}</th>
-            <th />
-          </tr>
-        </thead>
-        <tbody>
-          {documents.map((doc) => (
-            <tr key={doc.id}>
-              <td className="font-mono zero-slash" data-label={labels.date}>
-                {formatDate(doc.transaction_date)}
-                {doc.date_uncertain && <span className="text-text-faint"> *</span>}
-              </td>
-              <td className="cell-title">
-                <span className="pri">{doc.counterparty_name}</span>
-              </td>
-              <td className="right tabular-nums font-mono zero-slash" data-label={labels.amount}>
-                {formatJpy(doc.amount_cents, locale)}
-              </td>
-              <td data-label={labels.category}>{t(`document.category.${doc.category}`)}</td>
-              <td data-label={labels.status}>
-                <Badge tone={doc.status === 'voided' ? 'danger' : 'success'} className={BADGE_DOT}>
-                  {t(`document.status.${doc.status}`)}
-                </Badge>
-              </td>
-              <td className="text-text-muted font-mono zero-slash" data-label={labels.uploaded}>
-                {doc.uploaded_at.slice(0, 10)}
-              </td>
-              <td className="right" data-label={labels.actions}>
-                <button
-                  type="button"
-                  className="text-accent bg-none border-0 cursor-pointer text-sm leading-inherit no-underline hover:text-x-navy-deep hover:underline hover:underline-offset-2"
-                  onClick={() => {
-                    onSelectDocument(doc.id);
-                  }}
-                >
-                  {t('common.buttons.view_detail')}
-                </button>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+    <div className="overflow-x-auto">
+      <DataTable
+        columns={columns}
+        rows={documents}
+        rowKey={(doc) => doc.id}
+        caption={t('document.list.title')}
+        collapse="sm"
+      />
     </div>
   );
 }
