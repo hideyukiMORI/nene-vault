@@ -76,7 +76,7 @@ describe('DocumentTable', () => {
     expect(screen.getByText('Active')).toBeInTheDocument();
   });
 
-  // Regression guard: the status badge is the kit's `Badge` (0.17.0, W1b) carrying this
+  // Regression guard: the status badge is the kit's `Badge` (0.19.0, #481) carrying this
   // product's dot through `className`. Asserts the kit's tone slot class and the dot
   // utilities, not a retired class name (判例#34).
   it('renders the status as the kit Badge with the product dot', () => {
@@ -84,15 +84,21 @@ describe('DocumentTable', () => {
     const badge = screen.getByText('Active');
     expect(badge).toHaveClass('inline-flex', 'items-center', 'border');
     expect(badge).toHaveClass('bg-x-slot-badge-success-bg', 'text-x-slot-badge-success-fg');
-    expect(badge).toHaveClass('text-2xs', 'font-semibold', 'leading-badge');
-    // `.badge::before` — the dot, now `BADGE_CHROME`.
+    // Gap, size and weight are the kit's own slots since 0.19.0. Asserting them here would
+    // pin the kit's class names from a product test; the product's stake is that they come
+    // from the kit at all, which the `not.toHaveClass` below states directly.
+    expect(badge).toHaveClass('gap-x-slot-badge-gap', 'text-x-slot-badge', 'font-x-slot-badge');
+    // `.badge::before` — the dot, and the line-height the kit ships no companion slot for.
     expect(badge).toHaveClass(
-      'gap-1.5',
+      'leading-badge',
       'before:w-1.5',
       'before:h-1.5',
       'before:rounded-full',
       'before:bg-current',
     );
+    // 🔴 The three that moved to the kit in 0.19.0. They lose to `BASE_CLASS` on source
+    // order, so leaving them on `className` would read as if they still set something.
+    expect(badge).not.toHaveClass('gap-1.5', 'text-2xs', 'font-semibold');
     expect(badge).not.toHaveClass('badge');
     expect(badge).not.toHaveAttribute('data-tone');
   });

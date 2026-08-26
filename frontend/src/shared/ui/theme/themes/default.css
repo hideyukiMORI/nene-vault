@@ -193,29 +193,30 @@
   /* ── Badge (W1b, owner NG 2026-08-26) ────────────────────────────────────────
      The kit's tones are solid fills (colour on white text); this product's status badges have
      always been the soft pill — tinted ground, coloured text, no visible border, fully round.
-     Slots choose steps, so the pill lives here as slot values; the type (2xs, semibold,
-     leading-badge) and the dot ride on `BADGE_CHROME` because the kit has no text-size slot. */
-  /* 🔴 gap: chosen ahead of nene2-ui 0.19.0, which gives `Badge` a gap / font-size /
-     font-weight of its own (kit #463). `className` loses to the kit's `BASE_CLASS` — same
-     specificity, decided by the order the CSS is generated in — so `gap-1.5` stops winning
-     the moment that version lands, and the value has to be a slot to survive.
+     Slots choose steps, so the pill lives here as slot values; since 0.19.0 the size and
+     weight are the kit's slots too, and only `leading-badge` and the dot ride on
+     `BADGE_CHROME` (see below). */
+  /* 🔴 gap, size and weight are deliberately NOT overridden. 0.19.0 gave `Badge` all three
+     (kit #463), and this product's values did not survive the comparison:
 
-     This is 6px → 4px, and it is deliberate. 6px cannot be written here: `slot-values` fails
-     on a literal, and the kit's scale has no 6px step (3xs 4px · 2xs 8px · xs 12px …) — a
-     slot chooses a step, it may not invent one. Routing through this product's own
-     `--spacing-stack-xs` (0.375rem) would pass the checker and defeat it: that is exactly
-     the drift the scale exists to stop. The kit keeps 4px as its default because the two
-     ships that overrode it disagreed — 6px here, 5px in deal — and neither is a step, so
-     honouring one would only make the other's drift canonical.
+       gap     6px → the kit's 4px. 6px is unwritable here — `slot-values` rejects a literal
+               and the scale has no 6px step (3xs 4px · 2xs 8px · xs 12px …); a slot chooses
+               a step, it may not invent one. Routing through this product's own
+               `--spacing-stack-xs` (0.375rem) would pass the checker and defeat it, which is
+               the drift the scale exists to stop. The kit kept 4px because the two ships
+               that overrode it disagreed — 6px here, 5px in deal — and neither is a step.
+       size    already identical: `--text-2xs` and the kit's `--text-x-2xs` are both
+               0.6875rem. An override would restate the default.
+       weight  already identical: semibold both sides.
 
-     ⚠️ Inert until 0.19.0: 0.17.1's `Badge` does not read this slot, so the rendered gap is
-     still `gap-1.5`'s 6px. It becomes 4px when the caret is raised and `gap-1.5` comes off
-     `BADGE_CHROME` (#479 step 3) — that step is a visible change and takes the owner's look.
+     ⚠️ #479 wrote `--spacing-x-slot-badge-gap: var(--spacing-x-3xs)` here and #481 removed it
+     again — byte-identical to the kit's own default, so it changed nothing and only added a
+     place where a future retune of the kit's scale would be silently pinned. Accepting a
+     default means writing nothing. The rule the kit distributes says it plainly: measure your
+     current value, override only what differs.
 
-     Only the type and the dot stay on `BADGE_CHROME`: `--text-x-slot-badge` needs no override
-     (this product's `--text-2xs` is 0.6875rem = 11px, the kit's default exactly) and the kit
-     ships no companion `--text-x-slot-badge--line-height`, so `leading-badge` still applies. */
-  --spacing-x-slot-badge-gap: var(--spacing-x-3xs);
+     `BADGE_CHROME` keeps only what the kit has no slot for — `leading-badge` (no companion
+     `--text-x-slot-badge--line-height` is shipped) and the status dot. */
   --color-x-slot-badge-success-bg: var(--color-success-soft);
   --color-x-slot-badge-success-fg: var(--color-success);
   --color-x-slot-badge-success-border: var(--color-success-soft);
