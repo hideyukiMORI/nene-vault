@@ -195,6 +195,27 @@
      always been the soft pill — tinted ground, coloured text, no visible border, fully round.
      Slots choose steps, so the pill lives here as slot values; the type (2xs, semibold,
      leading-badge) and the dot ride on `BADGE_CHROME` because the kit has no text-size slot. */
+  /* 🔴 gap: chosen ahead of nene2-ui 0.19.0, which gives `Badge` a gap / font-size /
+     font-weight of its own (kit #463). `className` loses to the kit's `BASE_CLASS` — same
+     specificity, decided by the order the CSS is generated in — so `gap-1.5` stops winning
+     the moment that version lands, and the value has to be a slot to survive.
+
+     This is 6px → 4px, and it is deliberate. 6px cannot be written here: `slot-values` fails
+     on a literal, and the kit's scale has no 6px step (3xs 4px · 2xs 8px · xs 12px …) — a
+     slot chooses a step, it may not invent one. Routing through this product's own
+     `--spacing-stack-xs` (0.375rem) would pass the checker and defeat it: that is exactly
+     the drift the scale exists to stop. The kit keeps 4px as its default because the two
+     ships that overrode it disagreed — 6px here, 5px in deal — and neither is a step, so
+     honouring one would only make the other's drift canonical.
+
+     ⚠️ Inert until 0.19.0: 0.17.1's `Badge` does not read this slot, so the rendered gap is
+     still `gap-1.5`'s 6px. It becomes 4px when the caret is raised and `gap-1.5` comes off
+     `BADGE_CHROME` (#479 step 3) — that step is a visible change and takes the owner's look.
+
+     Only the type and the dot stay on `BADGE_CHROME`: `--text-x-slot-badge` needs no override
+     (this product's `--text-2xs` is 0.6875rem = 11px, the kit's default exactly) and the kit
+     ships no companion `--text-x-slot-badge--line-height`, so `leading-badge` still applies. */
+  --spacing-x-slot-badge-gap: var(--spacing-x-3xs);
   --color-x-slot-badge-success-bg: var(--color-success-soft);
   --color-x-slot-badge-success-fg: var(--color-success);
   --color-x-slot-badge-success-border: var(--color-success-soft);
