@@ -1,0 +1,113 @@
+# weekly-audit.yml — PHP 依存の週次再検査（nene-vault・#492）
+#
+# 原本: nene2-fleet-tooling `docs/ci/weekly-audit.yml`（`21c4897`）。fleet #502 の適用1号。
+# 🔴 原本を更新したら、ここも追随すること（写しは中央に自動追随しない・フリート #240 の型）。
+#
+# 🔴 なぜ専用 workflow を1本立てるのか（施主決定 2026-08-22 (c)）
+#    vault の現状は `schedule` が frontend-ci.yml（`35 0 * * 1`）・`composer audit` が
+#    backend-ci.yml にあり、**交差していない**＝ PHP 側が週次で一度も再検査されていなかった。
+#    (a) backend に schedule を足す … cron が艦あたり2本になる ⇒ 却下
+#    (b) audit を frontend へ寄せる … 名前が実態と乖離する    ⇒ 却下
+#    (c) 週次専用を1本                                        ⇒ 採用
+#
+#    🔑 advisory は**我々のコミットではなく向こう側の時計で公開される**ので、
+#       PR 時の検査だけでは「世界が動いたか」を見られない。
+#
+# この写しで vault 固有に決めたもの:
+#   - cron の分 = `40`（フリート割当。NENE2 が `30 1 * * 1` を使用済みなので 1時台25分以降に配分）
+#   - php-version = `8.4`（composer.json の `"php": ">=8.4.1 <9.0"` に合わせた）
+#   - ISSUE_TITLE = 既存2本（Backend CI / 週次 CI）と衝突しない題
+#   - notify の `if` = 🔴 **この workflow が持つ event から導出**（下のコメント参照）
+
+name: Weekly audit
+
+on:
+  schedule:
+    # 🔴 分は艦ごとに変えること（上の割当表）。ここは原本なので未割当の 25 を置いてある。
+    - cron: '40 1 * * 1'
+  workflow_dispatch:
+    inputs:
+      simulate_failure:
+        description: '陽性対照: 意図的に赤にして notify を発火させる'
+        required: false
+        default: false
+        type: boolean
+
+# 週次なので同時実行は起きない想定だが、dispatch と重なりうるので明示する。
+concurrency:
+  group: weekly-audit-${{ github.ref }}
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  audit:
+    name: composer audit
+    runs-on: ubuntu-latest
+    # 🔴 値ではなく手順を写す（上の 3）。この 10 は原本の暫定値。
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+
+      # 🔴 陽性対照は checkout の直後に置く（#289）。後ろに置くと
+      #    「別の理由の赤」と区別がつかず、何を確かめたのか分からなくなる。
+      - name: Simulate failure (rehearsal only)
+        if: inputs.simulate_failure
+        run: exit 1
+
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.4'
+
+      # 🔴 `composer install` はしない。audit は lock を読むだけで足りる。
+      #    install を挟むと「依存が壊れている赤」と「advisory の赤」が混ざる。
+      #
+      # 🔴 setup-php は COMPOSER_NO_AUDIT=1 を立てる（#281 の実測・3艦で再現）。
+      #    これが殺すのは **install/update に付随する暗黙の audit** であって、
+      #    **明示的に呼ぶ `composer audit` は生きている**。だから明示で呼ぶ。
+      #    ⚠️ 「setup-php を使っているから audit は死んでいる」と読まないこと——
+      #       暗黙は死んでいるが明示は生きている、が実測の結論。
+      - name: composer audit
+        run: composer audit --locked --no-interaction
+
+  notify-failure:
+    name: Open an issue when an unattended run fails
+    # 🔴 **この workflow が「無人で走る」event を列挙する**（hub 裁定 2026-08-22・vault 発）。
+    #   - `schedule`          … 常に無人
+    #   - `workflow_dispatch` … 叩いた人が見ているが、`simulate_failure` は陽性対照専用なので通す
+    #   - `push`              … 🔴 **この原本には push トリガが無いので含めていない。足した艦は足すこと**
+    #   - `pull_request`      … 🔴 含めない（作者が見ているのでノイズ）
+    if: >-
+      failure() && (github.event_name == 'schedule'
+      || inputs.simulate_failure)
+    needs: [audit]
+    runs-on: ubuntu-latest
+    # gh の API 呼び出し2本だけ。ここが吊ると「赤が通知されない」に化ける。
+    timeout-minutes: 5
+    permissions:
+      issues: write
+    env:
+      # 🔴 艦名を自艦のものへ変えること。
+      ISSUE_TITLE: '🔴 nene-vault: 週次 composer audit が失敗しています'
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      GH_REPO: ${{ github.repository }}
+      RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+    steps:
+      - name: Create or update the failure issue
+        run: |
+          set -euo pipefail
+          # 🔴 --limit は 100 では足りない。open が 100 件を超えると同名を取りこぼして
+          #    重複起票へフォールバックする。しかも壊れ方が悪い——壊れた側の挙動が
+          #    「毎週新しい issue が立つ」で一見すると装置が動いて見え、かつ発現条件
+          #    （open 100 件超）は「通知が読まれず溜まっている状態」そのもの。
+          #    ＝この仕掛けが守ろうとしているものを、最も必要なときに自分で壊す。
+          #    （vault #379 発見・NENE2 #1656 起票）
+          existing="$(gh issue list --state open --limit 1000 --json number,title \
+            | jq -r --arg t "$ISSUE_TITLE" 'map(select(.title == $t)) | .[0].number // empty')"
+          body="無人実行（${{ github.event_name }}）で週次の composer audit が失敗しました。 実行: ${RUN_URL}"
+          if [ -n "$existing" ]; then
+            gh issue comment "$existing" --body "$body"
+          else
+            gh issue create --title "$ISSUE_TITLE" --body "$body"
+          fi
