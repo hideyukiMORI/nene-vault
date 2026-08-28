@@ -26,13 +26,14 @@
     "build-storybook": "storybook build",
     "knip": "knip",
     "stylelint": "stylelint \"src/**/*.css\"",
-    "check": "npm run type-check && npm run lint && npm run format && npm run coverage:check && npm run knip && npm run stylelint && npm run slot-values && npm run slot-pairs && npm run registries:check && npm run build && npm run source-probe && npm run build-storybook",
+    "check": "npm run type-check && npm run lint && npm run format && npm run coverage:check && npm run knip && npm run stylelint && npm run slot-values && npm run slot-pairs && npm run registries:check && npm run build && npm run assert-no-msw && npm run source-probe && npm run build-storybook",
     "e2e:live": "NODE_PATH=./node_modules playwright test --config playwright.live.config.ts",
     "registries:check": "nene2-check init --check",
     "audit": "audit-ci --config audit-ci.jsonc",
     "source-probe": "node tools/source-probe.mjs",
     "slot-values": "node tools/slot-values.mjs",
-    "slot-pairs": "node tools/slot-pairs.mjs"
+    "slot-pairs": "node tools/slot-pairs.mjs",
+    "assert-no-msw": "node tools/assert-no-msw-in-build.mjs"
   },
   "//overrides": "js-yaml is pulled transitively by @redocly/openapi-core and trips the CI npm audit high gate (GHSA-52cp-r559-cp3m). Bump it here rather than via `npm audit fix` (platform-binary risk) or a redocly bump (churn). (#273)",
   "overrides": {
@@ -88,5 +89,10 @@
     "typescript-eslint": "^8.59.2",
     "vite": "^8.0.12",
     "vitest": "^4.0.14"
+  },
+  "msw": {
+    "workerDirectory": [
+      "public"
+    ]
   }
 }
