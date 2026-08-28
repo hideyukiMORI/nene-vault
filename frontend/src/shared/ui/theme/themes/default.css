@@ -73,10 +73,19 @@
      nene2-ui 0.20.0 gave the same token a second background. `Button` `solid` × `warn`
      paints `--color-on-warn` on the full `--color-warn`, and there the same value is
      **2.37:1 — below AA** (measured 2026-08-28, sRGB from oklch, in a browser).
-     The kit's own contrast test is not wrong; it computes against the *contract's* warn pair
-     (0.70/0.15/85 with 0.20/0.02/85 = 6.71:1). That guarantee does not survive a product
-     redefining `--color-warn`, which this one does — so an upstream green does not transfer
-     to any ship that repaints the token.
+     The kit's own contrast test is not wrong, and neither is the number it reports. Measured
+     2026-08-28 in a browser (canvas pixels, positive control white/black = 21.00:1), there are
+     **two** upstream warn pairs and they disagree:
+       nene2-tokens/themes/reference.css  0.70/0.15/85 with 0.20/0.02/85  → 6.73:1
+       nene2-ui/themes/default.css        0.63/0.135/75 with 0.21/0.04/75 → 4.98:1  ← the kit's
+     The kit's default is deliberately off the contract's reference — its comment gives the
+     reason, the median of eight ships' own `--color-warn` (2026-08-23) — and `contract-freeze`
+     records slot *names* only, so no value is frozen anywhere (fleet #504). What that means
+     here: redefining `--color-warn` is not a deviation, and an upstream green does not transfer
+     to a ship that repaints the token, whichever of the two it is measured against.
+     ⚠️ An earlier version of this comment called the 6.73 pair "the contract" and cited 6.71.
+     That named one of two files as if it were the only one; the arithmetic was right and the
+     attribution was wrong.
      ⚠️ Nothing renders it today: `tone="warn"` is used **zero** times here (all 25 call
      sites are accent, neutral or danger). No slot is set for it for the same reason
      `bare`'s ink is not set — a value nothing draws is a value nobody can check. This
