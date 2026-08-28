@@ -27,16 +27,33 @@ const BASE = process.env.VAULT_MSW_URL ?? 'http://localhost:5199';
 const OUT_DIR = process.argv[2] ?? join(ROOT, 'real-screens');
 const DOCUMENT_ID = 'doc-01J0000000000000000000000';
 
+/**
+ * 🔴 `minButtons` is the arrival check that matters, and `landmark` alone is not enough.
+ *
+ * A landmark says "something rendered", not "the thing I am about to count rendered". Measured
+ * on production 2026-08-28: on document-detail the `<h1>` paints before the toolbar, because
+ * the toolbar is gated on capabilities that arrive with a later response — so a sweep that
+ * waited for `h1` and then counted read **zero kit buttons on a page that has four**. It
+ * reported a clean zero, exactly the shape nene-deal hit the same day from a different cause
+ * (sitting on the login form). **A screen not finished and a screen with nothing on it return
+ * the same number.**
+ *
+ * So each screen declares how many kit buttons it must end up with, and the run *waits for
+ * that count* rather than sampling once. A screen that never reaches it fails loudly.
+ * Declaring the number also makes a regression visible: if a screen quietly loses a button,
+ * the wait times out instead of silently capturing one fewer.
+ */
 const SCREENS = [
-  { name: 'documents', path: '/documents', landmark: 'table, [role="table"]' },
+  { name: 'documents', path: '/documents', landmark: 'table, [role="table"]', minButtons: 1 },
   {
     name: 'document-detail',
     path: `/documents/${DOCUMENT_ID}`,
     landmark: 'h1',
+    minButtons: 4,
     openDialog: '無効化',
   },
-  { name: 'audit', path: '/audit', landmark: 'h1' },
-  { name: 'users', path: '/users', landmark: 'h1' },
+  { name: 'audit', path: '/audit', landmark: 'h1', minButtons: 1 },
+  { name: 'users', path: '/users', landmark: 'h1', minButtons: 1 },
 ];
 
 const VIEWPORTS = [
@@ -110,8 +127,8 @@ for (const vp of VIEWPORTS) {
     attempted += 1;
     await page.goto(`${BASE}${screen.path}`, { waitUntil: 'networkidle' });
 
-    // 🔴 Arrival check, before anything is counted. Zero buttons on a screen you never
-    // reached is indistinguishable from zero buttons on a screen that has none.
+    // 🔴 Arrival check, before anything is counted, in two steps: the landmark says the route
+    // resolved, and the button count says the part being measured has actually painted.
     const onLogin = page.url().includes('/login');
     const landmark = await page
       .locator(screen.landmark)
@@ -125,9 +142,26 @@ for (const vp of VIEWPORTS) {
       continue;
     }
 
+    // Wait for the declared count instead of sampling once — see the note on SCREENS.
+    const arrived = await page
+      .waitForFunction(
+        (min) =>
+          [...document.querySelectorAll('button')].filter(
+            (el) => el.className.includes('x-slot-button') && el.getBoundingClientRect().height > 0,
+          ).length >= min,
+        screen.minButtons,
+        { timeout: 15000 },
+      )
+      .then(() => true)
+      .catch(() => false);
+
     const buttons = await readButtons(page);
-    if (buttons.length === 0) {
-      failures.push(`${screen.name}@${vp.tag}: reached, but zero kit buttons — check selector`);
+    if (!arrived) {
+      // Never a clean zero: say what was expected, what was found, and that this is a failure.
+      failures.push(
+        `${screen.name}@${vp.tag}: reached, but only ${buttons.length} kit button(s) after 15s ` +
+          `(expected >= ${screen.minButtons}) — the page did not finish, or the selector is wrong`,
+      );
     }
 
     const file = `real-${screen.name}-${vp.tag}.png`;
