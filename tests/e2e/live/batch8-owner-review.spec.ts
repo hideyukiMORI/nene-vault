@@ -1,8 +1,14 @@
-import { expect, test, type Browser, type Page, type TestInfo } from '@playwright/test';
-import { execSync } from 'node:child_process';
-import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
-import { resolve } from 'node:path';
-import { seatAdmin } from './_helpers';
+import {
+  expect,
+  test,
+  type Browser,
+  type Page,
+  type TestInfo,
+} from "@playwright/test";
+import { execSync } from "node:child_process";
+import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
+import { resolve } from "node:path";
+import { seatAdmin } from "./_helpers";
 
 /**
  * Live-target QA — batch 8: owner-review material (#439).
@@ -46,16 +52,17 @@ import { seatAdmin } from './_helpers';
  *   NENE_VAULT_OWNER_REVIEW_DIR=w1 npm run e2e:live --prefix frontend -- batch8
  */
 
-const LOCAL_URL = process.env.NENE_VAULT_PARITY_LOCAL_URL ?? 'http://localhost:5186';
+const LOCAL_URL =
+  process.env.NENE_VAULT_PARITY_LOCAL_URL ?? "http://localhost:5186";
 
 /** Resolved from Playwright's `rootDir` (= tests/e2e/live), never from CWD — see batch6. */
 function outDir(rootDir: string, name: string): string {
-  return resolve(rootDir, '../../../docs/qa/owner-review', name);
+  return resolve(rootDir, "../../../docs/qa/owner-review", name);
 }
 
 const VIEWPORTS = [
-  { name: 'desktop', width: 1280, height: 800 },
-  { name: 'mobile', width: 375, height: 812 },
+  { name: "desktop", width: 1280, height: 800 },
+  { name: "mobile", width: 375, height: 812 },
 ] as const;
 
 /** One screen: how to reach it from the seated landing page, and how to know we are there. */
@@ -75,42 +82,42 @@ interface Screen {
 }
 
 const SCREENS: Screen[] = [
-  { name: 'home', rail: null, urlPattern: null },
-  { name: 'documents', rail: 'Received Documents', urlPattern: /\/documents$/ },
+  { name: "home", rail: null, urlPattern: null },
+  { name: "documents", rail: "Received Documents", urlPattern: /\/documents$/ },
   {
-    name: 'upload-modal',
-    rail: 'Received Documents',
+    name: "upload-modal",
+    rail: "Received Documents",
     urlPattern: /\/documents$/,
     viewportOnly: true,
     then: async (page) => {
-      await page.getByRole('button', { name: 'Upload Document' }).click();
+      await page.getByRole("button", { name: "Upload Document" }).click();
       // Kit `Modal` is a native <dialog>; the pre-migration one was `.modal`. Either is fine —
       // the point of this screen is that the owner sees whichever one the build renders.
       await page
-        .locator('dialog[open], .modal')
+        .locator("dialog[open], .modal")
         .first()
-        .waitFor({ state: 'visible', timeout: 10_000 });
+        .waitFor({ state: "visible", timeout: 10_000 });
     },
   },
   {
-    name: 'document-detail',
-    rail: 'Received Documents',
+    name: "document-detail",
+    rail: "Received Documents",
     urlPattern: /\/documents$/,
     then: async (page) => {
-      const row = page.locator('table tbody tr').first();
-      await row.waitFor({ state: 'visible', timeout: 10_000 });
-      await row.getByRole('button', { name: 'Details' }).click();
+      const row = page.locator("table tbody tr").first();
+      await row.waitFor({ state: "visible", timeout: 10_000 });
+      await row.getByRole("button", { name: "Details" }).click();
       await page.waitForURL(/\/documents\/[^/]+$/, { timeout: 10_000 });
-      await page.waitForLoadState('networkidle');
+      await page.waitForLoadState("networkidle");
     },
   },
-  { name: 'audit', rail: 'Audit Log', urlPattern: /\/audit$/ },
-  { name: 'export', rail: 'Export', urlPattern: /\/export$/ },
-  { name: 'settings', rail: 'Vault Settings', urlPattern: /\/settings$/ },
+  { name: "audit", rail: "Audit Log", urlPattern: /\/audit$/ },
+  { name: "export", rail: "Export", urlPattern: /\/export$/ },
+  { name: "settings", rail: "Vault Settings", urlPattern: /\/settings$/ },
 ];
 
 interface Shot {
-  side: 'prod' | 'local';
+  side: "prod" | "local";
   screen: string;
   viewport: string;
   file: string | null;
@@ -119,19 +126,22 @@ interface Shot {
 }
 
 async function goHome(page: Page, base: string): Promise<void> {
-  await page.goto(`${base}/`, { waitUntil: 'networkidle' });
-  await page.locator('nav.rail-nav').waitFor({ state: 'visible', timeout: 15_000 });
+  await page.goto(`${base}/`, { waitUntil: "networkidle" });
+  await page
+    .locator("nav.rail-nav")
+    .waitFor({ state: "visible", timeout: 15_000 });
 }
 
 async function reach(page: Page, base: string, screen: Screen): Promise<void> {
   await goHome(page, base);
   if (screen.rail) {
     await page
-      .locator('nav.rail-nav')
-      .getByRole('button', { name: screen.rail, exact: true })
+      .locator("nav.rail-nav")
+      .getByRole("button", { name: screen.rail, exact: true })
       .click();
-    if (screen.urlPattern) await page.waitForURL(screen.urlPattern, { timeout: 10_000 });
-    await page.waitForLoadState('networkidle');
+    if (screen.urlPattern)
+      await page.waitForURL(screen.urlPattern, { timeout: 10_000 });
+    await page.waitForLoadState("networkidle");
   }
   if (screen.then) await screen.then(page);
   // Let transitions and lazy images settle; bounded, never fatal.
@@ -149,7 +159,7 @@ async function assertStyled(page: Page, side: string): Promise<void> {
 
 async function shootSide(
   browser: Browser,
-  side: 'prod' | 'local',
+  side: "prod" | "local",
   base: string,
   dir: string,
   guardStyled: boolean,
@@ -157,16 +167,16 @@ async function shootSide(
   const shots: Shot[] = [];
   const ctx = await browser.newContext({
     viewport: { width: 1280, height: 800 },
-    locale: 'en-US',
+    locale: "en-US",
   });
   const page = await ctx.newPage();
   // Seat once per side. `seatAdmin` navigates relative to baseURL, so give it the absolute URL.
-  await page.goto(`${base}/demo/standard`, { waitUntil: 'networkidle' });
+  await page.goto(`${base}/demo/standard`, { waitUntil: "networkidle" });
   try {
-    await page.waitForSelector('nav.rail-nav', { timeout: 30_000 });
+    await page.waitForSelector("nav.rail-nav", { timeout: 30_000 });
   } catch {
-    await page.goto(`${base}/demo/standard`, { waitUntil: 'networkidle' });
-    await page.waitForSelector('nav.rail-nav', { timeout: 30_000 });
+    await page.goto(`${base}/demo/standard`, { waitUntil: "networkidle" });
+    await page.waitForSelector("nav.rail-nav", { timeout: 30_000 });
   }
   // 🔴 Guard on /documents, not on the landing page: the landing is this product's own
   // markup (rail, quick-access cards) and carries no kit utility even when fully styled —
@@ -183,7 +193,10 @@ async function shootSide(
       const file = `${side}-${screen.name}-${vp.name}.png`;
       try {
         await reach(page, base, screen);
-        await page.screenshot({ path: resolve(dir, file), fullPage: !screen.viewportOnly });
+        await page.screenshot({
+          path: resolve(dir, file),
+          fullPage: !screen.viewportOnly,
+        });
         shots.push({
           side,
           screen: screen.name,
@@ -192,8 +205,10 @@ async function shootSide(
           note: null,
         });
       } catch (e) {
-        const note = (e as Error).message.split('\n')[0].slice(0, 200);
-        console.log(`${side} ${screen.name} @${vp.name}: not captured — ${note}`);
+        const note = (e as Error).message.split("\n")[0].slice(0, 200);
+        console.log(
+          `${side} ${screen.name} @${vp.name}: not captured — ${note}`,
+        );
         shots.push({
           side,
           screen: screen.name,
@@ -210,9 +225,9 @@ async function shootSide(
 
 function sh(cmd: string): string {
   try {
-    return execSync(cmd, { encoding: 'utf8' }).trim();
+    return execSync(cmd, { encoding: "utf8" }).trim();
   } catch {
-    return 'unmeasured';
+    return "unmeasured";
   }
 }
 
@@ -220,42 +235,47 @@ function kitVersion(rootDir: string): string {
   try {
     const p = resolve(
       rootDir,
-      '../../../frontend/node_modules/@hideyukimori/nene2-ui/package.json',
+      "../../../frontend/node_modules/@hideyukimori/nene2-ui/package.json",
     );
-    return (JSON.parse(readFileSync(p, 'utf8')) as { version: string }).version;
+    return (JSON.parse(readFileSync(p, "utf8")) as { version: string }).version;
   } catch {
-    return 'unmeasured';
+    return "unmeasured";
   }
 }
 
 function esc(s: string): string {
   return s
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;');
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;");
 }
 
 function renderIndex(meta: Record<string, string>, shots: Shot[]): string {
   const cell = (s: Shot | undefined): string => {
     if (!s) return '<td class="miss">not run</td>';
-    if (!s.file) return `<td class="miss">not captured<br><small>${esc(s.note ?? '')}</small></td>`;
+    if (!s.file)
+      return `<td class="miss">not captured<br><small>${esc(s.note ?? "")}</small></td>`;
     return `<td><a href="${s.file}" target="_blank"><img src="${s.file}" alt="${esc(s.file)}" loading="lazy"></a></td>`;
   };
   const rows = VIEWPORTS.flatMap((vp) =>
     SCREENS.map((sc) => {
       const prod = shots.find(
-        (s) => s.side === 'prod' && s.screen === sc.name && s.viewport === vp.name,
+        (s) =>
+          s.side === "prod" && s.screen === sc.name && s.viewport === vp.name,
       );
       const local = shots.find(
-        (s) => s.side === 'local' && s.screen === sc.name && s.viewport === vp.name,
+        (s) =>
+          s.side === "local" && s.screen === sc.name && s.viewport === vp.name,
       );
       return `<tr><th scope="row">${esc(sc.name)}<br><small>${vp.name} ${vp.width}×${vp.height}</small></th>${cell(prod)}${cell(local)}</tr>`;
     }),
-  ).join('\n');
+  ).join("\n");
   const metaRows = Object.entries(meta)
-    .map(([k, v]) => `<tr><th scope="row">${esc(k)}</th><td>${esc(v)}</td></tr>`)
-    .join('\n');
+    .map(
+      ([k, v]) => `<tr><th scope="row">${esc(k)}</th><td>${esc(v)}</td></tr>`,
+    )
+    .join("\n");
   return `<!doctype html>
 <meta charset="utf-8">
 <title>Owner review — ${esc(meta.date)}</title>
@@ -286,9 +306,34 @@ ${rows}
 `;
 }
 
-test.describe.configure({ mode: 'serial' });
+/**
+ * Read the content-hashed asset filenames a deployment references, which identify its build.
+ * Empty (not thrown) if the page cannot be fetched: a missing fingerprint should degrade the
+ * manifest, not lose the whole bundle.
+ */
+async function fingerprintAssets(
+  browser: Browser,
+  base: string,
+): Promise<string[]> {
+  const context = await browser.newContext();
+  try {
+    const page = await context.newPage();
+    const response = await page.goto(base, { waitUntil: "domcontentloaded" });
+    const html = (await response?.text()) ?? "";
+    return [...html.matchAll(/assets\/(index-[A-Za-z0-9_-]+\.(?:js|css))/g)]
+      .map((m) => m[1])
+      .filter((v, i, a) => a.indexOf(v) === i)
+      .sort();
+  } catch {
+    return [];
+  } finally {
+    await context.close();
+  }
+}
 
-test('OWNER-REVIEW: production vs local, every screen, two viewports', async ({
+test.describe.configure({ mode: "serial" });
+
+test("OWNER-REVIEW: production vs local, every screen, two viewports", async ({
   browser,
 }, testInfo: TestInfo) => {
   test.setTimeout(10 * 60_000);
@@ -298,36 +343,62 @@ test('OWNER-REVIEW: production vs local, every screen, two viewports', async ({
   const dir = outDir(rootDir, name);
   mkdirSync(dir, { recursive: true });
 
-  const prodBase = (testInfo.project.use.baseURL ?? 'https://vault.ayane.co.jp').replace(/\/$/, '');
-  const localBase = LOCAL_URL.replace(/\/$/, '');
+  const prodBase = (
+    testInfo.project.use.baseURL ?? "https://vault.ayane.co.jp"
+  ).replace(/\/$/, "");
+  const localBase = LOCAL_URL.replace(/\/$/, "");
+
+  // 🔴 The production side is fingerprinted, not asserted.
+  //
+  // Until 2026-08-28 this manifest named the production URL and left which *build* was behind
+  // it to a note in a document — and the README told the reader to "establish which build that
+  // is before reading a row", which is a job nobody does while looking at pictures. A bundle
+  // that cannot say what it compared against decays into "production, whenever that was".
+  //
+  // Vite's asset names are content hashes, so the `/assets/index-*.js` the production HTML
+  // references identifies its build exactly. Recording it costs one request and turns "the
+  // baseline is c6890e4" from something remembered into something checkable: build that commit
+  // and the emitted filename either matches or it does not. Verified 2026-08-28 —
+  // `index-tudmWql9.js` / `index-DRS_fEZs.css` are what `c6890e4` emits, so production is that
+  // commit and the deployment note was right.
+  const prodAssets = await fingerprintAssets(browser, prodBase);
 
   const meta: Record<string, string> = {
     date,
-    'measured at (UTC)': new Date().toISOString(),
+    "measured at (UTC)": new Date().toISOString(),
     prod: prodBase,
+    "prod assets (content hashes — identifies the build)": prodAssets.join(" "),
     local: localBase,
-    'local HEAD': sh('git rev-parse --short HEAD'),
-    'local branch': sh('git rev-parse --abbrev-ref HEAD'),
-    'local nene2-ui': kitVersion(rootDir),
+    "local HEAD": sh("git rev-parse --short HEAD"),
+    "local branch": sh("git rev-parse --abbrev-ref HEAD"),
+    // 🔴 A capture from a dirty tree is filed under a commit that never produced it (#443).
+    "local working tree":
+      sh("git status --porcelain") === "" ? "clean" : "DIRTY",
+    "local nene2-ui": kitVersion(rootDir),
   };
 
   // Local first: if the build is unstyled we learn it before minting a production org.
-  const local = await shootSide(browser, 'local', localBase, dir, true);
-  const prod = await shootSide(browser, 'prod', prodBase, dir, false);
+  const local = await shootSide(browser, "local", localBase, dir, true);
+  const prod = await shootSide(browser, "prod", prodBase, dir, false);
   const shots = [...prod, ...local];
 
-  writeFileSync(resolve(dir, 'meta.json'), JSON.stringify({ meta, shots }, null, 2));
-  writeFileSync(resolve(dir, 'index.html'), renderIndex(meta, shots));
+  writeFileSync(
+    resolve(dir, "meta.json"),
+    JSON.stringify({ meta, shots }, null, 2),
+  );
+  writeFileSync(resolve(dir, "index.html"), renderIndex(meta, shots));
 
   const captured = shots.filter((s) => s.file).length;
-  console.log(`owner-review: ${captured}/${shots.length} captured → ${dir}/index.html`);
+  console.log(
+    `owner-review: ${captured}/${shots.length} captured → ${dir}/index.html`,
+  );
   // The material is only useful if both sides produced something; partial is reported, not hidden.
   expect(
     local.some((s) => s.file),
-    'no local screenshot at all',
+    "no local screenshot at all",
   ).toBe(true);
   expect(
     prod.some((s) => s.file),
-    'no production screenshot at all',
+    "no production screenshot at all",
   ).toBe(true);
 });
