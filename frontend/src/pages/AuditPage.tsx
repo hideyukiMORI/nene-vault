@@ -460,10 +460,10 @@ export function AuditPage() {
             </FormField>
           </Grid>
           <Stack direction="horizontal" align="center" justify="end" gap="2xs">
-            <Button variant="secondary" onClick={handleReset}>
+            <Button variant="outline" tone="neutral" onClick={handleReset}>
               {t('document.search.reset_button')}
             </Button>
-            <Button variant="primary" onClick={handleSearch} disabled={isLoading}>
+            <Button onClick={handleSearch} disabled={isLoading}>
               {t('document.search.search_button')}
             </Button>
           </Stack>

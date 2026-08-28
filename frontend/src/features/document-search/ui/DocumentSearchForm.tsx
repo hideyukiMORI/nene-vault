@@ -84,10 +84,10 @@ export function DocumentSearchForm({
             {...register('include_voided')}
           />
           <Stack direction="horizontal" align="center" gap="2xs">
-            <Button type="button" variant="secondary" onClick={onReset}>
+            <Button type="button" variant="outline" tone="neutral" onClick={onReset}>
               {t('document.search.reset_button')}
             </Button>
-            <Button type="submit" variant="primary" disabled={isLoading}>
+            <Button type="submit" disabled={isLoading}>
               {t('document.search.search_button')}
             </Button>
           </Stack>

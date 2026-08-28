@@ -67,6 +67,23 @@
   --color-x-danger-hover: oklch(49% 0.1 33);
   --color-warn: oklch(60% 0.075 74);
   --color-warn-soft: oklch(95% 0.045 80);
+  /* 🔴 This value is for `--color-warn-soft`, not for `--color-warn`.
+     It was chosen for `--color-x-slot-alert-warn-fg`, where it sits on the pale
+     `--color-warn-soft`: 8.16:1, comfortably AA.
+     nene2-ui 0.20.0 gave the same token a second background. `Button` `solid` × `warn`
+     paints `--color-on-warn` on the full `--color-warn`, and there the same value is
+     **2.37:1 — below AA** (measured 2026-08-28, sRGB from oklch, in a browser).
+     The kit's own contrast test is not wrong; it computes against the *contract's* warn pair
+     (0.70/0.15/85 with 0.20/0.02/85 = 6.71:1). That guarantee does not survive a product
+     redefining `--color-warn`, which this one does — so an upstream green does not transfer
+     to any ship that repaints the token.
+     ⚠️ Nothing renders it today: `tone="warn"` is used **zero** times here (all 25 call
+     sites are accent, neutral or danger). No slot is set for it for the same reason
+     `bare`'s ink is not set — a value nothing draws is a value nobody can check. This
+     comment is the guard instead: **the first person to write `<Button tone="warn">` must
+     set `--color-x-slot-button-warn-fg` at the same time.** A near-white passes (L≥0% at
+     chroma 0.01/83 gives 5.26:1); a darker brown needs L≤20% (4.55:1). Reported upstream
+     2026-08-28. */
   --color-on-warn: oklch(40% 0.09 60);
 
   /* ---- dark sidebar rail ---- */
@@ -79,6 +96,18 @@
 
   /* ---- on-dark / on-color text ---- */
   --color-on-accent: oklch(98% 0.01 83);
+  /* 🔴 Set because nene2-ui 0.20.0 changed what `--color-x-slot-button-danger-fg` points at,
+     without changing its name: `var(--color-on-accent)` became `var(--color-on-danger)`
+     (measured 2026-08-28, both versions' `themes/default.css` — 146 slots present in both, two
+     right-hand sides changed, this one and `danger-border`). This product redefines
+     `--color-on-accent` and had never defined `--color-on-danger`, so the upgrade would have
+     moved the solid danger button's label off this palette's warm off-white and onto the
+     contract's neutral `oklch(99% 0 0)` — no error, no failing test, a different colour.
+     A rename-only sweep cannot find this: the slot's name is unchanged.
+     The value is this theme's existing off-white, so the rendering does not move.
+     Contrast on `--color-danger`: 4.59:1 here, 4.72:1 for the contract default — both AA,
+     so this restores the palette rather than fixing an accessibility defect. */
+  --color-on-danger: oklch(98% 0.01 83);
   --color-x-on-brass: oklch(20% 0.02 256);
 
   /* ---- typography ---- */
@@ -364,30 +393,40 @@
      `npm run check` looks at a colour or a weight, so all three were green for a day.
 
        weight   `font-semibold` in BASE            600 → 500   every button on every screen
-       fg       `text-x-ink-deep` on secondary     24% → 31%
-       border   `border-border-strong` on secondary 76% → 89%
+       fg       `text-x-ink-deep` on the outlined  24% → 31%   (`secondary` before 0.20.0)
+       border   `border-border-strong` on the same 76% → 89%
 
      ⚠️ The weight one is the widest: it is in BASE, so it reaches all 39 buttons, and a
      500 next to a 600 is the kind of difference that reads as "this looks a bit off" rather
      than as a defect with a name. */
-  /* 🔴 The primary button's shadow, back. The retired `.btn` carried `shadow-sm` and the
+  /* 🔴 The filled button's shadow, back. The retired `.btn` carried `shadow-sm` and the
      migration dropped it — not because a value was wrong but because the kit had no shadow
      slot at all (#409; `--shadow-x-slot-*` was the only dimension at zero). 0.15.0 added the
      dimension with defaults that copy today's rendering, so this line is the one override
      that restores this product's own value.
+     ⚠️ Renamed from `--shadow-x-slot-button-primary` in 0.20.0, and the rename widens it: the
+     slot used to reach one variant, and now reaches `solid` in all six tones. This product
+     renders two of them — `accent` (ten call sites, the default) and `danger` (two) — so the
+     shadow this line restores now also lands on the two danger buttons, which did not have it
+     in 0.19.0. That is a deliberate accept: both are filled buttons and a filled button in
+     this theme casts `shadow-sm`. It is in the owner's visual bundle for that reason.
      ⚠️ `--shadow-x-slot-card-raised` and `--shadow-x-slot-toast` default to `--shadow-sm`,
      which is what this theme wants, so they are not restated. */
-  --shadow-x-slot-button-primary: var(--shadow-sm);
+  --shadow-x-slot-button-solid: var(--shadow-sm);
 
   --font-weight-x-slot-button: var(--font-weight-semibold);
-  --color-x-slot-button-secondary-fg: var(--color-x-ink-deep);
-  --color-x-slot-button-secondary-border: var(--color-border-strong);
+  --color-x-slot-button-neutral-ink: var(--color-x-ink-deep);
+  --color-x-slot-button-neutral-border: var(--color-border-strong);
 
-  /* 🔴 NOT set: `--color-x-slot-button-ghost-fg`. The pre-W1 ghost variant was
-     `text-text-muted` against the kit's `text-text-primary`, so the slot would be wrong if
-     the variant were used — measured 2026-08-24, it is used **zero** times. Setting a slot
-     for a variant nothing renders would be a value no one can check. Recorded here so the
-     next person to write `variant="ghost"` finds the number rather than rediscovering it. */
+  /* 🔴 NOT set: the `bare` shape's ink (0.20.0 renamed `ghost` to `bare`, because the kit's
+     `ghost` and this fleet's `.btn-ghost` meant different things). The pre-W1 ghost variant
+     was `text-text-muted` against the kit's `text-text-primary`, so a slot for it would be
+     wrong if the shape were used — measured 2026-08-24 and again 2026-08-28, it is used
+     **zero** times. Setting a value nothing renders would be a value no one can check.
+     ⚠️ `bare` and `outline` now share one ink slot (`neutral-ink`, set two lines up), so the
+     first `variant="bare" tone="neutral"` written here will inherit the outlined button's
+     ink rather than nothing. Recorded so the next person finds the number instead of
+     rediscovering it. */
 
   --spacing-x-slot-control-pad-y: var(--spacing-x-2xs);
   --spacing-x-slot-control-pad-x: var(--spacing-x-xs);

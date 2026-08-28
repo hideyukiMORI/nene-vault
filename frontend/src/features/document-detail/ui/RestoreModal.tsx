@@ -32,7 +32,8 @@ export function RestoreModal({ documentId, onClose }: RestoreModalProps) {
           <div className="flex items-center justify-end gap-2 max-md:flex-col-reverse max-md:items-stretch max-md:gap-2.5">
             <Button
               type="button"
-              variant="secondary"
+              variant="outline"
+              tone="neutral"
               onClick={onClose}
               disabled={mutation.isPending}
             >
@@ -40,7 +41,6 @@ export function RestoreModal({ documentId, onClose }: RestoreModalProps) {
             </Button>
             <Button
               type="button"
-              variant="primary"
               disabled={mutation.isPending}
               onClick={() => {
                 mutation.mutate(documentId);

@@ -71,10 +71,16 @@ export function VoidModal({ documentId, onClose }: VoidModalProps) {
             gap="2xs"
             className="max-md:flex-col-reverse max-md:items-stretch max-md:gap-2.5"
           >
-            <Button type="button" variant="secondary" onClick={onClose} disabled={isSubmitting}>
+            <Button
+              type="button"
+              variant="outline"
+              tone="neutral"
+              onClick={onClose}
+              disabled={isSubmitting}
+            >
               {t('common.buttons.cancel')}
             </Button>
-            <Button type="submit" variant="danger" disabled={isSubmitting}>
+            <Button type="submit" tone="danger" disabled={isSubmitting}>
               {isSubmitting ? t('common.status.processing') : t('document.void.confirm_button')}
             </Button>
           </Stack>

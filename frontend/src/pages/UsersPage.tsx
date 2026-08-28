@@ -123,13 +123,14 @@ function UserFormModal({ onClose }: { onClose: () => void }) {
           >
             <Button
               type="button"
-              variant="secondary"
+              variant="outline"
+              tone="neutral"
               onClick={onClose}
               disabled={mutation.isPending}
             >
               {t('common.buttons.cancel')}
             </Button>
-            <Button type="submit" variant="primary" disabled={mutation.isPending}>
+            <Button type="submit" disabled={mutation.isPending}>
               {mutation.isPending ? t('common.status.saving') : t('common.buttons.invite')}
             </Button>
           </Stack>
@@ -224,7 +225,6 @@ export function UsersPage() {
           </h1>
         </Stack>
         <Button
-          variant="primary"
           onClick={() => {
             setShowCreate(true);
           }}

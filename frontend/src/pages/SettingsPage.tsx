@@ -216,7 +216,7 @@ export function SettingsPage() {
             {submitError !== null && <p className="text-2xs text-danger">{t(submitError)}</p>}
 
             <div>
-              <Button type="submit" variant="primary" disabled={mutation.isPending}>
+              <Button type="submit" disabled={mutation.isPending}>
                 {mutation.isPending ? t('common.status.saving') : t('vault_settings.save_button')}
               </Button>
             </div>

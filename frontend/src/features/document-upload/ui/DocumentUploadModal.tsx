@@ -120,10 +120,16 @@ export function DocumentUploadModal({ onClose }: DocumentUploadModalProps) {
             gap="2xs"
             className="max-md:flex-col-reverse max-md:items-stretch max-md:gap-2.5"
           >
-            <Button type="button" variant="secondary" onClick={onClose} disabled={isSubmitting}>
+            <Button
+              type="button"
+              variant="outline"
+              tone="neutral"
+              onClick={onClose}
+              disabled={isSubmitting}
+            >
               {t('common.buttons.cancel')}
             </Button>
-            <Button type="submit" variant="primary" disabled={isSubmitting}>
+            <Button type="submit" disabled={isSubmitting}>
               {isSubmitting ? t('common.status.uploading') : t('document.upload.submit')}
             </Button>
           </Stack>
