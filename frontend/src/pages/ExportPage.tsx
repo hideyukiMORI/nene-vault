@@ -161,7 +161,6 @@ export function ExportPage() {
 
           <div>
             <Button
-              variant="primary"
               onClick={() => {
                 void handleExport();
               }}

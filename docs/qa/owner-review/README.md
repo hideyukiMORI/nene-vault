@@ -27,8 +27,21 @@ npm run e2e:live --prefix frontend -- batch8
 ```
 
 Output: `docs/qa/owner-review/<date>/index.html` + PNGs + `meta.json`. ~45 s, 28 captures
-(7 screens × 2 viewports × 2 sides). **Gitignored** — the material is per-wave and
-disposable; the verdict goes on the issue, and this generator is what persists.
+(7 screens × 2 viewports × 2 sides).
+
+**Gitignored, but not disposable** (revised 2026-08-28, hub ruling; this passage previously
+read "per-wave and disposable"). The bundle is not committed — it is large, binary, and
+per-wave — and it is also **not deleted**: leave the directory on disk.
+
+The reason is that the generator does not guarantee reproduction. npm versions, transitive
+dependencies and what production is serving all move, so re-running it later answers "how
+does it look now", not "how did it look when this shipped". The question a bundle exists to
+answer is the second one, and it has to be answerable **without re-shooting**.
+
+`meta.json` is required, and it is what keeps an old bundle from being misread as the current
+one: it records the HEAD, the kit version, and whether the working tree was clean. A capture
+taken from a dirty tree is filed under a commit that never produced it unless the manifest
+says so (#443).
 
 Both sides are seated through `/demo/standard` (admin, disposable org, no credentials). One
 org is minted per side per run; the viewport is switched on the same page.

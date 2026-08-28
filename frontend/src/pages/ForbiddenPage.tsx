@@ -18,7 +18,8 @@ export function ForbiddenPage() {
           <p className="danger">{t('problem.forbidden')}</p>
           {/* Escape hatch so a forbidden route is never a dead-end (#174). */}
           <Button
-            variant="secondary"
+            variant="outline"
+            tone="neutral"
             onClick={() => {
               void navigate('/');
             }}

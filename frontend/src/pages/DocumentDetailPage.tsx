@@ -133,7 +133,8 @@ export function DocumentDetailPage() {
 
             <Stack direction="horizontal" align="center" wrap gap="2xs">
               <Button
-                variant="secondary"
+                variant="outline"
+                tone="neutral"
                 onClick={() => {
                   void handleDownload();
                 }}
@@ -144,7 +145,8 @@ export function DocumentDetailPage() {
               {canEdit && (
                 <>
                   <Button
-                    variant="secondary"
+                    variant="outline"
+                    tone="neutral"
                     onClick={() => {
                       void handleOcrSuggest();
                     }}
@@ -155,7 +157,8 @@ export function DocumentDetailPage() {
                       : t('document.detail.ocr_suggest_button')}
                   </Button>
                   <Button
-                    variant="secondary"
+                    variant="outline"
+                    tone="neutral"
                     onClick={() => {
                       setOcrPrefill(undefined);
                       setModal('metadata-edit');
@@ -168,7 +171,7 @@ export function DocumentDetailPage() {
               {canVoid &&
                 (doc.status === 'active' ? (
                   <Button
-                    variant="danger"
+                    tone="danger"
                     onClick={() => {
                       setModal('void');
                     }}
@@ -177,7 +180,8 @@ export function DocumentDetailPage() {
                   </Button>
                 ) : (
                   <Button
-                    variant="secondary"
+                    variant="outline"
+                    tone="neutral"
                     onClick={() => {
                       setModal('restore');
                     }}

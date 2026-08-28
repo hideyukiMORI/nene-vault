@@ -54,7 +54,6 @@ export function DocumentsPage() {
             own children now; the gap is `--spacing-x-slot-button-gap` in the theme. */}
         {canUpload && (
           <Button
-            variant="primary"
             onClick={() => {
               setShowUpload(true);
             }}
