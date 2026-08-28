@@ -1,11 +1,18 @@
-# weekly-audit.yml — PHP 依存の週次再検査（nene-vault・#492）
+# weekly-audit.yml — PHP 依存の週次再検査（nene-vault）
 #
-# 原本: nene2-fleet-tooling `docs/ci/weekly-audit.yml`（`21c4897`）。fleet #502 の適用1号。
-# 🔴 原本を更新したら、ここも追随すること（写しは中央に自動追随しない・フリート #240 の型）。
+# 原本: nene2-fleet-tooling `docs/ci/weekly-audit.yml`（`04d6506`）。fleet #502 の適用1号。
+# 🔴 原本を更新したらここも追随すること（写しは中央に自動追随しない・フリート #240 の型）。
+#
+# この写しで vault 固有に決めたもの（それ以外は原本のまま）:
+#   - cron の分 = `40`（フリート割当。NENE2 の `30` と衝突しない）
+#   - php-version = `8.4`（composer.json の `">=8.4.1 <9.0"` に合わせた）
+#   - timeout-minutes = 原本の暫定値のまま（**未計測**・下の注記）
+#
+# 🔴 題名は**導出**するので、この写しで書き換える場所は無い（#512・vault 提案）。
 #
 # 🔴 なぜ専用 workflow を1本立てるのか（施主決定 2026-08-22 (c)）
-#    vault の現状は `schedule` が frontend-ci.yml（`35 0 * * 1`）・`composer audit` が
-#    backend-ci.yml にあり、**交差していない**＝ PHP 側が週次で一度も再検査されていなかった。
+#    多くの艦は `schedule` が frontend-ci.yml・`composer audit` が backend-ci.yml にあり、
+#    **交差していない**＝ PHP 側が週次で一度も再検査されていなかった。
 #    (a) backend に schedule を足す … cron が艦あたり2本になる ⇒ 却下
 #    (b) audit を frontend へ寄せる … 名前が実態と乖離する    ⇒ 却下
 #    (c) 週次専用を1本                                        ⇒ 採用
@@ -13,18 +20,15 @@
 #    🔑 advisory は**我々のコミットではなく向こう側の時計で公開される**ので、
 #       PR 時の検査だけでは「世界が動いたか」を見られない。
 #
-# この写しで vault 固有に決めたもの:
-#   - cron の分 = `40`（フリート割当。NENE2 が `30 1 * * 1` を使用済みなので 1時台25分以降に配分）
-#   - php-version = `8.4`（composer.json の `"php": ">=8.4.1 <9.0"` に合わせた）
-#   - ISSUE_TITLE = 既存2本（Backend CI / 週次 CI）と衝突しない題
-#   - notify の `if` = 🔴 **この workflow が持つ event から導出**（下のコメント参照）
+# ⚠️ このファイルは各艦へ**写して**使う。**配布手順・cron の割当表・写すときに決める4点は
+#    `docs/ci/README.md` にある**（このファイルには書かない——**写した瞬間に嘘になるため**・#512）。
 
 name: Weekly audit
 
 on:
   schedule:
-    # 分は艦ごとに割り当てられている（NENE2 の `30` を避けて1時台に7艦を散らした表が原本にある）。
-    # vault は `40`。原本の割当表を変えたときはここも合わせること。
+    # 🔴 「分」は艦ごとに固有。**同じ分を2艦が使わないこと**（割当表は README）。
+    #    NENE2 が `30 1 * * 1` を使用済みなので、1時台は 25 分以降から選ぶ。
     - cron: '40 1 * * 1'
   workflow_dispatch:
     inputs:
@@ -46,8 +50,11 @@ jobs:
   audit:
     name: composer audit
     runs-on: ubuntu-latest
-    # 原本の暫定値をそのまま採っている。audit は lock を読むだけなので通常は数十秒で終わる。
-    # ここが効くのは「吊った」ときだけで、その場合は赤になって notify が拾う。
+    # 🔴 この値は艦ごとに測って決める（手順は原本の README）。
+    #    ⚠️ **vault はまだ測っていない**——原本の暫定値 10 をそのまま置いている。
+    #    週次の success が30 run 溜まったら中央値と最大を取り直すこと。
+    #    参考: ローカルの `composer audit --locked` は数秒（2026-08-28 実測）なので、
+    #    10分は「吊ったとき」にしか効かない。その場合は赤になり notify が拾う。
     timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4
@@ -78,7 +85,8 @@ jobs:
     # 🔴 **この workflow が「無人で走る」event を列挙する**（hub 裁定 2026-08-22・vault 発）。
     #   - `schedule`          … 常に無人
     #   - `workflow_dispatch` … 叩いた人が見ているが、`simulate_failure` は陽性対照専用なので通す
-    #   - `push`              … 🔴 **この原本には push トリガが無いので含めていない。足した艦は足すこと**
+    #   - `push`              … 🔴 **この workflow は push トリガを持たないので含めていない。**
+    #                            **push を足すなら、この列挙にも push を足す**（下の `if` と `on:` は対応する）
     #   - `pull_request`      … 🔴 含めない（作者が見ているのでノイズ）
     if: >-
       failure() && (github.event_name == 'schedule'
@@ -90,10 +98,6 @@ jobs:
     permissions:
       issues: write
     env:
-      # 既存2本（Backend CI / Frontend CI の通知）と衝突しない題。
-      # 🔴 この文字列は下の `jq` で**完全一致**の鍵として使われる。変えると、変える前に
-      #    立った issue が二度と見つからなくなり、重複が1本立つ。変えるなら既存を先に閉じる。
-      ISSUE_TITLE: '🔴 nene-vault: 週次 composer audit が失敗しています'
       GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       GH_REPO: ${{ github.repository }}
       RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
@@ -101,6 +105,22 @@ jobs:
       - name: Create or update the failure issue
         run: |
           set -euo pipefail
+          # 🔴 題名は**艦ごとに固有**でなければならない（下の `jq` の完全一致キー）。
+          #    ⇒ **書き換えさせず、導出する**（#512・vault 提案）。**置換する場所が無ければ置換漏れも無い。**
+          #
+          #    `GITHUB_REPOSITORY` は Actions の**既定環境変数**〔仕様・**自艦の実測ではない**〕。
+          #    `#*/` で owner を落として艦名だけにする〔**この展開は実測**・3例＋陰性対照〕。
+          #    `github.event.repository.name` は **payload 依存**で `schedule` での解決が
+          #    未計測だったため採らなかった（vault 提案・vault 自身が未計測の札を貼った）。
+          #
+          #    🟢 **仕様に頼っている部分の失敗の形は良性**——万一 `GITHUB_REPOSITORY` が空でも
+          #    題名が `🔴 : …` になるだけで、**毎回同じ文字列なので重複検出は成立し、Issue は立つ。**
+          #    ⇒ **見た目が崩れるだけで黙らない。** だから「全 event で在る」を測らずに採ってよい。
+          #    （**黙る方を選んだのが、撤去したガードだった**——README の対比表を参照。）
+          #
+          #    🔑 一度決めたら変えないこと——変えると、変更前に立った issue が
+          #    二度と見つからず、**重複が1本立つ**。
+          ISSUE_TITLE="🔴 ${GITHUB_REPOSITORY#*/}: 週次 composer audit が失敗しています"
           # 🔴 --limit は 100 では足りない。open が 100 件を超えると同名を取りこぼして
           #    重複起票へフォールバックする。しかも壊れ方が悪い——壊れた側の挙動が
           #    「毎週新しい issue が立つ」で一見すると装置が動いて見え、かつ発現条件
