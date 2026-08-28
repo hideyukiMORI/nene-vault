@@ -23,7 +23,8 @@ name: Weekly audit
 
 on:
   schedule:
-    # 🔴 分は艦ごとに変えること（上の割当表）。ここは原本なので未割当の 25 を置いてある。
+    # 分は艦ごとに割り当てられている（NENE2 の `30` を避けて1時台に7艦を散らした表が原本にある）。
+    # vault は `40`。原本の割当表を変えたときはここも合わせること。
     - cron: '40 1 * * 1'
   workflow_dispatch:
     inputs:
@@ -45,7 +46,8 @@ jobs:
   audit:
     name: composer audit
     runs-on: ubuntu-latest
-    # 🔴 値ではなく手順を写す（上の 3）。この 10 は原本の暫定値。
+    # 原本の暫定値をそのまま採っている。audit は lock を読むだけなので通常は数十秒で終わる。
+    # ここが効くのは「吊った」ときだけで、その場合は赤になって notify が拾う。
     timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4
@@ -88,7 +90,9 @@ jobs:
     permissions:
       issues: write
     env:
-      # 🔴 艦名を自艦のものへ変えること。
+      # 既存2本（Backend CI / Frontend CI の通知）と衝突しない題。
+      # 🔴 この文字列は下の `jq` で**完全一致**の鍵として使われる。変えると、変える前に
+      #    立った issue が二度と見つからなくなり、重複が1本立つ。変えるなら既存を先に閉じる。
       ISSUE_TITLE: '🔴 nene-vault: 週次 composer audit が失敗しています'
       GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       GH_REPO: ${{ github.repository }}
