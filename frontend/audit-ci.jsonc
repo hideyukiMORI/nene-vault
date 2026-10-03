@@ -8,6 +8,29 @@
   "high": true,
   "critical": true,
   "allowlist": [
+    // GHSA-vfj7-8cjw-p6xm — braces <= 3.0.3, stack-exhaustion DoS through deeply nested brace
+    // patterns. Added 2026-10-03 (#507). **Expires 2026-11-03.**
+    //
+    // No fix exists to take: the advisory lists first_patched_version = none and 3.0.3 is the
+    // latest braces on npm (`gh api /advisories/GHSA-vfj7-8cjw-p6xm`, `npm view braces version`,
+    // both read 2026-10-03). An override cannot help for the same reason.
+    //
+    // Why it does not apply here, measured on this tree 2026-10-03:
+    //   - audit paths:
+    //       fast-glob>micromatch>braces
+    //       knip>fast-glob>micromatch>braces
+    //       micromatch>braces
+    //       stylelint>globby>fast-glob>micromatch>braces
+    //     — all dev tooling; braces@3.0.3 is marked dev in the lockfile.
+    //   - `npm ls braces --omit=dev --all` → (empty). It ships in nothing and is on no
+    //     request path.
+    //   - The only patterns it expands are globs committed in this repo (tool configs and
+    //     npm script arguments). No user- or network-supplied string reaches it, so there is
+    //     no attacker-controlled pattern to nest. Worst case: a developer's own lint run dies.
+    //
+    // Removed by: a patched braces release (> 3.0.3), or micromatch dropping braces.
+    // Re-read the advisory before touching this entry, not only at expiry.
+    "GHSA-vfj7-8cjw-p6xm",
     // 撤去 2026-08-15（#365）: GHSA-qwww-vcr4-c8h2（react-router・high）を**更新ではなく撤去**する。
     // しかも、このエントリが想定していた解除条件（react-router v8 への移行）**ではない理由**で不要になった。
     // **2026-08-07T18:16:54Z に advisory 自体が更新され**、単一だった 7.x〜8.x のレンジが2本に分割されて
