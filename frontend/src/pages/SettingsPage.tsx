@@ -16,7 +16,8 @@ import { useNavigate } from 'react-router-dom';
 const RETENTION_WARNING_ID = 'settings-retention-warning';
 
 const settingsSchema = z.object({
-  retention_years: z.coerce
+  // The input is registered with valueAsNumber, so it already arrives as a number.
+  retention_years: z
     .number()
     .int(VALIDATION.invalidFormat)
     .min(7, VALIDATION.tooSmall)
