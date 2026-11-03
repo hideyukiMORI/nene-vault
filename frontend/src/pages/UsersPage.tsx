@@ -41,7 +41,7 @@ const ROLES = ['admin', 'member', 'viewer'] as const;
 const PASSWORD_MIN_LENGTH = 8;
 
 const createUserSchema = z.object({
-  email: z.string().min(1, VALIDATION.required).email(VALIDATION.invalidEmail),
+  email: z.string().min(1, VALIDATION.required).pipe(z.email(VALIDATION.invalidEmail)),
   password: z.string().min(PASSWORD_MIN_LENGTH, VALIDATION.passwordTooShort),
   role: z.enum(['admin', 'member', 'viewer']),
 });

@@ -12,7 +12,7 @@ import { useTranslation } from '@/shared/i18n/use-translation';
 // Messages are locale *keys*, resolved by the hook. Zod carries no user-facing text:
 // a schema is shared by every locale, and the field that fails is the only thing it knows.
 const loginSchema = z.object({
-  email: z.string().min(1, VALIDATION.required).email(VALIDATION.invalidEmail),
+  email: z.string().min(1, VALIDATION.required).pipe(z.email(VALIDATION.invalidEmail)),
   password: z.string().min(1, VALIDATION.required),
 });
 
